@@ -36,14 +36,14 @@ to uncompress these. As such, the steps below download `.img`.
      2:                    FreeBSD                         1.4 GB     disk6s2
                       (free space)                         6.5 GB     -
 
-  % diskutil umountDisk /dev/disk6
+  # diskutil umountDisk /dev/disk6
   Unmount of all volumes on disk6 was successful
   ```
 
 * Write the image:
 
   ```console
-  % sudo dd \
+  # dd \
       status=progress \
       if=FreeBSD-14.3-RELEASE-amd64-mini-memstick.img \
       of=/dev/disk6 \
@@ -57,6 +57,7 @@ to uncompress these. As such, the steps below download `.img`.
   % diskutil eject /dev/disk6
   Disk /dev/disk6 ejected
   ```
+
 
 ## Step 2: Install
 
@@ -83,26 +84,24 @@ Boot from the memstick and follow the instructions:
   - `secure_console` console password prompt
 * Install FreeBSD handbook
 
+
 ## Step 3: Update the system
 
 Ref: https://docs.freebsd.org/en/books/handbook/cutting-edge/
 
-* Check running version:
+* Check running version of installed kernel `-k`, running kernel `-r`, and
+  running userland `-u`:
 
   ```console
-  # installed kernel
-  % freebsd-version -k
+  % freebsd-version -kru
   14.3-RELEASE
-
-  # running kernel
-  % freebsd-version -r
   14.3-RELEASE
-
-  # running userland
-  % freebsd-version -u
   14.3-RELEASE
+  ```
 
-  # all at once
+  alternatively:
+
+  ```
   % uname -a
   FreeBSD nuc.lab.net 14.3-RELEASE FreeBSD 14.3-RELEASE GENERIC amd64
   ```
@@ -112,9 +111,9 @@ Ref: https://docs.freebsd.org/en/books/handbook/cutting-edge/
   still a good idea to restart the node.
 
   ```
-  % freebsd-update fetch
-  % freebsd-update install
-  % reboot
+  # freebsd-update fetch
+  # freebsd-update install
+  # reboot
   ```
 
 * Verify running version is up to date, e.g. the installed and running
@@ -125,4 +124,36 @@ Ref: https://docs.freebsd.org/en/books/handbook/cutting-edge/
   14.3-RELEASE-p2
   14.3-RELEASE-p2
   14.3-RELEASE-p2
+  ```
+
+
+## Step 4: Setup
+
+Create an operator user:
+
+* [one time] create an template configuration `/etc/adduser.conf` for
+  `adduser(1)` to use `tcsh(1)` by default:
+
+  ```console
+  # adduser -C
+  ...
+  Shell (sh csh tcsh zsh nologin) [sh]: tcsh
+  ...
+  ```
+
+* Create an operator group `op:1000` and user `op:1000` to manage the host:
+
+  ```console
+  # pw groupadd -n op -g 1000
+  # pw useradd \
+      -c 'System Operator' \
+      -d /home/op \
+      -g op \
+      -G wheel \
+      -m \
+      -n op \
+      -s /bin/tcsh \
+      -u 1000 \
+      -w no
+  # passwd -l op
   ```
