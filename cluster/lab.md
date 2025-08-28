@@ -65,10 +65,10 @@ Ref: https://docs.freebsd.org/en/books/handbook/bsdinstall/
       of=/dev/disk6 \
       bs=1m \
       conv=sync
-  407896064 bytes (408 MB, 389 MiB) transferred 17.011s, 24 MB/s
-  412+0 records in
-  412+0 records out
-  432013312 bytes transferred in 18.013281 secs (23983044 bytes/sec)
+  532676608 bytes (533 MB, 508 MiB) transferred 22.021s, 24 MB/s
+  508+0 records in
+  508+0 records out
+  532676608 bytes transferred in 22.059363 secs (24147416 bytes/sec)
   ```
 
   Eject the memstick:
@@ -77,3 +77,33 @@ Ref: https://docs.freebsd.org/en/books/handbook/bsdinstall/
   % diskutil eject /dev/disk6
   Disk /dev/disk6 ejected
   ```
+
+## Step 2: Install
+
+Boot from the memstick and follow the instructions:
+
+* Select default keyboard layout (US)
+* Set hostname `nuc.lab.net`
+* Setup network for `em0` to IPv4 DHCP
+* Choose ZFS for file system with mirrored pool
+* enable services:
+  - `dumpdev` dump kernel crashes to `/var/crash`
+  - `ntpd` for clock synchronization
+  - `ntpd_sync_on_start` sync time on `ntpd` start
+  - `sshd` for SSH server
+* System security hardening:
+  - `hide_uids` processes as other users
+  - `hide_gids` processes as other groups
+  - `hide_jail` processes in jails
+  - `read_msgbuf` no kernel msgbuf read for unprivileged
+  - `proc_debug` no proc debug for unprivileged
+  - `random_pid` random PID for new processes
+  - `clear_tmp` clean `/tmp` on startup
+  - `disable_syslogd` no syslogd network socket
+  - `secure_console` console password prompt
+* Install FreeBSD handbook
+
+Shutdown
+
+> [!NOTE]
+> There are no users setup at this point except `root`.
