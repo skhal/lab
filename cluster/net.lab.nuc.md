@@ -92,15 +92,19 @@ Ref: https://docs.freebsd.org/en/books/handbook/cutting-edge/
   ```console
   # installed kernel
   % freebsd-version -k
+  14.3-RELEASE
 
   # running kernel
   % freebsd-version -r
+  14.3-RELEASE
 
   # running userland
   % freebsd-version -u
+  14.3-RELEASE
 
   # all at once
   % uname -a
+  FreeBSD nuc.lab.net 14.3-RELEASE FreeBSD 14.3-RELEASE GENERIC amd64
   ```
 
 * Fetch and install updates--the system will auto-reboot if there is
@@ -111,4 +115,14 @@ Ref: https://docs.freebsd.org/en/books/handbook/cutting-edge/
   % freebsd-update fetch
   % freebsd-update install
   % reboot
+  ```
+
+* Verify running version is up to date, e.g. the installed and running
+  running kernels should match, the userland should match these too:
+
+  ```console
+  % freebsd-version -kru
+  14.3-RELEASE-p2
+  14.3-RELEASE-p2
+  14.3-RELEASE-p2
   ```
