@@ -127,7 +127,7 @@ Ref: https://docs.freebsd.org/en/books/handbook/cutting-edge/
   ```
 
 
-## Step 4: Setup
+## Step 4: Add users
 
 Create an operator user:
 
@@ -157,6 +157,9 @@ Create an operator user:
       -w no
   # passwd -l op
   ```
+
+
+## Step 5: Configure services
 
 Historically, service configurations reside in a single file `/etc/rc.conf`.
 In fact, `rc.conf(1)` can read flags from a number of places:
@@ -209,4 +212,15 @@ of configuration files the service supports:
   # service sshd restart
   # sockstat -4 | grep sshd
   root	sshd	82748	7	tcp4	*:22	192.168.1.100:*
+  ```
+
+### NTP time server
+
+* Move flags to a separate file
+
+  ```console
+  # sysrc -f /etc/rc.conf.d/ntpd ntpd_enable=yes
+  # sysrc -f /etc/rc.conf.d/ntpd ntpd_sync_on_start=yes
+  # sysrc -x ntpd_sync_on_start
+  # sysrc -x ntpd_enable
   ```
