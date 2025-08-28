@@ -157,3 +157,56 @@ Create an operator user:
       -w no
   # passwd -l op
   ```
+
+Historically, service configurations reside in a single file `/etc/rc.conf`.
+In fact, `rc.conf(1)` can read flags from a number of places:
+
+* Default values come from `/etc/defaults/rc.conf`
+* `/etc/rc.conf` override default values
+* `/etc/rc.conf.d/<service>` additional overrides for services
+
+There is also `local_startup` flag that specifies additional folders to pull
+service overrides from `rc.conf.d/` (remove `/rc.d` suffix from it):
+
+```console
+% sysrc local_startup
+local_startup: /usr/local/etc/rc.d
+```
+
+We'll follow `hier(1)` to store base system configurations. One can get a list
+of configuration files the service supports:
+
+```console
+% sysrc -s netif -l | tr ' ' '\n'
+/etc/rc.conf
+/etc/rc.conf.local
+/etc/rc.conf.d/network
+/usr/local/etc/rc.conf.d/network
+/etc/rc.conf.d/netif
+/usr/local/etc/rc.conf.d/netif
+```
+
+### SSH server
+
+* Verify that SSH listens on all IP addresses:
+
+  ```console
+  # sockstat -4 | grep sshd
+  root	sshd	82748	7	tcp4	*:22	*:*
+  ```
+
+* Move SSH flags to a separate file and make SSH only listen on local IP:
+
+  ```console
+  # sysrc -x sshd_enable
+  # sysrc -f /etc/rc.conf.d/sshd sshd_enable
+  # sysrc -f /etc/rc.conf.d/sshd sshd_flags+="-o ListenAddress=192.168.1.100"
+  ```
+
+* Restart the service and verify sockets:
+
+  ```console
+  # service sshd restart
+  # sockstat -4 | grep sshd
+  root	sshd	82748	7	tcp4	*:22	192.168.1.100:*
+  ```
