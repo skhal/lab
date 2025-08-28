@@ -82,3 +82,33 @@ Boot from the memstick and follow the instructions:
   - `disable_syslogd` no syslogd network socket
   - `secure_console` console password prompt
 * Install FreeBSD handbook
+
+## Step 3: Update the system
+
+Ref: https://docs.freebsd.org/en/books/handbook/cutting-edge/
+
+* Check running version:
+
+  ```console
+  # installed kernel
+  % freebsd-version -k
+
+  # running kernel
+  % freebsd-version -r
+
+  # running userland
+  % freebsd-version -u
+
+  # all at once
+  % uname -a
+  ```
+
+* Fetch and install updates--the system will auto-reboot if there is
+  a kernel update, otherwise it restarts updated services only. It is
+  still a good idea to restart the node.
+
+  ```
+  % freebsd-update fetch
+  % freebsd-update install
+  % reboot
+  ```
