@@ -82,19 +82,19 @@ Ref: https://docs.freebsd.org/en/books/handbook/bsdinstall/
 
 Boot from the memstick and follow the instructions:
 
-* Select default keyboard layout (US)
-* Set hostname `nuc.lab.net`
-* Setup network for `em0` to IPv4 DHCP
-* Choose ZFS for file system with mirrored pool
-* enable services:
-  - `dumpdev` dump kernel crashes to `/var/crash`
+* Keyboard: default layout (US)
+* Hostname: `nuc.lab.net`
+* Network: `em0` IPv4 DHCP
+* Filesystem: ZFS with mirrored pool
+* Services:
+  - `dumpdev` to dump kernel crashes to `/var/crash`
   - `ntpd` for clock synchronization
-  - `ntpd_sync_on_start` sync time on `ntpd` start
+  - `ntpd_sync_on_start` to sync time on `ntpd` start
   - `sshd` for SSH server
-* System security hardening:
-  - `hide_uids` processes as other users
-  - `hide_gids` processes as other groups
-  - `hide_jail` processes in jails
+* Security hardening:
+  - `hide_uids` hide processes as other users
+  - `hide_gids` hide processes as other groups
+  - `hide_jail` hide processes in jails
   - `read_msgbuf` no kernel msgbuf read for unprivileged
   - `proc_debug` no proc debug for unprivileged
   - `random_pid` random PID for new processes
@@ -102,8 +102,6 @@ Boot from the memstick and follow the instructions:
   - `disable_syslogd` no syslogd network socket
   - `secure_console` console password prompt
 * Install FreeBSD handbook
-
-Shutdown
 
 > [!NOTE]
 > There are no users setup at this point except `root`.
