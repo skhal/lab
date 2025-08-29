@@ -295,3 +295,45 @@ The hostname is set by the `hostname` service:
       && service routing restart \
       && service sshd restart
   ```
+
+### Other
+
+Syslog service files:
+
+```console
+% sysrc -s syslogd -l | tr ' ' '\n'
+/etc/rc.conf
+/etc/rc.conf.local
+/etc/rc.conf.d/syslogd
+/usr/local/etc/rc.conf.d/syslogd
+```
+
+* Move the flag:
+
+  ```console
+  # sysrc -f /etc/rc.conf.d/syslogd syslogd_flags="-ss"
+  syslogd_flags: -s -> -ss
+  # sysrc -x syslogd_flags
+  ```
+
+* Restart: `service syslogd restart`
+
+ZFS service files:
+
+```console
+% sysrc -s zfs -l | tr ' ' '\n'
+/etc/rc.conf
+/etc/rc.conf.local
+/etc/rc.conf.d/zfs
+/usr/local/etc/rc.conf.d/zfs
+```
+
+* Move the flag:
+
+  ```console
+  # sysrc -f /etc/rc.conf.d/zfs zfs_enable="YES"
+  zfs_enable: NO -> YES
+  # sysrc -x zfs_enable
+  ```
+
+* Restart: `service zfs restart`
