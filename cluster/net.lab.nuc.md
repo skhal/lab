@@ -1,339 +1,290 @@
-# Bootstrap
+# NAME
 
-The following instructions demonstrate how to install FreeBSD 14.3 release.
+**nuc.lab.net** - FreeBSD cluster on Intel NUC Kit NUC6i7KYK.
 
 
-## Step 1: Create a bootable memstick.
+# DESCRIPTION
+
+`nuc.lab.net` is a host running FreeBSD cluster on Intel NUC Kit NUC6i7KYK:
+
+  * 32 GB of RAM
+  * 2x 1TB M.2 NVMe SSD
+
+## Install FreeBSD
 
 Ref: https://docs.freebsd.org/en/books/handbook/bsdinstall/
 
-The instructions download `.img` for memstick. `.iso` file is for optical media.
-Even though there are `xz(1)` compressed images, MacOS does not include the tool
-to uncompress these. As such, the steps below download `.img`.
+Download AMD64 image and verify the checksum (as of Aug '25, MacOS does not
+include `xz(1)`, install it or download `.img`):
 
-* Download `amd64` ISO image, checksum list, and verify download
-  by matching checksum:
+```console
+% curl -O https://download.freebsd.org/releases/amd64/amd64/ISO-IMAGES/14.3/FreeBSD-14.3-RELEASE-amd64-mini-memstick.img
+% curl -O https://download.freebsd.org/releases/amd64/amd64/ISO-IMAGES/14.3/CHECKSUM.SHA512-FreeBSD-14.3-RELEASE-amd64
+% shasum \
+    -c CHECKSUM.SHA512-FreeBSD-14.3-RELEASE-amd64 \
+    --ignore-missing
+FreeBSD-14.3-RELEASE-amd64-mini-memstick.img: OK
+```
 
-  ```console
-  % curl -O https://download.freebsd.org/releases/amd64/amd64/ISO-IMAGES/14.3/FreeBSD-14.3-RELEASE-amd64-mini-memstick.img
+Insert the memstick and write the image:
 
-  % curl -O https://download.freebsd.org/releases/amd64/amd64/ISO-IMAGES/14.3/CHECKSUM.SHA512-FreeBSD-14.3-RELEASE-amd64
-
-  % shasum -c CHECKSUM.SHA512-FreeBSD-14.3-RELEASE-amd64 --ignore-missing
-  FreeBSD-14.3-RELEASE-amd64-mini-memstick.img: OK
-  ```
-
-* Insert memstick, identify the device and prepare it to write the image using
-  `diskutil(1)`.
-
-  ```console
-  % disktuil list
-  ...
-  /dev/disk6 (external, physical):
-     #:                       TYPE NAME                    SIZE       IDENTIFIER
-     0:     FDisk_partition_scheme                        *7.9 GB     disk6
-     1:                       0xEF                         34.1 MB    disk6s1
-     2:                    FreeBSD                         1.4 GB     disk6s2
-                      (free space)                         6.5 GB     -
-
-  # diskutil umountDisk /dev/disk6
-  Unmount of all volumes on disk6 was successful
-  ```
-
-* Write the image:
-
-  ```console
-  # dd \
-      status=progress \
-      if=FreeBSD-14.3-RELEASE-amd64-mini-memstick.img \
-      of=/dev/disk6 \
-      bs=1m \
-      conv=sync
-  532676608 bytes (533 MB, 508 MiB) transferred 22.021s, 24 MB/s
-  508+0 records in
-  508+0 records out
-  532676608 bytes transferred in 22.059363 secs (24147416 bytes/sec)
-
-  % diskutil eject /dev/disk6
-  Disk /dev/disk6 ejected
-  ```
-
-
-## Step 2: Install
+```console
+% disktuil list
+...
+/dev/disk6 (external, physical):
+#:                       TYPE NAME                    SIZE       IDENTIFIER
+0:     FDisk_partition_scheme                        *7.9 GB     disk6
+1:                       0xEF                         34.1 MB    disk6s1
+2:                    FreeBSD                         1.4 GB     disk6s2
+	      (free space)                         6.5 GB     -
+# diskutil umountDisk /dev/disk6
+Unmount of all volumes on disk6 was successful
+# dd \
+    status=progress \
+    if=FreeBSD-14.3-RELEASE-amd64-mini-memstick.img \
+    of=/dev/disk6 \
+    bs=1m \
+    conv=sync
+532676608 bytes (533 MB, 508 MiB) transferred 22.021s, 24 MB/s
+508+0 records in
+508+0 records out
+532676608 bytes transferred in 22.059363 secs (24147416 bytes/sec)
+% diskutil eject /dev/disk6
+Disk /dev/disk6 ejected
+```
 
 Boot from the memstick and follow the instructions:
 
-* Keyboard: default layout (US)
-* Hostname: `nuc.lab.net`
-* Network: `em0` IPv4 DHCP
-* Filesystem: ZFS with mirrored pool
-* Services:
-  - `dumpdev` to dump kernel crashes to `/var/crash`
-  - `ntpd` for clock synchronization
-  - `ntpd_sync_on_start` to sync time on `ntpd` start
-  - `sshd` for SSH server
-* Security hardening:
-  - `hide_uids` hide processes as other users
-  - `hide_gids` hide processes as other groups
-  - `hide_jail` hide processes in jails
-  - `read_msgbuf` no kernel msgbuf read for unprivileged
-  - `proc_debug` no proc debug for unprivileged
-  - `random_pid` random PID for new processes
-  - `clear_tmp` clean `/tmp` on startup
-  - `disable_syslogd` no syslogd network socket
-  - `secure_console` console password prompt
-* Install FreeBSD handbook
+  * Keyboard: default layout (US)
+  * Hostname: `nuc.lab.net`
+  * Network: `em0` IPv4 DHCP
+  * Filesystem: ZFS with mirrored pool
+  * Enable services:
+    - `dumpdev` to dump kernel crashes to `/var/crash`
+    - `ntpd` for clock synchronization
+    - `ntpd_sync_on_start` to sync time on `ntpd` start
+    - `sshd` for SSH server
+  * Turn on security hardening:
+    - `hide_uids` hide processes as other users
+    - `hide_gids` hide processes as other groups
+    - `hide_jail` hide processes in jails
+    - `read_msgbuf` no kernel msgbuf read for unprivileged
+    - `proc_debug` no proc debug for unprivileged
+    - `random_pid` random PID for new processes
+    - `clear_tmp` clean `/tmp` on startup
+    - `disable_syslogd` no syslogd network socket
+    - `secure_console` console password prompt
+  * Install FreeBSD handbook
 
-
-## Step 3: Update the system
+## Update the OS
 
 Ref: https://docs.freebsd.org/en/books/handbook/cutting-edge/
 
-* Check running version of installed kernel `-k`, running kernel `-r`, and
-  running userland `-u`:
-
-  ```console
-  % freebsd-version -kru
-  14.3-RELEASE
-  14.3-RELEASE
-  14.3-RELEASE
-  ```
-
-  alternatively:
-
-  ```
-  % uname -a
-  FreeBSD nuc.lab.net 14.3-RELEASE FreeBSD 14.3-RELEASE GENERIC amd64
-  ```
-
-* Fetch and install updates--the system will auto-reboot if there is
-  a kernel update, otherwise it restarts updated services only. It is
-  still a good idea to restart the node.
-
-  ```
-  # freebsd-update fetch
-  # freebsd-update install
-  # reboot
-  ```
-
-* Verify running version is up to date, e.g. the installed and running
-  running kernels should match, the userland should match these too:
-
-  ```console
-  % freebsd-version -kru
-  14.3-RELEASE-p2
-  14.3-RELEASE-p2
-  14.3-RELEASE-p2
-  ```
-
-
-## Step 4: Add users
-
-Create an operator user:
-
-* [one time] create an template configuration `/etc/adduser.conf` for
-  `adduser(1)` to use `tcsh(1)` by default:
-
-  ```console
-  # adduser -C
-  ...
-  Shell (sh csh tcsh zsh nologin) [sh]: tcsh
-  ...
-  ```
-
-* Create an operator group `op:1000` and user `op:1000` to manage the host:
-
-  ```console
-  # pw groupadd -n op -g 1000
-  # pw useradd \
-      -c 'System Operator' \
-      -d /home/op \
-      -g op \
-      -G wheel \
-      -m \
-      -n op \
-      -s /bin/tcsh \
-      -u 1000 \
-      -w no
-  # passwd -l op
-  ```
-
-
-## Step 5: Configure services
-
-Historically, service configurations reside in a single file `/etc/rc.conf`.
-In fact, `rc.conf(1)` can read flags from a number of places:
-
-* Default values come from `/etc/defaults/rc.conf`
-* `/etc/rc.conf` override default values
-* `/etc/rc.conf.d/<service>` additional overrides for services
-
-There is also `local_startup` flag that specifies additional folders to pull
-service overrides from `rc.conf.d/` (remove `/rc.d` suffix from it):
+Check the running version of installed kernel `-k`, running kernel `-r`,
+and running userland `-u`:
 
 ```console
-% sysrc local_startup
-local_startup: /usr/local/etc/rc.d
+% freebsd-version -kru
+14.3-RELEASE
+14.3-RELEASE
+14.3-RELEASE
 ```
 
-We'll follow `hier(1)` to store base system configurations. One can get a list
-of configuration files the service supports:
+Fetch and install updates. The system will auto-reboot if there is
+a kernel update, otherwise it restarts the updated services only.
+It is still a good idea to restart the node.
 
 ```console
-% sysrc -s netif -l | tr ' ' '\n'
-/etc/rc.conf
-/etc/rc.conf.local
-/etc/rc.conf.d/network
-/usr/local/etc/rc.conf.d/network
-/etc/rc.conf.d/netif
-/usr/local/etc/rc.conf.d/netif
+# freebsd-update fetch
+# freebsd-update install
+# reboot
 ```
 
-### SSH server
+Verify the running version is up to date--all three should match:
 
-* Verify that SSH listens on all IP addresses:
+```console
+% freebsd-version -kru
+14.3-RELEASE-p2
+14.3-RELEASE-p2
+14.3-RELEASE-p2
+```
 
-  ```console
-  # sockstat -4 | grep sshd
-  root	sshd	82748	7	tcp4	*:22	*:*
-  ```
+## Create users
 
-* Move SSH flags to a separate file and make SSH only listen on local IP:
+Create an operator user `op` to manage the node:
 
-  ```console
-  # sysrc -x sshd_enable
-  # sysrc -f /etc/rc.conf.d/sshd sshd_enable
-  # sysrc -f /etc/rc.conf.d/sshd sshd_flags+="-o ListenAddress=192.168.1.100"
-  ```
+```console
+# pw groupadd \
+    -g 1000 \
+    -n op
+# pw useradd \
+    -c 'System Operator' \
+    -d /home/op \
+    -g op \
+    -G wheel \
+    -m \
+    -n op \
+    -s /bin/tcsh \
+    -u 1000 \
+    -w no
+# passwd -l op
+```
 
-* Restart the service and verify sockets:
+## Configure services
 
-  ```console
-  # service sshd restart
-  # sockstat -4 | grep sshd
-  root	sshd	82748	7	tcp4	*:22	192.168.1.100:*
-  ```
+FreeBSD `init(8)`, the last stage of the boot process, runs `rc(8)` to start
+services, available in `/etc/rc.d` and `sysrc local_startup` folders. The
+services define mutual dependencies. Use `rcorder(8)` to list the start
+sequence in topological order and the name of services:
+
+```
+% rcorder -p /etc/rc.d/*
+/etc/rc.d/dhclient /etc/rc.d/dnctl /etc/rc.d/dumpon /etc/rc.d/natd /etc/rc.d/sysctl
+...
+```
+
+The services use flags set in one of `rc.conf` files. Use `sysrc(8)` to get
+a list of supported configuration files:
+
+```
+% sysrc -s dhclient -l
+/etc/rc.conf /etc/rc.conf.local /etc/rc.conf.d/dhclient /usr/local/etc/rc.conf.d/dhclient /etc/rc.conf.d/network /usr/local/etc/rc.conf.d/network
+```
+
+Notice that services pull flags from multiple locations:
+
+  * `/etc/rc.conf` is the central file with all flags, backed by default values in `/etc/default/rc.conf` and `/etc/default/vendor.conf` (see `rc.conf(5)`)
+  * `/etc/rc.conf.d/<name>` is per-service flags
+  * `/usr/local/etc/rc.conf.d/<name>` is another per-service flags location,
+    typically used for ports and packages. There might be multiple locations,
+    controlled by `sysrc local_startup` with `/rc.d` suffix removed.
+
+> [!NOTE]
+> `dhclient` is part of the networking stack. It shares a number of
+> settings with other services, that are available in
+> `/etc/rc.conf.d/network`. For example, `netif` service loads it:
+>
+> ```console
+> % sysrc -s netif -l
+> /etc/rc.conf /etc/rc.conf.local /etc/rc.conf.d/network /usr/local/etc/rc.conf.d/network /etc/rc.conf.d/netif /usr/local/etc/rc.conf.d/netif
+> ```
+
+The objective is to move most of the flags into per-service configuration
+files under `/etc/rc.conf.d/`.
+
+### SSH
+
+```console
+% sysrc -s sshd -l
+/etc/rc.conf /etc/rc.conf.local /etc/rc.conf.d/sshd /usr/local/etc/rc.conf.d/sshd
+# sysrc -x sshd_enable
+# sysrc -f /etc/rc.conf.d/sshd sshd_enable
+# service sshd restart
+```
+
+By default, SSH server listens on all IP addresses. Restrict it to the host IP:
+
+```console
+# sockstat -4 | grep sshd
+root     sshd          21 7   tcp4   *:22                  *:*
+# sysrc -f /etc/rc.conf.d/sshd sshd_flags+="-o ListenAddress=192.168.1.100"
+# service sshd restart
+# sockstat -4 | grep sshd
+root     sshd          21 7   tcp4   192.168.1.100:22      *:*
+```
 
 ### NTP time server
 
-* Move flags to a separate file
-
-  ```console
-  # sysrc -f /etc/rc.conf.d/ntpd ntpd_enable=yes
-  # sysrc -f /etc/rc.conf.d/ntpd ntpd_sync_on_start=yes
-  # sysrc -x ntpd_sync_on_start
-  # sysrc -x ntpd_enable
-  ```
+```console
+% sysrc -s ntpd -l
+/etc/rc.conf /etc/rc.conf.local /etc/rc.conf.d/ntpd /usr/local/etc/rc.conf.d/ntpd
+# sysrc -f /etc/rc.conf.d/ntpd ntpd_enable=yes
+# sysrc -f /etc/rc.conf.d/ntpd ntpd_sync_on_start=yes
+# sysrc -x ntpd_sync_on_start
+# sysrc -x ntpd_enable
+# service ntpd restart
+```
 
 ### Network
 
-FreeBSD uses `netif` service to manage network. It confusingly reports two
-configuration files `network` and `netif`:
+There are three services to setup: `hostname`, `routing`, and `netif`.
 
 ```console
-% sysrc -s netif -l | tr ' ' '\n'
-/etc/rc.conf
-/etc/rc.conf.local
-/etc/rc.conf.d/network
-/usr/local/etc/rc.conf.d/network
-/etc/rc.conf.d/netif
-/usr/local/etc/rc.conf.d/netif
+% sysrc -s hostname -l
+/etc/rc.conf /etc/rc.conf.local /etc/rc.conf.d/hostname /usr/local/etc/rc.conf.d/hostname
+# sysrc -f /etc/rc.conf.d/hostname hostname="nuc.lab.net"
+# sysrc -x hostname
+# service hostname restart
 ```
-
-Even though `network` configuration file is a
-[legacy one](https://github.com/freebsd/freebsd-src/blob/778bfd4e1033715de6cf21e2e2454bdea2a0f1ab/libexec/rc/rc.d/netif#L269-L270) (see comment), some of the services
-still explicitly [import](https://github.com/freebsd/freebsd-src/blob/778bfd4e1033715de6cf21e2e2454bdea2a0f1ab/libexec/rc/rc.d/dhclient#L64)
-it, e.g. `dhclient` service--DHCP client. As such, store the flags
-in `network` file instead of `netif`.
-
-* Move the flags for `netif`:
-
-  ```console
-  # sysrc -f /etc/rc.conf.d/network ifconfig_em0=DHCP
-  # sysrc -x ifconfig_em0
-  ```
-
-The routing service uses following files:
 
 ```console
-% sysrc -s routing -l | tr ' ' '\n'
-/etc/rc.conf
-/etc/rc.conf.local
-/etc/rc.conf.d/routing
-/usr/local/etc/rc.conf.d/routing
+% sysrc -s routing -l
+/etc/rc.conf /etc/rc.conf.local /etc/rc.conf.d/routing /usr/local/etc/rc.conf.d/routing
+# sysrc -f /etc/rc.conf.d/routing defaultrouter=192.168.1.1
+# service routing restart
 ```
 
-* Add default router:
-
-  ```console
-  # sysrc -f /etc/rc.conf.d/routing defaultrouter=192.168.1.1
-  ```
-
-The hostname is set by the `hostname` service:
+`netif` manages the network. It shares some of the configuration with
+`dhclient`, especially DHCP configured networks. Store the configuration in
+`/etc/rc.conf.d/network`.
 
 ```console
-% sysrc -s hostname -l | tr ' ' '\n'
-/etc/rc.conf
-/etc/rc.conf.local
-/etc/rc.conf.d/hostname
-/usr/local/etc/rc.conf.d/hostname
+% sysrc -s netif -l
+/etc/rc.conf /etc/rc.conf.local /etc/rc.conf.d/network /usr/local/etc/rc.conf.d/network /etc/rc.conf.d/netif /usr/local/etc/rc.conf.d/netif
+# sysrc -f /etc/rc.conf.d/network ifconfig_em0=DHCP
+# sysrc -x ifconfig_em0
+# shutdown -r now
 ```
 
-* Move the flag from `/etc/rc.conf`:
+It is best to reboot the host for all the services to pick up the network file.
 
-  ```console
-  # sysrc -f /etc/rc.conf.d/hostname hostname="nuc.lab.net"
-  # sysrc -x hostname
-  ```
-
-* Restart services to reconfigure hostname, network interfaces, routing, and
-  reinitialize SSH server.
-
-  ```console
-  # service hostname restart \
-      && service netif restart \
-      && service routing restart \
-      && service sshd restart
-  ```
-
-### Other
-
-Syslog service files:
+### Syslog
 
 ```console
-% sysrc -s syslogd -l | tr ' ' '\n'
-/etc/rc.conf
-/etc/rc.conf.local
-/etc/rc.conf.d/syslogd
-/usr/local/etc/rc.conf.d/syslogd
+% sysrc -s syslogd -l
+/etc/rc.conf /etc/rc.conf.local /etc/rc.conf.d/syslogd /usr/local/etc/rc.conf.d/syslogd
+# sysrc -f /etc/rc.conf.d/syslogd syslogd_flags="-ss"
+# sysrc -x syslogd_flags
+# service syslogd restart
 ```
 
-* Move the flag:
-
-  ```console
-  # sysrc -f /etc/rc.conf.d/syslogd syslogd_flags="-ss"
-  syslogd_flags: -s -> -ss
-  # sysrc -x syslogd_flags
-  ```
-
-* Restart: `service syslogd restart`
-
-ZFS service files:
+Debugging `rc(8)` is hard as log messages sent go `logger(1)` are routed to
+console until `syslog(8)` starts at some point in `rc(8)`:
 
 ```console
-% sysrc -s zfs -l | tr ' ' '\n'
-/etc/rc.conf
-/etc/rc.conf.local
-/etc/rc.conf.d/zfs
-/usr/local/etc/rc.conf.d/zfs
+% rcorder -p | cat -n | grep -C 1 syslogd
+    29	/etc/rc.d/accounting /etc/rc.d/cleartmp /etc/rc.d/devfs /etc/rc.d/dmesg /etc/rc.d/gptboot /etc/rc.d/hostapd /etc/rc.d/mdconfig2 /etc/rc.d/motd /etc/rc.d/newsyslog /etc/rc.d/os-release /etc/rc.d/virecover /etc/rc.d/wpa_supplicant 
+    30	/etc/rc.d/syslogd 
+    31	/etc/rc.d/auditd /etc/rc.d/bsnmpd /etc/rc.d/hastd /etc/rc.d/ntpdate /etc/rc.d/power_profile /etc/rc.d/pwcheck /etc/rc.d/savecore /etc/rc.d/watchdogd 
 ```
 
-* Move the flag:
+As such, rc-log messages only start with `auditd`:
 
-  ```console
-  # sysrc -f /etc/rc.conf.d/zfs zfs_enable="YES"
-  zfs_enable: NO -> YES
-  # sysrc -x zfs_enable
-  ```
+```
+Aug 29 14:40:08 nuc kernel: em0: link state changed to UP
+Aug 29 14:40:08 nuc root[26487]: /etc/rc: DEBUG: checkyesno: auditd_enable is set to NO.
+```
 
-* Restart: `service zfs restart`
+Log all messages sent to console:
+
+```console
+% grep console.info /etc/syslog.conf 
+console.info					/var/log/console.log
+```
+
+Enable rc debug and info logging:
+
+```console
+# sysrc rc_debug=yes
+# sysrc rc_info=yes
+```
+
+### ZFS
+
+```console
+% sysrc -s zfs -l
+/etc/rc.conf /etc/rc.conf.local /etc/rc.conf.d/zfs /usr/local/etc/rc.conf.d/zfs
+# sysrc -f /etc/rc.conf.d/zfs zfs_enable="YES"
+# sysrc -x zfs_enable
+# shutdown -r now
+```
