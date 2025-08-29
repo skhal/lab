@@ -224,3 +224,74 @@ of configuration files the service supports:
   # sysrc -x ntpd_sync_on_start
   # sysrc -x ntpd_enable
   ```
+
+### Network
+
+FreeBSD uses `netif` service to manage network. It confusingly reports two
+configuration files `network` and `netif`:
+
+```console
+% sysrc -s netif -l | tr ' ' '\n'
+/etc/rc.conf
+/etc/rc.conf.local
+/etc/rc.conf.d/network
+/usr/local/etc/rc.conf.d/network
+/etc/rc.conf.d/netif
+/usr/local/etc/rc.conf.d/netif
+```
+
+Even though `network` configuration file is a
+[legacy one](https://github.com/freebsd/freebsd-src/blob/778bfd4e1033715de6cf21e2e2454bdea2a0f1ab/libexec/rc/rc.d/netif#L269-L270) (see comment), some of the services
+still explicitly [import](https://github.com/freebsd/freebsd-src/blob/778bfd4e1033715de6cf21e2e2454bdea2a0f1ab/libexec/rc/rc.d/dhclient#L64)
+it, e.g. `dhclient` service--DHCP client. As such, store the flags
+in `network` file instead of `netif`.
+
+* Move the flags for `netif`:
+
+  ```console
+  # sysrc -f /etc/rc.conf.d/network ifconfig_em0=DHCP
+  # sysrc -x ifconfig_em0
+  ```
+
+The routing service uses following files:
+
+```console
+% sysrc -s routing -l | tr ' ' '\n'
+/etc/rc.conf
+/etc/rc.conf.local
+/etc/rc.conf.d/routing
+/usr/local/etc/rc.conf.d/routing
+```
+
+* Add default router:
+
+  ```console
+  # sysrc -f /etc/rc.conf.d/routing defaultrouter=192.168.1.1
+  ```
+
+The hostname is set by the `hostname` service:
+
+```console
+% sysrc -s hostname -l | tr ' ' '\n'
+/etc/rc.conf
+/etc/rc.conf.local
+/etc/rc.conf.d/hostname
+/usr/local/etc/rc.conf.d/hostname
+```
+
+* Move the flag from `/etc/rc.conf`:
+
+  ```console
+  # sysrc -f /etc/rc.conf.d/hostname hostname="nuc.lab.net"
+  # sysrc -x hostname
+  ```
+
+* Restart services to reconfigure hostname, network interfaces, routing, and
+  reinitialize SSH server.
+
+  ```console
+  # service hostname restart \
+      && service netif restart \
+      && service routing restart \
+      && service sshd restart
+  ```
