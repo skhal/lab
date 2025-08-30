@@ -132,12 +132,20 @@ Create an operator user `op` to manage the node:
 
 ## Configure services
 
-FreeBSD boot process uses `init(8)` to trigger `rc(8)` to start services,
-managed by scripts in `/etc/rc.d` and `local_startup` folders.
+FreeBSD boot process uses `init(8)`. It triggers `rc(8)` to start services.
+Every service has a script in one of `rc.d/` folders: standard location `/etc`
+and folders set by `local_startup` flag:
 
-Service scripts define dependencies, rc-variables, and functions to manage the
-service, e.g. start, stop, etc. Use `rcorder(8)` to dump services dependency
-graph in topological order (`-p` groups services that can start in parallel`).
+```console
+% sysrc local_startup
+local_startup: /usr/local/etc/rc.d
+```
+
+Service scripts define dependencies, rc-variables, actions (start, stop, etc.)
+and function to execute the actions.
+
+Use `rcorder(8)` to dump services dependency graph in topological order (`-p`
+groups services that can start in parallel`):
 
 ```console
 % rcorder -p /etc/rc.d/* | head -n 2
@@ -145,32 +153,41 @@ graph in topological order (`-p` groups services that can start in parallel`).
 /etc/rc.d/ddb /etc/rc.d/hostid
 ```
 
-Service scripts use variables, aka flags, `rc.conf(5)`. These have a default
-value that is set in `/etc/default/rc.conf` and optional override in
-`/etc/default/vendor.conf`. Flag overrides reside in one of the `rc.conf` files.
-Use `sysrc(8)` to list per-service configuration files:
+Service scripts use variables, aka flags, set in `rc.conf(5)`.
+
+Flags have a default value set in `/etc/default/rc.conf` with optional override
+in `/etc/default/vendor.conf` (if exists).
+
+A defualt flag value can be overridden by one of `rc.conf(5)` files.
+
+  *  `/etc/rc.conf` and `/etc/rc.conf.local` are global containers of flags
+     in standard location `/etc/`, loaded by all services including `rc(8)`
+     itself.
+  * `<dir>/rc.conf.d/<name>` holds service flags and is only loaded by the
+     service `<name>`, where `<dir>/` is either standard location `/etc` or
+     folders listed in `local_startup` without `rc.d/` suffix.
+
+Use `sysrc(8)` to list supported configuration files for a given service:
 
 ```console
 % sysrc -s dhclient -l
 /etc/rc.conf /etc/rc.conf.local /etc/rc.conf.d/dhclient /usr/local/etc/rc.conf.d/dhclient /etc/rc.conf.d/network /usr/local/etc/rc.conf.d/network
 ```
 
-`/etc/rc.conf` and `/etc/rc.conf.local` contain flags accessible to all
-services. Per-service flags are in one of `rc.conf.d/<name>` files.
-`local_startup` flag lists folders to look up for services (`rc.d`)
-and configurations (`rc.conf.d`) outside of standard `/etc`.
-
 > [!WARNING]
-> Some services share flags using files in `rc.conf.d`. For example, `dhclient`
-> and `netif` use the same `/etc/rc.conf.d/network`.
+> Some services share flags via a mechansim other than `/etc/rc.conf`, to limit
+> visibility of these flags, namely through in `rc.conf.d/` shared file.
+> `dhclient` and `netif` are two services that share DHCP settings using
+> `/etc/rc.conf.d/network`.
 >
 > ```console
 > % sysrc -s netif -l
 > /etc/rc.conf /etc/rc.conf.local /etc/rc.conf.d/network /usr/local/etc/rc.conf.d/network /etc/rc.conf.d/netif /usr/local/etc/rc.conf.d/netif
 > ```
 
-The objective is to move most of the flags into per-service configuration
-files under `/etc/rc.conf.d/`.
+The instructions below move flags from `/etc/rc.conf` to per-service
+configuration file under `/etc/rc.conf.d/`. It preserves `/usr/local/etc` 
+use for services installed by ports and packages.
 
 ### SSH
 
