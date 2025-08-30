@@ -188,7 +188,7 @@ Use `sysrc(8)` to list supported configuration files for a given service:
 
 The instructions below move flags from `/etc/rc.conf` to per-service
 configuration file under `/etc/rc.conf.d/`. It preserves `/usr/local/etc` 
-use for services installed by ports and packages.
+for services installed by ports and packages.
 
 ### SSH
 
@@ -242,8 +242,8 @@ There are three services to setup: `hostname`, `routing`, and `netif`.
 # service routing restart
 ```
 
-`netif` manages the network. It shares some of the DHCP configuration flags with
-`dhclient`. Store the flags in `/etc/rc.conf.d/network`.
+`netif` manages network interfaces. It shares some of the DHCP configurations
+with `dhclient` via `/etc/rc.conf.d/network`.
 
 ```console
 % sysrc -s netif -l
@@ -265,8 +265,9 @@ It is best to reboot the host for all the services to pick up the network file.
 # service syslogd restart
 ```
 
-Debugging `rc(8)` is hard as log messages sent go `logger(1)` are routed to
-console until `syslog(8)` starts at some point in `rc(8)`:
+`rc(8)` scripts log messages using `logger(1)`, backed to `syslog(3)`. This
+writes messages to console and any other sinks configured in `systlogd(8)`.
+Unfortunately, `syslogd(8)` starts at some later stage in `rc(8)` sequence:
 
 ```console
 % rcorder -p | cat -n | grep -C 1 syslogd
@@ -275,19 +276,22 @@ console until `syslog(8)` starts at some point in `rc(8)`:
     31	/etc/rc.d/auditd /etc/rc.d/bsnmpd /etc/rc.d/hastd /etc/rc.d/ntpdate /etc/rc.d/power_profile /etc/rc.d/pwcheck /etc/rc.d/savecore /etc/rc.d/watchdogd 
 ```
 
-As such, rc-log messages only start with `auditd`:
+In result, rc-messages prior to `syslogd(8)` are only availalbe in console. The
+first ones are from `auditd` service in `/var/log/messages`:
 
 ```
 Aug 29 14:40:08 nuc kernel: em0: link state changed to UP
 Aug 29 14:40:08 nuc root[26487]: /etc/rc: DEBUG: checkyesno: auditd_enable is set to NO.
 ```
 
-Log all messages sent to console:
+Configure `syslog(3)` to log all console messages:
 
 ```console
 % grep console.info /etc/syslog.conf 
 console.info					/var/log/console.log
 ```
+
+### RC
 
 Enable rc debug and info logging:
 
