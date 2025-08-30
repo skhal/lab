@@ -14,8 +14,8 @@
 
 Ref: https://docs.freebsd.org/en/books/handbook/bsdinstall/
 
-Download AMD64 image and verify the checksum (as of Aug '25, MacOS does not
-include `xz(1)`, install it or download `.img`):
+Download AMD64 image and verify the checksum. MacOS does not include `xz(1)`
+in the base installation, therefore use `.img`:
 
 ```console
 % curl -O https://download.freebsd.org/releases/amd64/amd64/ISO-IMAGES/14.3/FreeBSD-14.3-RELEASE-amd64-mini-memstick.img
@@ -26,7 +26,7 @@ include `xz(1)`, install it or download `.img`):
 FreeBSD-14.3-RELEASE-amd64-mini-memstick.img: OK
 ```
 
-Insert the memstick and write the image:
+Write the image to the memstick:
 
 ```console
 % disktuil list
@@ -100,7 +100,7 @@ It is still a good idea to restart the node.
 # reboot
 ```
 
-Verify the running version is up to date--all three should match:
+Verify the running version is up to date, all three should match:
 
 ```console
 % freebsd-version -kru
@@ -132,37 +132,37 @@ Create an operator user `op` to manage the node:
 
 ## Configure services
 
-FreeBSD `init(8)`, the last stage of the boot process, runs `rc(8)` to start
-services, available in `/etc/rc.d` and `sysrc local_startup` folders. The
-services define mutual dependencies. Use `rcorder(8)` to list the start
-sequence in topological order and the name of services:
+FreeBSD boot process uses `init(8)` to trigger `rc(8)` to start services,
+managed by scripts in `/etc/rc.d` and `local_startup` folders.
+
+Service scripts define dependencies, rc-variables, and functions to manage the
+service, e.g. start, stop, etc. Use `rcorder(8)` to dump services dependency
+graph in topological order (`-p` groups services that can start in parallel`).
 
 ```
-% rcorder -p /etc/rc.d/*
-/etc/rc.d/dhclient /etc/rc.d/dnctl /etc/rc.d/dumpon /etc/rc.d/natd /etc/rc.d/sysctl
-...
+% rcorder -p /etc/rc.d/* | head -n 2
+/etc/rc.d/dhclient /etc/rc.d/dumpon /etc/rc.d/dnctl /etc/rc.d/natd /etc/rc.d/sysctl
+/etc/rc.d/ddb /etc/rc.d/hostid
 ```
 
-The services use flags set in one of `rc.conf` files. Use `sysrc(8)` to get
-a list of supported configuration files:
+Service scripts use variables, aka flags, `rc.conf(5)`. These have a default
+value that is set in `/etc/default/rc.conf` and optional override in
+`/etc/default/vendor.conf`. Flag overrides reside in one of the `rc.conf` files.
+Use `sysrc(8)` to list per-service configuration files:
 
 ```
 % sysrc -s dhclient -l
 /etc/rc.conf /etc/rc.conf.local /etc/rc.conf.d/dhclient /usr/local/etc/rc.conf.d/dhclient /etc/rc.conf.d/network /usr/local/etc/rc.conf.d/network
 ```
 
-Notice that services pull flags from multiple locations:
+`/etc/rc.conf` and `/etc/rc.conf.local` contain flags accessible to all
+services. Per-service flags are in one of `rc.conf.d/<name>` files.
+`local_startup` flag lists folders to look up for services (`rc.d`)
+and configurations (`rc.conf.d`) outside of standard `/etc`.
 
-  * `/etc/rc.conf` is the central file with all flags, backed by default values in `/etc/default/rc.conf` and `/etc/default/vendor.conf` (see `rc.conf(5)`)
-  * `/etc/rc.conf.d/<name>` is per-service flags
-  * `/usr/local/etc/rc.conf.d/<name>` is another per-service flags location,
-    typically used for ports and packages. There might be multiple locations,
-    controlled by `sysrc local_startup` with `/rc.d` suffix removed.
-
-> [!NOTE]
-> `dhclient` is part of the networking stack. It shares a number of
-> settings with other services, that are available in
-> `/etc/rc.conf.d/network`. For example, `netif` service loads it:
+> [!WARNING]
+> Some services share flags using files in `rc.conf.d`. For example, `dhclient`
+> and `netif` use the same `/etc/rc.conf.d/network`.
 >
 > ```console
 > % sysrc -s netif -l
