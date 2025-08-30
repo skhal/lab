@@ -133,8 +133,8 @@ Create an operator user `op` to manage the node:
 ## Configure services
 
 FreeBSD boot process uses `init(8)`. It triggers `rc(8)` to start services.
-Every service has a script in one of `rc.d/` folders: standard location `/etc`
-and folders set by `local_startup` flag:
+Every service has a script in one of `rc.d/` folders: standard location
+`/etc/rc.d` and folders set by `local_startup` flag:
 
 ```console
 % sysrc local_startup
@@ -153,34 +153,35 @@ groups services that can start in parallel`):
 /etc/rc.d/ddb /etc/rc.d/hostid
 ```
 
-Service scripts use variables, aka flags, set in `rc.conf(5)`.
+Service scripts use variables, aka flags, set in `rc.conf(5)` files, loaded
+in the following order (the last loaded value wins):
 
-Flags have a default value set in `/etc/default/rc.conf` with optional override
-in `/etc/default/vendor.conf` (if exists).
-
-A defualt flag value can be overridden by one of `rc.conf(5)` files.
-
-  *  `/etc/rc.conf` and `/etc/rc.conf.local` are global containers of flags
-     in standard location `/etc/`, loaded by all services including `rc(8)`
-     itself.
-  * `<dir>/rc.conf.d/<name>` holds service flags and is only loaded by the
-     service `<name>`, where `<dir>/` is either standard location `/etc` or
-     folders listed in `local_startup` without `rc.d/` suffix.
+  * A default value is set in `/etc/default/rc.conf` with optional override
+    from `/etc/default/vendor.conf` (if exists).
+  * `/etc/rc.conf` and `/etc/rc.conf.local` (legacy) are global containers,
+    loaded by all services including `rc(8)` itself.
+  * `<dir>/rc.conf.d/<name>` is only loaded by the service `<name>`, where
+    `<dir>/` is either the standard location `/etc` or folders listed in
+    `local_startup` with `rc.d/` suffix removed.
 
 Use `sysrc(8)` to list supported configuration files for a given service:
 
 ```console
-% sysrc -s dhclient -l
-/etc/rc.conf /etc/rc.conf.local /etc/rc.conf.d/dhclient /usr/local/etc/rc.conf.d/dhclient /etc/rc.conf.d/network /usr/local/etc/rc.conf.d/network
+% sysrc -s hostname -l
+/etc/rc.conf /etc/rc.conf.local /etc/rc.conf.d/hostname /usr/local/etc/rc.conf.d/hostname
 ```
 
 > [!WARNING]
-> Some services share flags via a mechansim other than `/etc/rc.conf`, to limit
-> visibility of these flags, namely through in `rc.conf.d/` shared file.
-> `dhclient` and `netif` are two services that share DHCP settings using
+> `/etc/rc.conf` is a global container of flags, shared between all services
+> and `rc(8)`. In order to limit the visibility of flags, place flags into
+> shared files under `<dir>/rc.conf.d/`.
+>
+> For example, `dhclient` and `netif` services share DHCP settings via
 > `/etc/rc.conf.d/network`.
 >
 > ```console
+> % sysrc -s dhclient -l
+> /etc/rc.conf /etc/rc.conf.local /etc/rc.conf.d/dhclient /usr/local/etc/rc.conf.d/dhclient /etc/rc.conf.d/network /usr/local/etc/rc.conf.d/network
 > % sysrc -s netif -l
 > /etc/rc.conf /etc/rc.conf.local /etc/rc.conf.d/network /usr/local/etc/rc.conf.d/network /etc/rc.conf.d/netif /usr/local/etc/rc.conf.d/netif
 > ```
