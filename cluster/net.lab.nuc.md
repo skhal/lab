@@ -190,39 +190,6 @@ The instructions below move flags from `/etc/rc.conf` to per-service
 configuration file under `/etc/rc.conf.d/`. It preserves `/usr/local/etc` 
 for services installed by ports and packages.
 
-### SSH
-
-```console
-% sysrc -s sshd -l
-/etc/rc.conf /etc/rc.conf.local /etc/rc.conf.d/sshd /usr/local/etc/rc.conf.d/sshd
-# sysrc -x sshd_enable
-# sysrc -f /etc/rc.conf.d/sshd sshd_enable=yes
-# service sshd restart
-```
-
-By default, SSH server listens on all IP addresses. Restrict it to the host IP:
-
-```console
-# sockstat -4 | grep sshd
-root     sshd          21 7   tcp4   *:22                  *:*
-# sysrc -f /etc/rc.conf.d/sshd sshd_flags+="-o ListenAddress=192.168.1.100"
-# service sshd restart
-# sockstat -4 | grep sshd
-root     sshd          21 7   tcp4   192.168.1.100:22      *:*
-```
-
-### NTP time server
-
-```console
-% sysrc -s ntpd -l
-/etc/rc.conf /etc/rc.conf.local /etc/rc.conf.d/ntpd /usr/local/etc/rc.conf.d/ntpd
-# sysrc -x ntpd_sync_on_start
-# sysrc -x ntpd_enable
-# sysrc -f /etc/rc.conf.d/ntpd ntpd_enable=yes
-# sysrc -f /etc/rc.conf.d/ntpd ntpd_sync_on_start=yes
-# service ntpd restart
-```
-
 ### Network
 
 There are three services to setup: `hostname`, `routing`, and `netif`.
@@ -254,6 +221,27 @@ with `dhclient` via `/etc/rc.conf.d/network`.
 ```
 
 It is best to reboot the host for all the services to pick up the network file.
+
+### NTP time server
+
+```console
+% sysrc -s ntpd -l
+/etc/rc.conf /etc/rc.conf.local /etc/rc.conf.d/ntpd /usr/local/etc/rc.conf.d/ntpd
+# sysrc -x ntpd_sync_on_start
+# sysrc -x ntpd_enable
+# sysrc -f /etc/rc.conf.d/ntpd ntpd_enable=yes
+# sysrc -f /etc/rc.conf.d/ntpd ntpd_sync_on_start=yes
+# service ntpd restart
+```
+
+### RC
+
+Enable rc debug and info logging:
+
+```console
+# sysrc rc_debug=yes
+# sysrc rc_info=yes
+```
 
 ### Syslog
 
@@ -291,13 +279,25 @@ Configure `syslog(3)` to log all console messages:
 console.info					/var/log/console.log
 ```
 
-### RC
-
-Enable rc debug and info logging:
+### SSH
 
 ```console
-# sysrc rc_debug=yes
-# sysrc rc_info=yes
+% sysrc -s sshd -l
+/etc/rc.conf /etc/rc.conf.local /etc/rc.conf.d/sshd /usr/local/etc/rc.conf.d/sshd
+# sysrc -x sshd_enable
+# sysrc -f /etc/rc.conf.d/sshd sshd_enable=yes
+# service sshd restart
+```
+
+By default, SSH server listens on all IP addresses. Restrict it to the host IP:
+
+```console
+# sockstat -4 | grep sshd
+root     sshd          21 7   tcp4   *:22                  *:*
+# sysrc -f /etc/rc.conf.d/sshd sshd_flags+="-o ListenAddress=192.168.1.100"
+# service sshd restart
+# sockstat -4 | grep sshd
+root     sshd          21 7   tcp4   192.168.1.100:22      *:*
 ```
 
 ### ZFS
