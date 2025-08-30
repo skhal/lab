@@ -139,7 +139,7 @@ Service scripts define dependencies, rc-variables, and functions to manage the
 service, e.g. start, stop, etc. Use `rcorder(8)` to dump services dependency
 graph in topological order (`-p` groups services that can start in parallel`).
 
-```
+```console
 % rcorder -p /etc/rc.d/* | head -n 2
 /etc/rc.d/dhclient /etc/rc.d/dumpon /etc/rc.d/dnctl /etc/rc.d/natd /etc/rc.d/sysctl
 /etc/rc.d/ddb /etc/rc.d/hostid
@@ -150,7 +150,7 @@ value that is set in `/etc/default/rc.conf` and optional override in
 `/etc/default/vendor.conf`. Flag overrides reside in one of the `rc.conf` files.
 Use `sysrc(8)` to list per-service configuration files:
 
-```
+```console
 % sysrc -s dhclient -l
 /etc/rc.conf /etc/rc.conf.local /etc/rc.conf.d/dhclient /usr/local/etc/rc.conf.d/dhclient /etc/rc.conf.d/network /usr/local/etc/rc.conf.d/network
 ```
@@ -178,7 +178,7 @@ files under `/etc/rc.conf.d/`.
 % sysrc -s sshd -l
 /etc/rc.conf /etc/rc.conf.local /etc/rc.conf.d/sshd /usr/local/etc/rc.conf.d/sshd
 # sysrc -x sshd_enable
-# sysrc -f /etc/rc.conf.d/sshd sshd_enable
+# sysrc -f /etc/rc.conf.d/sshd sshd_enable=yes
 # service sshd restart
 ```
 
@@ -198,10 +198,10 @@ root     sshd          21 7   tcp4   192.168.1.100:22      *:*
 ```console
 % sysrc -s ntpd -l
 /etc/rc.conf /etc/rc.conf.local /etc/rc.conf.d/ntpd /usr/local/etc/rc.conf.d/ntpd
-# sysrc -f /etc/rc.conf.d/ntpd ntpd_enable=yes
-# sysrc -f /etc/rc.conf.d/ntpd ntpd_sync_on_start=yes
 # sysrc -x ntpd_sync_on_start
 # sysrc -x ntpd_enable
+# sysrc -f /etc/rc.conf.d/ntpd ntpd_enable=yes
+# sysrc -f /etc/rc.conf.d/ntpd ntpd_sync_on_start=yes
 # service ntpd restart
 ```
 
@@ -212,8 +212,8 @@ There are three services to setup: `hostname`, `routing`, and `netif`.
 ```console
 % sysrc -s hostname -l
 /etc/rc.conf /etc/rc.conf.local /etc/rc.conf.d/hostname /usr/local/etc/rc.conf.d/hostname
-# sysrc -f /etc/rc.conf.d/hostname hostname="nuc.lab.net"
 # sysrc -x hostname
+# sysrc -f /etc/rc.conf.d/hostname hostname="nuc.lab.net"
 # service hostname restart
 ```
 
@@ -224,15 +224,14 @@ There are three services to setup: `hostname`, `routing`, and `netif`.
 # service routing restart
 ```
 
-`netif` manages the network. It shares some of the configuration with
-`dhclient`, especially DHCP configured networks. Store the configuration in
-`/etc/rc.conf.d/network`.
+`netif` manages the network. It shares some of the DHCP configuration flags with
+`dhclient`. Store the flags in `/etc/rc.conf.d/network`.
 
 ```console
 % sysrc -s netif -l
 /etc/rc.conf /etc/rc.conf.local /etc/rc.conf.d/network /usr/local/etc/rc.conf.d/network /etc/rc.conf.d/netif /usr/local/etc/rc.conf.d/netif
-# sysrc -f /etc/rc.conf.d/network ifconfig_em0=DHCP
 # sysrc -x ifconfig_em0
+# sysrc -f /etc/rc.conf.d/network ifconfig_em0=DHCP
 # shutdown -r now
 ```
 
@@ -243,8 +242,8 @@ It is best to reboot the host for all the services to pick up the network file.
 ```console
 % sysrc -s syslogd -l
 /etc/rc.conf /etc/rc.conf.local /etc/rc.conf.d/syslogd /usr/local/etc/rc.conf.d/syslogd
-# sysrc -f /etc/rc.conf.d/syslogd syslogd_flags="-ss"
 # sysrc -x syslogd_flags
+# sysrc -f /etc/rc.conf.d/syslogd syslogd_flags="-ss"
 # service syslogd restart
 ```
 
@@ -284,7 +283,7 @@ Enable rc debug and info logging:
 ```console
 % sysrc -s zfs -l
 /etc/rc.conf /etc/rc.conf.local /etc/rc.conf.d/zfs /usr/local/etc/rc.conf.d/zfs
-# sysrc -f /etc/rc.conf.d/zfs zfs_enable="YES"
 # sysrc -x zfs_enable
+# sysrc -f /etc/rc.conf.d/zfs zfs_enable=yes
 # shutdown -r now
 ```
