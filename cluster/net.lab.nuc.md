@@ -227,8 +227,8 @@ moused_nondefault_enable: YES -> no
 ### Network
 
 `netif` manages network interfaces. It shares some of the DHCP configurations
-with `dhclient` via `/etc/rc.conf.d/network`, therefore keep configuration in this
-file.
+with `dhclient` via `/etc/rc.conf.d/network`, therefore keep configuration in
+this file.
 
 ```console
 % sysrc -s netif -l
@@ -239,6 +239,36 @@ file.
 ```
 
 It is best to reboot the host for all the services to pick up the network file.
+
+Wireless: https://docs.freebsd.org/en/books/handbook/network/#network-wireless
+
+First, create a `wpa_supplicant.conf(5)` with wireless Service Set Identifier
+(SSID) and Pre-Shared Key (PSK) (the contents are redacted):
+
+```console
+% cat /etc/wpa_supplicant.conf
+network={
+  ssid="<wifi-id>"
+  bssid=<access-point-mac-address>
+  psk="<password>"
+}
+```
+
+Identify wireless network device interface:
+
+```console
+% sysctl net.wlan.devices
+net.wlan.devices: iwm0
+```
+
+Create a wireless LAN on this interface:
+
+```console
+# sysrc -f /etc/rc.conf.d/network wlans_iwm0="wlan0"
+wlans_iwm0:  -> wlan0
+# sysrc -f /etc/rc.conf.d/network ifconfig_wlan0="WPA DHCP"
+ifconfig_wlan0:  -> WPA DHCP
+```
 
 ### Network Time server
 
@@ -270,7 +300,7 @@ search localdomain
 nameserver 192.168.1.1
 ```
 
-Verify DNS resolution goes through router:
+Verify that DNS resolution uses router:
 
 ```console
  % drill freebsd.org
@@ -355,6 +385,21 @@ root     sshd          21 7   tcp4   *:22                  *:*
 # service sshd restart
 # sockstat -4 | grep sshd
 root     sshd          21 7   tcp4   192.168.1.100:22      *:*
+```
+
+Allow only user `op` to connect over SSH:
+
+```console
+# grep sshd_flags /etc/rc.conf.d/sshd
+sshd_flags="-o ListenAddress=192.168.1.100 -o AllowUsers=op"
+```
+
+Optional: make SSH server to listen to connection requests on wireless network:
+
+```console
+# sysrc -f /etc/rc.conf.d/sshd sshd_flags+=" -o ListenAddress=192.168.1.101"
+sshd_flags: -o ListenAddress=192.168.1.100 -> -o ListenAddress=192.168.1.100 -o ListenAddress=192.168.1.101
+# service sshd restart
 ```
 
 ### ZFS
