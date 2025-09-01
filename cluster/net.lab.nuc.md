@@ -10,6 +10,20 @@
   * 32 GB of RAM
   * 2x 1TB M.2 NVMe SSD
 
+```console
+% pciconf -lv | grep -B 4 'subclass.*NVM'
+nvme0@pci0:61:0:0:	class=0x010802 rev=0x00 hdr=0x00 vendor=0x15b7 device=0x5006 subvendor=0x15b7 subdevice=0x5006
+    vendor     = 'Sandisk Corp'
+    device     = 'SanDisk Extreme Pro / WD Black SN750 / PC SN730 / Red SN700 NVMe SSD'
+    class      = mass storage
+    subclass   = NVM
+nvme1@pci0:62:0:0:	class=0x010802 rev=0x00 hdr=0x00 vendor=0x15b7 device=0x5006 subvendor=0x15b7 subdevice=0x5006
+    vendor     = 'Sandisk Corp'
+    device     = 'SanDisk Extreme Pro / WD Black SN750 / PC SN730 / Red SN700 NVMe SSD'
+    class      = mass storage
+    subclass   = NVM
+```
+
 ## Install FreeBSD
 
 Ref: https://docs.freebsd.org/en/books/handbook/bsdinstall/
