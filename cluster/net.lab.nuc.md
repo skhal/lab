@@ -462,6 +462,7 @@ Install packages:
 doas
 gpu-firmware-intel-kmod-skylake
 pkg
+vim-tiny
 wifi-firmware-iwlwifi-kmod-8000
 ```
 
