@@ -214,6 +214,15 @@ for services installed by ports and packages.
 # service hostname restart
 ```
 
+### Jail
+
+```console
+# sysrc -f /etc/rc.conf.d/jail jail_enable="YES"
+jail_enable: NO -> YES
+# sysrc -f /etc/rc.conf.d/jail jail_parallel_start="YES"
+jail_parallel_start: NO -> YES
+```
+
 ### Moused
 
 ```console
