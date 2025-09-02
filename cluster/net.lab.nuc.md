@@ -144,6 +144,16 @@ Create an operator user `op` to manage the node:
 # passwd -l op
 ```
 
+Isolate user home folder in a dedicated ZFS dataaset and let the user
+manage it:
+
+```console
+# zfs create zroot/home/op
+# zfs allow -u op create,destroy,mount,snapshot zroot/home/op
+# sh -c 'for f in /usr/share/skel/*; do cp $f ~/.${f##*/dot.}; done'
+# chown -R op:op /home/op
+```
+
 Create a group to manage jails:
 
 ```console
