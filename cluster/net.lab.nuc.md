@@ -144,6 +144,12 @@ Create an operator user `op` to manage the node:
 # passwd -l op
 ```
 
+Create a group to manage jails:
+
+```console
+# pw groupadd -g 1001 -n jail
+```
+
 ## Configure services
 
 FreeBSD boot process uses `init(8)`. It triggers `rc(8)` to start services.
@@ -419,4 +425,43 @@ sshd_flags: -o ListenAddress=192.168.1.100 -> -o ListenAddress=192.168.1.100 -o 
 # sysrc -x zfs_enable
 # sysrc -f /etc/rc.conf.d/zfs zfs_enable=yes
 # shutdown -r now
+```
+
+## Applications
+
+Ref: https://docs.freebsd.org/en/books/handbook/ports/
+
+Ports build software from the source. Packages are pre-built binaries. There
+might be multiple packages for the same port representing the same application
+with different configuraiton options. Not every port has a binary package.
+
+Switch from Quarterly to Latest packages:
+
+```console
+# mkdir -p /usr/local/etc/pkg/repos
+# cat <<eof > /usr/local/etc/pkg/repos/FreeBSD.conf 
+FreeBSD: { url: "pkg+http://pkg.FreeBSD.org/${ABI}/latest" }
+eof
+# pkg update -f
+```
+
+Install packages:
+
+```console
+% pkg prime-list
+doas
+gpu-firmware-intel-kmod-skylake
+pkg
+wifi-firmware-iwlwifi-kmod-8000
+```
+
+### Doas
+
+Let members of `jail` group manage jails:
+
+```console
+# cat <<eof >/usr/local/etc/doas.conf
+permit nopass :jail cmd jail
+permit nopass :jail cmd jexec
+eof
 ```
