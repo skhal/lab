@@ -514,6 +514,43 @@ Inclue jail configurations from `/etc/jail.conf.d/`:
 
 ```console
 # cat <<eof >/etc/jail.conf
-> .include "/etc/jail.conf.d/*.conf";
-> eof
+.include "/etc/jail.conf.d/*.conf";
+eof
+```
+
+### Thin Jail
+
+Download userland (`-m` forces to download the file only if the remote version
+is newer than the local file):
+
+```console
+# fetch https://download.freebsd.org/ftp/releases/amd64/amd64/14.3-RELEASE/base.txz -m -o /jail/image/14.3-RELEASE-base.txz
+```
+
+Create a template:
+
+```console
+# tar -xf /jail/image/14.3-RELEASE-base.txz -C /jail/template/14.3-RELEASE --unlink
+# freebsd-update -b /jail/template/14.3-RELEASE/ fetch install
+# env ROOT=/jail/template/14.3-RELEASE /jail/template/14.3-RELEASE/bin/freebsd-version -u
+14.3-RELEASE-p2
+# zfs snapshot zroot/jail/template/14.3-RELEASE@p2
+```
+
+Create a `dev` jail:
+
+```console
+# zfs clone zroot/jail/template/14.3-RELEASE@p2 zroot/jail/container/dev
+# cat <<eof >/etc/jail.conf.d/dev.conf
+dev {
+  exec.start = "/bin/sh /etc/rc";
+  exec.stop = "/bin/sh /etc/rc.shutdown";
+  exec.consolelog = "/var/log/jail_console_${name}.log";
+
+  host.hostname = "${name}.nuc.lab.net";
+  path = "/jail/container/${name}";
+
+  exec.clean;
+}
+eof
 ```
