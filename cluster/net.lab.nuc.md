@@ -476,3 +476,44 @@ permit nopass :jail cmd jail
 permit nopass :jail cmd jexec
 eof
 ```
+
+## Jails
+
+Ref: https://docs.freebsd.org/en/books/handbook/jails/
+
+  * Keep jails under `/jail/`.
+  * Configurations are under `/etc/jail.conf.d/`
+  * `jail` group is privileged to control datasets under `zroot/jail`
+  * Split jail data between `image` for downloadable images, `template` for base
+    templates, and `container` for running jails.
+
+Create ZFS dataset to backup jails:
+
+```console
+# zfs create -o mountpoint=/jail zroot/jail
+# zfs create zroot/jail/image
+# zfs create zroot/jail/template
+# zfs create zroot/jail/container
+```
+
+Let `jail` group manage datasets:
+
+```console
+# zfs allow -s @mount mount,canmount,mountpoint zroot/jail
+# zfs allow -s @create create,destroy,@mount zroot/jail
+# zfs allow -g jail @mount,@create,readonly zroot/jail
+```
+
+Add `op` user to the `jail` group.
+
+```console
+# pw groupmod jail -m op
+```
+
+Inclue jail configurations from `/etc/jail.conf.d/`:
+
+```console
+# cat <<eof >/etc/jail.conf
+> .include "/etc/jail.conf.d/*.conf";
+> eof
+```
