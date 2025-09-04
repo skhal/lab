@@ -10,7 +10,9 @@ Ref: https://docs.freebsd.org/en/books/handbook/jails/
   * Jail configurations are under `/etc/jail.conf.d/`
   * Jail filesystem is under ZFS dataset `zroot/jail` 
 
-# PREPARE HOST
+# HOST SETUP
+
+## Jail service
 
 Stop jails in the reverse order to resolve jail dependencies:
 
@@ -19,20 +21,55 @@ Stop jails in the reverse order to resolve jail dependencies:
 jail_reverse_stop: NO -> YES
 ```
 
+## User groups
+
+Create a jail group to manipulate jails:
+
+```console
+# pw groupadd -g 1001 -n jail
+# pw groupmod -m op -n jail
+```
+
+## Doas
+
+Let members of `jail` group control jails:
+
+```console
+# cat <<eof > /usr/local/etc/doas.conf
+permit nopass :jail cmd jail
+permit nopass :jail cmd jexec
+eof
+```
+
+## ZFS datasets
+
 Create ZFS root dataset for jails:
 
 ```console
 # zfs create -o mountpoint=/jail zroot/jail
 ```
 
-Create child datasets to store loaded images, templates that are ready to
-create jails, and running containers:
+Grant group `jail` permissions to control datasets:
+
+```control
+# zfs allow -s @mount  mount,canmount,mountpoint zroot/jail
+# zfs allow -s @create create,destroy,@mount zroot/jail
+# zfs allow -g jail @mount,@create,readonly zroot/jail
+```
+
+Create child datasets:
+
+  * `zroot/jail/image` stores loaded images
+  * `zroot/jail/template` holds base templates for jails
+  * `zroot/jail/container` running jails
 
 ```
 # zfs create zroot/jail/image
 # zfs create zroot/jail/template
 # zfs create zroot/jail/container
 ```
+
+## Jail config
 
 Include jail configuraitons from `/etc/jail.conf.d/`:
 
@@ -41,6 +78,7 @@ Include jail configuraitons from `/etc/jail.conf.d/`:
 .include "/etc/jail.conf.d/*.conf";
 eof
 ```
+
 
 # CREATE TEMPLATE
 
@@ -63,6 +101,7 @@ Create a template with updated software:
 
 > [!NOTE]
 > Set `PAGER` to `cat(1)` to suppress interactive mode for `freebsd-update(8)`.
+
 
 # NO NET JAIL
 
