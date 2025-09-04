@@ -1,2 +1,2 @@
 sshd_enable="YES"
-sshd_flags="-o ListenAddress=192.168.1.110 -o AllowUsers=op"
+sshd_flags="-o ListenAddress=192.168.1.110 -o AllowGroups=ssh"
