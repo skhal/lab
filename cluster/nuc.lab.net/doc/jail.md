@@ -105,7 +105,7 @@ Create a template with updated software:
 
 # NO NET JAIL
 
-Create a `dev` jail:
+The new jail `dev` is isolated and does not have a network access:
 
 ```console
 # zfs clone zroot/jail/template/14.3-RELEASE@p2 zroot/jail/container/dev
