@@ -1,0 +1,13 @@
+etc/jail.conf
+etc/jail.conf.d
+etc/rc.conf
+etc/rc.conf.d
+etc/syslog.conf
+usr/local/etc/doas.conf
+usr/local/etc/pkg/repos
+home/op/.cshrc
+home/op/.login
+home/op/.login_conf
+home/op/.mailrc
+home/op/.profile
+home/op/.shrc
