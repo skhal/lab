@@ -5,7 +5,8 @@
 
 # DESCRIPTION
 
-The hardware is Intel NUC Kit NUC6i7KYK with:
+The hardware is Intel NUC Kit NUC6i7KYK with AMD64 architecture and the following
+modules installed:
 
   * RAM: 2x 16 GB DDR4-2400 16GB  
     HyperX HX424S14IBK2/32 kit
