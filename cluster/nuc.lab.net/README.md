@@ -18,3 +18,4 @@ modules installed:
 # SEE ALSO
 
   * [Install FreeBSD](./doc/install.md)
+  * [Setup](./doc/setup.md)

@@ -1,6 +1,6 @@
 # NAME
 
-**install** - install FreeBSD
+**install** - install FreeBSD on `nuc.lab.net`
 
 
 # DESCRIPTION
