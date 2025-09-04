@@ -47,8 +47,13 @@ bind ^[[6~ ed-move-to-end
 # EISDIR errors from each directory encountered.
 # alias grep='grep -d skip'
 
+# ref: https://en.wikipedia.org/wiki/ANSI_escape_code
+esc_cyan_="\\e[;36m"
+esc_red_="\\e[;31m"
+esc_reset_="\\e[m"
 # set prompt: ``username@hostname:directory $ '' 
-PS1="\u@\h:\w \\$ "
+PS1="${esc_red_}\u${esc_reset_}@\h:${esc_cyan_}\w${esc_reset_} \\$ "
+unset esc_cyan_ esc_red_ esc_reset_
 
 # search path for cd(1)
 # CDPATH=:$HOME
