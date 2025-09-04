@@ -1,0 +1,5 @@
+ifconfig_em0="DHCP"
+wlans_iwm0="wlan0"
+ifconfig_wlan0="WPA DHCP"
+cloned_interfaces="bridge0"
+ifconfig_bridge0="addm em0 up"

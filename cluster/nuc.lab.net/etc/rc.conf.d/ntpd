@@ -1,0 +1,2 @@
+ntpd_enable="yes"
+ntpd_sync_on_start="yes"
