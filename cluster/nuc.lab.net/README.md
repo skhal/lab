@@ -18,4 +18,5 @@ modules installed:
 # SEE ALSO
 
   * [Install FreeBSD](./doc/install.md)
-  * [Setup](./doc/setup.md)
+  * [Basic Setup](./doc/setup.md)
+  * [Jail Setup](./doc/jail.md)
