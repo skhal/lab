@@ -17,7 +17,11 @@ following modules installed:
 
 ## SYNC
 
-Use `rsync(1)` to sync files with the remote host. To pull the files use:
+Use `rsync(1)` to sync files with the remote host. `rsync.files-from` lists
+files to pull from the server to skip history and other unnecessary files.
+
+> [!NOTE]
+> Keep `rsync.files-from` file sorted to optimize `rsync(1)`
 
 ```console
 % rsync -arvz --files-from=./rsync.files-from op@nuc.lab.net:/ ./
