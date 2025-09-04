@@ -345,9 +345,9 @@ eof
 
 ## Vim
 
-There are different pre-built configurations of vim. `vim-tiny` only
-includes binary without runtime files. It makes `vim-tiny` suitable
-for minimal installations.
+There are different pre-built configurations of
+[vim](https://www.freshports.org/editors/vim/). `vim-tiny` only includes binary
+without runtime files. It makes `vim-tiny` suitable for minimal installations.
 
 ```console
 # pkg install vim-tiny
