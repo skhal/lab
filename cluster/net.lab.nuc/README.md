@@ -14,8 +14,7 @@ following modules installed:
   * SSD: 2x 1TB NVMe  
     WD WDS100T3X0C Black SN 750 Gen3 PCIe M.2 2280
 
-
-## SYNC
+## Sync files
 
 Use `rsync(1)` to sync files with the remote host. `rsync.files-from` lists
 files to pull from the server to skip history and other unnecessary files.
