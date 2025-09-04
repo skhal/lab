@@ -481,11 +481,14 @@ eof
 
 Ref: https://docs.freebsd.org/en/books/handbook/jails/
 
-  * Keep jails under `/jail/`.
   * Configurations are under `/etc/jail.conf.d/`
-  * `jail` group is privileged to control datasets under `zroot/jail`
-  * Split jail data between `image` for downloadable images, `template` for base
-    templates, and `container` for running jails.
+  * ZFS dataset `zroot/jail` mounted at `/jail`
+    - `zroot/jail/image` downloaded images
+    - `zroot/jail/template` templates for new jails
+    - `zroot/jail/container` running jails
+  * Group `jail` group is privileged to control jails:
+    - Use `jexec(8)` and `jail(8)`
+    - Manage datasets under `zroot/jail`
 
 Create ZFS dataset to backup jails:
 
@@ -553,4 +556,72 @@ dev {
   exec.clean;
 }
 eof
+```
+
+### Virtual Network (VNET)
+
+It adds own networking stack to the jail, including interfaces, addresses,
+routing tables and firewall rules.
+
+  * Use epair(4) to create a pair of virtual connected Ethernet interfaces,
+    i.e., a virtual network cable `epairN` with two ends `epairNa` and
+    `epairNb`.
+  * Jail uses `epairNb` to configure its own network, give it an IP address,
+    etc.
+  * The host creates a bridge(4) to connect its network interface and `epairNb`.
+
+> [!Note]
+> The bridge only passes traffic between up-networks.
+
+On the host:
+
+```console
+# sysrc -f /etc/rc.conf.d/network cloned_interfaces+="bridge0"
+cloned_interfaces:  -> bridge0
+root@nuc:~ # sysrc -f /etc/rc.conf.d/network ifconfig_bridge0="addm em0 up"
+ifconfig_bridge0:  -> addm em0 up
+```
+
+Jail configuration includes the following changes:
+
+  * Enable VNET and enjail epair(4) b-side of the pair.
+  * Prestart copies resolver configuration from the host to jail, creates an
+    epair, and adds the a-side of it to the bridge(4).
+  * Start assigns an ip to the epair(4) b-side and brings it up
+  * Poststop removes the epair(4) from the bridge and deletes the epair(4)
+
+```console
+% cat /etc/jail.conf.d/dev.conf
+dev {
+  $id = "110";
+  $ip = "192.168.1.${id}/24";
+  $epair = "epair${id}";
+  $bridge = "bridge0";
+
+  allow.raw_sockets;
+  exec.clean;
+  mount.devfs;
+  devfs_ruleset = 5;
+
+  host.hostname = "${name}.nuc.lab.net";
+  path = "/jail/container/${name}";
+
+  vnet;
+  vnet.interface = "${epair}b";
+  
+  exec.consolelog = "/var/log/jail_console_${name}.log";
+  
+  exec.prestart  = "cp /etc/resolv.conf ${path}/etc/";
+  exec.prestart += "/sbin/ifconfig ${epair} create";
+  exec.prestart += "/sbin/ifconfig ${epair}a up";
+  exec.prestart += "/sbin/ifconfig ${bridge} addm ${epair}a up";
+
+  exec.start  = "/sbin/ifconfig ${epair}b ${ip} up";
+  exec.start += "/bin/sh /etc/rc";
+
+  exec.stop = "/bin/sh /etc/rc.shutdown";
+
+  exec.poststop += "/sbin/ifconfig ${bridge} deletem ${epair}a";
+  exec.poststop += "/sbin/ifconfig ${epair}a destroy";
+}
 ```
