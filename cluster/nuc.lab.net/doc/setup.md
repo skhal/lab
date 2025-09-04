@@ -328,6 +328,7 @@ List of installed packages:
 doas
 gpu-firmware-intel-kmod-skylake
 pkg
+rsync
 vim-tiny
 wifi-firmware-iwlwifi-kmod-8000
 ```
