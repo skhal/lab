@@ -30,3 +30,29 @@ go.work.sum
 # Editor/IDE
 # .idea/
 # .vscode/
+
+# https://github.com/github/gitignore/blob/10b26ce43da9337f75fb3d4e8d034c4a30ea6f96/Global/macOS.gitignore#L4
+# General
+.DS_Store
+
+# https://github.com/github/gitignore/blob/10b26ce43da9337f75fb3d4e8d034c4a30ea6f96/Global/Vim.gitignore
+# Swap
+[._]*.s[a-v][a-z]
+# comment out the next line if you don't need vector files
+!*.svg
+[._]*.sw[a-p]
+[._]s[a-rt-v][a-z]
+[._]ss[a-gi-z]
+[._]sw[a-p]
+
+# Session
+Session.vim
+Sessionx.vim
+
+# Temporary
+.netrwhist
+*~
+# Auto-generated tag files
+tags
+# Persistent undo
+[._]*.un~
