@@ -88,7 +88,12 @@ Installed packages:
 
 ```console
 % pkg prime-list
+doas
+git
+go125
 pkg
 rsync
+tmux
+tree
 vim
 ```
