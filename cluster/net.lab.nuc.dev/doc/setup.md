@@ -97,3 +97,22 @@ tmux
 tree
 vim
 ```
+
+
+# Other
+
+## Date & time
+
+The date & time might be using UTC:
+
+```console
+% date
+Fri Sep  5 03:12:45 UTC 2025
+```
+
+Run `tzsetup(8)` to change timezone.
+
+```console
+% date
+Thu Sep  4 22:19:54 CDT 2025
+```
