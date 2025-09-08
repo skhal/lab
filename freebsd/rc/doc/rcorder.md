@@ -28,4 +28,20 @@ in the base installation (see [`rcorder_base.txt`](./rcorder_base.txt)):
 /etc/rc.d/dnctl
 ```
 
-# SEE ALSO
+The list does not include service that are installed with ports or packages in
+`/usr/local/etc/rc.d/`. Include these services in the `rcorder(8)` arguments:
+
+```console
+% rcorder /etc/rc.d/* | wc -l
+    173
+% rcorder /etc/rc.d/* /usr/local/etc/rc.d/* | wc -l
+    175
+```
+
+One caveat is that `rcorder(8)` does not check whether a service is enabled.
+Use `service(8)` to list only enabled services:
+
+```console
+% service -r | wc -l
+    96
+```
