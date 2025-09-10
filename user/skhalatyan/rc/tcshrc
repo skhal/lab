@@ -1,0 +1,84 @@
+# Copyrigth (c) 2025, Samvel Khalatyan. All rights reserved.
+#
+# .tcshrc - tcsh resource script, read at the beginning of each shell.
+#
+# vim: ft=tcsh
+
+setenv EDITOR vim
+setenv PAGER less
+
+if ( ! $?prompt ) goto end
+
+# prompt
+# force %c to represent skipped path components with `...`, csh(1)
+set ellipsis
+# ref: https://en.wikipedia.org/wiki/ANSI_escape_code
+set esc_cyan_ = "%{\033[;36m%}"
+set esc_green_ = "%{\033[;32m%}"
+set esc_reset_ = "%{\033[m%}"
+set prompt = "${esc_green_}%N${esc_reset_}@%m:${esc_cyan_}%c03${esc_reset_} %# "
+set promptchars = "%#"
+unset esc_cyan_ esc_green_ esc_reset_
+
+# vi(1) mode
+bindkey -v
+bindkey '^R' i-search-back
+
+# History
+set history = 10000
+set savehist = (10000 merge)
+
+# Completion
+set autolist = ambiguous
+# Use history to aid expansion
+set autoexpand
+set autorehash
+
+# Paint ls(1).
+setenv CLICOLOR 1
+
+# Go setup - use system install
+set go_base_ = "/usr/local/go125"
+if ( -d ${go_base_} ) then
+	set path = (${path} ${go_base_}/bin)
+endif
+unset go_base_
+
+# `dev' starts a tmux session with shell history scoped to the session.
+alias dev '\\
+	tmux has -t "=$PWD:t" >& /dev/null || \\
+    		tmux new -d -c "$PWD" -s "$PWD:t" && \\
+    		tmux setenv -t "=$PWD:t" HISTFILE "$PWD"/.history && \\
+    		tmux respawnw -k -t "=$PWD:t":0 ; \\
+	if ($?TMUX) \\
+		tmux switchc -t "=$PWD:t" ; \\
+	if ! ($?TMUX) \\
+		tmux attach -t "=$PWD:t" \\
+  	'
+
+if ( ${?TMUX} ) then
+	# in tmux(1) session.
+	# pull HISTFILE from tmux
+	set histfile_ = `tmux show-env HISTFILE >& /dev/stdout`
+	if ( ! $? ) then
+		set histfile = "${histfile_:s/HISTFILE=//}"
+	endif
+	unset histfile_
+
+	alias dev-update-environment '\\
+	  if ( ${?TMUX} ) \\
+	  	setenv SSH_AUTH_SOCK `tmux show-env SSH_AUTH_SOCK | cut -d'=' -f 2` \\
+	  '
+	set postcmd_ = `alias postcmd \
+		| sed -E 's/dev-update-environment//' \
+		| sed -E 's/;[[:space:]]*;/;/' \
+		| sed -E 's/;$//'`
+	if ( ${?postcmd_} && ${#postcmd_} ) then
+		alias postcmd "${postcmd_}; dev-update-environment"
+	else
+		alias postcmd dev-update-environment
+	endif
+	unset postcmd_
+endif
+
+end:
