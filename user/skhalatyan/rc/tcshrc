@@ -44,6 +44,13 @@ if ( -d ${go_base_} ) then
 endif
 unset go_base_
 
+# Go setup - add user binaries from `go install`.
+set go_user_base_ = "$HOME"/go
+if ( -d ${go_user_base_} ) then
+	set path = (${path} ${go_user_base_}/bin)
+endif
+unset go_user_base_
+
 # `dev' starts a tmux session with shell history scoped to the session.
 alias dev '\\
 	tmux has -t "=$PWD:t" >& /dev/null || \\
