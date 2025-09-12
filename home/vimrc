@@ -37,7 +37,6 @@ au FileType go map <leader>fc gg=G<c-o><c-o>
 au FileType go imap <leader>fc <esc>gg=G<c-o><c-o>
 
 " -- Plugin github.com:noahfrederick/vim-skeleton
-" Generate help tags after install. See `:help package-doc`.
 let g:skeleton_replacements = {}
 function! g:skeleton_replacements.YEAR()
   return strftime('%Y')

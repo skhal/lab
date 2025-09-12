@@ -35,13 +35,19 @@ under `pack/`. The repository name is the package name:
 % git -C ~/.vim/pack/noahfrederick/start clone https://github.com/noahfrederick/vim-skeleton.git
 ```
 
-That's it. The plugin is available in Vim.
+Generate help tags for the newly installed plugin (see `:help package-doc`):
+
+```console
+% vim -c 'helptags ~/.vim/pack/noahfrederick/start/vim-skeleton/doc'
+```
 
 ## Update the plugin
 
 ```console
 % git -C ~/.vim/pack/noahfrederick/start/vim-skeleton pull --rebase
 ```
+
+Regenerate help tags.
 
 
 # CONFIGURATION
