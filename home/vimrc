@@ -35,3 +35,19 @@ au FileType go set equalprg=goimports
 " Shortcuts: entire buffer `=G`, selection `=`.
 au FileType go map <leader>fc gg=G<c-o><c-o>
 au FileType go imap <leader>fc <esc>gg=G<c-o><c-o>
+
+" -- Plugin github.com:noahfrederick/vim-skeleton
+" Generate help tags after install. See `:help package-doc`.
+let g:skeleton_replacements = {}
+function! g:skeleton_replacements.YEAR()
+  return strftime('%Y')
+endfunction
+
+let g:skeleton_replacements_go = {}
+function! g:skeleton_replacements_go.PACKAGE()
+  let l:package = expand('%:h:t')
+  if expand('%:t') =~ '_test.go$'
+    let l:package .= '_test'
+  endif
+  return l:package
+endfunction
