@@ -9,7 +9,7 @@ setenv PAGER less
 
 if ( ! $?prompt ) goto end
 
-# prompt
+# -- PROMPT
 # force %c to represent skipped path components with `...`, csh(1)
 set ellipsis
 # ref: https://en.wikipedia.org/wiki/ANSI_escape_code
@@ -20,37 +20,38 @@ set prompt = "${esc_green_}%N${esc_reset_}@%m:${esc_cyan_}%c03${esc_reset_} %# "
 set promptchars = "%#"
 unset esc_cyan_ esc_green_ esc_reset_
 
-# vi(1) mode
+# -- VI(1) PROMPT MODE
 bindkey -v
 bindkey '^R' i-search-back
 
-# History
+# -- HISTORY
 set history = 10000
 set savehist = (10000 merge)
 
-# Completion
+# -- COMPLETION
 set autolist = ambiguous
 # Use history to aid expansion
 set autoexpand
 set autorehash
 
-# Paint ls(1).
+# -- PAINT LS(1).
 setenv CLICOLOR 1
 
-# Go setup - use system install
+# -- GO SETUP
+# Pick up system install
 set go_base_ = "/usr/local/go125"
 if ( -d ${go_base_} ) then
 	set path = (${path} ${go_base_}/bin)
 endif
 unset go_base_
-
-# Go setup - add user binaries from `go install`.
+# Pick up user binaries from `go install`.
 set go_user_base_ = "$HOME"/go
 if ( -d ${go_user_base_} ) then
 	set path = (${path} ${go_user_base_}/bin)
 endif
 unset go_user_base_
 
+# -- DEVELOPMENT
 # `dev' starts a tmux session with shell history scoped to the session.
 alias dev '\\
 	tmux has -t "=$PWD:t" >& /dev/null || \\
@@ -62,16 +63,15 @@ alias dev '\\
 	if ! ($?TMUX) \\
 		tmux attach -t "=$PWD:t" \\
   	'
-
 if ( ${?TMUX} ) then
-	# in tmux(1) session.
-	# pull HISTFILE from tmux
+	# • In tmux(1) session.
+	# Pick up histfile from tmux(1)
 	set histfile_ = `tmux show-env HISTFILE >& /dev/stdout`
 	if ( ! $? ) then
 		set histfile = "${histfile_:s/HISTFILE=//}"
 	endif
 	unset histfile_
-
+  # Pick up ssh-agent socket from tmux(1)
 	alias dev-update-environment '\\
 	  if ( ${?TMUX} ) \\
 	  	setenv SSH_AUTH_SOCK `tmux show-env SSH_AUTH_SOCK | cut -d'=' -f 2` \\
