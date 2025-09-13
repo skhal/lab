@@ -41,51 +41,51 @@ setenv CLICOLOR 1
 # Pick up system install
 set go_base_ = "/usr/local/go125"
 if ( -d ${go_base_} ) then
-	set path = (${path} ${go_base_}/bin)
+  set path = (${path} ${go_base_}/bin)
 endif
 unset go_base_
 # Pick up user binaries from `go install`.
 set go_user_base_ = "$HOME"/go
 if ( -d ${go_user_base_} ) then
-	set path = (${path} ${go_user_base_}/bin)
+  set path = (${path} ${go_user_base_}/bin)
 endif
 unset go_user_base_
 
 # -- DEVELOPMENT
 # `dev' starts a tmux session with shell history scoped to the session.
 alias dev '\\
-	tmux has -t "=$PWD:t" >& /dev/null || \\
-    		tmux new -d -c "$PWD" -s "$PWD:t" && \\
-    		tmux setenv -t "=$PWD:t" HISTFILE "$PWD"/.history && \\
-    		tmux respawnw -k -t "=$PWD:t":0 ; \\
-	if ($?TMUX) \\
-		tmux switchc -t "=$PWD:t" ; \\
-	if ! ($?TMUX) \\
-		tmux attach -t "=$PWD:t" \\
-  	'
+  tmux has -t "=$PWD:t" >& /dev/null || \\
+        tmux new -d -c "$PWD" -s "$PWD:t" && \\
+        tmux setenv -t "=$PWD:t" HISTFILE "$PWD"/.history && \\
+        tmux respawnw -k -t "=$PWD:t":0 ; \\
+  if ($?TMUX) \\
+    tmux switchc -t "=$PWD:t" ; \\
+  if ! ($?TMUX) \\
+    tmux attach -t "=$PWD:t" \\
+    '
 if ( ${?TMUX} ) then
-	# • In tmux(1) session.
-	# Pick up histfile from tmux(1)
-	set histfile_ = `tmux show-env HISTFILE >& /dev/stdout`
-	if ( ! $? ) then
-		set histfile = "${histfile_:s/HISTFILE=//}"
-	endif
-	unset histfile_
+  # • In tmux(1) session.
+  # Pick up histfile from tmux(1)
+  set histfile_ = `tmux show-env HISTFILE >& /dev/stdout`
+  if ( ! $? ) then
+    set histfile = "${histfile_:s/HISTFILE=//}"
+  endif
+  unset histfile_
   # Pick up ssh-agent socket from tmux(1)
-	alias dev-update-environment '\\
-	  if ( ${?TMUX} ) \\
-	  	setenv SSH_AUTH_SOCK `tmux show-env SSH_AUTH_SOCK | cut -d'=' -f 2` \\
-	  '
-	set postcmd_ = `alias postcmd \
-		| sed -E 's/dev-update-environment//' \
-		| sed -E 's/;[[:space:]]*;/;/' \
-		| sed -E 's/;$//'`
-	if ( ${?postcmd_} && ${#postcmd_} ) then
-		alias postcmd "${postcmd_}; dev-update-environment"
-	else
-		alias postcmd dev-update-environment
-	endif
-	unset postcmd_
+  alias dev-update-environment '\\
+    if ( ${?TMUX} ) \\
+      setenv SSH_AUTH_SOCK `tmux show-env SSH_AUTH_SOCK | cut -d'=' -f 2` \\
+    '
+  set postcmd_ = `alias postcmd \
+    | sed -E 's/dev-update-environment//' \
+    | sed -E 's/;[[:space:]]*;/;/' \
+    | sed -E 's/;$//'`
+  if ( ${?postcmd_} && ${#postcmd_} ) then
+    alias postcmd "${postcmd_}; dev-update-environment"
+  else
+    alias postcmd dev-update-environment
+  endif
+  unset postcmd_
 endif
 
 end:
