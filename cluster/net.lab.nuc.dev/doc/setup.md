@@ -88,15 +88,23 @@ Installed packages:
 
 ```console
 % pkg prime-list
+bazel
 doas
 git
 go125
+llvm
 pkg
 rsync
 tmux
 tree
 vim
 ```
+
+The following packages keep installation under own folder instead of injecting
+files into appropriate locations of `/usr/local/`:
+
+  * `go125` goes into `/usr/local/go125`
+  * `llvm` goes into `/usr/local/llvm19`
 
 
 # Other
