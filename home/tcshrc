@@ -51,6 +51,13 @@ if ( -d ${go_user_base_} ) then
 endif
 unset go_user_base_
 
+# -- C++ SETUP
+set llvm_base_ = "/usr/local/llvm19"
+if ( -d ${llvm_base_} ) then
+  set path = (${path} ${llvm_base_}/bin)
+endif
+unset llvm_base_
+
 # -- DEVELOPMENT
 # `dev' starts a tmux session with shell history scoped to the session.
 alias dev '\\
