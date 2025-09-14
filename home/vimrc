@@ -51,3 +51,40 @@ function! g:skeleton_replacements_go.PACKAGE()
   endif
   return l:package
 endfunction
+
+function! s:skeleton_getGitWorktreeRelpath()
+  let l:git_worktree = trim(system('git rev-parse --show-toplevel'))
+  let l:path = expand('%:p')
+  let l:relpath = fnamemodify(l:path, ':s,^' . l:git_worktree . '/,,')
+  return l:relpath
+endfunction
+
+function! s:skeleton_getCCNamespace()
+  let l:relpath = s:skeleton_getGitWorktreeRelpath()
+  let l:namespace = fnamemodify(l:relpath, ':h:gs,/,::,')
+  echow 'namespace: ' . l:namespace
+  return l:namespace
+endfunction
+
+let g:skeleton_replacements_c = {}
+function! g:skeleton_replacements_c.NAMESPACE()
+  let l:namespace = s:skeleton_getCCNamespace()
+  return l:namespace
+endfunction
+function! g:skeleton_replacements_c.GUARD()
+  let l:relpath = s:skeleton_getGitWorktreeRelpath()
+  let l:guard = fnamemodify(l:relpath, ':gs,[/.],_,:s,$,_,')
+  let l:guard = toupper(l:guard)
+  return l:guard
+endfunction
+
+let g:skeleton_replacements_cpp = {}
+function! g:skeleton_replacements_cpp.NAMESPACE()
+  let l:namespace = s:skeleton_getCCNamespace()
+  return l:namespace
+endfunction
+function! g:skeleton_replacements_cpp.HEADER()
+  let l:relpath = s:skeleton_getGitWorktreeRelpath()
+  let l:header = fnamemodify(l:relpath, ':s,\(_test\)\?.cc$,.h,')
+  return escape(l:header, '/')
+endfunction
