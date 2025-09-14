@@ -59,3 +59,7 @@ Sessionx.vim
 tags
 # Persistent undo
 [._]*.un~
+
+# https://github.com/github/gitignore/blob/fc6ce5da28a8c3480cc8a5acad050449f72a9261/community/Bazel.gitignore
+# Bazel-build
+/bazel-*
