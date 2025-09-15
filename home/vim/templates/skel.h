@@ -6,4 +6,4 @@
 namespace @NAMESPACE@ {
 }  // namespace @NAMESPACE@
 
-#endif @GUARD@
+#endif  // @GUARD@
