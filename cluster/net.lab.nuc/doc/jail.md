@@ -258,98 +258,41 @@ dev proc  sys
 > linux-bitwarden-cli-1.22.1     Bitwarden CLI
 > ```
 
-## Step 2: Bootstrap a VNET jail
+## Step 2: Linux Userland in VNET Jail
 
-Use the instructions for setting up a new [VNET Jail](#vnet-jail). Mount
-following changes:
+Create a `ubuntu` VNET jail with `$id=111`.
 
-  * Name it `ubuntu`.
-  * Allow mounts of different type filesystems for Linux
-
-```
-# cat /etc/jail.conf.d/ubuntu
-ubuntu {
-  $id = "111";
-  $ip = "192.168.1.${id}/24";
-  $epair = "epair${id}";
-  $bridge = "bridge0";
-
-  allow.mount;
-  allow.mount.devfs;
-  allow.mount.fdescfs;
-  allow.mount.procfs;
-  allow.mount.linprocfs;
-  allow.mount.linsysfs;
-  allow.mount.tmpfs;
-
-  enforce_statfs = 1; # only mount points below jail's chroot
-
-  # Virtual Network (VNET)
-  vnet;
-  vnet.interface = "${epair}b";
-  devfs_ruleset = 5;
-
-  exec.prestart += "/sbin/ifconfig ${epair} create";
-  exec.prestart += "/sbin/ifconfig ${epair}a up";
-  exec.prestart += "/sbin/ifconfig ${bridge} addm ${epair}a up";
-
-  exec.start  = "/sbin/ifconfig ${epair}b ${ip} up";
-  exec.start += "/bin/sh /etc/rc";
-
-  exec.poststop += "/sbin/ifconfig ${bridge} deletem ${epair}a";
-  exec.poststop += "/sbin/ifconfig ${epair}a destroy";
-}
-```
-
-Start the jail:
-
-```console
-# service jail start ubuntu
-```
-
-## Step 3: Linux Userland
-
-Use [debootstrap(8)](https://manpages.debian.org/stretch/debootstrap/debootstrap.8.en.html)
-to provide Linux shared libraries inside the jail.
+Provide Linux shared libraries using
+[debootstrap(8)](https://manpages.debian.org/stretch/debootstrap/debootstrap.8.en.html).
 
 ```console
 # pkg install debootstrap
 # debootstrap jammy /compat/ubuntu
 ```
 
-  * `jammy` is the name of [Ubuntu release](https://www.releases.ubuntu.com),
-    LTS Ubuntu 22.04 Jammy Jellyfish.
-  * Install into `/compat/<distribution>`. Even though we don't plan to install
-    multiple userlands from different Linux distributions inside the same jail,
-    it is still a good practice to keep filesystem hierarchy organized for
-    ease of discovery in the future.
+where `jammy` is the [Ubuntu release](https://www.releases.ubuntu.com) name,
+i.e. LTS Ubuntu 22.04 Jammy Jellyfish. Install Linux libraries into
+`/compat/<distribution>` instead of `/compat/linux` to make it clear what
+distribution is in use.
 
-## Step 4: Linux Mount Points
+## Step 3: Linux Mount Points
 
-At this point, the host environemnt has Linux ABI enabled via `/etc/rc.d/linux`
-service. Ubuntu userland is installed inside the jail under `/compat/ubuntu`
-with `debootstrap(8)`.
+At this point, the host environemnt has Linux ABI enabled by `linux` service,
+which [mounts](https://github.com/freebsd/freebsd-src/blob/1c3ca0c733a4e4ba550cedfa8019260fb0cf5707/libexec/rc/rc.d/linux#L75-L79)
+a number of filesystems for Linux in the host environment: `devfs`, `procfs`,
+etc.
 
-The `linux` service [mounts](https://github.com/freebsd/freebsd-src/blob/1c3ca0c733a4e4ba550cedfa8019260fb0cf5707/libexec/rc/rc.d/linux#L75-L79)
-a number of filesystems for Linux in the host environment, including `devfs`,
-`procfs`, etc.
-
-We'll need to share these mount points with the jail for the Ubuntu userland
-to operate correctly.
-
-Stop the jail.
-
-```console
-# service jail stop ubuntu
-```
-
-Add the following instructions to the jail's configuration:
+We'll need to share these filesystems with the jail for Ubuntu applications to
+operate correctly.
 
 > [!WARNING]
-> Mount these under `$path/compat/ubuntu` becasue we'll run Linux applications
-> using `chroot /compat/ubuntu ...`.
+> Mount filesystems under `$path/compat/ubuntu` since we'll run Linux
+> applications with `chroot /compat/ubuntu ...`.
+
+Stop the jail and add the following instructions to the jail configuration:
 
 ```
+# service jail stop ubuntu
 # cat /etc/jail.conf.d/ubuntu
 ubuntu {
   $id = "111";
@@ -391,8 +334,8 @@ ubuntu {
 ```
 
 > [!NOTE]
-> FreeBSD instructions include `/tmp` and `/home` mounts. It is only required
-> for X11 applications.
+> FreeBSD instructions include `/tmp` and `/home` mounts. Mount these only if
+> using X11 applications.
 
 Start the jail:
 
