@@ -45,6 +45,12 @@ manage it:
 # chown -R op:op /home/op
 ```
 
+Change root-user shell to tcsh(1):
+
+```console
+# chsh -s /bin/tcsh root
+```
+
 
 # SERVICES
 
