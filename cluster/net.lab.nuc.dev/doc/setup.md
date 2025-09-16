@@ -5,6 +5,12 @@
 
 # USERS & GROUPS
 
+Change root-user shell to tcsh(1):
+
+```consold
+# chsh -s /bin/tcsh root
+```
+
 Users:
 
   * `skhalatyan` is a software engineer
@@ -44,13 +50,12 @@ Users:
     # passwd -l op
     ```
 
-
 Groups:
 
-  * `ssh` lists users that are allowed to SSH into the host
+> [!WARNING]
+> `pw` adds **existing** users to the group with `-M ...` flag.
 
-    > [!WARNING]
-    > the command adds **existing** users to the group with `-M ...` flag.
+  * `ssh` lists users that are allowed to SSH into the host
 
     ```console
     # pw groupadd \
