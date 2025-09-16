@@ -96,6 +96,21 @@ Create a template with updated software:
 # env PAGER=cat freebsd-update -b /jail/template/14.3-RELEASE/ fetch install
 # env ROOT=/jail/template/14.3-RELEASE /jail/template/14.3-RELEASE/bin/freebsd-version -u
 14.3-RELEASE-p2
+```
+
+Fix timezone from UTC to local (US Central Time):
+
+```console
+# chroot /jail/template/14.3-RELEASE date
+Tue Sep 16 15:45:41 UTC 2025
+# chroot /jail/template/14.3-RELEASE tzsetup
+# chroot /jail/template/14.3-RELEASE date
+Tue Sep 16 10:47:15 CDT 2025
+```
+
+Snapshot the version with installed patch number.
+
+```console
 # zfs snapshot zroot/jail/template/14.3-RELEASE@p2
 ```
 
