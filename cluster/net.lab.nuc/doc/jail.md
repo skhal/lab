@@ -205,6 +205,18 @@ dev {
 }
 ```
 
+Close syslog port.
+
+```console
+# sockstat -4
+USER     COMMAND    PID   FD  PROTO  LOCAL ADDRESS         FOREIGN ADDRESS
+root     syslogd    41091 6   udp4   *:514
+# sysrc -f /etc/rc.conf.d/syslogd syslogd_flags="-ss"
+# service syslogd restart
+# sockstat -4
+USER     COMMAND    PID   FD  PROTO  LOCAL ADDRESS         FOREIGN ADDRESS
+```
+
 # LINUX JAIL
 
 Ref: https://docs.freebsd.org/en/books/handbook/jails/#creating-linux-jail
