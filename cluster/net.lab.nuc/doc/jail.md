@@ -8,7 +8,7 @@
 Ref: https://docs.freebsd.org/en/books/handbook/jails/
 
   * Jail configurations are under `/etc/jail.conf.d/`
-  * Jail filesystem is under ZFS dataset `zroot/jail` 
+  * Jail filesystem is under ZFS dataset `zroot/jail`
 
 # HOST SETUP
 
@@ -74,9 +74,23 @@ Create child datasets:
 Include jail configuraitons from `/etc/jail.conf.d/`:
 
 ```console
-# cat <<eof >/etc/jail.conf
+# cat /etc/jail.conf
+host.hostname = "${name}.nuc.lab.net";
+path = "/jail/container/${name}";
+
+# Permissions
+allow.raw_sockets;
+mount.devfs;
+# https://github.com/freebsd/freebsd-src/blob/a7340d559ee942c21ea1a037d1d60a7859dd873b/sbin/devfs/devfs.rules
+devfs_ruleset = 4; # no vnet
+exec.clean;
+
+exec.consolelog = "/var/log/jail_console_${name}.log";
+exec.prestart  = "cp /etc/resolv.conf ${path}/etc/";
+exec.start = "/bin/sh /etc/rc";
+exec.stop = "/bin/sh /etc/rc.shutdown";
+
 .include "/etc/jail.conf.d/*.conf";
-eof
 ```
 
 
@@ -124,18 +138,10 @@ The new jail `dev` is isolated and does not have a network access:
 
 ```console
 # zfs clone zroot/jail/template/14.3-RELEASE@p2 zroot/jail/container/dev
-# cat <<eof >/etc/jail.conf.d/dev.conf
+# cat /etc/jail.conf.d/dev.conf
 dev {
-  exec.start = "/bin/sh /etc/rc";
-  exec.stop = "/bin/sh /etc/rc.shutdown";
-  exec.consolelog = "/var/log/jail_console_${name}.log";
-
-  host.hostname = "${name}.nuc.lab.net";
-  path = "/jail/container/${name}";
-
-  exec.clean;
+  # empty
 }
-eof
 ```
 
 # VNET JAIL
@@ -151,7 +157,7 @@ connect the other end to one of the network interfaces on the host system via
 `bridge(4)`.
 
 > [!Note]
-> The bridge and both ends of epair must be in the UP state for the packets to 
+> The bridge and both ends of epair must be in the UP state for the packets to
 > flow.
 
 Create a bridge on the host system and add the network interface with Internet
@@ -182,29 +188,17 @@ dev {
   $epair = "epair${id}";
   $bridge = "bridge0";
 
-  allow.raw_sockets;
-  exec.clean;
-  mount.devfs;
-  devfs_ruleset = 5;
-
-  host.hostname = "${name}.nuc.lab.net";
-  path = "/jail/container/${name}";
-
-  # Enable VNET and enjail the b-side of the epair
+  # Virtual Network (VNET)
   vnet;
   vnet.interface = "${epair}b";
-  
-  exec.consolelog = "/var/log/jail_console_${name}.log";
-  
-  exec.prestart  = "cp /etc/resolv.conf ${path}/etc/";
+  devfs_ruleset = 5;
+
   exec.prestart += "/sbin/ifconfig ${epair} create";
   exec.prestart += "/sbin/ifconfig ${epair}a up";
   exec.prestart += "/sbin/ifconfig ${bridge} addm ${epair}a up";
 
   exec.start  = "/sbin/ifconfig ${epair}b ${ip} up";
   exec.start += "/bin/sh /etc/rc";
-
-  exec.stop = "/bin/sh /etc/rc.shutdown";
 
   exec.poststop += "/sbin/ifconfig ${bridge} deletem ${epair}a";
   exec.poststop += "/sbin/ifconfig ${epair}a destroy";
@@ -247,13 +241,20 @@ dev proc  sys
 
 ## Step 2: Bootstrap a VNET jail
 
-Use the instructions for setting up a new [VNET Jail](#vnet-jail) with the
+Use the instructions for setting up a new [VNET Jail](#vnet-jail). Mount
 following changes:
 
   * Name it `ubuntu`.
   * Allow mounts of different type filesystems for Linux
 
 ```
+# cat /etc/jail.conf.d/ubuntu
+ubuntu {
+  $id = "111";
+  $ip = "192.168.1.${id}/24";
+  $epair = "epair${id}";
+  $bridge = "bridge0";
+
   allow.mount;
   allow.mount.devfs;
   allow.mount.fdescfs;
@@ -261,12 +262,24 @@ following changes:
   allow.mount.linprocfs;
   allow.mount.linsysfs;
   allow.mount.tmpfs;
-  allow.raw_sockets;
 
-  devfs_ruleset = 4;
   enforce_statfs = 1; # only mount points below jail's chroot
-  exec.clean;
-  mount.devfs;
+
+  # Virtual Network (VNET)
+  vnet;
+  vnet.interface = "${epair}b";
+  devfs_ruleset = 5;
+
+  exec.prestart += "/sbin/ifconfig ${epair} create";
+  exec.prestart += "/sbin/ifconfig ${epair}a up";
+  exec.prestart += "/sbin/ifconfig ${bridge} addm ${epair}a up";
+
+  exec.start  = "/sbin/ifconfig ${epair}b ${ip} up";
+  exec.start += "/bin/sh /etc/rc";
+
+  exec.poststop += "/sbin/ifconfig ${bridge} deletem ${epair}a";
+  exec.poststop += "/sbin/ifconfig ${epair}a destroy";
+}
 ```
 
 Start the jail:
@@ -318,11 +331,44 @@ Add the following instructions to the jail's configuration:
 > using `chroot /compat/ubuntu ...`.
 
 ```
+# cat /etc/jail.conf.d/ubuntu
+ubuntu {
+  $id = "111";
+  $ip = "192.168.1.${id}/24";
+  $epair = "epair${id}";
+  $bridge = "bridge0";
+
+  allow.mount;
+  allow.mount.devfs;
+  allow.mount.fdescfs;
+  allow.mount.procfs;
+  allow.mount.linprocfs;
+  allow.mount.linsysfs;
+  allow.mount.tmpfs;
+
+  enforce_statfs = 1; # only mount points below jail's chroot
+
+  # Virtual Network (VNET)
+  vnet;
+  vnet.interface = "${epair}b";
+  devfs_ruleset = 5;
+
+  exec.prestart += "/sbin/ifconfig ${epair} create";
+  exec.prestart += "/sbin/ifconfig ${epair}a up";
+  exec.prestart += "/sbin/ifconfig ${bridge} addm ${epair}a up";
+
+  exec.start  = "/sbin/ifconfig ${epair}b ${ip} up";
+  exec.start += "/bin/sh /etc/rc";
+
+  exec.poststop += "/sbin/ifconfig ${bridge} deletem ${epair}a";
+  exec.poststop += "/sbin/ifconfig ${epair}a destroy";
+
   mount += "devfs     $path/compat/ubuntu/dev     devfs     rw  0 0";
   mount += "tmpfs     $path/compat/ubuntu/dev/shm tmpfs     rw,size=1g,mode=1777  0 0";
   mount += "fdescfs   $path/compat/ubuntu/dev/fd  fdescfs   rw,linrdlnk 0 0";
   mount += "linprocfs $path/compat/ubuntu/proc    linprocfs rw  0 0";
   mount += "linsysfs  $path/compat/ubuntu/sys     linsysfs  rw  0 0";
+}
 ```
 
 > [!NOTE]
