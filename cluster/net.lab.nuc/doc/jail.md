@@ -217,6 +217,13 @@ root     syslogd    41091 6   udp4   *:514
 USER     COMMAND    PID   FD  PROTO  LOCAL ADDRESS         FOREIGN ADDRESS
 ```
 
+Setup routing:
+
+```console
+# sysrc -f /etc/rc.conf.d/routing defaultrouter="192.168.1.1"
+# service routing restart
+```
+
 # LINUX JAIL
 
 Ref: https://docs.freebsd.org/en/books/handbook/jails/#creating-linux-jail
