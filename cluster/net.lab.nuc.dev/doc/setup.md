@@ -88,7 +88,6 @@ Installed packages:
 
 ```console
 % pkg prime-list
-bazel
 doas
 git
 go125

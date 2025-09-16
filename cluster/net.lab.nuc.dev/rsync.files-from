@@ -1,4 +1,3 @@
-etc/fstab
 etc/rc.conf
 etc/rc.conf.d
 home/op/.cshrc
