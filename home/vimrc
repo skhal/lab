@@ -51,8 +51,15 @@ endfunction
 
 let g:skeleton_find_template = {}
 function! g:skeleton_find_template.go(path)
-  if fnamemodify(a:path, ':t') =~ '_test.go$'
+  if fnamemodify(a:path, ':t') =~ '_test\.go$'
     return 'skel_test.go'
+  endif
+  return ''
+endfunction
+
+function! g:skeleton_find_template.cpp(path)
+  if fnamemodify(a:path, ':t') =~ '_test\.cc$'
+    return 'skel_test\.cc'
   endif
   return ''
 endfunction
