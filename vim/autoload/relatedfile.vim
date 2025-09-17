@@ -36,8 +36,10 @@ let s:header_by_file = {
 let s:source_by_file = {
   \ 'c': s:makeSubstitutor('\(_test\.cc\|\.h\)$', '.cc'),
   \ 'cpp': s:makeSubstitutor('\(_test\.cc\|\.h\)$', '.cc'),
+  \ 'go': s:makeSubstitutor('_test\.go$', '.go'),
   \}
 let s:test_by_file = {
   \ 'c': s:makeSubstitutor('\(\(_test\)\@<!\.cc\|\.h\)$', '_test.cc'),
   \ 'cpp': s:makeSubstitutor('\(\(_test\)\@<!\.cc\|\.h\)$', '_test.cc'),
+  \ 'go': s:makeSubstitutor('\(_test\)\@<!\.go$', '_test.go'),
   \}
