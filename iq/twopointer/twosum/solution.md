@@ -6,5 +6,6 @@ depending on the current sum value compared to the target value `S`.
 
 ## Complexity
 
-  * Time • O(n)
-  * Space • O(1)
+*Time*: a linear scan is O(n).
+
+*Space*: constant factor of variables per iteration is O(1).
