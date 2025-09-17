@@ -2,9 +2,10 @@
 #
 # Flavor: FreeBSD
 
+INSTALL_PATHS = vim
 INSTALL_TARGETS = ${HOME}/.tcshrc ${HOME}/.vimrc
 
-install: ${INSTALL_TARGETS} .PHONY
+install: ${INSTALL_TARGETS} ${INSTALL_PATHS} .PHONY
 
 # Target is `${HOME}/.foo`, the source is `foo`.
 SOURCE = ${.TARGET:T:S/^.//}
@@ -18,4 +19,9 @@ INSTALL_TARGET: .NOTMAIN .USE
 # commands.
 .for target in ${INSTALL_TARGETS}
 ${target}: ${SOURCE} INSTALL_TARGET
+.endfor
+
+.for target in ${INSTALL_PATHS}
+${target}: .PHONY
+	@${MAKE} -C ${.CURDIR}/${.TARGET} install
 .endfor
