@@ -1,18 +1,22 @@
 " Copyright 2025 Samvel Khalatyan. All rights reserved.
 
 function! relatedfile#OpenHeader(file)
-  call s:open(a:file, s:header_by_file)
+  call s:open(a:file, s:header_by_file, 'header')
 endfunction
 
 function! relatedfile#OpenSource(file)
-  call s:open(a:file, s:source_by_file)
+  call s:open(a:file, s:source_by_file, 'source')
 endfunction
 
 function! relatedfile#OpenTest(file)
-  call s:open(a:file, s:test_by_file)
+  call s:open(a:file, s:test_by_file, 'test')
 endfunction
 
-function! s:open(file, substitutor_by_filetype)
+function! relatedfile#OpenExample(file)
+  call s:open(a:file, s:example_by_file, 'example')
+endfunction
+
+function! s:open(file, substitutor_by_filetype, reltype)
   let l:file = fnamemodify(a:file, ':p')
   let l:Subsitutor = get(a:substitutor_by_filetype, &filetype, '')
   if l:Subsitutor == ''
@@ -23,6 +27,7 @@ function! s:open(file, substitutor_by_filetype)
   if l:relatedfile == l:file
     return
   endif
+  echow a:reltype . ': ' . relatedfile
   execute 'edit ' . l:relatedfile
 endfunction
 
@@ -36,10 +41,13 @@ let s:header_by_file = {
 let s:source_by_file = {
   \ 'c': s:makeSubstitutor('\(_test\.cc\|\.h\)$', '.cc'),
   \ 'cpp': s:makeSubstitutor('\(_test\.cc\|\.h\)$', '.cc'),
-  \ 'go': s:makeSubstitutor('_test\.go$', '.go'),
+  \ 'go': s:makeSubstitutor('\(_example\)\?_test\.go$', '.go'),
   \}
 let s:test_by_file = {
   \ 'c': s:makeSubstitutor('\(\(_test\)\@<!\.cc\|\.h\)$', '_test.cc'),
   \ 'cpp': s:makeSubstitutor('\(\(_test\)\@<!\.cc\|\.h\)$', '_test.cc'),
-  \ 'go': s:makeSubstitutor('\(_test\)\@<!\.go$', '_test.go'),
+  \ 'go': s:makeSubstitutor('\(_example_test\.go\|\(_test\)\@<!\.go\)$', '_test.go'),
+  \}
+let s:example_by_file = {
+  \ 'go': s:makeSubstitutor('\(example_test\)\@<!\.go$', '_example_test.go'),
   \}
