@@ -49,7 +49,7 @@ https://github.com/skhal/lab/blob/b2f7174d45867695b9fa9799902d3f965e809258/x/pro
 Run Go generate commands:
 
 ```console
-% go generate x/proto/pb/...
+% go generate ./x/proto/pb/...
 ```
 
 > [!TIP]
