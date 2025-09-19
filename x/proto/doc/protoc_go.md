@@ -26,12 +26,12 @@ Install Go Protobuf plugin:
 % go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
 ```
 
-Define Protobuf messages in `x/proto/pb/pingpong.proto`.
+Define Protobuf messages in `x/proto/pb/foo.proto`.
 
 > [!TIP]
 > Place Protobuf definitions under `pb/` folder.
 
-https://github.com/skhal/lab/blob/443c3225718191cb207097030b4b7950c47db443/x/proto/pb/pingpong.proto#L1-L22
+https://github.com/skhal/lab/blob/0f6437e22a1abec11f28f0d6a5741138e980f754/x/proto/pb/foo.proto#L3-L15
 
 Instead of manually running Protobuf compiler on `.proto` files, we'll use
 [`go generate`](https://pkg.go.dev/cmd/go#hdr-Generate_Go_files_by_processing_source).
@@ -49,7 +49,7 @@ https://github.com/skhal/lab/blob/b2f7174d45867695b9fa9799902d3f965e809258/x/pro
 Run Go generate commands:
 
 ```console
-% go generate x/proto/pb/....
+% go generate x/proto/pb/...
 ```
 
 > [!TIP]
