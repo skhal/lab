@@ -22,4 +22,4 @@ Ref: https://protobuf.dev/reference/protobuf/textformat-spec/
 
 Use `prototext.Unmarshall()` to parse Protobuf text format into a message:
 
-
+https://github.com/skhal/lab/blob/db1d9e35935be0dbfca9790616d8b127bcf2a0f4/x/proto/pb/foo_example_txtpb_test.go#L16-L19
