@@ -32,3 +32,11 @@ to generate Go files by processing source.
 Create a `pb/gen.go` file with `//go:generate` directives to compile `.proto`
 files to `.go`. It is helpful to create an alias to a command with common flags
 with `//go:generate -command foo ...` to create an alias `foo`.
+
+https://github.com/skhal/lab/blob/064a3526bada7eaf1a3856c344449ea929922a8f/x/proto/pb/gen.go
+
+Generate go code:
+
+```console
+% go generate ....
+```
