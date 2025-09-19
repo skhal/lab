@@ -24,7 +24,11 @@ Install Protobuf plugin for Go gRPC using Go modules:
 
 Define the service `x/proto/pb/fooer.proto`.
 
+https://github.com/skhal/lab/blob/2c99ba3d642faac93e5778c39149da4393f85d23/x/proto/pb/fooer.proto#L12-L24
+
 Add Go generate directives to compile the service definition into Go.
+
+https://github.com/skhal/lab/blob/2c99ba3d642faac93e5778c39149da4393f85d23/x/proto/pb/gen.go#L8-L9
 
 Run Go generate:
 
