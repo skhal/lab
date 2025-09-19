@@ -1,0 +1,10 @@
+// Copyright @YEAR@ Samvel Khalatyan. All rights reserved.
+
+edition = "2023"
+
+package @PACKAGE@;
+
+import "google/protobuf/go_features.proto";
+
+option features.(pb.go).api_level = API_OPAQUE;
+option go_package = "@GO_PACKAGE@";

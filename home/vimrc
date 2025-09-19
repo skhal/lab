@@ -43,6 +43,7 @@ function! g:skeleton_replacements.YEAR()
   return strftime('%Y')
 endfunction
 
+" Go
 let g:skeleton_replacements_go = {}
 function! g:skeleton_replacements_go.PACKAGE()
   let l:package = expand('%:h:t')
@@ -57,6 +58,7 @@ function! g:skeleton_find_template.go(path)
   return ''
 endfunction
 
+" C++
 function! g:skeleton_find_template.cpp(path)
   if fnamemodify(a:path, ':t') =~ '_test\.cc$'
     return 'skel_test\.cc'
@@ -99,4 +101,23 @@ function! g:skeleton_replacements_cpp.HEADER()
   let l:relpath = s:skeleton_getGitWorktreeRelpath()
   let l:header = fnamemodify(l:relpath, ':s,\(_test\)\?.cc$,.h,')
   return escape(l:header, '/')
+endfunction
+
+" Protobuf
+let g:skeleton_replacements_proto = {}
+function! g:skeleton_replacements_proto.PACKAGE()
+  " Assuming a .proto is in a folder `foo/bar/pb`, the package is `foo/bar`.
+  let l:relpath = s:skeleton_getGitWorktreeRelpath()
+  let l:package = fnamemodify(l:relpath, ':h:gs,/,.,')
+  let l:package = fnamemodify(l:package, ':s,.pb$,,')
+  echow 'package: ' . l:package
+  return l:package
+endfunction
+function! g:skeleton_replacements_proto.GO_PACKAGE()
+  let l:go_module = trim(system('go list -m'))
+  let l:relpath = s:skeleton_getGitWorktreeRelpath()
+  let l:relpath = fnamemodify(l:relpath, ':h')
+  let l:go_package = l:go_module . '/' . l:relpath
+  echow 'go_package: ' . l:go_package
+  return escape(l:go_package, '/')
 endfunction
