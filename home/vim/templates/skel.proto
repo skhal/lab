@@ -1,6 +1,6 @@
 // Copyright @YEAR@ Samvel Khalatyan. All rights reserved.
 
-edition = "2023"
+edition = "2023";
 
 package @PACKAGE@;
 
