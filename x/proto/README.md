@@ -33,7 +33,7 @@ Create a `pb/gen.go` file with `//go:generate` directives to compile `.proto`
 files to `.go`. It is helpful to create an alias to a command with common flags
 with `//go:generate -command foo ...` to create an alias `foo`.
 
-https://github.com/skhal/lab/blob/064a3526bada7eaf1a3856c344449ea929922a8f/x/proto/pb/gen.go
+https://github.com/skhal/lab/blob/b2f7174d45867695b9fa9799902d3f965e809258/x/proto/pb/gen.go#L5-L6
 
 Generate go code:
 
