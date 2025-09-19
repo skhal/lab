@@ -51,3 +51,6 @@ Run Go generate commands:
 ```console
 % go generate ....
 ```
+
+> [!TIP]
+> It is common to check in the generated code into Version Control System.
