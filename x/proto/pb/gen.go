@@ -3,4 +3,4 @@
 package pb
 
 //go:generate -command protoc_cmd protoc --proto_path=. -I=../../ --go_out=. --go_opt=paths=source_relative
-//go:generate protoc_cmd pingpong.proto
+//go:generate protoc_cmd foo.proto
