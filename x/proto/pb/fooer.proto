@@ -1,0 +1,24 @@
+// Copyright 2025 Samvel Khalatyan. All rights reserved.
+
+edition = "2023";
+
+package x.proto;
+
+import "google/protobuf/go_features.proto";
+
+option features.(pb.go).api_level = API_OPAQUE;
+option go_package = "github.com/skhal/lab/x/proto/pb";
+
+service Fooer {
+  rpc Foo(FooRequest) returns (FooResponse) {}
+}
+
+// Next ID: 2
+message FooRequest {
+  string message = 1;
+}
+
+// Next ID: 2
+message FooResponse {
+  string message = 1;
+}
