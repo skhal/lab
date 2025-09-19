@@ -3,11 +3,13 @@
 **protoc-go** - compile Protobuf for Go
 
 
-# SUMMARY
+# SYNOPSIS
 
-* Install `protobuf` package with Protobuf compiler `protoc`.
-* Install Go Protobuf plugin `protoc-gen-go` with `go install`.
-* Compile Protobuf into Go code with `go generate`.
+```console
+% doas pkg install protobuf
+% go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+% go generate ./x/proto/pb/...
+```
 
 
 # DESCRIPTION
