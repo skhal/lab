@@ -56,12 +56,15 @@ endfunction
 
 let g:skeleton_find_template = {}
 function! g:skeleton_find_template.go(path)
-  let l:filename = 'skel.go'
-  if fnamemodify(a:path, ':t') =~ '_test\.go$'
-    let l:filename = 'skel_test.go'
+  let l:skel = 'skel.go'
+  let l:filename = fnamemodify(a:path, ':t')
+  if l:filename =~ '_example_test\.go$'
+    let l:skel = 'skel_example_test.go'
+  elseif l:filename =~ '_test\.go$'
+    let l:skel = 'skel_test.go'
   endif
-  echow 'skel: ' . l:filename
-  return l:filename
+  echow 'skel: ' . l:skel
+  return l:skel
 endfunction
 
 " C++
