@@ -49,5 +49,5 @@ let s:test_by_file = {
   \ 'go': s:makeSubstitutor('\(_example_test\.go\|\(_test\)\@<!\.go\)$', '_test.go'),
   \}
 let s:example_by_file = {
-  \ 'go': s:makeSubstitutor('\(example_test\)\@<!\.go$', '_example_test.go'),
+  \ 'go': s:makeSubstitutor('\(\(_example\)\@<!_test\.go\|\(example_test\)\@<!\.go\)$', '_example_test.go'),
   \}
