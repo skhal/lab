@@ -3,9 +3,11 @@
 package threesum_test
 
 import (
+	"slices"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
+	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/skhal/lab/iq/twopointer/threesum"
 )
 
@@ -85,12 +87,16 @@ var tests = []struct {
 	},
 }
 
+func less(x, y []int) bool {
+	return slices.Compare(x, y) < 0
+}
+
 func TestFind(t *testing.T) {
 	for _, tc := range tests {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			got := threesum.Find(tc.nn)
-			if diff := cmp.Diff(tc.want, got); diff != "" {
+			if diff := cmp.Diff(tc.want, got, cmpopts.SortSlices(less)); diff != "" {
 				t.Errorf("threesum.Find(%v) mismatch (-want, +got):\n%s", tc.nn, diff)
 			}
 		})
@@ -102,7 +108,7 @@ func TestFindWithOptimizations(t *testing.T) {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			got := threesum.FindWithOptimizations(tc.nn)
-			if diff := cmp.Diff(tc.want, got); diff != "" {
+			if diff := cmp.Diff(tc.want, got, cmpopts.SortSlices(less)); diff != "" {
 				t.Errorf("threesum.FindWithOptimizations(%v) mismatch (-want, +got):\n%s", tc.nn, diff)
 			}
 		})
