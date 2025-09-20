@@ -12,7 +12,7 @@ to a given value `S`.
 
   * Array is [1, 2, 3, 4, 5]
   * S is 5
-  * Output is [2, 3]
+  * Output is [0, 3]
 
 
 # SEE ALSO

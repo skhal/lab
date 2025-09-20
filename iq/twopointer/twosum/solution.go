@@ -7,7 +7,8 @@ func Find(nn []int, x int) []int {
 	if len(nn) < 2 {
 		return nil
 	}
-	for left, right := 0, len(nn)-1; left < right; {
+	left, right := 0, len(nn)-1
+	for left < right {
 		sum := nn[left] + nn[right]
 		if sum < x {
 			left += 1
