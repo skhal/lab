@@ -24,7 +24,9 @@ blockSize - offset = -offset & (blockSize - 1)
 The blockSize is:
 
 ```math
+\begin{align*}
 blockSize = 2^N
+\end{align*}
 ```
 
 Then:
@@ -48,7 +50,7 @@ There are different ways to represent negative numbers in computers
 two'2 complement being dominant these days. Two's complement of a number is
 given by the complement of the number plus one:
 
-```math
+```
 -N => ~N + 1
 ```
 
@@ -56,19 +58,19 @@ Applying this idea to the offset, it translates into:
 
 ```math
 \begin{align}
--offset &= ~\left( \sum_{i=0}^{N-1}{\nu_i 2^i} \right) + 1 \\
-        &= \sum_{i=0}^{N-1}{\bar{\nu}_i 2^i} + 2^0 \\
+-offset &= \sim \sum_{i=0}^{N-1}{\nu_i 2^i} + 1 \\
+        &= \sum_{i=0}^{N-1}{\bar{\nu_i} 2^i} + 2^0 \\
 \end{align}
 ```
 
-where $`\bar{\nu}_i`$ is the complement of $`\nu_i`$.
+where $`\bar{\nu_i}`$ is the complement of $`\nu_i`$.
 
 Final expression:
 
 ```math
 \begin{align}
--offset \& (blockSize - 1) &= \left( \sum_{i=0}^{N-1}{\bar{\nu}_i 2^i} + 2^0 \right) & \sum_{j=0}^{N-1}{2^j} \\
-  &= \sum_{i=0}^{N-1}{\bar{\nu}_i 2^i} + 2^0
+-offset \& (blockSize - 1) &= \left( \sum_{i=0}^{N-1}{\bar{\nu_i} 2^i} + 2^0 \right) & \sum_{j=0}^{N-1}{2^j} \\
+  &= \sum_{i=0}^{N-1}{\bar{\nu_i} 2^i} + 2^0
 \end{align}
 ```
 
@@ -76,7 +78,7 @@ Verify the result by adding it to the offset - we expect to get the block size:
 
 ```math
 \begin{align}
-offset + [ -offset & ( blockSize - 1 ) ] &= \sum_{i=0}^{N-1}{\nu_i 2^i} + \sum_{i=0}^{N-1}{\bar{\nu}_i 2^i} + 2^0 \\
+\mathsf{offset} + [ -\mathsf{offset} & ( \mathsf{blockSize} - 1 ) ] &= \sum_{i=0}^{N-1}{\nu_i 2^i} + \sum_{i=0}^{N-1}{\bar{\nu_i} 2^i} + 2^0 \\
   &= \sum_{i=0}^{N-1}{2^i} + 2^0 \\
   &= 2^N
 \end{align}
