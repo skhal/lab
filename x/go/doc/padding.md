@@ -56,7 +56,7 @@ The negative offset in two's complement is:
 
 ```math
 \begin{align}
-- \mathsf{offset} &= \medskip \sim \sum_{i=0}^{N-1}{\nu_i 2^i} + 1 \\
+- \mathsf{offset} &= \hspace{1mm} \sim \sum_{i=0}^{N-1}{\nu_i 2^i} + 1 \\
         &= \sum_{i=0}^{N-1}{\bar{\nu_i} 2^i} + 2^0 \\
 \end{align}
 ```
