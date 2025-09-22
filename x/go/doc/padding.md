@@ -24,41 +24,39 @@ blockSize - offset = -offset & (blockSize - 1)
 The blockSize is:
 
 ```math
-\begin{align*}
-blockSize = 2^N
-\end{align*}
+\mathsf{blockSize} = 2^N
 ```
 
 Then:
 
 ```math
-blockSize - 1 = \sum_{i=0}^{N-1}{2^i}
+\mathsf{blockSize} - 1 = \sum_{i=0}^{N-1}{2^i}
 ```
 
-Offset is some number that is less than the block size. When represented as a
-polynomial of the powers of 2, it will use only N-1 powers.
+the offset is some number that is less than the block size. When represented as
+a polynomial of the powers of 2, it will run only to $`2^{N-1}`$.
 
-Let's denote $`\nu_i`$ the i-th power of 2 factor, which is either 0 or 1. The
-offset then can be represented as:
+Let's denote the multiplier of $`2^i`$ as $`\nu_i`$. It can have a value of 0 or
+1:
 
 ```math
-offset = \sum_{i=0}^{N-1}{\nu_i 2^i}
+\mathsf{offset} = \sum_{i=0}^{N-1}{\nu_i 2^i}
 ```
 
 There are different ways to represent negative numbers in computers
-([Wikipedia](https://en.wikipedia.org/wiki/Signed_number_representations) with
-two'2 complement being dominant these days. Two's complement of a number is
-given by the complement of the number plus one:
+([Wikipedia](https://en.wikipedia.org/wiki/Signed_number_representations)), with
+two's complement being dominant these days, where a negative number is given
+by the complement of the positive number plus one:
 
 ```
 -N => ~N + 1
 ```
 
-Applying this idea to the offset, it translates into:
+The negative offset in two's complement is:
 
 ```math
 \begin{align}
--offset &= \sim \sum_{i=0}^{N-1}{\nu_i 2^i} + 1 \\
+- \mathsf{offset} &= \medskip \sim \sum_{i=0}^{N-1}{\nu_i 2^i} + 1 \\
         &= \sum_{i=0}^{N-1}{\bar{\nu_i} 2^i} + 2^0 \\
 \end{align}
 ```
@@ -69,7 +67,7 @@ Final expression:
 
 ```math
 \begin{align}
--offset \& (blockSize - 1) &= \left( \sum_{i=0}^{N-1}{\bar{\nu_i} 2^i} + 2^0 \right) & \sum_{j=0}^{N-1}{2^j} \\
+- \mathsf{offset} \& ( \mathsf{blockSize} - 1 ) &= \left( \sum_{i=0}^{N-1}{\bar{\nu_i} 2^i} + 2^0 \right) \& \sum_{j=0}^{N-1}{2^j} \\
   &= \sum_{i=0}^{N-1}{\bar{\nu_i} 2^i} + 2^0
 \end{align}
 ```
@@ -78,7 +76,7 @@ Verify the result by adding it to the offset - we expect to get the block size:
 
 ```math
 \begin{align}
-\mathsf{offset} + [ -\mathsf{offset} & ( \mathsf{blockSize} - 1 ) ] &= \sum_{i=0}^{N-1}{\nu_i 2^i} + \sum_{i=0}^{N-1}{\bar{\nu_i} 2^i} + 2^0 \\
+\mathsf{offset} + [ \mathsf{-offset} \& ( \mathsf{blockSize} - 1 ) ] &= \sum_{i=0}^{N-1}{\nu_i 2^i} + \sum_{i=0}^{N-1}{\bar{\nu_i} 2^i} + 2^0 \\
   &= \sum_{i=0}^{N-1}{2^i} + 2^0 \\
   &= 2^N
 \end{align}
