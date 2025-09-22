@@ -49,7 +49,7 @@ endfunction
 " Go
 let g:skeleton_replacements_go = {}
 function! g:skeleton_replacements_go.PACKAGE()
-  let l:package = expand('%:h:t')
+  let l:package = expand('%:p:h:t')
   echow 'package: ' . l:package
   return l:package
 endfunction
