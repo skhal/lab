@@ -21,6 +21,20 @@ Stop jails in the reverse order to resolve jail dependencies:
 jail_reverse_stop: NO -> YES
 ```
 
+Parallel start jails:
+
+```console
+# sysrc -f /etc/rc.conf.d/jail jail_parallel_start="YES"
+jail_parallel_start: NO -> YES
+```
+
+Enable jails:
+
+```console
+# sysrc -f /etc/rc.conf.d/jail jail_enable="YES"
+jail_enable: NO -> YES
+```
+
 ## User groups
 
 Create a jail group to manipulate jails:
