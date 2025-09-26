@@ -1,0 +1,53 @@
+--- /usr/local/etc/openldap/slapd.ldif.sample	2025-08-09 02:08:12.000000000 -0500
++++ /usr/local/etc/openldap/slapd.ldif	2025-09-26 18:20:12.632731000 -0500
+@@ -39,6 +39,8 @@
+ cn: schema
+ 
+ include: file:///usr/local/etc/openldap/schema/core.ldif
++include: file:///usr/local/etc/openldap/schema/cosine.ldif
++include: file:///usr/local/etc/openldap/schema/nis.ldif
+ 
+ # Frontend settings
+ #
+@@ -68,6 +70,7 @@
+ #
+ # rootdn can always read and write EVERYTHING!
+ #
++olcAccess: to * by * read
+ 
+ 
+ #######################################################################
+@@ -79,18 +82,29 @@
+ objectClass: olcMdbConfig
+ olcDatabase: mdb
+ olcDbMaxSize: 1073741824
+-olcSuffix: dc=my-domain,dc=com
+-olcRootDN: cn=Manager,dc=my-domain,dc=com
++olcSuffix: dc=lab,dc=net
++olcRootDN: cn=op,dc=lab,dc=net
+ # Cleartext passwords, especially for the rootdn, should
+ # be avoided.  See slappasswd(8) and slapd-config(5) for details.
+ # Use of strong authentication encouraged.
+-olcRootPW: secret
++olcRootPW: {SSHA}Zrk3DTgsXhcuGXEUU/V5eTxE7q/MyFHo
+ # The database directory MUST exist prior to running slapd AND 
+ # should only be accessible by the slapd and slap tools.
+ # Mode 700 recommended.
+-olcDbDirectory:	/var/db/openldap-data
++olcDbDirectory:	/var/db/openldap-data/lab.net
+ # Indices to maintain
+ olcDbIndex: objectClass eq
++olcDbIndex: uid pres,eq
++olcDbIndex: cn,sn pres,eq,approx,sub
++olcAccess: to attrs=userPassword
++  by self write
++  by anonymous auth
++  by dn.base="cn=op,dc=lab,dc=net" write
++  by * none
++olcAccess: to *
++  by self write
++  by dn.base="cn=op,dc=lab,dc=net" write
++  by * read
+ 
+ dn: olcDatabase=monitor,cn=config
+ objectClass: olcDatabaseConfig

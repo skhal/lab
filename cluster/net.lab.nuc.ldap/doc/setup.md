@@ -141,3 +141,78 @@ for additional upgrade instructions.
 ```
 
 </details>
+
+Update OpenLDAP server configuration with the following changes:
+
+  * Include `cosine.ldif` and `nis.ldif` schemas for users and groups.
+  * Grant default read access to all content.
+  * Create a database for `dc=lab,dc=net`:
+    - Administrator is `cn=op,dc=lab,dc=net`.
+    - Use `slappasswd` to generate a password hash.
+    - Store data under `/var/db/openldap-data/lab.net`.
+    - Add multiple indices to speed up lookups.
+    - Let users and the administrator change user passwords.
+    - Users and administrator can update own entries.
+
+```console
+# patch -R /usr/local/etc/openldap/slapd.ldif < ~/slapd.ldif.diff
+Hmm...  Looks like a unified diff to me...
+The text leading up to this was:
+--------------------------
+|--- /usr/local/etc/openldap/slapd.ldif.sample  2025-08-09 02:08:12.000000000 -0500
+|+++ /usr/local/etc/openldap/slapd.ldif 2025-09-26 17:54:04.466570000 -0500
+--------------------------
+Patching file /usr/local/etc/openldap/slapd.ldif using Plan A...
+Hunk #1 succeeded at 39.
+Hunk #2 succeeded at 70.
+Hunk #3 succeeded at 82.
+done
+```
+
+Create a configuration directory and import the configuration:
+
+```console
+# mkdir /usr/local/etc/openldap/slapd.d
+# mkdir /var/db/openldap-data/lab.net
+# /usr/local/sbin/slapadd -n0 -F /usr/local/etc/openldap/slapd.d/ -l /usr/local/etc/openldap/slapd.ldif
+```
+
+We'll run OpenLDAP server under `ldap:ldap` user and need to update permissions
+to databases to grant access:
+
+```console
+# chown -R ldap:ldap /var/db/openldap-data /usr/local/etc/openldap/slapd.d
+# chmod -R 700 /var/db/openldap-data/lab.net /usr/local/etc/openldap/slapd.d
+```
+
+Configure and start slapd(8) service:
+
+```console
+# mkdir /usr/local/etc/rc.conf.d
+# sysrc -f /usr/local/etc/rc.conf.d/slapd slapd_enable=yes
+slapd_enable:  -> yes
+# sysrc -f /usr/local/etc/rc.conf.d/slapd slapd_sockets="/var/run/openldap/ldapi"
+slapd_sockets:  -> /var/run/openldap/ldapi
+# sysrc -f /usr/local/etc/rc.conf.d/slapd slapd_flags="-h 'ldapi://%2Fvar%2Frun%2Fopenldap%2Fldapi ldap://192.168.1.90'"
+slapd_flags:  -> -h 'ldapi://%2Fvar%2Frun%2Fopenldap%2Fldapi ldap://192.168.1.90:389/'
+# sysrc -f /usr/local/etc/rc.conf.d/slapd slapd_cn_config=yes
+slapd_cn_config:  -> yes
+# service slapd start
+```
+
+Verity slapd(8) runs:
+
+```console
+# sockstat -4 | grep slapd
+ldap     slapd      73735 8   tcp4   192.168.1.90:389      *:*
+# ls -l /var/run/openldap/
+total 6
+srw-rw-rw-  1 ldap ldap   0 Sep 26 18:25 ldapi
+-rw-r--r--  1 ldap ldap 105 Sep 26 18:25 slapd.args
+-rw-r--r--  1 ldap ldap   6 Sep 26 18:25 slapd.pid
+```
+
+Check that the service runs as `ldap` user and binds to local IP address on
+default port `:389`. There must be service socket and PID present under
+`/var/run/openldap` with owner set to `ldap:ldap` (the socket permissions are
+set by rc-script `slapd` using `slapd_sockets` flag).
