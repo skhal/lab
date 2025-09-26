@@ -144,15 +144,50 @@ for additional upgrade instructions.
 
 Update OpenLDAP server configuration with the following changes:
 
-  * Include `cosine.ldif` and `nis.ldif` schemas for users and groups.
-  * Grant default read access to all content.
-  * Create a database for `dc=lab,dc=net`:
-    - Administrator is `cn=op,dc=lab,dc=net`.
-    - Use `slappasswd` to generate a password hash.
-    - Store data under `/var/db/openldap-data/lab.net`.
-    - Add multiple indices to speed up lookups.
-    - Let users and the administrator change user passwords.
-    - Users and administrator can update own entries.
+<details>
+<summary>Schemas</summary>
+
+Include `cosine.ldif` and `nis.ldif` schemas for users and groups.
+
+https://github.com/skhal/lab/blob/be6831e29d56094e22a0b56568a67c90526a3dd8/cluster/net.lab.nuc.ldap/doc/slapd.ldif.diff#L6-L8
+
+</details>
+
+<details>
+<summary>Default read access</summary>
+
+https://github.com/skhal/lab/blob/be6831e29d56094e22a0b56568a67c90526a3dd8/cluster/net.lab.nuc.ldap/doc/slapd.ldif.diff#L14-L16
+
+</details>
+
+<details>
+<summary>Database `dc=lab,dc=net`</summary>
+
+Define database:
+
+https://github.com/skhal/lab/blob/be6831e29d56094e22a0b56568a67c90526a3dd8/cluster/net.lab.nuc.ldap/doc/slapd.ldif.diff#L23-L26
+
+The administrator is `cn=op,dc=lab,dc=net` with passwword from `slappasswd`:
+
+https://github.com/skhal/lab/blob/be6831e29d56094e22a0b56568a67c90526a3dd8/cluster/net.lab.nuc.ldap/doc/slapd.ldif.diff#L27-L32
+
+Store database under `/var/db/openldap-data/lab.net`:
+
+https://github.com/skhal/lab/blob/be6831e29d56094e22a0b56568a67c90526a3dd8/cluster/net.lab.nuc.ldap/doc/slapd.ldif.diff#L33-L37
+
+Add several indices to speed up lookups:
+
+https://github.com/skhal/lab/blob/be6831e29d56094e22a0b56568a67c90526a3dd8/cluster/net.lab.nuc.ldap/doc/slapd.ldif.diff#L38-L41
+
+Access Control List (ACL) to restrict password updates to users and admin:
+
+https://github.com/skhal/lab/blob/be6831e29d56094e22a0b56568a67c90526a3dd8/cluster/net.lab.nuc.ldap/doc/slapd.ldif.diff#L42-L46
+
+ACL to restrict user updates to users and admin:
+
+https://github.com/skhal/lab/blob/be6831e29d56094e22a0b56568a67c90526a3dd8/cluster/net.lab.nuc.ldap/doc/slapd.ldif.diff#L47-L50
+
+</details>
 
 ```console
 # patch -R /usr/local/etc/openldap/slapd.ldif < ~/slapd.ldif.diff
