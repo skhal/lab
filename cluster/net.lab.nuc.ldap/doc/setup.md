@@ -217,7 +217,7 @@ to databases to grant access:
 
 ```console
 # chown -R ldap:ldap /var/db/openldap-data /usr/local/etc/openldap/slapd.d
-# chmod -R 700 /var/db/openldap-data/lab.net /usr/local/etc/openldap/slapd.d
+# chmod -R 700 /var/db/openldap-data /usr/local/etc/openldap/slapd.d
 ```
 
 Configure and start slapd(8) service:
