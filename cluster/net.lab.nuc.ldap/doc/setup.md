@@ -97,7 +97,7 @@ NOTE: This port has been compiled with a default pwcheck_method of
       ports/security/cyrus-sasl2-ldapdb.
 
 ===
-Message from openldap26-client-2.6.10</summary>
+Message from openldap26-client-2.6.10
 
 The OpenLDAP client package has been successfully installed.
 
@@ -109,7 +109,7 @@ http://www.OpenLDAP.org/faq/index.cgi?file=3
 for more information.
 
 ===
-Message from openldap26-server-2.6.10</summary>
+Message from openldap26-server-2.6.10
 
 The OpenLDAP server package has been successfully installed.
 
@@ -151,34 +151,24 @@ Update OpenLDAP server slapd(8) configuration.
 <details>
 <summary>Changes</summary>
 
-  * **Schemas**<br/>
-
-    Include `cosine.ldif` and `nis.ldif` schemas for users and groups.
+  * **Schemas**: include `cosine.ldif` and `nis.ldif` schemas for users and
+    groups.
 
     https://github.com/skhal/lab/blob/47060d9b7f1185a04bd8a4dffa5d62c4053ac8cf/cluster/net.lab.nuc.ldap/doc/slapd.ldif.diff#L6-L8
 
-  * **Config access**<br/>
-
-    Grant root user unlimited access to the configuration when connected through
-    Unix sockets `ldapi://`:
-
-    https://github.com/skhal/lab/blob/47060d9b7f1185a04bd8a4dffa5d62c4053ac8cf/cluster/net.lab.nuc.ldap/doc/slapd.ldif.diff#L16-L24
-
-  * **Database `dc=lab,dc=net`**<br/>
-
-    Define database:
+  * **Database `dc=lab,dc=net`**: definition
 
     https://github.com/skhal/lab/blob/47060d9b7f1185a04bd8a4dffa5d62c4053ac8cf/cluster/net.lab.nuc.ldap/doc/slapd.ldif.diff#L32-L36
 
-    The administrator is `cn=op,dc=lab,dc=net` with passwword from `slappasswd`:
+    Set the administrator and passwword from `slappasswd`:
 
     https://github.com/skhal/lab/blob/47060d9b7f1185a04bd8a4dffa5d62c4053ac8cf/cluster/net.lab.nuc.ldap/doc/slapd.ldif.diff#L37-L42
 
-    Store database under `/var/db/openldap-data/lab.net`:
+    Store the database under `/var/db/openldap-data/lab.net`:
 
     https://github.com/skhal/lab/blob/47060d9b7f1185a04bd8a4dffa5d62c4053ac8cf/cluster/net.lab.nuc.ldap/doc/slapd.ldif.diff#L43-L47
 
-    Add several indices to speed up lookups:
+    Speed up lookups with indices:
 
     https://github.com/skhal/lab/blob/47060d9b7f1185a04bd8a4dffa5d62c4053ac8cf/cluster/net.lab.nuc.ldap/doc/slapd.ldif.diff#L48-L51
 
