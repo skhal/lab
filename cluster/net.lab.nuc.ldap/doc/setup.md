@@ -255,25 +255,55 @@ default port `:389`. There must be service socket and PID present under
 `/var/run/openldap` with owner set to `ldap:ldap` (the socket permissions are
 set by rc-script `slapd` using `slapd_sockets` flag).
 
+Unfortunately, the access to the server configuration is searchable at this
+point. To fix this, we'll stop the service, dump the configuration database
+into a temporary LDIF file, update ACL to grant permission to root to manage
+`cn=config`, re-create the configuration database, and start the service.
+
+```console
+# service slapd stop
+# slapcat -n0 -l /tmp/slapd.ldif
+# slapcat -n0 | diff -u - /tmp/slapd.ldif 
+--- -   2025-09-26 20:52:07.357710000 -0500
++++ /tmp/slapd.ldif     2025-09-26 20:50:22.724090000 -0500
+@@ -574,7 +574,10 @@
+ dn: olcDatabase={0}config,cn=config
+ objectClass: olcDatabaseConfig
+ olcDatabase: {0}config
+-olcAccess: {0}to *  by * none
++olcAccess: {0}to *
++  by dn.exact=gidNumber=0+uidNumber=0,cn=peercred,cn=external,cn=auth manage
++  by * break
++olcAccess: {0}to * by * none
+ olcAddContentAcl: TRUE
+ olcLastMod: TRUE
+ olcLastBind: FALSE
+# rm -rf /usr/local/etc/openldap/slapd.d/*
+# /usr/local/sbin/slapadd -n0 -F /usr/local/etc/openldap/slapd.d/ -l /tmp/slapd.ldif
+# chmod -R 700 /var/db/openldap-data /usr/local/etc/openldap/slapd.d
+# chown -R ldap:ldap /var/db/openldap-data /usr/local/etc/openldap/slapd.d
+# service slapd start
+```
+
 Validate root user has access to the service:
 
 > [!TIP]
 > Use following alias to speed up search:<br/>
 > `alias ldapisearch /usr/local/bin/ldapsearch -Y EXTERNAL -H ldapi://%2Fvar%2Frun%2Fopenldap%2Fldapi`
 
-```
-# ldapisearch -b cn=subschema -s base + | grep '^\w\+:' | grep -v '\(dn\|search\|result\):' | cut -d: -f 1 | sort -u
+```console
+# ldapisearch -b cn=config dn | grep '^dn:'
 SASL/EXTERNAL authentication started
 SASL username: gidNumber=0+uidNumber=0,cn=peercred,cn=external,cn=auth
 SASL SSF: 0
-attributeTypes
-createTimestamp
-entryDN
-ldapSyntaxes
-matchingRuleUse
-matchingRules
-modifyTimestamp
-objectClasses
-structuralObjectClass
-subschemaSubentry
+dn: cn=config
+dn: cn=module{0},cn=config
+dn: cn=schema,cn=config
+dn: cn={0}core,cn=schema,cn=config
+dn: cn={1}cosine,cn=schema,cn=config
+dn: cn={2}nis,cn=schema,cn=config
+dn: olcDatabase={-1}frontend,cn=config
+dn: olcDatabase={0}config,cn=config
+dn: olcDatabase={1}mdb,cn=config
+dn: olcDatabase={2}monitor,cn=config
 ```
