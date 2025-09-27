@@ -5,4 +5,3 @@ root/.k5login
 root/.login
 root/.profile
 root/.shrc
-usr/local/etc/openldap/slapd.ldif
