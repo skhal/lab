@@ -251,3 +251,26 @@ Check that the service runs as `ldap` user and binds to local IP address on
 default port `:389`. There must be service socket and PID present under
 `/var/run/openldap` with owner set to `ldap:ldap` (the socket permissions are
 set by rc-script `slapd` using `slapd_sockets` flag).
+
+Validate root user has access to the service:
+
+> [!TIP]
+> Use following alias to speed up search:<br/>
+> `alias ldapisearch /usr/local/bin/ldapsearch -Y EXTERNAL -H ldapi://%2Fvar%2Frun%2Fopenldap%2Fldapi`
+
+```
+# ldapisearch -b cn=subschema -s base + | grep '^\w\+:' | grep -v '\(dn\|search\|result\):' | cut -d: -f 1 | sort -u
+SASL/EXTERNAL authentication started
+SASL username: gidNumber=0+uidNumber=0,cn=peercred,cn=external,cn=auth
+SASL SSF: 0
+attributeTypes
+createTimestamp
+entryDN
+ldapSyntaxes
+matchingRuleUse
+matchingRules
+modifyTimestamp
+objectClasses
+structuralObjectClass
+subschemaSubentry
+```

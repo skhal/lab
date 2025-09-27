@@ -1,5 +1,5 @@
 --- /usr/local/etc/openldap/slapd.ldif.sample	2025-08-09 02:08:12.000000000 -0500
-+++ /usr/local/etc/openldap/slapd.ldif	2025-09-26 18:20:12.632731000 -0500
++++ /usr/local/etc/openldap/slapd.ldif	2025-09-26 19:03:49.559766000 -0500
 @@ -39,6 +39,8 @@
  cn: schema
  
@@ -9,15 +9,25 @@
  
  # Frontend settings
  #
-@@ -68,6 +70,7 @@
- #
+@@ -69,7 +71,17 @@
  # rootdn can always read and write EVERYTHING!
  #
-+olcAccess: to * by * read
  
++dn: olcDatabase=config,cn=config
++objectClass: olcDatabaseConfig
++olcDatabase: config
++olcAccess: to * by * none
++# Unlimited access to root via local connection
++olcAccess: to *
++  by dn.exact=gidNumber=0+uidNumber=0,cn=peercred,cn=external,cn=auth manage
++  by * break
++olcAccess: to * by * none
  
++
  #######################################################################
-@@ -79,18 +82,29 @@
+ # LMDB database definitions
+ #######################################################################
+@@ -79,18 +91,29 @@
  objectClass: olcMdbConfig
  olcDatabase: mdb
  olcDbMaxSize: 1073741824
