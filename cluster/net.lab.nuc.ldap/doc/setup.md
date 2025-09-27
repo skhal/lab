@@ -68,106 +68,103 @@ We'll start minimal configuration of LDAP server without databases.
 # pkg install openldap26-server
 ```
 
-Messages from installed packages:
+<details>
+<summary>Messages from installed packages</summary>
 
-  * <details>
-    <summary>Message from cyrus-sasl-2.1.28_5</summary>
+```
+===
+Message from cyrus-sasl-2.1.28_5
 
-    You can use sasldb2 for authentication, to add users use:
-    
-    ```saslpasswd2 -c username```
-    
-    If you want to enable SMTP AUTH with the system Sendmail, read
-    Sendmail.README
-    
-    NOTE: This port has been compiled with a default pwcheck_method of
-          auxprop.  If you want to authenticate your user by /etc/passwd,
-          PAM or LDAP, install ports/security/cyrus-sasl2-saslauthd and
-          set sasl_pwcheck_method to saslauthd after installing the
-          Cyrus-IMAPd 2.X port.  You should also check the
-          /usr/local/lib/sasl2/*.conf files for the correct
-          pwcheck_method.
-          If you want to use GSSAPI mechanism, install
-          ports/security/cyrus-sasl2-gssapi.
-          If you want to use SRP mechanism, install
-          ports/security/cyrus-sasl2-srp.
-          If you want to use LDAP auxprop plugin, install
-          ports/security/cyrus-sasl2-ldapdb.
-    </details>
+You can use sasldb2 for authentication, to add users use:
 
-  * <details>
-    <summary>Message from openldap26-client-2.6.10</summary>
+  saslpasswd2 -c username
 
-    The OpenLDAP client package has been successfully installed.
+If you want to enable SMTP AUTH with the system Sendmail, read
+Sendmail.README
 
-    Edit `/usr/local/etc/openldap/ldap.conf`
-    to change the system-wide client defaults.
+NOTE: This port has been compiled with a default pwcheck_method of
+      auxprop.  If you want to authenticate your user by /etc/passwd,
+      PAM or LDAP, install ports/security/cyrus-sasl2-saslauthd and
+      set sasl_pwcheck_method to saslauthd after installing the
+      Cyrus-IMAPd 2.X port.  You should also check the
+      /usr/local/lib/sasl2/*.conf files for the correct
+      pwcheck_method.
+      If you want to use GSSAPI mechanism, install
+      ports/security/cyrus-sasl2-gssapi.
+      If you want to use SRP mechanism, install
+      ports/security/cyrus-sasl2-srp.
+      If you want to use LDAP auxprop plugin, install
+      ports/security/cyrus-sasl2-ldapdb.
 
-    Try `man ldap.conf' and visit the OpenLDAP FAQ-O-Matic at
-    http://www.OpenLDAP.org/faq/index.cgi?file=3
-    for more information.
-    </details>
+===
+Message from openldap26-client-2.6.10</summary>
 
-  * <details>
-    <summary>Message from openldap26-server-2.6.10</summary>
+The OpenLDAP client package has been successfully installed.
 
-    The OpenLDAP server package has been successfully installed.
+Edit /usr/local/etc/openldap/ldap.conf
+to change the system-wide client defaults.
 
-    In order to run the LDAP server, you need to edit
-    `/usr/local/etc/openldap/slapd.conf`
-    to suit your needs and add the following lines to /etc/rc.conf:
+Try `man ldap.conf' and visit the OpenLDAP FAQ-O-Matic at
+http://www.OpenLDAP.org/faq/index.cgi?file=3
+for more information.
 
-    ```
-    slapd_enable="YES"
-    slapd_flags='-h "ldapi://%2fvar%2frun%2fopenldap%2fldapi/ ldap://0.0.0.0/"'
-    slapd_sockets="/var/run/openldap/ldapi"
-    ```
+===
+Message from openldap26-server-2.6.10</summary>
 
-    Then start the server with
-    ```/usr/local/etc/rc.d/slapd start```
-    or reboot.
+The OpenLDAP server package has been successfully installed.
 
-    Try `man slapd' and the online manual at
-    http://www.OpenLDAP.org/doc/
-    for more information.
+In order to run the LDAP server, you need to edit
+`/usr/local/etc/openldap/slapd.conf`
+to suit your needs and add the following lines to /etc/rc.conf:
 
-    slapd runs under a non-privileged user id (by default `ldap'),
-    see /usr/local/etc/rc.d/slapd for more information.
+  slapd_enable="YES"
+  slapd_flags='-h "ldapi://%2fvar%2frun%2fopenldap%2fldapi/ ldap://0.0.0.0/"'
+  slapd_sockets="/var/run/openldap/ldapi"
 
-    PLEASE NOTE:
+Then start the server with
+  usr/local/etc/rc.d/slapd start
+or reboot.
 
-    Upgrading from openldap26-server 2.4 to 2.5 requires a full dump
-    and reimport of database.
+Try `man slapd' and the online manual at
+http://www.OpenLDAP.org/doc/
+for more information.
 
-    Starting from openldap26-server 2.4.59_3, automatic data dumps
-    are saved at /var/backups/openldap when shutting down slapd.
+slapd runs under a non-privileged user id (by default `ldap'),
+see /usr/local/etc/rc.d/slapd for more information.
 
-    Please refer to OpenLDAP Software 2.5 Administrator's Guide at
-      https://www.openldap.org/doc/admin25/appendix-upgrading.html
-    for additional upgrade instructions.
-    </details>
+PLEASE NOTE:
 
-Update OpenLDAP server slapd(8) configuration with the following changes:
+Upgrading from openldap26-server 2.4 to 2.5 requires a full dump
+and reimport of database.
 
-  * <details>
-    <summary>Schemas</summary>
+Starting from openldap26-server 2.4.59_3, automatic data dumps
+are saved at /var/backups/openldap when shutting down slapd.
+
+Please refer to OpenLDAP Software 2.5 Administrator's Guide at
+  https://www.openldap.org/doc/admin25/appendix-upgrading.html
+for additional upgrade instructions.
+```
+</details>
+
+Update OpenLDAP server slapd(8) configuration.
+
+<details>
+<summary>Changes</summary>
+
+  * **Schemas**<br/>
 
     Include `cosine.ldif` and `nis.ldif` schemas for users and groups.
 
     https://github.com/skhal/lab/blob/47060d9b7f1185a04bd8a4dffa5d62c4053ac8cf/cluster/net.lab.nuc.ldap/doc/slapd.ldif.diff#L6-L8
-    </details>
 
-  * <details>
-    <summary>Config access</summary>
+  * **Config access**<br/>
 
     Grant root user unlimited access to the configuration when connected through
     Unix sockets `ldapi://`:
 
     https://github.com/skhal/lab/blob/47060d9b7f1185a04bd8a4dffa5d62c4053ac8cf/cluster/net.lab.nuc.ldap/doc/slapd.ldif.diff#L16-L24
-    </details>
 
-  * <details>
-    <summary>Database `dc=lab,dc=net`</summary>
+  * **Database `dc=lab,dc=net`**<br/>
 
     Define database:
 
@@ -192,7 +189,7 @@ Update OpenLDAP server slapd(8) configuration with the following changes:
     ACL to restrict user updates to users and admin:
 
     https://github.com/skhal/lab/blob/47060d9b7f1185a04bd8a4dffa5d62c4053ac8cf/cluster/net.lab.nuc.ldap/doc/slapd.ldif.diff#L57-L60
-    </details>
+</details>
 
 Push [spad.ldif.diff](./spad.ldif.diff) patch to `ldap.nuc.lab.net` and apply it
 to the default slapd(8) configuration:
