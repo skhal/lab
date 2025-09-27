@@ -149,14 +149,17 @@ Update OpenLDAP server configuration with the following changes:
 
 Include `cosine.ldif` and `nis.ldif` schemas for users and groups.
 
-https://github.com/skhal/lab/blob/be6831e29d56094e22a0b56568a67c90526a3dd8/cluster/net.lab.nuc.ldap/doc/slapd.ldif.diff#L6-L8
+https://github.com/skhal/lab/blob/47060d9b7f1185a04bd8a4dffa5d62c4053ac8cf/cluster/net.lab.nuc.ldap/doc/slapd.ldif.diff#L6-L8
 
 </details>
 
 <details>
-<summary>Default read access</summary>
+<summary>Config access</summary>
 
-https://github.com/skhal/lab/blob/be6831e29d56094e22a0b56568a67c90526a3dd8/cluster/net.lab.nuc.ldap/doc/slapd.ldif.diff#L14-L16
+Grant root user unlimited access to the configuration when connected through
+Unix sockets `ldapi://`:
+
+https://github.com/skhal/lab/blob/47060d9b7f1185a04bd8a4dffa5d62c4053ac8cf/cluster/net.lab.nuc.ldap/doc/slapd.ldif.diff#L16-L24
 
 </details>
 
@@ -165,27 +168,27 @@ https://github.com/skhal/lab/blob/be6831e29d56094e22a0b56568a67c90526a3dd8/clust
 
 Define database:
 
-https://github.com/skhal/lab/blob/be6831e29d56094e22a0b56568a67c90526a3dd8/cluster/net.lab.nuc.ldap/doc/slapd.ldif.diff#L23-L26
+https://github.com/skhal/lab/blob/47060d9b7f1185a04bd8a4dffa5d62c4053ac8cf/cluster/net.lab.nuc.ldap/doc/slapd.ldif.diff#L32-L36
 
 The administrator is `cn=op,dc=lab,dc=net` with passwword from `slappasswd`:
 
-https://github.com/skhal/lab/blob/be6831e29d56094e22a0b56568a67c90526a3dd8/cluster/net.lab.nuc.ldap/doc/slapd.ldif.diff#L27-L32
+https://github.com/skhal/lab/blob/47060d9b7f1185a04bd8a4dffa5d62c4053ac8cf/cluster/net.lab.nuc.ldap/doc/slapd.ldif.diff#L37-L42
 
 Store database under `/var/db/openldap-data/lab.net`:
 
-https://github.com/skhal/lab/blob/be6831e29d56094e22a0b56568a67c90526a3dd8/cluster/net.lab.nuc.ldap/doc/slapd.ldif.diff#L33-L37
+https://github.com/skhal/lab/blob/47060d9b7f1185a04bd8a4dffa5d62c4053ac8cf/cluster/net.lab.nuc.ldap/doc/slapd.ldif.diff#L43-L47
 
 Add several indices to speed up lookups:
 
-https://github.com/skhal/lab/blob/be6831e29d56094e22a0b56568a67c90526a3dd8/cluster/net.lab.nuc.ldap/doc/slapd.ldif.diff#L38-L41
+https://github.com/skhal/lab/blob/47060d9b7f1185a04bd8a4dffa5d62c4053ac8cf/cluster/net.lab.nuc.ldap/doc/slapd.ldif.diff#L48-L51
 
 Access Control List (ACL) to restrict password updates to users and admin:
 
-https://github.com/skhal/lab/blob/be6831e29d56094e22a0b56568a67c90526a3dd8/cluster/net.lab.nuc.ldap/doc/slapd.ldif.diff#L42-L46
+https://github.com/skhal/lab/blob/47060d9b7f1185a04bd8a4dffa5d62c4053ac8cf/cluster/net.lab.nuc.ldap/doc/slapd.ldif.diff#L52-L56
 
 ACL to restrict user updates to users and admin:
 
-https://github.com/skhal/lab/blob/be6831e29d56094e22a0b56568a67c90526a3dd8/cluster/net.lab.nuc.ldap/doc/slapd.ldif.diff#L47-L50
+https://github.com/skhal/lab/blob/47060d9b7f1185a04bd8a4dffa5d62c4053ac8cf/cluster/net.lab.nuc.ldap/doc/slapd.ldif.diff#L57-L60
 
 </details>
 
