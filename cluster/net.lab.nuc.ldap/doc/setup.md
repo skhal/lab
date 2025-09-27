@@ -4,15 +4,25 @@
 
 # DESCRIPTION
 
-The instructions explain how to setup OpenLDAP server to host Unix users and
-groups for Single Sign On in other jails.
+Setup of `ldap.nuc.lab.net` describe how to:
 
-## Create a jail
+  * Create a VNET jail with Internet access
+  * Bootstrap OpenLDAP server slapd(8) ready for `dc=ldap,dc=net` database.
+  * Configure ACL to give root full access to the configuration `cn=config`
+    database over local connections using Unix sockets.
 
-Create a VNET jail `ldap.nuc.lab.net` with IP `192.168.1.90/24`:
+> [!WARNING]
+> The setup is minimal, without traffic encryption. SSL/TLS encryption is
+> coming shortly.
+
+## Create a VNET jail
+
+Create a VNET jail `ldap.nuc.lab.net` with IP `192.168.1.90/24`
+([doc](https://github.com/skhal/lab/blob/84821678384d2a7b4b6daa9b4e1266dd56cc9264/cluster/net.lab.nuc/doc/jail.md#vnet-jail)) by running the following commands from the jail hosting node
+`nuc.lab.net`:
 
 ```console
-# zfs clone zroot/jail/template/14.3-RELEASE@p2.2 zroot/jail/container/ldap 
+# zfs clone zroot/jail/template/14.3-RELEASE@p2.3 zroot/jail/container/ldap 
 # cat /etc/jail.conf.d/ldap.conf 
 ldap {
   $id = "90";
@@ -58,91 +68,86 @@ We'll start minimal configuration of LDAP server without databases.
 # pkg install openldap26-server
 ```
 
-<details>
-<summary>Message from cyrus-sasl-2.1.28_5</summary>
+Messages from installed packages:
 
-```
-You can use sasldb2 for authentication, to add users use:
+  * <details>
+    <summary>Message from cyrus-sasl-2.1.28_5</summary>
 
-	saslpasswd2 -c username
+    You can use sasldb2 for authentication, to add users use:
+    
+    ```saslpasswd2 -c username```
+    
+    If you want to enable SMTP AUTH with the system Sendmail, read
+    Sendmail.README
+    
+    NOTE: This port has been compiled with a default pwcheck_method of
+          auxprop.  If you want to authenticate your user by /etc/passwd,
+          PAM or LDAP, install ports/security/cyrus-sasl2-saslauthd and
+          set sasl_pwcheck_method to saslauthd after installing the
+          Cyrus-IMAPd 2.X port.  You should also check the
+          /usr/local/lib/sasl2/*.conf files for the correct
+          pwcheck_method.
+          If you want to use GSSAPI mechanism, install
+          ports/security/cyrus-sasl2-gssapi.
+          If you want to use SRP mechanism, install
+          ports/security/cyrus-sasl2-srp.
+          If you want to use LDAP auxprop plugin, install
+          ports/security/cyrus-sasl2-ldapdb.
+    </details>
 
-If you want to enable SMTP AUTH with the system Sendmail, read
-Sendmail.README
+  * <details>
+    <summary>Message from openldap26-client-2.6.10</summary>
 
-NOTE: This port has been compiled with a default pwcheck_method of
-      auxprop.  If you want to authenticate your user by /etc/passwd,
-      PAM or LDAP, install ports/security/cyrus-sasl2-saslauthd and
-      set sasl_pwcheck_method to saslauthd after installing the
-      Cyrus-IMAPd 2.X port.  You should also check the
-      /usr/local/lib/sasl2/*.conf files for the correct
-      pwcheck_method.
-      If you want to use GSSAPI mechanism, install
-      ports/security/cyrus-sasl2-gssapi.
-      If you want to use SRP mechanism, install
-      ports/security/cyrus-sasl2-srp.
-      If you want to use LDAP auxprop plugin, install
-      ports/security/cyrus-sasl2-ldapdb.
-```
+    The OpenLDAP client package has been successfully installed.
 
-</details>
+    Edit `/usr/local/etc/openldap/ldap.conf`
+    to change the system-wide client defaults.
 
-<details>
-<summary>Message from openldap26-client-2.6.10</summary>
+    Try `man ldap.conf' and visit the OpenLDAP FAQ-O-Matic at
+    http://www.OpenLDAP.org/faq/index.cgi?file=3
+    for more information.
+    </details>
 
-```
-The OpenLDAP client package has been successfully installed.
+  * <details>
+    <summary>Message from openldap26-server-2.6.10</summary>
 
-Edit
-  /usr/local/etc/openldap/ldap.conf
-to change the system-wide client defaults.
+    The OpenLDAP server package has been successfully installed.
 
-Try `man ldap.conf' and visit the OpenLDAP FAQ-O-Matic at
-  http://www.OpenLDAP.org/faq/index.cgi?file=3
-for more information.
-```
+    In order to run the LDAP server, you need to edit
+    `/usr/local/etc/openldap/slapd.conf`
+    to suit your needs and add the following lines to /etc/rc.conf:
 
-</details>
+    ```
+    slapd_enable="YES"
+    slapd_flags='-h "ldapi://%2fvar%2frun%2fopenldap%2fldapi/ ldap://0.0.0.0/"'
+    slapd_sockets="/var/run/openldap/ldapi"
+    ```
 
-<details>
-<summary>Message from openldap26-server-2.6.10</summary>
+    Then start the server with
+    ```/usr/local/etc/rc.d/slapd start```
+    or reboot.
 
-```
-The OpenLDAP server package has been successfully installed.
+    Try `man slapd' and the online manual at
+    http://www.OpenLDAP.org/doc/
+    for more information.
 
-In order to run the LDAP server, you need to edit
-  /usr/local/etc/openldap/slapd.conf
-to suit your needs and add the following lines to /etc/rc.conf:
-  slapd_enable="YES"
-  slapd_flags='-h "ldapi://%2fvar%2frun%2fopenldap%2fldapi/ ldap://0.0.0.0/"'
-  slapd_sockets="/var/run/openldap/ldapi"
+    slapd runs under a non-privileged user id (by default `ldap'),
+    see /usr/local/etc/rc.d/slapd for more information.
 
-Then start the server with
-  /usr/local/etc/rc.d/slapd start
-or reboot.
+    PLEASE NOTE:
 
-Try `man slapd' and the online manual at
-  http://www.OpenLDAP.org/doc/
-for more information.
+    Upgrading from openldap26-server 2.4 to 2.5 requires a full dump
+    and reimport of database.
 
-slapd runs under a non-privileged user id (by default `ldap'),
-see /usr/local/etc/rc.d/slapd for more information.
+    Starting from openldap26-server 2.4.59_3, automatic data dumps
+    are saved at /var/backups/openldap when shutting down slapd.
 
-PLEASE NOTE:
+    Please refer to OpenLDAP Software 2.5 Administrator's Guide at
+      https://www.openldap.org/doc/admin25/appendix-upgrading.html
+    for additional upgrade instructions.
+    </details>
 
-Upgrading from openldap26-server 2.4 to 2.5 requires a full dump
-and reimport of database.
-
-Starting from openldap26-server 2.4.59_3, automatic data dumps
-are saved at /var/backups/openldap when shutting down slapd.
-
-Please refer to OpenLDAP Software 2.5 Administrator's Guide at
-  https://www.openldap.org/doc/admin25/appendix-upgrading.html
-for additional upgrade instructions.
-```
-
-</details>
-
-Update OpenLDAP server configuration with the following changes:
+Update OpenLDAP server slapd(8) configuration with the following changes:
 
 <details>
 <summary>Schemas</summary>
