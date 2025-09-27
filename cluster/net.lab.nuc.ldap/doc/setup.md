@@ -267,7 +267,10 @@ only, using `-Y EXTERNAL -H ldapi://%2Fvar%2Frun%2Fopenldap%2Fldapi` by
 modifying the configuration database.
 
 > [!CAUTION]
-> Do not ever edit `/usr/local/etc/openldap/slapd.d` files manually.
+> Do not edit `/usr/local/etc/openldap/slapd.d` files manually. It may break
+> consistency of the configuration directory. Change `.ldif` file and then
+> import it into the directory configuration instead. See
+> [doc](https://openldap.org/doc/admin26/slapdconf2.html).
 
 The idea is to convert the configuration directory into an LDIF file, do the
 update, and re-create the configuration directory while the server is down. We
