@@ -6,14 +6,13 @@
 
 Setup of `ldap.nuc.lab.net` describe how to:
 
-  * Create a VNET jail with Internet access
   * Bootstrap OpenLDAP server slapd(8) ready for `dc=ldap,dc=net` database.
   * Configure ACL to give root user full access to the configuration `cn=config`
     database over local connections using Unix sockets.
 
 > [!WARNING]
-> The setup is minimal, without traffic encryption. SSL/TLS encryption is
-> coming shortly.
+> The setup is minimal, without traffic encryption. SSL/TLS encryption is coming
+> shortly.
 
 ## Create a VNET jail
 
@@ -154,31 +153,25 @@ Update OpenLDAP server slapd(8) configuration.
   * **Schemas**: include `cosine.ldif` and `nis.ldif` schemas for users and
     groups.
 
-    https://github.com/skhal/lab/blob/47060d9b7f1185a04bd8a4dffa5d62c4053ac8cf/cluster/net.lab.nuc.ldap/doc/slapd.ldif.diff#L6-L8
+    https://github.com/skhal/lab/blob/6ae08fbaed51ae922e8b4c454f77e402d8872e3c/cluster/net.lab.nuc.ldap/doc/slapd.ldif.diff#L6-L8
 
-  * **Database `dc=lab,dc=net`**: definition
+  * **Database `dc=lab,dc=net`**: set administrator and password from
+    `slappasswd`:
 
-    https://github.com/skhal/lab/blob/47060d9b7f1185a04bd8a4dffa5d62c4053ac8cf/cluster/net.lab.nuc.ldap/doc/slapd.ldif.diff#L32-L36
-
-    Set the administrator and passwword from `slappasswd`:
-
-    https://github.com/skhal/lab/blob/47060d9b7f1185a04bd8a4dffa5d62c4053ac8cf/cluster/net.lab.nuc.ldap/doc/slapd.ldif.diff#L37-L42
+    https://github.com/skhal/lab/blob/6ae08fbaed51ae922e8b4c454f77e402d8872e3c/cluster/net.lab.nuc.ldap/doc/slapd.ldif.diff#L16-L24
 
     Store the database under `/var/db/openldap-data/lab.net`:
 
-    https://github.com/skhal/lab/blob/47060d9b7f1185a04bd8a4dffa5d62c4053ac8cf/cluster/net.lab.nuc.ldap/doc/slapd.ldif.diff#L43-L47
+    https://github.com/skhal/lab/blob/6ae08fbaed51ae922e8b4c454f77e402d8872e3c/cluster/net.lab.nuc.ldap/doc/slapd.ldif.diff#L28-L29
 
     Speed up lookups with indices:
 
-    https://github.com/skhal/lab/blob/47060d9b7f1185a04bd8a4dffa5d62c4053ac8cf/cluster/net.lab.nuc.ldap/doc/slapd.ldif.diff#L48-L51
+    https://github.com/skhal/lab/blob/6ae08fbaed51ae922e8b4c454f77e402d8872e3c/cluster/net.lab.nuc.ldap/doc/slapd.ldif.diff#L32-L33
 
-    Access Control List (ACL) to restrict password updates to users and admin:
+    Access Control List (ACL) to restrict updates to user profiles to users and
+    administrator - noone can read passwords:
 
-    https://github.com/skhal/lab/blob/47060d9b7f1185a04bd8a4dffa5d62c4053ac8cf/cluster/net.lab.nuc.ldap/doc/slapd.ldif.diff#L52-L56
-
-    ACL to restrict user updates to users and admin:
-
-    https://github.com/skhal/lab/blob/47060d9b7f1185a04bd8a4dffa5d62c4053ac8cf/cluster/net.lab.nuc.ldap/doc/slapd.ldif.diff#L57-L60
+    https://github.com/skhal/lab/blob/6ae08fbaed51ae922e8b4c454f77e402d8872e3c/cluster/net.lab.nuc.ldap/doc/slapd.ldif.diff#L34-L42
 </details>
 
 Push [spad.ldif.diff](./spad.ldif.diff) patch to `ldap.nuc.lab.net` and apply it
