@@ -8,7 +8,7 @@ Setup of `ldap.nuc.lab.net` describe how to:
 
   * Create a VNET jail with Internet access
   * Bootstrap OpenLDAP server slapd(8) ready for `dc=ldap,dc=net` database.
-  * Configure ACL to give root full access to the configuration `cn=config`
+  * Configure ACL to give root user full access to the configuration `cn=config`
     database over local connections using Unix sockets.
 
 > [!WARNING]
@@ -149,53 +149,53 @@ Messages from installed packages:
 
 Update OpenLDAP server slapd(8) configuration with the following changes:
 
-<details>
-<summary>Schemas</summary>
+  * <details>
+    <summary>Schemas</summary>
 
-Include `cosine.ldif` and `nis.ldif` schemas for users and groups.
+    Include `cosine.ldif` and `nis.ldif` schemas for users and groups.
 
-https://github.com/skhal/lab/blob/47060d9b7f1185a04bd8a4dffa5d62c4053ac8cf/cluster/net.lab.nuc.ldap/doc/slapd.ldif.diff#L6-L8
+    https://github.com/skhal/lab/blob/47060d9b7f1185a04bd8a4dffa5d62c4053ac8cf/cluster/net.lab.nuc.ldap/doc/slapd.ldif.diff#L6-L8
+    </details>
 
-</details>
+  * <details>
+    <summary>Config access</summary>
 
-<details>
-<summary>Config access</summary>
+    Grant root user unlimited access to the configuration when connected through
+    Unix sockets `ldapi://`:
 
-Grant root user unlimited access to the configuration when connected through
-Unix sockets `ldapi://`:
+    https://github.com/skhal/lab/blob/47060d9b7f1185a04bd8a4dffa5d62c4053ac8cf/cluster/net.lab.nuc.ldap/doc/slapd.ldif.diff#L16-L24
+    </details>
 
-https://github.com/skhal/lab/blob/47060d9b7f1185a04bd8a4dffa5d62c4053ac8cf/cluster/net.lab.nuc.ldap/doc/slapd.ldif.diff#L16-L24
+  * <details>
+    <summary>Database `dc=lab,dc=net`</summary>
 
-</details>
+    Define database:
 
-<details>
-<summary>Database `dc=lab,dc=net`</summary>
+    https://github.com/skhal/lab/blob/47060d9b7f1185a04bd8a4dffa5d62c4053ac8cf/cluster/net.lab.nuc.ldap/doc/slapd.ldif.diff#L32-L36
 
-Define database:
+    The administrator is `cn=op,dc=lab,dc=net` with passwword from `slappasswd`:
 
-https://github.com/skhal/lab/blob/47060d9b7f1185a04bd8a4dffa5d62c4053ac8cf/cluster/net.lab.nuc.ldap/doc/slapd.ldif.diff#L32-L36
+    https://github.com/skhal/lab/blob/47060d9b7f1185a04bd8a4dffa5d62c4053ac8cf/cluster/net.lab.nuc.ldap/doc/slapd.ldif.diff#L37-L42
 
-The administrator is `cn=op,dc=lab,dc=net` with passwword from `slappasswd`:
+    Store database under `/var/db/openldap-data/lab.net`:
 
-https://github.com/skhal/lab/blob/47060d9b7f1185a04bd8a4dffa5d62c4053ac8cf/cluster/net.lab.nuc.ldap/doc/slapd.ldif.diff#L37-L42
+    https://github.com/skhal/lab/blob/47060d9b7f1185a04bd8a4dffa5d62c4053ac8cf/cluster/net.lab.nuc.ldap/doc/slapd.ldif.diff#L43-L47
 
-Store database under `/var/db/openldap-data/lab.net`:
+    Add several indices to speed up lookups:
 
-https://github.com/skhal/lab/blob/47060d9b7f1185a04bd8a4dffa5d62c4053ac8cf/cluster/net.lab.nuc.ldap/doc/slapd.ldif.diff#L43-L47
+    https://github.com/skhal/lab/blob/47060d9b7f1185a04bd8a4dffa5d62c4053ac8cf/cluster/net.lab.nuc.ldap/doc/slapd.ldif.diff#L48-L51
 
-Add several indices to speed up lookups:
+    Access Control List (ACL) to restrict password updates to users and admin:
 
-https://github.com/skhal/lab/blob/47060d9b7f1185a04bd8a4dffa5d62c4053ac8cf/cluster/net.lab.nuc.ldap/doc/slapd.ldif.diff#L48-L51
+    https://github.com/skhal/lab/blob/47060d9b7f1185a04bd8a4dffa5d62c4053ac8cf/cluster/net.lab.nuc.ldap/doc/slapd.ldif.diff#L52-L56
 
-Access Control List (ACL) to restrict password updates to users and admin:
+    ACL to restrict user updates to users and admin:
 
-https://github.com/skhal/lab/blob/47060d9b7f1185a04bd8a4dffa5d62c4053ac8cf/cluster/net.lab.nuc.ldap/doc/slapd.ldif.diff#L52-L56
+    https://github.com/skhal/lab/blob/47060d9b7f1185a04bd8a4dffa5d62c4053ac8cf/cluster/net.lab.nuc.ldap/doc/slapd.ldif.diff#L57-L60
+    </details>
 
-ACL to restrict user updates to users and admin:
-
-https://github.com/skhal/lab/blob/47060d9b7f1185a04bd8a4dffa5d62c4053ac8cf/cluster/net.lab.nuc.ldap/doc/slapd.ldif.diff#L57-L60
-
-</details>
+Push [spad.ldif.diff](./spad.ldif.diff) patch to `ldap.nuc.lab.net` and apply it
+to the default slapd(8) configuration:
 
 ```console
 # patch -R /usr/local/etc/openldap/slapd.ldif < ~/slapd.ldif.diff
@@ -212,16 +212,23 @@ Hunk #3 succeeded at 82.
 done
 ```
 
-Create a configuration directory and import the configuration:
+slapd(8) works with a configuration directory in
+`/usr/local/etc/openldap/slapd.d` instead of a configuration file. Create the
+folder and import the configuration file into it:
 
 ```console
 # mkdir /usr/local/etc/openldap/slapd.d
-# mkdir /var/db/openldap-data/lab.net
 # /usr/local/sbin/slapadd -n0 -F /usr/local/etc/openldap/slapd.d/ -l /usr/local/etc/openldap/slapd.ldif
 ```
 
-We'll run OpenLDAP server under `ldap:ldap` user and need to update permissions
-to databases to grant access:
+Create a folder to store `dc=lab,dc=net` database:
+
+```console
+# mkdir /var/db/openldap-data/lab.net
+```
+
+slapd(8) will run as `ldap:ldap` user. Fix permissions to the server
+configuration and databases:
 
 ```console
 # chown -R ldap:ldap /var/db/openldap-data /usr/local/etc/openldap/slapd.d
@@ -243,6 +250,11 @@ slapd_cn_config:  -> yes
 # service slapd start
 ```
 
+> [!NOTE]
+> The `slapd_sockets` flag forces the `slapd` rc-script to
+> [fix](https://github.com/freebsd/freebsd-ports/blob/c2991243dbb2dfc9f932d1560af12061ed998cf2/net/openldap26-server/files/slapd.in#L153)
+> the owner and permissions for `slapd:slapd` user.
+
 Verity slapd(8) runs:
 
 ```console
@@ -255,19 +267,49 @@ srw-rw-rw-  1 ldap ldap   0 Sep 26 18:25 ldapi
 -rw-r--r--  1 ldap ldap   6 Sep 26 18:25 slapd.pid
 ```
 
-Check that the service runs as `ldap` user and binds to local IP address on
-default port `:389`. There must be service socket and PID present under
-`/var/run/openldap` with owner set to `ldap:ldap` (the socket permissions are
-set by rc-script `slapd` using `slapd_sockets` flag).
+Items to check:
 
-Unfortunately, the access to the server configuration is searchable at this
-point. To fix this, we'll stop the service, dump the configuration database
-into a temporary LDIF file, update ACL to grant permission to root to manage
-`cn=config`, re-create the configuration database, and start the service.
+  * The service runs as `ldap` user.
+  * slapd(8) is listening on the jail's IP address on the default port `:389`.
+  * There must be a server socket and `slapd.pid` under `/var/run/openldap` with
+    owner set to `ldap:ldap`.
+
+## Root ACL for `cn=config`
+
+slapd(8) prevents access to the configuration database `cn=config` by default:
+
+```
+olcAccess: to * by * none
+```
+
+We'll grant access to the root user when connected locally using Unix sockets
+only, using `-Y EXTERNAL -H ldapi://%2Fvar%2Frun%2Fopenldap%2Fldapi` by
+modifying the configuration database.
+
+> [!CAUTION]
+> Do not ever edit `/usr/local/etc/openldap/slapd.d` files manually.
+
+The idea is to convert the configuration directory into an LDIF file, do the
+update, and re-create the configuration directory while the server is down. We
+can use this technique in the future to make further updates to the server.
+
+Stop the service.
 
 ```console
 # service slapd stop
+```
+
+Dump the directory service to an LDIF file:
+
+```console
 # slapcat -n0 -l /tmp/slapd.ldif
+```
+
+The root user connected over Unix sockets has
+`gidNumber=0+uidNumber=0,cn=peercred,cn=external,cn=auth` identity. Grant
+permissions to manage the configuration database:
+
+```console
 # slapcat -n0 | diff -u - /tmp/slapd.ldif 
 --- -   2025-09-26 20:52:07.357710000 -0500
 +++ /tmp/slapd.ldif     2025-09-26 20:50:22.724090000 -0500
@@ -283,17 +325,28 @@ into a temporary LDIF file, update ACL to grant permission to root to manage
  olcAddContentAcl: TRUE
  olcLastMod: TRUE
  olcLastBind: FALSE
+```
+
+Re-create the configuration database and fix the permissions for `ldap:ldap`
+user:
+
+```console
 # rm -rf /usr/local/etc/openldap/slapd.d/*
 # /usr/local/sbin/slapadd -n0 -F /usr/local/etc/openldap/slapd.d/ -l /tmp/slapd.ldif
 # chmod -R 700 /var/db/openldap-data /usr/local/etc/openldap/slapd.d
 # chown -R ldap:ldap /var/db/openldap-data /usr/local/etc/openldap/slapd.d
+```
+
+Start the service:
+
+```console
 # service slapd start
 ```
 
-Validate root user has access to the service:
+Validate that the root user has access to the service:
 
 > [!TIP]
-> Use following alias to speed up search:<br/>
+> Use the following tcsh(1) alias to speed up search commands:<br/>
 > `alias ldapisearch /usr/local/bin/ldapsearch -Y EXTERNAL -H ldapi://%2Fvar%2Frun%2Fopenldap%2Fldapi`
 
 ```console
