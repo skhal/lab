@@ -1,0 +1,10 @@
+--- /etc/pam.d/sshd.sample	2025-09-28 09:15:43.174489000 -0500
++++ /etc/pam.d/sshd	2025-09-28 09:36:34.631403000 -0500
+@@ -6,6 +6,7 @@
+ # auth
+ #auth		sufficient	pam_krb5.so		no_warn try_first_pass
+ #auth		sufficient	pam_ssh.so		no_warn try_first_pass
++auth		sufficient	pam_ldap.so		no_warn
+ auth		required	pam_unix.so		no_warn try_first_pass
+ 
+ # account

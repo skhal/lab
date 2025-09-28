@@ -193,7 +193,69 @@ op:*:1000:1000:Operator:/home/op:/bin/tcsh
 
 ## SSH
 
-More PAM configurations are under `/etc/pam.d/`.
+Use Pluggable Authentication Modules to configure SSH with LDAP:
+
+```console
+# pkg install pam_ldap
+```
+
+<details>
+<summary>Messages from installed packages</summary>
+
+```
+=====
+Message from pam_ldap-186_2:
+
+--
+Edit /usr/local/etc/ldap.conf in order to use this module.  Then
+create a /usr/local/etc/pam.d/ldap with a line similar to the following:
+
+login	auth	sufficient	/usr/local/lib/pam_ldap.so
+```
+
+</details>
+
+> [!IMPORTANT]
+> PAM LDAP uses a different `ldap.conf` file, located at
+> `/usr/local/etc/ldap.conf`. Recall that LDAP client configuration used
+> `/usr/local/etc/opendlap/ldap.conf` to run `ldapsearch` and other LDAP
+> commands.
+
+Patch LDAP configuration for PAM:
+
+```console
+# patch /usr/local/etc/ldap.conf ~/pam_ldap.conf.diff 
+Hmm...  Looks like a unified diff to me...
+The text leading up to this was:
+--------------------------
+|--- /usr/local/etc/ldap.conf.sample  2025-08-09 11:23:34.000000000 -0500
+|+++ /usr/local/etc/ldap.conf 2025-09-28 09:25:14.265522000 -0500
+--------------------------
+Patching file /usr/local/etc/ldap.conf using Plan A...
+Hunk #1 succeeded at 12.
+Hunk #2 succeeded at 24.
+done
+```
+
+PAM policies use pam.conf(5) format. Per-service policies are under
+`/etc/pam.d/` or `/usr/local/etc/pam.d/` for installed packages respectively.
+
+Use [`pam_sshd.diff`](./pam_sshd.diff) to patch PAM policy for SSH server:
+
+```console
+# patch /etc/pam.d/sshd ~/pam_sshd.diff 
+Hmm...  Looks like a unified diff to me...
+The text leading up to this was:
+--------------------------
+|--- /etc/pam.d/sshd.sample 2025-09-28 09:15:43.174489000 -0500
+|+++ /etc/pam.d/sshd  2025-09-28 09:36:34.631403000 -0500
+--------------------------
+Patching file /etc/pam.d/sshd using Plan A...
+Hunk #1 succeeded at 6.
+done
+```
+
+Configure SSH server:
 
 ```console
 # sysrc -f /etc/rc.conf.d/sshd sshd_flags="-o ListenAddress=192.168.1.112"
@@ -208,9 +270,13 @@ Start the service
 # service sshd start
 ```
 
-Verify it is running:
+Verify that SSH server runs and it works using an `op` user from LDAP:
 
 ```console
 # sockstat -4 | grep sshd
 root     sshd        2662 7   tcp4   192.168.1.112:22      *:*
+# ssh op@192.168.1.112 whoami
+(op@192.168.1.112) Password: 
+Could not chdir to home directory /home/op: No such file or directory
+op
 ```
