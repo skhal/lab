@@ -1,0 +1,13 @@
+--- /usr/local/etc/openldap/ldap.conf.sample	2025-08-08 20:14:24.000000000 -0500
++++ /usr/local/etc/openldap/ldap.conf	2025-09-28 08:45:32.133654000 -0500
+@@ -5,8 +5,8 @@
+ # See ldap.conf(5) for details
+ # This file should be world readable but not world writable.
+ 
+-#BASE	dc=example,dc=com
+-#URI	ldap://ldap.example.com ldap://ldap-provider.example.com:666
++BASE	dc=lab,dc=net
++URI	ldap://192.168.1.90
+ 
+ #SIZELIMIT	12
+ #TIMELIMIT	15
