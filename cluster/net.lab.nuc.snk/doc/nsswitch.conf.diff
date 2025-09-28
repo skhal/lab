@@ -1,0 +1,17 @@
+--- /etc/nsswitch.conf.sample	2025-09-28 09:01:28.828836000 -0500
++++ /etc/nsswitch.conf	2025-09-28 09:02:30.649736000 -0500
+@@ -1,12 +1,12 @@
+ #
+ # nsswitch.conf(5) - name service switch configuration file
+ #
+-group: compat
++group: files ldap
+ group_compat: nis
+ hosts: files dns
+ netgroup: compat
+ networks: files
+-passwd: compat
++passwd: files ldap
+ passwd_compat: nis
+ shells: files
+ services: compat

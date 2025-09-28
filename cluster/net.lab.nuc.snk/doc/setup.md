@@ -88,23 +88,20 @@ Try `man ldap.conf' and visit the OpenLDAP FAQ-O-Matic at
 
 </details>
 
-Configure LDAP server default settings:
+Configure LDAP server default settings using
+[`ldap.conf.diff`](./ldap.conf.diff) (push the file to the remote server):
 
 ```console
-# diff -u /usr/local/etc/openldap/ldap.conf{.sample,}
---- /usr/local/etc/openldap/ldap.conf.sample	2025-08-08 20:14:24.000000000 -0500
-+++ /usr/local/etc/openldap/ldap.conf	2025-09-27 19:23:19.839450000 -0500
-@@ -5,8 +5,10 @@
- # See ldap.conf(5) for details
- # This file should be world readable but not world writable.
- 
--#BASE	dc=example,dc=com
--#URI	ldap://ldap.example.com ldap://ldap-provider.example.com:666
-+BASE	dc=lab,dc=net
-+URI	ldap://192.168.1.90
- 
- #SIZELIMIT	12
- #TIMELIMIT	15
+# patch /usr/local/etc/openldap/ldap.conf ~/ldap.conf.diff
+Hmm...  Looks like a unified diff to me...
+The text leading up to this was:
+--------------------------
+|--- /usr/local/etc/openldap/ldap.conf.sample 2025-08-08 20:14:24.000000000 -0500
+|+++ /usr/local/etc/openldap/ldap.conf  2025-09-28 08:45:32.133654000 -0500
+--------------------------
+Patching file /usr/local/etc/openldap/ldap.conf using Plan A...
+Hunk #1 succeeded at 5.
+done
 ```
 
 Verify it works:
@@ -120,11 +117,11 @@ dn: cn=op,ou=groups,dc=lab,dc=net
 
 ## Single Sign On
 
-We'll use Pluggable Authentication Modules (PAM) for a Single Sign On with
-LDAP users and gruops.
+We'll use Name Switch Service (NSS) integration with LDAP to pull users and
+passwords from LDAP after trying local users first.
 
 ```console
-# pkg install pam_ldap nss_ldap
+# pkg install nss_ldap
 ```
 
 <details>
@@ -140,78 +137,57 @@ following paths:
 
 LDAP configuration:     /usr/local/etc/nss_ldap.conf
 LDAP secret (optional): /usr/local/etc/nss_ldap.secret
-=====
-Message from pam_ldap-186_2:
-
---
-Edit /usr/local/etc/ldap.conf in order to use this module.  Then
-create a /usr/local/etc/pam.d/ldap with a line similar to the following:
-
-login	auth	sufficient	/usr/local/lib/pam_ldap.so
 ```
 
 </details>
 
-Configure NSS with LDAP:
+Use [`nss_ldap.conf.diff`](./nss_ldap.conf.diff) to patch nss_ldap(5)
+configuration to point NSS to LDAP instance and define base for lookups.
 
 ```console
-# diff -u /usr/local/etc/nss_ldap.conf{.sample,}
---- /usr/local/etc/nss_ldap.conf.sample	2025-08-10 10:17:40.000000000 -0500
-+++ /usr/local/etc/nss_ldap.conf	2025-09-27 19:45:24.726695000 -0500
-@@ -12,10 +12,10 @@
- # space. How long nss_ldap takes to failover depends on
- # whether your LDAP client library supports configurable
- # network or connect timeouts (see bind_timelimit).
--host 127.0.0.1
-+host 192.168.1.90
- 
- # The distinguished name of the search base.
--base dc=padl,dc=com
-+base dc=lab,dc=net
- 
- # Another way to specify your LDAP server is to provide an
- # uri with the server name. This allows to use
-@@ -87,7 +87,7 @@
- #pam_filter objectclass=account
- 
- # The user ID attribute (defaults to uid)
--#pam_login_attribute uid
-+pam_login_attribute uid
- 
- # Search the root DSE for the password policy (works
- # with Netscape Directory Server)
+# patch /usr/local/etc/nss_ldap.conf ~/nss_ldap.conf.diff
+Hmm...  Looks like a unified diff to me...
+The text leading up to this was:
+--------------------------
+|--- /usr/local/etc/nss_ldap.conf.sample  2025-08-10 10:17:40.000000000 -0500
+|+++ /usr/local/etc/nss_ldap.conf 2025-09-28 08:56:50.439652000 -0500
+--------------------------
+Patching file /usr/local/etc/nss_ldap.conf using Plan A...
+Hunk #1 succeeded at 12.
+Hunk #2 succeeded at 24.
+done
+```
+
+Finally, let NSS use local files and LDAP to lookup users and groups in that
+order by patching `nsswitch.conf` with
+[`nsswitch.conf.diff`](./nsswitch.conf.diff):
+
+```console
+# patch /etc/nsswitch.conf ~/nsswitch.conf.diff 
+Hmm...  Looks like a unified diff to me...
+The text leading up to this was:
+--------------------------
+|--- /etc/nsswitch.conf.sample  2025-09-28 09:01:28.828836000 -0500
+|+++ /etc/nsswitch.conf 2025-09-28 09:02:30.649736000 -0500
+--------------------------
+Patching file /etc/nsswitch.conf using Plan A...
+Hunk #1 succeeded at 1.
+done
 ```
 
 Now PAM LDAP searches for entries with matching uid under LDAP base. It will
 bind with the found record only if a single record is found.
 
-Set Name Service Switch (NSS) to use local files and LDAP for user password
-and group lookups:
-
 ```console
-# diff -u /etc/nsswitch.conf{.orig,}
---- /etc/nsswitch.conf.orig	2025-09-27 19:37:20.601699000 -0500
-+++ /etc/nsswitch.conf	2025-09-27 19:37:42.649046000 -0500
-@@ -1,12 +1,12 @@
- #
- # nsswitch.conf(5) - name service switch configuration file
- #
--group: compat
-+group: files ldap
- group_compat: nis
- hosts: files dns
- netgroup: compat
- networks: files
--passwd: compat
-+passwd: files ldap
- passwd_compat: nis
- shells: files
- services: compat
+# getent group op
+op:*:1000:op
+# getent passwd op
+op:*:1000:1000:Operator:/home/op:/bin/tcsh
 ```
 
-More PAM configurations are under `/etc/pam.d/`.
-
 ## SSH
+
+More PAM configurations are under `/etc/pam.d/`.
 
 ```console
 # sysrc -f /etc/rc.conf.d/sshd sshd_flags="-o ListenAddress=192.168.1.112"
