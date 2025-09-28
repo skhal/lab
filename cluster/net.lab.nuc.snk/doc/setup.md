@@ -91,6 +91,8 @@ Try `man ldap.conf' and visit the OpenLDAP FAQ-O-Matic at
 Configure LDAP server default settings using
 [`ldap.conf.diff`](./ldap.conf.diff) (push the file to the remote server):
 
+https://github.com/skhal/lab/blob/0d47a18e2a4a68a668ff4164971160e17baba8bd/cluster/net.lab.nuc.snk/doc/ldap.conf.diff#L7-L10
+
 ```console
 # patch /usr/local/etc/openldap/ldap.conf ~/ldap.conf.diff
 Hmm...  Looks like a unified diff to me...
@@ -144,6 +146,8 @@ LDAP secret (optional): /usr/local/etc/nss_ldap.secret
 Use [`nss_ldap.conf.diff`](./nss_ldap.conf.diff) to patch nss_ldap(5)
 configuration to point NSS to LDAP instance and define base for lookups.
 
+https://github.com/skhal/lab/blob/0d47a18e2a4a68a668ff4164971160e17baba8bd/cluster/net.lab.nuc.snk/doc/nss_ldap.conf.diff#L7-L20
+
 ```console
 # patch /usr/local/etc/nss_ldap.conf ~/nss_ldap.conf.diff
 Hmm...  Looks like a unified diff to me...
@@ -161,6 +165,8 @@ done
 Finally, let NSS use local files and LDAP to lookup users and groups in that
 order by patching `nsswitch.conf` with
 [`nsswitch.conf.diff`](./nsswitch.conf.diff):
+
+https://github.com/skhal/lab/blob/0d47a18e2a4a68a668ff4164971160e17baba8bd/cluster/net.lab.nuc.snk/doc/nsswitch.conf.diff#L7-L14
 
 ```console
 # patch /etc/nsswitch.conf ~/nsswitch.conf.diff 
