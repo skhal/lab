@@ -88,8 +88,8 @@ Try `man ldap.conf' and visit the OpenLDAP FAQ-O-Matic at
 
 </details>
 
-Configure LDAP server default settings using
-[`ldap.conf.diff`](./ldap.conf.diff) (push the file to the remote server):
+Patch LDAP client configuration with [`ldap.conf.diff`](./ldap.conf.diff) to
+set LDAP instance and base DN for lookups.
 
 https://github.com/skhal/lab/blob/0d47a18e2a4a68a668ff4164971160e17baba8bd/cluster/net.lab.nuc.snk/doc/ldap.conf.diff#L7-L10
 
@@ -143,8 +143,9 @@ LDAP secret (optional): /usr/local/etc/nss_ldap.secret
 
 </details>
 
-Use [`nss_ldap.conf.diff`](./nss_ldap.conf.diff) to patch nss_ldap(5)
-configuration to point NSS to LDAP instance and define base for lookups.
+Patch nss_ldap(5) configuration with
+[`nss_ldap.conf.diff`](./nss_ldap.conf.diff) to set LDAP instance and base DN
+for lookupds.
 
 https://github.com/skhal/lab/blob/0d47a18e2a4a68a668ff4164971160e17baba8bd/cluster/net.lab.nuc.snk/doc/nss_ldap.conf.diff#L7-L20
 
@@ -162,9 +163,8 @@ Hunk #2 succeeded at 24.
 done
 ```
 
-Finally, let NSS use local files and LDAP to lookup users and groups in that
-order by patching `nsswitch.conf` with
-[`nsswitch.conf.diff`](./nsswitch.conf.diff):
+Patch NSS configuration with [`nsswitch.conf.diff`](./nsswitch.conf.diff) to
+use local files and LDAP for lookups in that order.
 
 https://github.com/skhal/lab/blob/0d47a18e2a4a68a668ff4164971160e17baba8bd/cluster/net.lab.nuc.snk/doc/nsswitch.conf.diff#L7-L14
 
@@ -221,7 +221,11 @@ login	auth	sufficient	/usr/local/lib/pam_ldap.so
 > `/usr/local/etc/opendlap/ldap.conf` to run `ldapsearch` and other LDAP
 > commands.
 
-Patch LDAP configuration for PAM:
+Patch PAM's LDAP configuration with
+[`pam_ldap.conf.diff`](./pam_ldap.conf.diff) to set LDAP instance and base DN
+for lookups.
+
+https://github.com/skhal/lab/blob/140a3ff61a03f0aec264775a7b5251971be1123d/cluster/net.lab.nuc.snk/doc/pam_ldap.conf.diff#L7-L20
 
 ```console
 # patch /usr/local/etc/ldap.conf ~/pam_ldap.conf.diff 
@@ -240,7 +244,9 @@ done
 PAM policies use pam.conf(5) format. Per-service policies are under
 `/etc/pam.d/` or `/usr/local/etc/pam.d/` for installed packages respectively.
 
-Use [`pam_sshd.diff`](./pam_sshd.diff) to patch PAM policy for SSH server:
+Patch PAM policy for SSH server with [`pam_sshd.diff`](./pam_sshd.diff).
+
+https://github.com/skhal/lab/blob/140a3ff61a03f0aec264775a7b5251971be1123d/cluster/net.lab.nuc.snk/doc/pam_sshd.diff#L7-L8
 
 ```console
 # patch /etc/pam.d/sshd ~/pam_sshd.diff 
@@ -270,7 +276,7 @@ Start the service
 # service sshd start
 ```
 
-Verify that SSH server runs and it works using an `op` user from LDAP:
+Verify that SSH server runs and works by using an `op` user from LDAP:
 
 ```console
 # sockstat -4 | grep sshd
