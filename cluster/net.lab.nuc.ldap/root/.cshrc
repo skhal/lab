@@ -49,4 +49,6 @@ if ($?prompt) then
 		bindkey -k down history-search-forward
 	endif
 
+	alias ldapisearch /usr/local/bin/ldapsearch -H ldapi://%2Fvar%2Frun%2Fopenldap%2Fldapi -Y EXTERNAL
+	alias ldapsearch /usr/local/bin/ldapsearch -H ldap://10.0.1.90 -x
 endif

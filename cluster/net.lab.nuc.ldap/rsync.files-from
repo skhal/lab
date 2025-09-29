@@ -5,3 +5,4 @@ root/.k5login
 root/.login
 root/.profile
 root/.shrc
+root/openldap

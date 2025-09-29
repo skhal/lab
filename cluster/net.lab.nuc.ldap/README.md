@@ -17,7 +17,7 @@ files to pull from the server to skip history and other unnecessary files.
 > Keep `rsync.files-from` file sorted to optimize `rsync(1)`
 
 ```console
-% rsync -arvz --files-from=./rsync.files-from op@dev.nuc.lab.net:/jail/container/ldap/ ./
+% rsync -arvz --files-from=./rsync.files-from op@192.168.1.100:/jail/container/ldap/ ./
 ```
 
 
