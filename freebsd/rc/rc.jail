@@ -9,9 +9,10 @@
 #   foo {
 #     $bridge "bridge0";
 #     $ip = "10.0.1.100/24";
+#     $bridge_ip = "${bridge}:${ip}";
 #     vnet;
 #     exec.prestart = "/bin/sh /usr/local/etc/rc.jail prestart ${name} ${bridge}"
-#     exec.created  = "/bin/sh /usr/local/etc/rc.jail created ${name} ${bridge} ${ip}"
+#     exec.created  = "/bin/sh /usr/local/etc/rc.jail created ${name} ${bridge_ip}"
 #     exec.poststop = "/bin/sh /usr/local/etc/rc.jail poststop ${name} ${bridge}"
 #   }
 #
@@ -66,12 +67,13 @@ jail_exec_prestart() {
 #
 # Arguments:
 #   $1 : jail name
-#   $2 : bridge name
-#   $3 : IP address
+#   $2 : colon-separated bridge name and ip
 jail_exec_created() {
   local jail_name=${1:?'jail_exec_created: missing jail name'}
-  local jail_bridge=${2:?'jail_exec_created: missing jail bridge'}
-  local jail_ip=${3:?'jail_exec_created: missing jail IP address'}
+  local jail_bridge_and_ip=${2:?'jail_exec_created: missing jail bridge and ip'}
+
+  local jail_bridge=${jail_bridge_and_ip%%:*}
+  local jail_ip=${jail_bridge_and_ip#*:}
 
   local jail_epair
   jail_epair="$(jail_read_epair ${jail_name} ${jail_bridge})"
