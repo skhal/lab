@@ -113,9 +113,9 @@ jail_exec_poststop() {
 #
 # It creates the jail runtime path if one does not exist.
 jail_write_epair() {
-	local jail_epair=${1:?'jail_write_epair: missing jail epair'}
-	local jail_name=${2:?'jail_write_epair: missing jail name'}
-	local jail_bridge=${3:?'jail_write_epair: missing jail bridge'}
+	local jail_name=${1:?'jail_write_epair: missing jail name'}
+	local jail_bridge=${2:?'jail_write_epair: missing jail bridge'}
+	local jail_epair=${3:?'jail_write_epair: missing jail epair'}
 
 	local jail_epair_file
   jail_epair_file=$(jail_get_epair_file ${jail_name} ${jail_bridge})
