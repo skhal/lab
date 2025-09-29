@@ -1,3 +1,4 @@
 jail_enable="YES"
 jail_parallel_start="YES"
 jail_reverse_stop="YES"
+jail_list="dev"
