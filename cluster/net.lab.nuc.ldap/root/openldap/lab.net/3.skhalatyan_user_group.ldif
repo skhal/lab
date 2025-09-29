@@ -1,0 +1,18 @@
+dn: uid=skhalatyan,ou=people,dc=lab,dc=net
+cn: skhalatyan
+objectClass: top
+objectClass: account
+objectClass: posixAccount
+uid: skhalatyan
+uidNumber: 10001
+gidNumber: 10001
+homeDirectory: /home/skhalatyan
+loginShell: /bin/tcsh
+description: Samvel Khalatyan account
+
+dn: cn=skhalatyan,ou=groups,dc=lab,dc=net
+cn: skhalatyan
+objectClass: top
+objectClass: posixGroup
+gidNumber: 10001
+memberUid: skhalatyan
