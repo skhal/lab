@@ -14,23 +14,13 @@ Ref: https://docs.freebsd.org/en/books/handbook/jails/
 
 ## Jail service
 
-Stop jails in the reverse order to resolve jail dependencies:
-
-```console
-# sysrc -f /etc/rc.conf.d/jail jail_reverse_stop="YES"
-jail_reverse_stop: NO -> YES
-```
-
-Parallel start jails:
+Start jails in parallel, reverse the shutdown order and enable `jail` service.
 
 ```console
 # sysrc -f /etc/rc.conf.d/jail jail_parallel_start="YES"
 jail_parallel_start: NO -> YES
-```
-
-Enable jails:
-
-```console
+# sysrc -f /etc/rc.conf.d/jail jail_reverse_stop="YES"
+jail_reverse_stop: NO -> YES
 # sysrc -f /etc/rc.conf.d/jail jail_enable="YES"
 jail_enable: NO -> YES
 ```
@@ -87,25 +77,7 @@ Create child datasets:
 
 Include jail configuraitons from `/etc/jail.conf.d/`:
 
-```console
-# cat /etc/jail.conf
-host.hostname = "${name}.nuc.lab.net";
-path = "/jail/container/${name}";
-
-# Permissions
-allow.raw_sockets;
-mount.devfs;
-# https://github.com/freebsd/freebsd-src/blob/a7340d559ee942c21ea1a037d1d60a7859dd873b/sbin/devfs/devfs.rules
-devfs_ruleset = 4; # no vnet
-exec.clean;
-
-exec.consolelog = "/var/log/jail_console_${name}.log";
-exec.prestart  = "cp /etc/resolv.conf ${path}/etc/";
-exec.start = "/bin/sh /etc/rc";
-exec.stop = "/bin/sh /etc/rc.shutdown";
-
-.include "/etc/jail.conf.d/*.conf";
-```
+https://github.com/skhal/lab/blob/23207daeb5f8ed9708d40eb8141ef3c1157a744c/cluster/net.lab.nuc/etc/jail.conf#L16
 
 
 # CREATE TEMPLATE
@@ -118,6 +90,9 @@ is newer than the local file):
 ```
 
 Create a template with updated software:
+
+> [!TIP]
+> Set `PAGER` to `cat(1)` to suppress interactive mode for `freebsd-update(8)`.
 
 ```console
 # tar -xf /jail/image/14.3-RELEASE-base.txz -C /jail/template/14.3-RELEASE --unlink
@@ -136,14 +111,45 @@ Tue Sep 16 15:45:41 UTC 2025
 Tue Sep 16 10:47:15 CDT 2025
 ```
 
+Change root shell to `tcsh(1)`:
+
+```console
+# chroot /jail/template/14.3-RELEASE chsh -s /bin/tcsh root
+```
+
+Copy root tcsh(1) resource configuration:
+
+```console
+# cp /root/.cshrc /jail/template/14.3-RELEASE/root
+```
+
+Operate syslogd(8) without sockets, i.e., local mode:
+
+```console
+# chroot /jail/template/14.3-RELEASE sysrc -f /etc/rc.conf.d/syslogd syslogd_flags="-ss"
+```
+
+Set default gateway to avoid `routing` service restarts:
+
+```console
+# chroot /jail/template/14.3-RELEASE sysrc -f /etc/rc.conf.d/routing defaultrouter="192.168.1.1"
+```
+
 Snapshot the version with installed patch number.
 
 ```console
-# zfs snapshot zroot/jail/template/14.3-RELEASE@p2
+# zfs snapshot zroot/jail/template/14.3-RELEASE@p1
 ```
 
 > [!NOTE]
-> Set `PAGER` to `cat(1)` to suppress interactive mode for `freebsd-update(8)`.
+> Check latest snapshot before using it with
+> `zfs list -t snapshot zroot/jail/template/14.3-RELEASE`
+
+Include [`rc.jail`](https://github.com/skhal/lab/blob/main/freebsd/rc/rc.jail) for jail VNET management:
+
+```console
+# fetch -o /usr/local/etc/rc.jail https://raw.githubusercontent.com/skhal/lab/refs/heads/main/freebsd/rc/rc.jail
+```
 
 
 # NO NET JAIL
@@ -151,7 +157,7 @@ Snapshot the version with installed patch number.
 The new jail `dev` is isolated and does not have a network access:
 
 ```console
-# zfs clone zroot/jail/template/14.3-RELEASE@p2 zroot/jail/container/dev
+# zfs clone zroot/jail/template/14.3-RELEASE@p1 zroot/jail/container/dev
 # cat /etc/jail.conf.d/dev.conf
 dev {
   # empty
