@@ -16,48 +16,8 @@ Setup of `ldap.nuc.lab.net` describe how to:
 
 ## Create a VNET jail
 
-Create a VNET jail `ldap.nuc.lab.net` with IP `192.168.1.90/24`
-([doc](https://github.com/skhal/lab/blob/84821678384d2a7b4b6daa9b4e1266dd56cc9264/cluster/net.lab.nuc/doc/jail.md#vnet-jail)) by running the following commands from the jail hosting node
-`nuc.lab.net`:
-
-```console
-# zfs clone zroot/jail/template/14.3-RELEASE@p2.3 zroot/jail/container/ldap 
-# cat /etc/jail.conf.d/ldap.conf 
-ldap {
-  $id = "90";
-  $ip = "192.168.1.${id}/24";
-  $epair = "epair${id}";
-  $bridge = "bridge0";
-
-  # Virtual Network (VNET)
-  vnet;
-  vnet.interface = "${epair}b";
-  devfs_ruleset = 5;
-
-  exec.prestart += "/sbin/ifconfig ${epair} create";
-  exec.prestart += "/sbin/ifconfig ${epair}a up descr jail:${name}";
-  exec.prestart += "/sbin/ifconfig ${bridge} addm ${epair}a up";
-
-  exec.start  = "/sbin/ifconfig ${epair}b ${ip} up";
-  exec.start += "/bin/sh /etc/rc";
-
-  exec.poststop += "/sbin/ifconfig ${bridge} deletem ${epair}a";
-  exec.poststop += "/sbin/ifconfig ${epair}a destroy";
-}
-```
-
-Start the jail and confirm it has Internet connection:
-
-```console
-# service jail start ldap
-# jexec ldap ping -c 1 google.com
-PING google.com (142.250.191.238): 56 data bytes
-64 bytes from 142.250.191.238: icmp_seq=0 ttl=115 time=11.181 ms
-
---- google.com ping statistics ---
-1 packets transmitted, 1 packets received, 0.0% packet loss
-round-trip min/avg/max/stddev = 11.181/11.181/11.181/0.000 ms
-```
+Create a [VNET jail](https://github.com/skhal/lab/blob/main/cluster/net.lab.nuc/doc/jail.md#vnet-jail)
+named `ldap` with `id=90`.
 
 ## Bootstrap OpenLDAP server
 
@@ -293,7 +253,7 @@ The root user connected over Unix sockets has
 permissions to manage the configuration database:
 
 ```console
-# slapcat -n0 | diff -u - /tmp/slapd.ldif 
+# slapcat -n0 | diff -u - /tmp/slapd.ldif
 --- -   2025-09-26 20:52:07.357710000 -0500
 +++ /tmp/slapd.ldif     2025-09-26 20:50:22.724090000 -0500
 @@ -574,7 +574,10 @@
@@ -390,4 +350,19 @@ Verify the changes:
 dn: dc=lab,dc=net
 dn: ou=people,dc=lab,dc=net
 dn: ou=groups,dc=lab,dc=net
+```
+
+## Manage LDAP
+
+Any client can update LDAP server contents with instructions in LDIF format:
+
+```console
+% ldapadd -x -W -D 'cn=op,dc=lab,dc=net' -f /tmp/foo.ldif
+% ldapmodify -x -W -D 'cn=op,dc=lab,dc=net' -f /tmp/foo.ldif
+```
+
+Change user password:
+
+```console
+% ldappasswd -x -W -D 'cn=op,dc=lab,dc=net' -S 'uid=foo,ou=people,dc=lab,dc=net'
 ```
