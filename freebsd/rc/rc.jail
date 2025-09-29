@@ -6,14 +6,28 @@
 #
 # Example
 #   # file: /etc/jail.conf.d/foo.conf:
+#   # A jail with a single network epair.
 #   foo {
-#     $bridge "bridge0";
-#     $ip = "10.0.1.100/24";
-#     $bridge_ip = "${bridge}:${ip}";
+#     $id = "101";
+#     $bridge0 = "bridge0";
+#     $bridge0ip = "${bridge0}:10.0.1.${id}/24";
 #     vnet;
-#     exec.prestart = "/bin/sh /usr/local/etc/rc.jail prestart ${name} ${bridge}"
-#     exec.created  = "/bin/sh /usr/local/etc/rc.jail created ${name} ${bridge_ip}"
-#     exec.poststop = "/bin/sh /usr/local/etc/rc.jail poststop ${name} ${bridge}"
+#     exec.prestart = "/bin/sh /usr/local/etc/rc.jail prestart ${name} ${bridge0}"
+#     exec.created  = "/bin/sh /usr/local/etc/rc.jail created ${name} ${bridge0ip}"
+#     exec.poststop = "/bin/sh /usr/local/etc/rc.jail poststop ${name} ${bridge0}"
+#   }
+#   # file: /etc/jail.conf.d/bar.conf:
+#   # A jail with two network epairs, each connected to a separate bridge.
+#   bar {
+#     $id = "101";
+#     $bridge0 = "bridge0";
+#     $bridge0ip = "${bridge0}:10.0.1.${id}/24";
+#     $bridge1 = "bridge1";
+#     $bridge1ip = "${bridge0}:10.0.2.${id}/24";
+#     vnet;
+#     exec.prestart = "/bin/sh /usr/local/etc/rc.jail prestart ${name} ${bridge0} ${bridge1}"
+#     exec.created  = "/bin/sh /usr/local/etc/rc.jail created ${name} ${bridge0ip} ${bridge1ip}"
+#     exec.poststop = "/bin/sh /usr/local/etc/rc.jail poststop ${name} ${bridge0} ${bridge1}"
 #   }
 #
 # Description
@@ -41,68 +55,74 @@ readonly RM_CMD=/bin/rm
 
 readonly JAIL_RUN_PATH=/var/run/jail
 
-# jail_exec_prestart creates an epair(4) and adds it to the bridge in the host
-# environment.
+# jail_exec_prestart creates an epair(4) for every bridge and connects it to
+# that bridge, resultin in N epairs for N bridges.
 #
 # Arguments:
 #   $1 : jail name
-#   $2 : bridge name
+#   $* : bridge name
 #
-# It stores the epair(4) identifier in the jail runtime file.
+# It stores the epair(4) identifier in the jail runtime file for every bridge.
 jail_exec_prestart() {
   local jail_name=${1:?'jail_exec_prestart: missing jail name'}
-  local jail_bridge=${2:?'jail_exec_prestart: missing jail bridge'}
 
-  local jail_epair_a=$(${IFCONFIG_CMD} epair create)
-  local jail_epair=${jail_epair_a%a}
-  jail_write_epair ${jail_name} ${jail_bridge} ${jail_epair}
-  local jail_epair_descr=jail:${jail_name}:${jail_bridge}
-  ${IFCONFIG_CMD} ${jail_epair_a} up descr ${jail_epair_descr}
-  ${IFCONFIG_CMD} ${jail_bridge} addm ${jail_epair_a} up
+  shift 1
+  local jail_bridge jail_epair_a jail_epair jail_epair_descr
+  for jail_bridge; do
+    jail_epair_a=$(${IFCONFIG_CMD} epair create)
+    jail_epair=${jail_epair_a%a}
+    jail_write_epair ${jail_name} ${jail_bridge} ${jail_epair}
+    jail_epair_descr=jail:${jail_name}:${jail_bridge}
+    ${IFCONFIG_CMD} ${jail_epair_a} up descr ${jail_epair_descr}
+    ${IFCONFIG_CMD} ${jail_bridge} addm ${jail_epair_a} up
+  done
 }
 
-# jail_exec_created moves the epair(4) to the jail(8) and assigns the IP address
-# in the jailed environment. It loads jail's epair(4) from the jail runtime
-# file.
+# jail_exec_created moves the epair(4) for every bridge to the jail(8) and
+# assigns the IP address in the jailed environment. It loads jail's epair(4)
+# from the jail runtime file for a given bridge.
 #
 # Arguments:
 #   $1 : jail name
-#   $2 : colon-separated bridge name and ip
+#   $* : colon-separated bridge name and ip
 jail_exec_created() {
   local jail_name=${1:?'jail_exec_created: missing jail name'}
-  local jail_bridge_and_ip=${2:?'jail_exec_created: missing jail bridge and ip'}
 
-  local jail_bridge=${jail_bridge_and_ip%%:*}
-  local jail_ip=${jail_bridge_and_ip#*:}
-
-  local jail_epair
-  jail_epair="$(jail_read_epair ${jail_name} ${jail_bridge})"
-  local jail_epair_b=${jail_epair}b
-  # Move the b-side of epair(4) inside the jail. All operations on the b-side
-  # must run from inside the jail after this completes.
-  ${IFCONFIG_CMD} ${jail_epair_b} vnet ${jail_name}
-  local jail_epair_descr=jail:${jail_name}:${jail_bridge}
-  ${JEXEC_CMD} ${jail_name} ${IFCONFIG_CMD} ${jail_epair_b} ${jail_ip} up descr ${jail_epair_descr}
+  shift 1
+  local jail_bridge_and_ip jail_bridge jail_ip jail_epair jail_epair_b jail_epair_descr
+  for jail_bridge_and_ip; do
+    jail_bridge=${jail_bridge_and_ip%%:*}
+    jail_ip=${jail_bridge_and_ip#*:}
+    jail_epair="$(jail_read_epair ${jail_name} ${jail_bridge})"
+    jail_epair_b=${jail_epair}b
+    # Move the b-side of epair(4) inside the jail. All operations on the b-side
+    # must run from inside the jail after this completes.
+    ${IFCONFIG_CMD} ${jail_epair_b} vnet ${jail_name}
+    jail_epair_descr=jail:${jail_name}:${jail_bridge}
+    ${JEXEC_CMD} ${jail_name} ${IFCONFIG_CMD} ${jail_epair_b} ${jail_ip} up descr ${jail_epair_descr}
+  done
 }
 
-# jail_exec_poststop disconnects the epair(4) from the bridge and removes it
-# from the host environment.
+# jail_exec_poststop disconnects the epair(4) from corresponding bridge and
+# removes the disconnected epair(4) from the host environment.
 #
 # Arguments:
 #   $1 : jail name
-#   $2 : bridge name
+#   $* : bridge name
 #
-# It cleans the jail runtime file.
+# It cleans the jail runtime file for every bridge.
 jail_exec_poststop() {
   local jail_name=${1:?'jail_exec_poststop: missing jail name'}
-  local jail_bridge=${2:?'jail_exec_poststop: missing jail bridge'}
 
-  local jail_epair
-  jail_epair=$(jail_read_epair ${jail_name} ${jail_bridge})
-  local jail_epair_a=${jail_epair}a
-  ${IFCONFIG_CMD} ${jail_bridge} deletem ${jail_epair_a}
-  ${IFCONFIG_CMD} ${jail_epair_a} destroy
-  jail_clean_epair ${jail_name} ${jail_bridge}
+  shift 1
+  local jail_bridge jail_epair jail_epair_a
+  for jail_bridge; do
+    jail_epair=$(jail_read_epair ${jail_name} ${jail_bridge})
+    jail_epair_a=${jail_epair}a
+    ${IFCONFIG_CMD} ${jail_bridge} deletem ${jail_epair_a}
+    ${IFCONFIG_CMD} ${jail_epair_a} destroy
+    jail_clean_epair ${jail_name} ${jail_bridge}
+  done
 }
 
 
