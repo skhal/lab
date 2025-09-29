@@ -166,82 +166,57 @@ dev {
 
 # VNET JAIL
 
+Ref: https://freebsdfoundation.org/wp-content/uploads/2020/03/Jail-vnet-by-Examples.pdf
+
 Virtual Network (VNET) adds a networking stack to the jail, isolated from the
 host system. It includes interfaces, addresses, routing tables and firewall
 rules.
 
-Ref: https://freebsdfoundation.org/wp-content/uploads/2020/03/Jail-vnet-by-Examples.pdf
+The setup uses two network interfaces to connect jails using bridge(4):
 
-**TL;DR**: create an `epair(4)` on the host system, jail one end of it and
-connect the other end to one of the network interfaces on the host system via
-`bridge(4)`.
+* `bridge0` connects jails to the Internet. Subnet: `192.168.1.0/24`
+* `bridge1` isolates intra-jail traffic. Subnet: `10.0.1.0/24`
+
+Create bridges and give `bridge0` Internet access:
+
+```console
+# sysrc -f /etc/rc.conf.d/network cloned_interfaces+="bridge0 bridge1"
+cloned_interfaces:  -> bridge0 bridge1
+# sysrc -f /etc/rc.conf.d/network ifconfig_bridge0="addm em0 up descr jail:em"
+ifconfig_bridge0:  -> addm em0 up descr jail:em
+# sysrc -f /etc/rc.conf.d/network ifconfig_bridge1="up descr jail:lo"
+ifconfig_bridge0:  -> addm em0 up descr jail:lo
+```
 
 > [!Note]
 > The bridge and both ends of epair must be in the UP state for the packets to
 > flow.
 
-Create a bridge on the host system and add the network interface with Internet
-access, `em0`:
-
-```console
-# sysrc -f /etc/rc.conf.d/network cloned_interfaces+="bridge0"
-cloned_interfaces:  -> bridge0
-# sysrc -f /etc/rc.conf.d/network ifconfig_bridge0="addm em0 up"
-ifconfig_bridge0:  -> addm em0 up
-```
-
-The jail configuration:
-
-  * *Host system*: create an epair and add the a-side of it to the bridge in
-    `exec.prestart`. Remove the epair from the bridge and destroy it in
-    `exec.poststop`.
-
-  * *Jail*: enable VNET and enajil the b-side of the epair into jail (it will
-    be auto-released when the jail shuts down). Assign an IP address to the
-    enjailed network interface.
+Let [`rc.jail`](https://github.com/skhal/lab/blob/main/freebsd/rc/rc.jail)
+script managet jail's epair(4), connect it to the bridge, and assign the IP
+address.
 
 ```console
 % cat /etc/jail.conf.d/dev.conf
 dev {
   $id = "110";
-  $ip = "192.168.1.${id}/24";
-  $epair = "epair${id}";
-  $bridge = "bridge0";
 
-  # Virtual Network (VNET)
+  $bridge0 = "bridge0";
+  $bridge0_ip = "${bridge0}:192.168.1.${id}/24";
+
+  $bridge1 = "bridge1";
+  $bridge1_ip = "${bridge1}:10.0.1.${id}/24";
+
+  $bridges = "${bridge0} ${bridge1}";
+  $bridgeips = "${bridge0_ip} ${bridge1_ip}";
+
   vnet;
-  vnet.interface = "${epair}b";
   devfs_ruleset = 5;
 
-  exec.prestart += "/sbin/ifconfig ${epair} create";
-  exec.prestart += "/sbin/ifconfig ${epair}a up";
-  exec.prestart += "/sbin/ifconfig ${bridge} addm ${epair}a up";
-
-  exec.start  = "/sbin/ifconfig ${epair}b ${ip} up";
-  exec.start += "/bin/sh /etc/rc";
-
-  exec.poststop += "/sbin/ifconfig ${bridge} deletem ${epair}a";
-  exec.poststop += "/sbin/ifconfig ${epair}a destroy";
+  exec.prestart = "/bin/sh /usr/local/etc/rc.jail prestart ${name} ${bridges}";
+  exec.created  = "/bin/sh /usr/local/etc/rc.jail created ${name} ${bridgeips}";
+  exec.poststop = "/bin/sh /usr/local/etc/rc.jail poststop ${name} ${bridges}";
 }
-```
-
-Close syslog port.
-
-```console
-# sockstat -4
-USER     COMMAND    PID   FD  PROTO  LOCAL ADDRESS         FOREIGN ADDRESS
-root     syslogd    41091 6   udp4   *:514
-# sysrc -f /etc/rc.conf.d/syslogd syslogd_flags="-ss"
-# service syslogd restart
-# sockstat -4
-USER     COMMAND    PID   FD  PROTO  LOCAL ADDRESS         FOREIGN ADDRESS
-```
-
-Setup routing:
-
-```console
-# sysrc -f /etc/rc.conf.d/routing defaultrouter="192.168.1.1"
-# service routing restart
 ```
 
 # LINUX JAIL
