@@ -291,9 +291,15 @@ Stop the jail and add the following instructions to the jail configuration:
 # cat /etc/jail.conf.d/ubuntu
 ubuntu {
   $id = "111";
-  $ip = "192.168.1.${id}/24";
-  $epair = "epair${id}";
-  $bridge = "bridge0";
+
+  $bridge0 = "bridge0";
+  $bridge0_ip = "${bridge0}:192.168.1.${id}/24";
+
+  $bridge1 = "bridge1";
+  $bridge1_ip = "${bridge1}:10.0.1.${id}/24";
+
+  $bridges = "${bridge0} ${bridge1}";
+  $bridgeips = "${bridge0_ip} ${bridge1_ip}";
 
   allow.mount;
   allow.mount.devfs;
@@ -305,20 +311,12 @@ ubuntu {
 
   enforce_statfs = 1; # only mount points below jail's chroot
 
-  # Virtual Network (VNET)
   vnet;
-  vnet.interface = "${epair}b";
   devfs_ruleset = 5;
 
-  exec.prestart += "/sbin/ifconfig ${epair} create";
-  exec.prestart += "/sbin/ifconfig ${epair}a up";
-  exec.prestart += "/sbin/ifconfig ${bridge} addm ${epair}a up";
-
-  exec.start  = "/sbin/ifconfig ${epair}b ${ip} up";
-  exec.start += "/bin/sh /etc/rc";
-
-  exec.poststop += "/sbin/ifconfig ${bridge} deletem ${epair}a";
-  exec.poststop += "/sbin/ifconfig ${epair}a destroy";
+  exec.prestart = "/bin/sh /usr/local/etc/rc.jail prestart ${name} ${bridges}";
+  exec.created  = "/bin/sh /usr/local/etc/rc.jail created ${name} ${bridgeips}";
+  exec.poststop = "/bin/sh /usr/local/etc/rc.jail poststop ${name} ${bridges}";
 
   mount += "devfs     $path/compat/ubuntu/dev     devfs     rw  0 0";
   mount += "tmpfs     $path/compat/ubuntu/dev/shm tmpfs     rw,size=1g,mode=1777  0 0";
@@ -405,5 +403,11 @@ Therefore it is helpful to enter the jail with `chroot(8)` unless one needs to
 debug FreeBSD jail:
 
 ```console
-# jexec ubuntu chroot /compat/ubuntu /bin/bash
+# jexec ubuntu chroot /compat/ubuntu su -l
+```
+
+or get into the jail the usual way:
+
+```console
+# jexec ubuntu su -l
 ```
