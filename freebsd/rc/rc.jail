@@ -1,0 +1,201 @@
+#!/bin/sh
+#
+# Copyright 2025 Samvel Khalatyan. All rights reserved.
+#
+# Manage jail(8) VNET via exec hooks.
+#
+# Example
+#   # file: /etc/jail.conf.d/foo.conf:
+#   foo {
+#     $bridge "bridge0";
+#     $ip = "10.0.1.100/24";
+#     vnet;
+#     exec.prestart = "/bin/sh /usr/local/etc/rc.jail prestart ${name} ${bridge}"
+#     exec.created  = "/bin/sh /usr/local/etc/rc.jail created ${name} ${bridge} ${ip}"
+#     exec.poststop = "/bin/sh /usr/local/etc/rc.jail poststop ${name} ${bridge}"
+#   }
+#
+# Description
+# `rc.jail` manages jail's epair(4) connection to the bridge(4) in the host and
+# jailed environments via jail(8) exec-hooks:
+#   * exec.prestart: create next logical epair(4) and attach it to the
+#     bridge(4).
+#   * exec.created: move the jail's side of the epair(4) to the jail(8) and
+#     assign it the IP address.
+#   * exec.poststop: disconnect jail's epair(4) from the bridge(4) and remove
+#     it from the host environment.
+#
+# `rc.jail` keeps track of the running jail's epair(4) in /var/run/jail/ folder,
+# in ${jail_name}.${bridge} file.
+#
+# vim: ft=sh
+
+# keep-sorted start
+readonly CAT_CMD=/bin/cat
+readonly IFCONFIG_CMD=/sbin/ifconfig
+readonly JEXEC_CMD=/usr/sbin/jexec
+readonly MKDIR_CMD=/bin/mkdir
+readonly RM_CMD=/bin/rm
+# keep-sorted end
+
+readonly JAIL_RUN_PATH=/var/run/jail
+
+# jail_exec_prestart creates an epair(4) and adds it to the bridge in the host
+# environment.
+#
+# Arguments:
+#   $1 : jail name
+#   $2 : bridge name
+#
+# It stores the epair(4) identifier in the jail runtime file.
+jail_exec_prestart() {
+	local jail_name=${1:?'jail_exec_prestart: missing jail name'}
+	local jail_bridge=${2:?'jail_exec_prestart: missing jail bridge'}
+
+	local jail_epair_a=$(${IFCONFIG_CMD} epair create)
+	local jail_epair=${jail_epair_a%a}
+	jail_write_epair ${jail_name} ${jail_bridge} ${jail_epair}
+  local jail_epair_descr=jail:${jail_name}:${jail_bridge}
+	${IFCONFIG_CMD} ${jail_epair_a} up descr ${jail_epair_descr}
+	${IFCONFIG_CMD} ${jail_bridge} addm ${jail_epair_a} up
+}
+
+# jail_exec_created moves the epair(4) to the jail(8) and assigns the IP address
+# in the jailed environment. It loads jail's epair(4) from the jail runtime
+# file.
+#
+# Arguments:
+#   $1 : jail name
+#   $2 : bridge name
+#   $3 : IP address
+jail_exec_created() {
+	local jail_name=${1:?'jail_exec_created: missing jail name'}
+	local jail_bridge=${2:?'jail_exec_created: missing jail bridge'}
+	local jail_ip=${3:?'jail_exec_created: missing jail IP address'}
+
+	local jail_epair
+  jail_epair="$(jail_read_epair ${jail_name} ${jail_bridge})"
+	local jail_epair_b=${jail_epair}b
+	# Move the b-side of epair(4) inside the jail. All operations on the b-side
+  # must run from inside the jail after this completes.
+	${IFCONFIG_CMD} ${jail_epair_b} vnet ${jail_name}
+  local jail_epair_descr=jail:${jail_name}:${jail_bridge}
+	${JEXEC_CMD} ${jail_name} ${IFCONFIG_CMD} ${jail_epair_b} ${jail_ip} up descr ${jail_epair_descr}
+}
+
+# jail_exec_poststop disconnects the epair(4) from the bridge and removes it
+# from the host environment.
+#
+# Arguments:
+#   $1 : jail name
+#   $2 : bridge name
+#
+# It cleans the jail runtime file.
+jail_exec_poststop() {
+	local jail_name=${1:?'jail_exec_poststop: missing jail name'}
+	local jail_bridge=${2:?'jail_exec_poststop: missing jail bridge'}
+
+	local jail_epair
+  jail_epair=$(jail_read_epair ${jail_name} ${jail_bridge})
+	local jail_epair_a=${jail_epair}a
+	${IFCONFIG_CMD} ${jail_bridge} deletem ${jail_epair_a}
+	${IFCONFIG_CMD} ${jail_epair_a} destroy
+  jail_clean_epair ${jail_name} ${jail_bridge}
+}
+
+
+# jail_write_epair writes the epair(4) identifier to the jail runtime file.
+#
+# Arguments:
+#   $1 : jail name
+#   $2 : bridge name
+#   $3 : epair
+#
+# It creates the jail runtime path if one does not exist.
+jail_write_epair() {
+	local jail_epair=${1:?'jail_write_epair: missing jail epair'}
+	local jail_name=${2:?'jail_write_epair: missing jail name'}
+	local jail_bridge=${3:?'jail_write_epair: missing jail bridge'}
+
+	local jail_epair_file
+  jail_epair_file=$(jail_get_epair_file ${jail_name} ${jail_bridge})
+	local jail_epair_file_path=${jail_epair_file%/*}
+	if ! [ -d ${jail_epair_file_path} ]; then
+		${MKDIR_CMD} ${jail_epair_file_path}
+	fi
+	echo ${jail_epair} > ${jail_epair_file}
+}
+
+# jail_read_epair reads the epair(4) identifier from the jail runtime file.
+
+# Arguments:
+#   $1 : jail name
+#   $2 : bridge name
+#
+# It returns 1 if the jail runtime file does not exist.
+jail_read_epair() {
+	local jail_name=${1:?'jail_read_epair: missing jail name'}
+	local jail_bridge=${2:?'jail_read_epair: missing jail bridge'}
+
+	local jail_epair_file
+  jail_epair_file=$(jail_get_epair_file ${jail_name} ${jail_bridge})
+  if ! [ -f ${jail_epair_file} ]; then
+    echo "jail_read_epair: runtime file ${jail_epair_file} does not exist" >&2
+    return 1
+  fi
+	${CAT_CMD} ${jail_epair_file}
+}
+
+# jail_clean_epair cleans up the jail runtime file.
+#
+# Arguments:
+#   $1 : jail name
+#   $2 : bridge name
+jail_clean_epair() {
+	local jail_name=${1:?'jail_clean_epair: missing jail name'}
+	local jail_bridge=${2:?'jail_clean_epair: missing jail bridge'}
+
+	local jail_epair_file=$(jail_get_epair_file ${jail_name} ${jail_bridge})
+	if [ -f ${jail_epair_file} ]; then
+		${RM_CMD} ${jail_epair_file}
+	fi
+}
+
+# jail_get_epair_file builds the jail runtime file name.
+#
+# Arguments:
+#   $1 : jail name
+#   $2 : bridge name
+#
+# The jail runtime file is in JAIL_RUN_PATH.
+jail_get_epair_file() {
+	local jail_name=${1:?'jail_get_epair_file: missing jail name'}
+	local jail_bridge=${2:?'jail_get_epair_file: missing jail bridge'}
+
+	echo ${JAIL_RUN_PATH}/${jail_name}_${jail_bridge}
+}
+
+# main runs jail(4) exec hooks.
+#
+# Arguments:
+#   $1 : hook name: prestart, created, poststop
+#   $* : hook arguments
+#
+# It prints an error message on unsupported hooks and return 1.
+main() {
+  local hook=${1:?'main: missing hook'}
+  shift 1
+
+  case ${hook} in
+    prestart|created|poststop)
+      ;;
+    *)
+      echo "invalid hook - ${hook}" >&2
+      return 1
+      ;;
+  esac
+  local hook_func=jail_exec_${hook}
+  ${hook_func} "$@"
+}
+
+main "$@"
