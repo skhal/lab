@@ -9,6 +9,7 @@ cc_test(
   srcs = ["solution_test.cc"],
   deps = [
     ":solution_cc",
-    "@com_google_googletest//:gtest_main",
+    "@googletest//:gtest",
+    "@googletest//:gtest_main",
   ],
 )
