@@ -3,7 +3,6 @@
 " -- BASIC
 syntax on
 set number"
-set mouse=a " enable mouse
 
 " -- COLORS
 set bg=dark
