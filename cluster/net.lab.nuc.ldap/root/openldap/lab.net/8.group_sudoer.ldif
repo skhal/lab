@@ -1,0 +1,14 @@
+dn: cn=sudoer,ou=groups,dc=lab,dc=net
+cn: sudoer
+objectClass: top
+objectClass: posixGroup
+gidNumber: 1002
+memberUid: skhalatyan
+
+dn: cn=%sudoer,ou=sudoers,dc=lab,dc=net
+cn: %sudoer
+objectClass: top
+objectClass: sudoRole
+sudoUser: %sudoer
+sudoHost: ALL
+sudoCommand: apt

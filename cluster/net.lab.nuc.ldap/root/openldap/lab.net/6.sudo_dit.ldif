@@ -1,0 +1,15 @@
+dn: ou=sudoers,dc=lab,dc=net
+ou: sudoers
+objectClass: organizationalUnit
+description: sudo security policy
+
+# keep in sync with /etc/sudoers
+dn: cn=defaults,ou=sudoers,dc=lab,dc=net
+cn: defaults
+objectClass: top
+objectClass: sudoRole
+description: Default sudoOption's go here
+sudoOption: env_reset
+sudoOption: secure_path=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin
+sudoOption: use_pty
+sudoOrder: 1
