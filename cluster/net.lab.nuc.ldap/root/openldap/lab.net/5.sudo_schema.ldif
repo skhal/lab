@@ -1,0 +1,2 @@
+# Import sudo.ldif schema:
+#   ldapadd -H ldapi://%2Fvar%2Frun%2Fopenldap%2Fldapi -Y EXTERNAL -f ~/openldap/schema/sudo.ldif
