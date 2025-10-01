@@ -11,4 +11,4 @@ objectClass: top
 objectClass: sudoRole
 sudoUser: %sudoer
 sudoHost: ALL
-sudoCommand: apt
+sudoCommand: /usr/bin/apt
