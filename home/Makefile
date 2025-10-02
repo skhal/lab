@@ -3,7 +3,7 @@
 # Flavor: FreeBSD
 
 INSTALL_PATHS = vim
-INSTALL_TARGETS = ${HOME}/.tcshrc ${HOME}/.vimrc
+INSTALL_TARGETS = ${HOME}/.tcshrc ${HOME}/.vimrc ${HOME}/.tmux.conf
 
 install: ${INSTALL_TARGETS} ${INSTALL_PATHS} .PHONY
 
