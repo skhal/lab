@@ -1,0 +1,9 @@
+# Copyright 2025 Samvel Khalatyan. All rights reserved.
+#
+# vim: ft=gitconfig
+
+[alias]
+  x = log --all --decorate --oneline --graph --max-count=10
+
+[include]
+  path = ~/.gitconfig.local
