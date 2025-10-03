@@ -43,7 +43,7 @@ Members of `jail` can manage jail datasets:
 ```console
 # zfs allow -s @mount  mount,canmount,mountpoint zroot/jail
 # zfs allow -s @create create,destroy,@mount zroot/jail
-# zfs allow -g jail @mount,@create,readonly zroot/jail
+# zfs allow -g jail @mount,@create,readonly,snapshot zroot/jail
 ```
 
 Add system operator to the `jail` group:
