@@ -3,10 +3,14 @@
 **template-freebsd** - create a FreeBSD jail template
 
 
-# BOOTSTRAP
+# DESCRIPTION
 
-Download user land into `/jail/image/`. We'll use `amd64` architecture and
-release 14.3:
+The instructions will create a ZFS dataset with patched FreeBSD user land and
+ready to create a new jail. It uses FreeBSD 14.3 release for amd64 architecture.
+
+## Bootstrap
+
+Download FreeBSD user land into `/jail/image/`:
 
 ```console
 # fetch \
@@ -19,27 +23,31 @@ Open the archive into `/jail/template/` sub-folder:
 
 ```console
 # tar \
+    -C /jail/template/14.3-RELEASE \
     -x \
     -f /jail/image/14.3-RELEASE-base.txz \
-    -C /jail/template/14.3-RELEASE \
     --unlink
 ```
 
+## Patch
+
 Update the release with latest patches. Use `PAGER=cat` to suppress
-interactivity in `freebsd-update`.
+interactivity in freebsd-update(8).
 
 ```console
-# env PAGER=cat \
-    freebsd-update -b /jail/template/14.3-RELEASE/ fetch install
-# chroot /jail/template/14.3-RELEASE \
-    freebsd-version -u
+# env PAGER=cat freebsd-update -b /jail/template/14.3-RELEASE/ fetch install
+```
+
+Verify work:
+
+```console
+# chroot /jail/template/14.3-RELEASE freebsd-version -u
 14.3-RELEASE-p2
 ```
 
+## Configure
 
-# CONFIGURATION
-
-## RC
+### Virtual network RC
 
 Install [`rc.jail`](https://github.com/skhal/lab/blob/main/freebsd/rc/rc.jail)
 to manage jail Virtual Networks:
@@ -51,7 +59,7 @@ to manage jail Virtual Networks:
     https://raw.githubusercontent.com/skhal/lab/refs/heads/main/freebsd/rc/rc.jail
 ```
 
-## Root user
+### Root
 
 Change shell to `tcsh(1)`:
 
@@ -61,7 +69,7 @@ Change shell to `tcsh(1)`:
 # cp /root/.cshrc /jail/template/14.3-RELEASE/root/
 ```
 
-## Routing
+### Routing
 
 Set default gateway:
 
@@ -71,7 +79,7 @@ Set default gateway:
 # cp /etc/resolv.conf /jail/template/14.3-RELEASE/etc/resolv.conf
 ```
 
-## Syslogd
+### Syslogd
 
 Run in local mode, e.g. close sockets:
 
@@ -80,7 +88,7 @@ Run in local mode, e.g. close sockets:
     sysrc -f /etc/rc.conf.d/syslogd syslogd_flags="-ss"
 ```
 
-## Timezone
+### Timezone
 
 Default timezone is set to UTC. Switch to US Central Time:
 
@@ -91,11 +99,20 @@ Default timezone is set to UTC. Switch to US Central Time:
     tzsetup -r
 ```
 
+## Snapshot
 
-# SNAPSHOT
-
-Create a ZFS snapshot for the template using patch number `pN`:
+Create a ZFS snapshot for the template using the release patch number `pN` and
+local changes number:
 
 ```console
-# zfs snapshot zroot/jail/template/14.3-RELEASE@p1
+# zfs snapshot zroot/jail/template/14.3-RELEASE@p2.0
 ```
+
+If the template is updated in the future with local changes, say a change to
+one of the RC-files, then re-snapshot the dataset with `p2.1` (assuming the
+FreeBSD version is still `14.3-RELEASE-p2`).
+
+
+# SEE ALSO
+
+* https://docs.freebsd.org/en/books/handbook/jails/#creating-classic-jail
