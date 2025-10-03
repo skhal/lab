@@ -47,18 +47,6 @@ Verify work:
 
 ## Configure
 
-### Virtual network RC
-
-Install [`rc.jail`](https://github.com/skhal/lab/blob/main/freebsd/rc/rc.jail)
-to manage jail Virtual Networks:
-
-```console
-# chroot /jail/template/14.3-RELEASE \
-    fetch \
-    -o /usr/local/etc/rc.jail \
-    https://raw.githubusercontent.com/skhal/lab/refs/heads/main/freebsd/rc/rc.jail
-```
-
 ### Root
 
 Change shell to `tcsh(1)`:
