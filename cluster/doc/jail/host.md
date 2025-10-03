@@ -57,16 +57,9 @@ parameters and pick up individual jail configurations from `/etc/jail.conf.d/`
 
 ```console
 # mkdir /etc/jail.conf.d
-# cat /etc/jail.conf
-host.hostname = "${name}.lab.net";
-
-path = "/jail/container/${name}";
-exec.consolelog = "/var/log/jail_${name}.log";
-
-exec.start = "/bin/sh /etc/rc";
-exec.stop = "/bin/sh /etc/rc.shutdown";
-
+# cat <<eof >/etc/jail.conf
 .include "/etc/jail.conf.d/*.conf";
+eof
 ```
 
 Enable `jail` service and stop jails in the reverse order to ensure dependencies
