@@ -7,10 +7,10 @@
 
 ## Directory tree
 
-We'll store jails under `/jail/` with tree sub-directories:
-  * `/jail/image/` stores downloaded user lands in compressed format.
-  * `/jail/template/` base templates to create jails.
-  * `/jail/container/` running jail.
+Jails reside under `/jail`. There are three folders:
+  * `/jail/image` stores downloaded user lands in compressed format.
+  * `/jail/template` holds base templates to create jails.
+  * `/jail/container` keeps running jail.
 
 ```console
 # zfs create -o mountpoint=/jail zroot/jail
@@ -19,7 +19,24 @@ We'll store jails under `/jail/` with tree sub-directories:
 # zfs create zroot/jail/container
 ```
 
-It might be beneficial to allow users in `jail` group to manage these locations:
+## Permissions
+
+Create `jail` user group:
+
+```console
+# pw groupadd -g 1001 -n jail
+```
+
+`jail` members can manage and enter jails:
+
+```console
+# cat <<eof >> /usr/local/etc/doas.conf
+permit nopass :jail cmd jail
+permit nopass :jail cmd jexec
+eof
+```
+
+Members of `jail` can manage jail datasets:
 
 ```console
 # zfs allow -s @mount  mount,canmount,mountpoint zroot/jail
@@ -27,17 +44,10 @@ It might be beneficial to allow users in `jail` group to manage these locations:
 # zfs allow -g jail @mount,@create,readonly zroot/jail
 ```
 
-## Permissions
-
-Use `jail` group to grant permissions to users to control jails:
+Add system operator to the `jail` group:
 
 ```console
-# pw groupadd -g 1001 -n jail
 # pw groupmod -m op -n jail
-# cat <<eof >> /usr/local/etc/doas.conf
-permit nopass :jail cmd jail
-permit nopass :jail cmd jexec
-eof
 ```
 
 ## Jail service
