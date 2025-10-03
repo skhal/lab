@@ -186,3 +186,8 @@ change version:
 ```console
 # zfs snapshot zroot/jail/template/Ubuntu-22.04@p2.0
 ```
+
+
+# SEE ALSO
+
+* https://docs.freebsd.org/en/books/handbook/jails/#creating-linux-jail
