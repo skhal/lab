@@ -48,7 +48,14 @@ inside the template. The template also needs to access default FreeBSD setup.
 Start from FreeBSD template:
 
 ```console
-# zfs clone zroot/jail/template/14.3-RELEASE@p2 zroot/jail/template/Ubuntu-22.04
+% zfs list -t snapshot zroot/jail/template/14.3-RELEASE
+NAME                                    USED  AVAIL  REFER  MOUNTPOINT
+zroot/jail/template/14.3-RELEASE@p2     144K      -   459M  -
+zroot/jail/template/14.3-RELEASE@p2.1   152K      -   459M  -
+zroot/jail/template/14.3-RELEASE@p2.2   128K      -   459M  -
+zroot/jail/template/14.3-RELEASE@p2.3   120K      -   459M  -
+zroot/jail/template/14.3-RELEASE@p2.4     8K      -   459M  -
+# zfs clone zroot/jail/template/14.3-RELEASE@p2.4 zroot/jail/template/Ubuntu-22.04
 ```
 
 ### Start template

@@ -13,6 +13,9 @@ using Ubuntu template.
 Start from Ubuntu template
 
 ```console
+% zfs list -t snapshot zroot/jail/template/Ubuntu-22.04
+NAME                                    USED  AVAIL  REFER  MOUNTPOINT
+zroot/jail/template/Ubuntu-22.04@p2.0     8K      -   920M  -
 # zfs clone zroot/jail/template/Ubuntu-22.04@p2.0 zroot/jail/container/jammy
 ```
 
