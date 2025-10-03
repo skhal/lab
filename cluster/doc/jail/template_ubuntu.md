@@ -3,7 +3,9 @@
 **template-ubuntu** - create a Ubuntu jail template
 
 
-# HOST
+# DESCRIPTION
+
+## Host
 
 Enable
 [Linux Binary Compatibility](https://docs.freebsd.org/en/books/handbook/linuxemu/#linuxemu)
@@ -14,19 +16,20 @@ to run Linux user land on FreeBSD:
 # service linux start
 ```
 
-The service loads kernel modules and mounts file systems for Linux applications
-under `/compat/linux`:
+The service
+[loads kernel modules](https://github.com/freebsd/freebsd-src/blob/ae5914c0e4478fd35ef9db3f32665b60e04d5a6f/libexec/rc/rc.d/linux#L32-L63)
+and
+[mounts file systems](https://github.com/freebsd/freebsd-src/blob/ae5914c0e4478fd35ef9db3f32665b60e04d5a6f/libexec/rc/rc.d/linux#L74-L80)
+for Linux applications under `/compat/linux` prefix:
 
 ```console
-% ls /compat/linux
-dev proc  sys
+# sysctl -n compat.linux.emul_path
+/compat/linux
 ```
 
-Linux application can run on the host like native FreeBSD binaries now. They
-are present in the process tree, can be traced, etc.
-
-FreeBSD Ports tree includes a small number of Linux applications with `linux-`
-prefix:
+Now Linux applications can run on the host along native FreeBSD binaries now.
+They show up in the process tree, can be traced, etc. There is a small number
+of such applications available in the FreeBSD Ports tree with `linux-` prefix:
 
 ```console
 % pkg search '^linux-*' | head -n 3
@@ -35,64 +38,66 @@ linux-bcompare-4.4.7           Compare, sync, and merge files and folders (X11)
 linux-bitwarden-cli-1.22.1     Bitwarden CLI
 ```
 
-Beware that when run, these applications expect to find configurations,
-libraries, and other files under `/` root folder. Use `chroot(8)` to guarantee
-its working:
+## Jail
 
-```console
-# chroot /compat/linux /bin/ls
-```
+debootstrap(8) installs Linux shared libraries. We'll need to install these
+inside the template. The template also needs to access default FreeBSD setup.
 
-# JAIL
+### ZFS Bootstrap
 
-## Debian bootstrap
-
-Create a FreeBSD jail template `Ubuntu-22.04`:
+Start from FreeBSD template:
 
 ```console
 # zfs clone zroot/jail/template/14.3-RELEASE@p2 zroot/jail/template/Ubuntu-22.04
 ```
 
-Manually start a jail at the template to install bootstrap Linux shared
-libraries inside the template:
+### Start template
+
+Manually start a jail with path set to the template:
 
 ```console
 # cat /tmp/jammy.conf
 jammy {
   host.hostname = "${name}.lab.net";
-  path = '/jail/template/Ubuntu-24.04';
-  exec.consolelog = "/var/log/jail_${name}.log";
+  path = "/jail/template/Ubuntu-22.04";
 
   interface = "em0";
   ip4.addr = "192.168.1.10";
 
+  allow.mount.devfs;
+  allow.mount.fdescfs;
+  allow.mount.linprocfs;
+  allow.mount.linsysfs;
+  allow.mount.procfs;
+  allow.mount.tmpfs;
+  allow.mount;
   allow.raw_sockets;
-  exec.clean;
 
   mount.devfs;
   devfs_ruleset = 4;
 
-  allow.mount;
-  allow.mount.devfs;
-  allow.mount.fdescfs;
-  allow.mount.procfs;
-  allow.mount.linprocfs;
-  allow.mount.linsysfs;
-  allow.mount.tmpfs;
-
   enforce_statfs = 1;
+
+  exec.clean;
+  exec.consolelog = "/var/log/jail_${name}.log";
 
   exec.start = "/bin/sh /etc/rc";
   exec.stop = "/bin/sh /etc/rc.shutdown";
 }
 # jail -cm -f /tmp/jammy.conf
+jammy: created
 ```
 
-Verify network setup:
+Verify work:
 
 ```console
-# jexec jammy ifconfig em0 | grep inet
-  inet 192.168.1.10 netmask 0xffffffff broadcast 192.168.1.10
+# jexec jammy ifconfig em0
+em0: flags=1008943<UP,BROADCAST,RUNNING,PROMISC,SIMPLEX,MULTICAST,LOWER_UP> metric 0 mtu 1500
+	options=a520b9<RXCSUM,VLAN_MTU,VLAN_HWTAGGING,JUMBO_MTU,VLAN_HWCSUM,WOL_MAGIC,VLAN_HWFILTER,VLAN_HWTSO,RXCSUM_IPV6,HWSTATS>
+	ether 00:1f:c6:9c:54:f1
+	inet 192.168.1.10 netmask 0xffffffff broadcast 192.168.1.10
+	media: Ethernet autoselect (1000baseT <full-duplex>)
+	status: active
 # jexec jammy ping -c 1 192.168.1.1
 PING 192.168.1.1 (192.168.1.1): 56 data bytes
 64 bytes from 192.168.1.1: icmp_seq=0 ttl=64 time=1.446 ms
@@ -105,9 +110,9 @@ Connection to 1.1.1.1 53 port [udp/domain] succeeded!
 ^C
 ```
 
-Use
-[debootstrap(8)](https://manpages.debian.org/stretch/debootstrap/debootstrap.8.en.html)
-to provide Linux shared libraries.
+### Debian bootstrap
+
+Install debootstrap(8):
 
 ```console
 # jexec jammy pkg install debootstrap
@@ -136,41 +141,48 @@ debootstrap bionic /compat/ubuntu
 
 </details>
 
-`debootstrap`:
+> [!IMPORTANT]
+> The message from debootstrap(8) includes installed version `1.0.128`.
+>
+> It is a Debian shell script, https://wiki.debian.org/Debootstrap. The script
+> pulls a number of libraries, customized for different Debian distributions by
+> `/usr/local/share/debootstrap/scripts/`.
+>
+> For example, `jammy` script is for Ubuntu 22.04.
+>
+> debootstrap(8) v1.0.128 does not include Ubuntu 24.04 Noble.
 
-  * It is a shell script from Debian - https://wiki.debian.org/Debootstrap.
-  * FreeBSD 14.3 uses
-    [1.0.128 version](https://cgit.freebsd.org/ports/commit/sysutils/debootstrap/Makefile?id=2bf4a73e61cd322efa426f55101afa25bd2481d3)
-    as of Oct '25.
-  * `debootstrap` uses scripts from `/usr/local/share/debootstrap/scripts/`
-    named after Linux distribution.
-  * Version 1.0.128 does not include Ubuntu 24.04 Noble but has Ubuntu 22.04
-    Jammy.
-  * Install Linux libraries into `/compat/<distribution>` to emphasize the
-    distribution in use.
+Install Linux libraries into `/compat/<distribution>`, i.e., `/compat/jammy`:
 
 ```console
 # jexec jammy debootstrap jammy /compat/jammy
 I: Retrieving InRelease
-I: Checking Release signature
 ...
 I: Base system installed successfully.
 ```
 
+Verify work:
+
+```console
+# jexec jammy ls /compat/jammy
+bin dev home  lib32 libx32  mnt proc  run srv tmp var
+boot  etc lib lib64 media opt root  sbin  sys usr
+```
+
+### Stop template
+
 Stop the jail:
 
 ```console
-# jail -r -f /tmp/jammy.conf
+# jail -r -f /tmp/jammy.conf jammy
+jammy: removed
 ```
 
-Snapshot the template:
+### Snapshot
+
+Create a ZFS Snapshot the template. Name it after FreeBSD patch. Include the
+change version:
 
 ```console
-# zfs snapshot zroot/jail/template/Ubuntu-22.04@p1
-```
-
-Clean up temporary jail configuration:
-
-```console
-# rm /etc/jail.conf.d/jammy.conf
+# zfs snapshot zroot/jail/template/Ubuntu-22.04@p2.0
 ```
