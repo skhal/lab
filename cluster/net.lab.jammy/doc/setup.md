@@ -5,6 +5,26 @@
 
 # DESCRIPTION
 
+## Root password
+
+Set FreeBSD pasword:
+
+```consoel
+% doas jexec jammy passwd
+Changing local password for root
+New Password:
+Retype New Password:
+```
+
+Set Ubuntu password:
+
+```console
+% doas jexec jammy chroot /compat/jammy passwd
+New password:
+Retype new password:
+passwd: password updated successfully
+```
+
 ## RC
 
 Enable debugging:
@@ -226,4 +246,18 @@ Verify work:
 % ssh op@jammy.lab.net hostname
 op@jammy.lab.net's password:
 jammy.lab.net
+```
+
+## Sudo
+
+```console
+% doas jexec jammy chroot /compat/jammy apt install sudo-ldap
+```
+
+Verify:
+
+```console
+% doas jexec jammy chroot /compat/jammy sudo whoami
+sudo: unable to resolve host jammy.lab.net: No address associated with hostname
+root
 ```
