@@ -60,7 +60,7 @@ Upgrade the user land:
 Add tcsh(1) for LDAP users. Simplify configuration edits with vim(1):
 
 ```console
-% doas jexec jammy chroot /compat/jammy apt install vim tcsh
+% doas jexec jammy chroot /compat/jammy apt install man vim tcsh
 ```
 
 ## Locale
@@ -254,10 +254,55 @@ jammy.lab.net
 % doas jexec jammy chroot /compat/jammy apt install sudo-ldap
 ```
 
+Sudo stores LDAP settings in `/etc/sudo-ldap.conf`:
+
+```console
+% doas jexec jammy chroot /compat/jammy cat /etc/sudo-ldap.conf
+#
+# LDAP Defaults
+#
+
+# See ldap.conf(5) for details
+# This file should be world readable but not world writable.
+
+#BASE dc=example,dc=com
+#URI  ldap://ldap.example.com ldap://ldap-provider.example.com:666
+BASE  dc=lab,dc=net
+URI   ldap://10.0.1.90
+
+SUDOERS_BASE ou=sudoers,dc=lab,dc=net
+
+#SIZELIMIT  12
+#TIMELIMIT  15
+#DEREF    never
+
+# TLS certificates (needed for GnuTLS)
+# TLS_CACERT  /etc/ssl/certs/ca-certificates.crt
+```
+
 Verify:
 
 ```console
 % doas jexec jammy chroot /compat/jammy sudo whoami
 sudo: unable to resolve host jammy.lab.net: No address associated with hostname
 root
+```
+
+## Clang
+
+Setup LLVM apt(1) sources:
+
+```console
+% doas jexec jammy chroot /compat/jammy su -l
+root@jammy:~# wget -qO /etc/apt/trusted.gpg.d/apt.llvm.org.asc https://apt.llvm.org/llvm-snapshot.gpg.key
+root@jammy:~# cat /etc/apt/sources.list.d/llvm.list
+# Reference: https://apt.llvm.org
+deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-19 main
+deb-src http://apt.llvm.org/jammy/ llvm-toolchain-jammy-19 main
+```
+
+Install clang(1) from LLVM 19:
+
+```console
+% doas jexec jammy chroot /compat/jammy apt install clang-19
 ```
