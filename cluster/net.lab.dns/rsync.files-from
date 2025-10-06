@@ -1,0 +1,10 @@
+etc/rc.conf
+etc/rc.conf.d
+root/.cshrc
+root/.login
+root/.profile
+root/.shrc
+root/.vimrc
+usr/local/etc/namedb/named.conf
+usr/local/etc/namedb/primary
+usr/local/etc/namedb/zones.conf.d

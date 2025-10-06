@@ -1,0 +1,21 @@
+$TTL 1h
+@ IN  SOA dns.lab.net. root.dns.lab.net. (
+  2025100501  ; Serial, [YYYYMMDDnn] (update date + number)
+  1h  ; Refresh
+  15m ; Retry
+  1w  ; Expiry
+  1d  ; Minimum
+)
+
+; Name server
+      IN  NS  dns.lab.net.
+      IN  A   10.0.1.2
+
+; Infrastructure
+1     IN  PTR nuc.lab.net.
+2     IN  PTR dns.lab.net.
+3     IN  PTR ldap.lab.net.
+
+; Development
+11    IN  PTR dev.lab.net.
+12    IN  PTR jammy.lab.net.
