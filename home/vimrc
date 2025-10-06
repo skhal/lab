@@ -30,12 +30,14 @@ nmap <leader>l <esc>:set list!<cr>
 au FileType markdown setlocal spell
 
 " -- FORMAT BUFFER.
-" Set format tool
-au FileType go set equalprg=goimports
+" keep-sorted start
+au FileType bzl set equalprg=buildifier
 au FileType c,cpp set equalprg=clang-format
+au FileType go set equalprg=goimports
+" keep-sorted end
 " Format entire buffer `=G` or selection `=` with shortcut `<leader>fc`
-au FileType go,c,cpp map <leader>fc gg=G<c-o><c-o>
-au FileType go,c,cpp imap <leader>fc <esc>gg=G<c-o><c-o>
+au FileType bzl,c,cpp,go map <leader>fc gg=G<c-o><c-o>
+au FileType bzl,c,cpp,go imap <leader>fc <esc>gg=G<c-o><c-o>
 
 " -- Plugin github.com:noahfrederick/vim-skeleton
 let g:skeleton_replacements = {}
