@@ -5,50 +5,50 @@
 # more examples available at /usr/share/examples/csh/
 #
 
-alias h		history 25
-alias j		jobs -l
-alias la	ls -aF
-alias lf	ls -FA
-alias ll	ls -lAF
+alias h   history 25
+alias j   jobs -l
+alias la  ls -aF
+alias lf  ls -FA
+alias ll  ls -lAF
 
 # read(2) of directories may not be desirable by default, as this will provoke
 # EISDIR errors from each directory encountered.
-# alias grep	grep -d skip
+# alias grep  grep -d skip
 
 # A righteous umask
 umask 22
 
 set path = (/sbin /bin /usr/sbin /usr/bin /usr/local/sbin /usr/local/bin $HOME/bin)
 
-setenv	EDITOR	vi
-setenv	PAGER	less
+setenv  EDITOR  vi
+setenv  PAGER less
 
 if ($?prompt) then
-	# An interactive shell -- set some stuff up
-	# force %c to represent skipped path components with `...`, csh(1)
-	set ellipsis
-	# ref: https://en.wikipedia.org/wiki/ANSI_escape_code
-	set esc_cyan_ = "%{\033[;36m%}"
-	set esc_red_ = "%{\033[;31m%}"
-        set esc_reset_ = "%{\033[m%}"
-	set prompt = "${esc_red_}%N${esc_reset_}@%m:${esc_cyan_}%c03${esc_reset_} %# "
-	set promptchars = "%#"
-	unset esc_cyan_ esc_red_ esc_reset_
+  # An interactive shell -- set some stuff up
+  # force %c to represent skipped path components with `...`, csh(1)
+  set ellipsis
+  # ref: https://en.wikipedia.org/wiki/ANSI_escape_code
+  set esc_cyan_ = "%{\033[;36m%}"
+  set esc_magenta_ = "%{\033[;35m%}"
+  set esc_red_ = "%{\033[;31m%}"
+  set esc_reset_ = "%{\033[m%}"
+  set prompt = "${esc_red_}%N${esc_reset_}@${esc_magenta_}jail${esc_reset_}:%m :${esc_cyan_}%c03${esc_reset_} %# "
+  set promptchars = "%#"
+  unset esc_cyan_ esc_magenta_ esc_red_ esc_reset_
 
-	set filec
-	set history = 1000
-	set savehist = (1000 merge)
-	set autolist = ambiguous
-	# Use history to aid expansion
-	set autoexpand
-	set autorehash
-	set mail = (/var/mail/$USER)
-	if ( $?tcsh ) then
-		bindkey "^W" backward-delete-word
-		bindkey -k up history-search-backward
-		bindkey -k down history-search-forward
-	endif
+  set filec
+  set history = 1000
+  set savehist = (1000 merge)
+  set autolist = ambiguous
+  # Use history to aid expansion
+  set autoexpand
+  set autorehash
+  set mail = (/var/mail/$USER)
+  if ( $?tcsh ) then
+    bindkey "^W" backward-delete-word
+    bindkey -k up history-search-backward
+    bindkey -k down history-search-forward
+  endif
 
-	alias ldapisearch /usr/local/bin/ldapsearch -H ldapi://%2Fvar%2Frun%2Fopenldap%2Fldapi -Y EXTERNAL
-	alias ldapsearch /usr/local/bin/ldapsearch -H ldap://10.0.1.90 -x
+  alias ldapisearch /usr/local/bin/ldapsearch -H ldapi://%2Fvar%2Frun%2Fopenldap%2Fldapi -Y EXTERNAL
 endif

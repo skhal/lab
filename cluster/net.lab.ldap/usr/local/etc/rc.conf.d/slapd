@@ -1,0 +1,4 @@
+slapd_enable="yes"
+slapd_sockets="/var/run/openldap/ldapi"
+slapd_flags="-h 'ldapi://%2Fvar%2Frun%2Fopenldap%2Fldapi ldap://10.0.1.3'"
+slapd_cn_config="yes"
