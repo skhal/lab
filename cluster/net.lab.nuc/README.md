@@ -1,12 +1,16 @@
 # NAME
 
-**nuc.lab.net** -- Intel NUC server with FreeBSD OS
+**nuc.lab.net** -- Intel NUC server with FreeBSD
 
 
 # DESCRIPTION
 
-The hardware is Intel NUC Kit NUC6i7KYK with AMD64 architecture and the
-following modules installed:
+`nuc.lab.net` is a FreeBSD server on
+[Intel NUC Kit NUC6i7KYK](https://www.intel.com/content/www/us/en/products/sku/89187/intel-nuc-kit-nuc6i7kyk/specifications.html).
+
+## Hardware
+
+  * Processor: [Intel Core i7-677HQ](https://www.intel.com/content/www/us/en/products/sku/93341/intel-core-i76770hq-processor-6m-cache-up-to-3-50-ghz/specifications.html)
 
   * RAM: 2x 16 GB DDR4-2400 16GB
     HyperX HX424S14IBK2/32 kit
@@ -14,13 +18,7 @@ following modules installed:
   * SSD: 2x 1TB NVMe
     WD WDS100T3X0C Black SN 750 Gen3 PCIe M.2 2280
 
-## Sync files
-
-Use `rsync(1)` to sync files with the remote host. `rsync.files-from` lists
-files to pull from the server to skip history and other unnecessary files.
-
-> [!NOTE]
-> Keep `rsync.files-from` file sorted to optimize `rsync(1)`
+## Sync
 
 ```console
 % rsync -arvz --files-from=./rsync.files-from op@nuc.lab.net:/ ./
@@ -29,5 +27,5 @@ files to pull from the server to skip history and other unnecessary files.
 
 # SEE ALSO
 
-  * [Install FreeBSD](./doc/install.md)
-  * [Basic Setup](./doc/setup.md)
+* [Install](./doc/install.md)
+* [Setup](./doc/setup.md)
