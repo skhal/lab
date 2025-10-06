@@ -1,3 +1,4 @@
-# Reference: https://abseil.io/docs/cpp/quickstart
+bazel_dep(name = "rules_cc", version = "0.2.9")
 
+# Reference: https://abseil.io/docs/cpp/quickstart
 bazel_dep(name = "abseil-cpp", version = "20250814.1")
