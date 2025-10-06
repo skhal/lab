@@ -1,0 +1,10 @@
+etc/nsswitch.conf
+etc/pam.d
+etc/rc.conf
+etc/rc.conf.d
+etc/resolv.conf
+root/.cshrc
+root/.k5login
+root/.login
+root/.profile
+root/.shrc
