@@ -83,7 +83,7 @@ Switch from Quarterly to Latest packages:
 
 ```console
 # mkdir -p /usr/local/etc/pkg/repos
-# cat <<eof > /usr/local/etc/pkg/repos/FreeBSD.conf 
+# cat <<eof > /usr/local/etc/pkg/repos/FreeBSD.conf
 FreeBSD: { url: "pkg+http://pkg.FreeBSD.org/${ABI}/latest" }
 eof
 # pkg update -f

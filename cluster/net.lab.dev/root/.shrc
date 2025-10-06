@@ -1,5 +1,5 @@
 #
-# .shrc - bourne shell startup file 
+# .shrc - bourne shell startup file
 #
 # This file will be used if the shell is invoked for interactive use and
 # the environment variable ENV is set to this file.
@@ -24,7 +24,7 @@
 # alias ll='ls -laFo'
 # alias l='ls -l'
 # alias g='egrep -i'
- 
+
 # # be paranoid
 # alias cp='cp -ip'
 # alias mv='mv -i'
@@ -51,7 +51,7 @@ bind ^[[6~ ed-move-to-end
 esc_cyan_="\\e[;36m"
 esc_red_="\\e[;31m"
 esc_reset_="\\e[m"
-# set prompt: ``username@hostname:directory $ '' 
+# set prompt: ``username@hostname:directory $ ''
 PS1="${esc_red_}\u${esc_reset_}@\h:${esc_cyan_}\w${esc_reset_} \\$ "
 unset esc_cyan_ esc_red_ esc_reset_
 
