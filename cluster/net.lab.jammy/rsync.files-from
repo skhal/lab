@@ -1,3 +1,11 @@
+compat/jammy/etc/apt/sources.list
+compat/jammy/etc/apt/sources.list.d
+compat/jammy/etc/bazel.bazelrc
+compat/jammy/etc/ldap/ldap.conf
+compat/jammy/etc/nslcd.conf
+compat/jammy/etc/nsswitch.conf
+compat/jammy/etc/resolv.conf
+compat/jammy/etc/sudo-ldap.conf
 etc/nsswitch.conf
 etc/pam.d
 etc/rc.conf
