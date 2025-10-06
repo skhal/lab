@@ -142,3 +142,9 @@ https://github.com/bazelbuild/buildtools/tree/main/buildifier
 ```console
 % go install github.com/bazelbuild/buildtools/buildifier@latest
 ```
+
+https://pkg.go.dev/golang.org/x/tools/cmd/goimports
+
+```console
+% go install golang.org/x/tools/cmd/goimports@latest
+```
