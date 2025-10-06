@@ -1,17 +1,5 @@
 etc/rc.conf
 etc/rc.conf.d
-home/op/.cshrc
-home/op/.login
-home/op/.login_conf
-home/op/.mailrc
-home/op/.profile
-home/op/.shrc
-home/skhalatyan/.cshrc
-home/skhalatyan/.login
-home/skhalatyan/.login_conf
-home/skhalatyan/.mailrc
-home/skhalatyan/.profile
-home/skhalatyan/.shrc
 root/.cshrc
 root/.k5login
 root/.login
