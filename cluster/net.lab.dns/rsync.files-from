@@ -1,5 +1,6 @@
 etc/rc.conf
 etc/rc.conf.d
+etc/resolv.conf
 root/.cshrc
 root/.login
 root/.profile
