@@ -12,6 +12,10 @@ function! relatedfile#OpenTest(file)
   call s:open(a:file, s:test_by_file, 'test')
 endfunction
 
+function! relatedfile#OpenBuild(file)
+  call s:open(a:file, s:build_by_file, 'build')
+endfunction
+
 function! relatedfile#OpenExample(file)
   call s:open(a:file, s:example_by_file, 'example')
 endfunction
@@ -47,6 +51,9 @@ let s:test_by_file = {
   \ 'c': s:makeSubstitutor('\(\(_test\)\@<!\.cc\|\.h\)$', '_test.cc'),
   \ 'cpp': s:makeSubstitutor('\(\(_test\)\@<!\.cc\|\.h\)$', '_test.cc'),
   \ 'go': s:makeSubstitutor('\(_example_test\.go\|\(_test\)\@<!\.go\)$', '_test.go'),
+  \}
+let s:build_by_file = {
+  \ 'cpp': s:makeSubstitutor('[^/]\+$', 'BUILD'),
   \}
 let s:example_by_file = {
   \ 'go': s:makeSubstitutor('\(\(_example\)\@<!_test\.go\|\(example_test\)\@<!\.go\)$', '_example_test.go'),
