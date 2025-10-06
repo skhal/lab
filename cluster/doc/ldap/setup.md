@@ -169,7 +169,7 @@ use local files and LDAP for lookups in that order.
 https://github.com/skhal/lab/blob/0d47a18e2a4a68a668ff4164971160e17baba8bd/cluster/net.lab.nuc.snk/doc/nsswitch.conf.diff#L7-L14
 
 ```console
-# patch /etc/nsswitch.conf ~/nsswitch.conf.diff 
+# patch /etc/nsswitch.conf ~/nsswitch.conf.diff
 Hmm...  Looks like a unified diff to me...
 The text leading up to this was:
 --------------------------
@@ -228,7 +228,7 @@ for lookups.
 https://github.com/skhal/lab/blob/140a3ff61a03f0aec264775a7b5251971be1123d/cluster/net.lab.nuc.snk/doc/pam_ldap.conf.diff#L7-L20
 
 ```console
-# patch /usr/local/etc/ldap.conf ~/pam_ldap.conf.diff 
+# patch /usr/local/etc/ldap.conf ~/pam_ldap.conf.diff
 Hmm...  Looks like a unified diff to me...
 The text leading up to this was:
 --------------------------
@@ -249,7 +249,7 @@ Patch PAM policy for SSH server with [`pam_sshd.diff`](./pam_sshd.diff).
 https://github.com/skhal/lab/blob/140a3ff61a03f0aec264775a7b5251971be1123d/cluster/net.lab.nuc.snk/doc/pam_sshd.diff#L7-L8
 
 ```console
-# patch /etc/pam.d/sshd ~/pam_sshd.diff 
+# patch /etc/pam.d/sshd ~/pam_sshd.diff
 Hmm...  Looks like a unified diff to me...
 The text leading up to this was:
 --------------------------
@@ -282,7 +282,7 @@ Verify that SSH server runs and works by using an `op` user from LDAP:
 # sockstat -4 | grep sshd
 root     sshd        2662 7   tcp4   192.168.1.112:22      *:*
 # ssh op@192.168.1.112 whoami
-(op@192.168.1.112) Password: 
+(op@192.168.1.112) Password:
 Could not chdir to home directory /home/op: No such file or directory
 op
 ```

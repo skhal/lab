@@ -6,5 +6,5 @@
  #auth		sufficient	pam_ssh.so		no_warn try_first_pass
 +auth		sufficient	pam_ldap.so		no_warn
  auth		required	pam_unix.so		no_warn try_first_pass
- 
+
  # account
