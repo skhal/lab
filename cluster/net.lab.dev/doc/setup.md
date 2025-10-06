@@ -128,3 +128,17 @@ Run `tzsetup(8)` to change timezone.
 % date
 Thu Sep  4 22:19:54 CDT 2025
 ```
+
+## Dev environment
+
+https://github.com/google/keep-sorted:
+
+```console
+% go install github.com/google/keep-sorted@v0.7.1
+```
+
+https://github.com/bazelbuild/buildtools/tree/main/buildifier
+
+```console
+% go install github.com/bazelbuild/buildtools/buildifier@latest
+```
