@@ -11,7 +11,7 @@ Convert `.schema` to `.ldif`:
 
 ```console
 % setenv SUDO_SCHEMA /path/to/sudo.schema
-% setenv SUDO_LDIF ${SUDO_SCHEMA:s/.schema/.ldif/} 
+% setenv SUDO_LDIF ${SUDO_SCHEMA:s/.schema/.ldif/}
 % mkdir /tmp/ldap_sudo
 % echo "include ${SUDO_SCHEMA}" > /tmp/ldap_sudo.conf
 % slaptest -F /tmp/ldap_sudo -f /tmp/ldap_sudo.conf

@@ -1,5 +1,5 @@
 #
-# .shrc - bourne shell startup file 
+# .shrc - bourne shell startup file
 #
 # This file will be used if the shell is invoked for interactive use and
 # the environment variable ENV is set to this file.
@@ -24,7 +24,7 @@
 # alias ll='ls -laFo'
 # alias l='ls -l'
 # alias g='egrep -i'
- 
+
 # # be paranoid
 # alias cp='cp -ip'
 # alias mv='mv -i'
@@ -47,7 +47,7 @@ bind ^[[6~ ed-move-to-end
 # EISDIR errors from each directory encountered.
 # alias grep='grep -d skip'
 
-# set prompt: ``username@hostname:directory $ '' 
+# set prompt: ``username@hostname:directory $ ''
 PS1="\u@\h:\w \\$ "
 
 # search path for cd(1)
