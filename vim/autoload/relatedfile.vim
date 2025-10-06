@@ -20,7 +20,7 @@ function! s:open(file, substitutor_by_filetype, reltype)
   let l:file = fnamemodify(a:file, ':p')
   let l:Subsitutor = get(a:substitutor_by_filetype, &filetype, '')
   if l:Subsitutor == ''
-    echoerr 'unsupported file' . a:file
+    echoerr 'unsupported file ' . a:file
     return
   endif
   let l:relatedfile = l:Subsitutor(l:file)
