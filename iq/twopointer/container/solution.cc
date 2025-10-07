@@ -7,7 +7,7 @@
 namespace iq::twopointer::container {
 namespace {
 
-constexpr Volume kVolumeZero = Volume{0};
+constexpr Volume kVolumeEmpty = Volume{0};
 
 constexpr int kSizeMin = 2;
 
@@ -21,11 +21,11 @@ Volume CalculateVolume(const std::vector<int>& nn, int lidx, int ridx) {
 
 Volume Find(const std::vector<int>& nn) {
   if (nn.size() < kSizeMin) {
-    return kVolumeZero;
+    return kVolumeEmpty;
   }
   int lidx = 0;
   int ridx = nn.size() - 1;
-  Volume vol_max = kVolumeZero;
+  Volume vol_max = kVolumeEmpty;
   while (lidx < ridx) {
     if (const Volume vol = CalculateVolume(nn, lidx, ridx); vol > vol_max) {
       vol_max = vol;
