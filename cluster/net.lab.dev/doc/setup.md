@@ -148,3 +148,18 @@ https://pkg.go.dev/golang.org/x/tools/cmd/goimports
 ```console
 % go install golang.org/x/tools/cmd/goimports@latest
 ```
+
+Statically build `ibazel` on FreeBSD jail to pick up in Linux compatibility
+jail, where session runs under `chroot /compat/<distribution>` without access
+to FreeBSD libraries:
+
+```console
+% go install -ldflags "-linkmode 'external' -extldflags '-static'" github.com/bazelbuild/bazel-watcher/cmd/ibazel@v0.26.10
+```
+
+> [!TIP]
+> build all Go binaries that are installed under `$HOME/go/bin` statically to
+> make it shareable between FreeBSD and Linux compatibility environments ...
+> at least for the time being until a better way is found to share FreeBSD
+> libraries with Linux environment via mounts (we are reluctant to do so at
+> the moment).
