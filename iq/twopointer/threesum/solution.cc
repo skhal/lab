@@ -1,4 +1,6 @@
 // Copyright 2025 Samvel Khalatyan. All rights reserved.
+//
+//go:build nobuild
 
 #include <algorithm>
 #include <cstddef>
