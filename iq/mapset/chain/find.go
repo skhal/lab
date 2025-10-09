@@ -1,0 +1,48 @@
+// Copyright 2025 Samvel Khalatyan. All rights reserved.
+
+package chain
+
+import "iter"
+
+func Find(nn []int) []int {
+	set := make(map[int]struct{})
+	for _, n := range nn {
+		set[n] = struct{}{}
+	}
+	var longestChain []int
+	for chain := range findChains(set) {
+		if len(chain) <= len(longestChain) {
+			continue
+		}
+		longestChain = chain[:]
+	}
+	return longestChain
+}
+
+type chain []int
+
+func findChains(nn map[int]struct{}) iter.Seq[chain] {
+	return func(yield func(chain) bool) {
+		for n := range nn {
+			if _, ok := nn[n-1]; ok {
+				continue
+			}
+			chain := newChain(nn, n)
+			if !yield(chain) {
+				break
+			}
+		}
+	}
+}
+
+func newChain(nn map[int]struct{}, start int) chain {
+	cc := []int{start}
+	exists := func(n int) bool {
+		_, ok := nn[n]
+		return ok
+	}
+	for n := start + 1; exists(n); n++ {
+		cc = append(cc, n)
+	}
+	return cc
+}
