@@ -19,10 +19,10 @@ func Find(nn []int) []int {
 	return longestChain
 }
 
-type chain []int
+type C []int
 
-func findChains(nn map[int]struct{}) iter.Seq[chain] {
-	return func(yield func(chain) bool) {
+func findChains(nn map[int]struct{}) iter.Seq[C] {
+	return func(yield func(C) bool) {
 		for n := range nn {
 			if _, ok := nn[n-1]; ok {
 				continue
@@ -35,7 +35,7 @@ func findChains(nn map[int]struct{}) iter.Seq[chain] {
 	}
 }
 
-func newChain(nn map[int]struct{}, start int) chain {
+func newChain(nn map[int]struct{}, start int) C {
 	cc := []int{start}
 	exists := func(n int) bool {
 		_, ok := nn[n]

@@ -3,17 +3,35 @@
 package chain_test
 
 import (
+	"slices"
 	"testing"
 
-	"github.com/google/go-cmp/cmp"
 	"github.com/skhal/lab/iq/mapset/chain"
 )
+
+func contains(t *testing.T, want []chain.C, got chain.C) bool {
+	t.Helper()
+	if len(want) == 0 && len(got) == 0 {
+		return true
+	}
+	return slices.ContainsFunc(want, func(nn chain.C) bool {
+		if len(nn) != len(got) {
+			return false
+		}
+		for i, n := range nn {
+			if got[i] != n {
+				return false
+			}
+		}
+		return true
+	})
+}
 
 func TestFind(t *testing.T) {
 	tests := []struct {
 		name string
 		nn   []int
-		want []int
+		want []chain.C // different opions
 	}{
 		{
 			name: "empty",
@@ -21,32 +39,32 @@ func TestFind(t *testing.T) {
 		{
 			name: "one item",
 			nn:   []int{1},
-			want: []int{1},
+			want: []chain.C{{1}},
 		},
 		{
 			name: "two items one chain",
 			nn:   []int{1, 2},
-			want: []int{1, 2},
+			want: []chain.C{{1, 2}},
 		},
 		{
 			name: "two items reversed one chain",
 			nn:   []int{2, 1},
-			want: []int{1, 2},
+			want: []chain.C{{1, 2}},
 		},
 		{
 			name: "two items two chains",
 			nn:   []int{1, 3},
-			want: []int{1},
+			want: []chain.C{{1}},
 		},
 		{
 			name: "two chains same size",
 			nn:   []int{1, 5, 2, 4},
-			want: []int{1, 2},
+			want: []chain.C{{1, 2}, {4, 5}},
 		},
 		{
 			name: "two chains different size",
 			nn:   []int{1, 7, 5, 2, 6},
-			want: []int{5, 6, 7},
+			want: []chain.C{{5, 6, 7}},
 		},
 	}
 	for _, tc := range tests {
@@ -54,8 +72,8 @@ func TestFind(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			got := chain.Find(tc.nn)
 
-			if diff := cmp.Diff(tc.want, got); diff != "" {
-				t.Errorf("chain.Find(%v) mismatch (-want, +got):\n%s", tc.nn, diff)
+			if ok := contains(t, tc.want, got); !ok {
+				t.Errorf("chain.Find(%v) = %v; want one of %v", tc.nn, got, tc.want)
 			}
 		})
 	}
