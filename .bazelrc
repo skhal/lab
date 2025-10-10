@@ -1,7 +1,6 @@
 " Copyright 2025 Samvel Khalatyan. All rights reserved.
 
-build --cxxopt '-std=c++20'
-build --cxxopt '-Wall'
-build --cxxopt '-Werror'
-build --cxxopt '-Wextra'
-build --cxxopt '-Wpedantic'
+build --cxxopt=-std=c++20
+build --cxxopt=-Wall
+build --cxxopt=-Werror
+build --cxxopt=-Wextra
