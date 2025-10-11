@@ -54,7 +54,7 @@ func TestFind(t *testing.T) {
 		{
 			name: "two items two chains",
 			nn:   []int{1, 3},
-			want: []chain.C{{1}},
+			want: []chain.C{{1}, {3}},
 		},
 		{
 			name: "two chains same size",
