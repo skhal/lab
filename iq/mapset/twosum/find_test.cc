@@ -1,6 +1,6 @@
 // Copyright 2025 Samvel Khalatyan. All rights reserved.
 //
-//go:build nobuild
+//go:build ignore
 
 #include <algorithm>
 #include <cctype>
