@@ -2,7 +2,7 @@
 #
 # Flavor: FreeBSD
 
-INSTALL_TARGETS = autoload plugin
+INSTALL_TARGETS = autoload colors plugin
 
 install: ${INSTALL_TARGETS} .PHONY
 
