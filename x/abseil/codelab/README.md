@@ -8,7 +8,7 @@
 This is pretty much reproduced [tutorial](https://abseil.io/docs/cpp/quickstart)
 from Abseil.
 
-``console
+```console
 % bazel run //:hello_world
 INFO: Analyzed target //:hello_world (0 packages loaded, 0 targets configured).
 INFO: Found 1 target...
