@@ -27,14 +27,12 @@ CleanOptions flagMatrix(Matrix& m) {
       }
       if (r == 0) {
         opts.first_row_has_zero = true;
-      } else {
-        m[r][0] = kZero;
       }
       if (c == 0) {
         opts.first_col_has_zero = true;
-      } else {
-        m[0][c] = kZero;
       }
+      m[r][0] = kZero;
+      m[0][c] = kZero;
     }
   }
   return opts;
@@ -47,7 +45,8 @@ void cleanRow(Row& row) {
 }
 
 void cleanRowsButFirst(Matrix& m) {
-  for (Row& row : m) {
+  for (std::size_t r = 1; r < m.size(); ++r) {
+    Row& row = m[r];
     if (row[0] != kZero) {
       continue;
     }
@@ -63,7 +62,7 @@ void cleanCol(Matrix& m, std::size_t c) {
 
 void cleanColsButFirst(Matrix& m) {
   const Row& first_row = m[0];
-  for (std::size_t c = 0; c < first_row.size(); ++c) {
+  for (std::size_t c = 1; c < first_row.size(); ++c) {
     if (first_row[c] != kZero) {
       continue;
     }
