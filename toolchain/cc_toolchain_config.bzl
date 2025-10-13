@@ -18,7 +18,7 @@ def _impl(ctx):
     tool_paths = [
         tool_path(
             name = "gcc",
-            path = "/usr/bin/clang-19",
+            path = "/usr/bin/clang-21",
         ),
         tool_path(
             name = "ld",
@@ -80,7 +80,7 @@ def _impl(ctx):
         ctx = ctx,
         features = features,
         cxx_builtin_include_directories = [
-            "/usr/lib/llvm-19/lib/clang/19/include",
+            "/usr/lib/llvm-21/lib/clang/21/include",
             "/usr/include",
         ],
         toolchain_identifier = "k8-toolchain",
