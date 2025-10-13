@@ -1,5 +1,6 @@
 // Copyright 2025 Samvel Khalatyan. All rights reserved.
 //
+// clang-format off-next-line: skip file in `go build`
 //go:build ignore
 
 #include <cctype>

@@ -1,6 +1,7 @@
 // Copyright 2025 Samvel Khalatyan. All rights reserved.
 //
-// go:build ignore
+// clang-format off-next-line: skip file in `go build`
+//go:build ignore
 
 #include <cstddef>
 
