@@ -147,6 +147,66 @@ const CleanTestParam kCleanTestParams[]{
     },
     // m-by-n matrix
     {
+        .name = "matrix zero in first row",
+        .matrix =
+            {
+                {1, 0, 1, 1},
+                {1, 1, 1, 1},
+                {1, 1, 1, 1},
+            },
+        .want =
+            {
+                {0, 0, 0, 0},
+                {1, 0, 1, 1},
+                {1, 0, 1, 1},
+            },
+    },
+    {
+        .name = "matrix two zeros in first row",
+        .matrix =
+            {
+                {1, 0, 0, 1},
+                {1, 1, 1, 1},
+                {1, 1, 1, 1},
+            },
+        .want =
+            {
+                {0, 0, 0, 0},
+                {1, 0, 0, 1},
+                {1, 0, 0, 1},
+            },
+    },
+    {
+        .name = "matrix zero in first col",
+        .matrix =
+            {
+                {1, 1, 1, 1},
+                {1, 1, 1, 1},
+                {0, 1, 1, 1},
+            },
+        .want =
+            {
+                {0, 1, 1, 1},
+                {0, 1, 1, 1},
+                {0, 0, 0, 0},
+            },
+    },
+    {
+        .name = "matrix two zeros in first col",
+        .matrix =
+            {
+                {1, 1, 1, 1},
+                {0, 1, 1, 1},
+                {0, 1, 1, 1},
+            },
+        .want =
+            {
+                {0, 1, 1, 1},
+                {0, 0, 0, 0},
+                {0, 0, 0, 0},
+            },
+    },
+    {
         .name = "matrix non zero",
         .matrix =
             {
@@ -188,66 +248,6 @@ const CleanTestParam kCleanTestParams[]{
             {
                 {0, 0, 0, 0},
                 {1, 0, 1, 0},
-                {0, 0, 0, 0},
-            },
-    },
-    {
-        .name = "matrix two zero in row",
-        .matrix =
-            {
-                {1, 0, 1, 1},
-                {1, 1, 1, 1},
-                {1, 1, 1, 1},
-            },
-        .want =
-            {
-                {0, 0, 0, 0},
-                {1, 0, 1, 1},
-                {1, 0, 1, 1},
-            },
-    },
-    {
-        .name = "matrix two two zeros in row",
-        .matrix =
-            {
-                {1, 0, 0, 1},
-                {1, 1, 1, 1},
-                {1, 1, 1, 1},
-            },
-        .want =
-            {
-                {0, 0, 0, 0},
-                {1, 0, 0, 1},
-                {1, 0, 0, 1},
-            },
-    },
-    {
-        .name = "matrix two zero in col",
-        .matrix =
-            {
-                {1, 1, 1, 1},
-                {1, 1, 1, 1},
-                {0, 1, 1, 1},
-            },
-        .want =
-            {
-                {0, 1, 1, 1},
-                {0, 1, 1, 1},
-                {0, 0, 0, 0},
-            },
-    },
-    {
-        .name = "matrix two two zeros in col",
-        .matrix =
-            {
-                {1, 1, 1, 1},
-                {0, 1, 1, 1},
-                {0, 1, 1, 1},
-            },
-        .want =
-            {
-                {0, 1, 1, 1},
-                {0, 0, 0, 0},
                 {0, 0, 0, 0},
             },
     },

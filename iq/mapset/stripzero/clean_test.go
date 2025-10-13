@@ -45,7 +45,7 @@ var tests = []struct {
 	},
 	// 1x1
 	{
-		name: "1x1 non zero",
+		name: "one by one non zero",
 		m: [][]int{
 			{1},
 		},
@@ -54,7 +54,7 @@ var tests = []struct {
 		},
 	},
 	{
-		name: "1x1 zero",
+		name: "one by one zero",
 		m: [][]int{
 			{0},
 		},
@@ -108,7 +108,59 @@ var tests = []struct {
 			{0},
 		},
 	},
-	// matrix
+	// m-by-n matrix
+	{
+		name: "matrix zero in first row",
+		m: [][]int{
+			{1, 0, 1, 1},
+			{1, 1, 1, 1},
+			{1, 1, 1, 1},
+		},
+		want: [][]int{
+			{0, 0, 0, 0},
+			{1, 0, 1, 1},
+			{1, 0, 1, 1},
+		},
+	},
+	{
+		name: "matrix two zeros in first row",
+		m: [][]int{
+			{1, 0, 0, 1},
+			{1, 1, 1, 1},
+			{1, 1, 1, 1},
+		},
+		want: [][]int{
+			{0, 0, 0, 0},
+			{1, 0, 0, 1},
+			{1, 0, 0, 1},
+		},
+	},
+	{
+		name: "matrix zero in first col",
+		m: [][]int{
+			{1, 1, 1, 1},
+			{1, 1, 1, 1},
+			{0, 1, 1, 1},
+		},
+		want: [][]int{
+			{0, 1, 1, 1},
+			{0, 1, 1, 1},
+			{0, 0, 0, 0},
+		},
+	},
+	{
+		name: "matrix two zeros in first col",
+		m: [][]int{
+			{1, 1, 1, 1},
+			{0, 1, 1, 1},
+			{0, 1, 1, 1},
+		},
+		want: [][]int{
+			{0, 1, 1, 1},
+			{0, 0, 0, 0},
+			{0, 0, 0, 0},
+		},
+	},
 	{
 		name: "matrix non zero",
 		m: [][]int{
