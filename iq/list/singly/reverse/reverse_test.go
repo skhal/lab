@@ -1,13 +1,13 @@
 // Copyright 2025 Samvel Khalatyan. All rights reserved.
 
-package singly_test
+package reverse_test
 
 import (
 	"fmt"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/skhal/lab/iq/list/singly"
+	"github.com/skhal/lab/iq/list/singly/reverse"
 )
 
 func EquateLists() cmp.Option {
@@ -15,14 +15,14 @@ func EquateLists() cmp.Option {
 }
 
 func areLists(x, y interface{}) bool {
-	_, okX := x.(singly.List)
-	_, okY := y.(singly.List)
+	_, okX := x.(reverse.List)
+	_, okY := y.(reverse.List)
 	return okX && okY
 }
 
 func compareLists(x, y interface{}) bool {
-	listX := x.(singly.List)
-	listY := y.(singly.List)
+	listX := x.(reverse.List)
+	listY := y.(reverse.List)
 	nodeX, nodeY := listX.Head, listY.Head
 	for {
 		if nodeX == nil && nodeY == nil {
@@ -43,28 +43,28 @@ func compareLists(x, y interface{}) bool {
 func TestReverse(t *testing.T) {
 	tests := []struct {
 		name string
-		list *singly.List
-		want *singly.List
+		list *reverse.List
+		want *reverse.List
 	}{
 		{
 			name: "empty",
-			list: singly.NewList(),
-			want: singly.NewList(),
+			list: reverse.NewList(),
+			want: reverse.NewList(),
 		},
 		{
 			name: "one item",
-			list: singly.NewList(1),
-			want: singly.NewList(1),
+			list: reverse.NewList(1),
+			want: reverse.NewList(1),
 		},
 		{
 			name: "two items",
-			list: singly.NewList(1, 2),
-			want: singly.NewList(2, 1),
+			list: reverse.NewList(1, 2),
+			want: reverse.NewList(2, 1),
 		},
 		{
 			name: "three items",
-			list: singly.NewList(1, 2, 3),
-			want: singly.NewList(3, 2, 1),
+			list: reverse.NewList(1, 2, 3),
+			want: reverse.NewList(3, 2, 1),
 		},
 	}
 	for _, tc := range tests {
@@ -75,7 +75,7 @@ func TestReverse(t *testing.T) {
 			tc.list.Reverse()
 
 			if diff := cmp.Diff(tc.want, tc.list, EquateLists()); diff != "" {
-				t.Errorf("singly.List.Reverse() mismatch (-want, got):\n%s", diff)
+				t.Errorf("reverse.List.Reverse() mismatch (-want, got):\n%s", diff)
 				t.Logf("Input list:\n%s", listString)
 			}
 		})

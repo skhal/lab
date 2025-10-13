@@ -1,15 +1,15 @@
 // Copyright 2025 Samvel Khalatyan. All rights reserved.
 
-package singly_test
+package reverse_test
 
 import (
 	"fmt"
 
-	"github.com/skhal/lab/iq/list/singly"
+	"github.com/skhal/lab/iq/list/singly/reverse"
 )
 
 func Example() {
-	list := singly.NewList(1, 2, 3)
+	list := reverse.NewList(1, 2, 3)
 	list.Reverse()
 	fmt.Println(list)
 	// Output:

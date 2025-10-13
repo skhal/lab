@@ -1,6 +1,6 @@
 // Copyright 2025 Samvel Khalatyan. All rights reserved.
 
-package singly
+package reverse
 
 import (
 	"bytes"
