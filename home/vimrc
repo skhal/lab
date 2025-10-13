@@ -32,7 +32,7 @@ au FileType markdown setlocal spell
 " -- FORMAT BUFFER.
 " keep-sorted start
 au FileType bzl set equalprg=buildifier
-au FileType c,cpp set equalprg=clang-format21
+au FileType c,cpp set equalprg=clang-format
 au FileType go set equalprg=goimports
 " keep-sorted end
 " Format entire buffer `=G` or selection `=` with shortcut `<leader>fc`
