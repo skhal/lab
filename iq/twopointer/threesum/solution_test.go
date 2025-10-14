@@ -16,7 +16,7 @@ type Triplet = threesum.Triplet
 var tests = []struct {
 	name string
 	nn   []int
-	want []Triplet
+	want []*Triplet
 }{
 	// nagative tests
 	{
@@ -51,60 +51,44 @@ var tests = []struct {
 	{
 		name: "three items one triplet",
 		nn:   []int{1, 2, -3},
-		want: []Triplet{Triplet{-3, 1, 2}},
+		want: []*Triplet{&Triplet{-3, 1, 2}},
 	},
 	// -- 4 items
 	{
 		name: "four items",
 		nn:   []int{1, 2, -3, 4},
-		want: []Triplet{Triplet{-3, 1, 2}},
+		want: []*Triplet{&Triplet{-3, 1, 2}},
 	},
 	{
 		name: "four items with duplicate low",
 		nn:   []int{1, 2, -3, -3},
-		want: []Triplet{Triplet{-3, 1, 2}},
+		want: []*Triplet{&Triplet{-3, 1, 2}},
 	},
 	{
 		name: "four items with duplicate high",
 		nn:   []int{1, 2, -3, 2},
-		want: []Triplet{Triplet{-3, 1, 2}},
+		want: []*Triplet{&Triplet{-3, 1, 2}},
 	},
 	{
 		name: "four items with duplicate middle",
 		nn:   []int{1, 2, -3, 1},
-		want: []Triplet{Triplet{-3, 1, 2}},
+		want: []*Triplet{&Triplet{-3, 1, 2}},
 	},
 	// -- 5 items
 	{
 		name: "five items one triplet",
 		nn:   []int{2, 4, -6, 3, 4},
-		want: []Triplet{Triplet{-6, 2, 4}},
+		want: []*Triplet{&Triplet{-6, 2, 4}},
 	},
 	{
 		name: "five items two triplets",
 		nn:   []int{2, 4, -6, 3, 3},
-		want: []Triplet{Triplet{-6, 2, 4}, Triplet{-6, 3, 3}},
+		want: []*Triplet{&Triplet{-6, 2, 4}, &Triplet{-6, 3, 3}},
 	},
 }
 
-func EquateTriplets() cmp.Option {
-	return cmp.FilterValues(areTriplets, cmp.Comparer(compareTriplets))
-}
-
-func areTriplets(x, y interface{}) bool {
-	_, xok := x.(Triplet)
-	_, yok := y.(Triplet)
-	return xok && yok
-}
-
-func compareTriplets(x, y interface{}) bool {
-	tx := x.(Triplet)
-	ty := y.(Triplet)
-	return lessTriplets(&tx, &ty) == 0
-}
-
 func lessTriplets(x, y *Triplet) int {
-	return slices.Compare([]int{x.A, x.B, x.C}, []int{y.A, y.B, y.C})
+	return slices.Compare(x[:], y[:])
 }
 
 func TestFind(t *testing.T) {
@@ -112,7 +96,7 @@ func TestFind(t *testing.T) {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			got := threesum.Find(tc.nn)
-			if diff := cmp.Diff(tc.want, got, cmpopts.SortSlices(lessTriplets), EquateTriplets()); diff != "" {
+			if diff := cmp.Diff(tc.want, got, cmpopts.SortSlices(lessTriplets)); diff != "" {
 				t.Errorf("threesum.Find(%v) mismatch (-want, +got):\n%s", tc.nn, diff)
 			}
 		})
@@ -124,7 +108,7 @@ func TestFindWithOptimizations(t *testing.T) {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			got := threesum.FindWithOptimizations(tc.nn)
-			if diff := cmp.Diff(tc.want, got, cmpopts.SortSlices(lessTriplets), EquateTriplets()); diff != "" {
+			if diff := cmp.Diff(tc.want, got, cmpopts.SortSlices(lessTriplets)); diff != "" {
 				t.Errorf("threesum.FindWithOptimizations(%v) mismatch (-want, +got):\n%s", tc.nn, diff)
 			}
 		})

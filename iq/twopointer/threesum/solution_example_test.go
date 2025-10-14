@@ -14,5 +14,5 @@ func Example() {
 		fmt.Println(triplet)
 	}
 	// Output:
-	// {-3 -2 5}
+	// [-3 -2 5]
 }

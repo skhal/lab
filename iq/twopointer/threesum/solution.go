@@ -3,31 +3,33 @@
 package threesum
 
 import (
+	"fmt"
 	"iter"
 	"maps"
 	"math"
 	"sort"
 )
 
-type Triplet struct {
-	A, B, C int
+type Triplet [3]int
+
+func (t *Triplet) String() string {
+	return fmt.Sprintf("%v", t[:])
 }
 
-func Find(nn []int) []Triplet {
-	numbers := nn[:]
+func Find(nn []int) []*Triplet {
+	numbers := append([]int(nil), nn...)
 	sort.Ints(numbers)
 	triplets := make(map[Triplet]struct{})
-	for i1 := range numbers {
-		x1 := numbers[i1]
-		for triplet := range findTwoSum(numbers[i1+1:], -x1) {
-			triplets[triplet] = struct{}{}
+	for i, x := range numbers {
+		for triplet := range findTwoSum(numbers[i+1:], -x) {
+			triplets[*triplet] = struct{}{}
 		}
 	}
 	return collectKeys(triplets)
 }
 
-func findTwoSum(nn []int, x int) iter.Seq[Triplet] {
-	return func(yield func(Triplet) bool) {
+func findTwoSum(nn []int, x int) iter.Seq[*Triplet] {
+	return func(yield func(*Triplet) bool) {
 		if len(nn) < 2 {
 			return
 		}
@@ -42,7 +44,7 @@ func findTwoSum(nn []int, x int) iter.Seq[Triplet] {
 			case sum > x:
 				i2 -= 1
 			default:
-				triplet := Triplet{-x, x1, x2}
+				triplet := &Triplet{-x, x1, x2}
 				if !yield(triplet) {
 					return
 				}
@@ -52,7 +54,7 @@ func findTwoSum(nn []int, x int) iter.Seq[Triplet] {
 	}
 }
 
-func FindWithOptimizations(nn []int) []Triplet {
+func FindWithOptimizations(nn []int) []*Triplet {
 	if len(nn) < 3 {
 		return nil
 	}
@@ -63,18 +65,18 @@ func FindWithOptimizations(nn []int) []Triplet {
 		return nil
 	}
 	triplets := make(map[Triplet]struct{})
-	for i1, nlen := 0, len(numbers); i1 < nlen; {
-		x1 := numbers[i1]
-		// Optimization 2: stop when x1 becomes positive
-		if x1 >= 0 {
+	for i, nlen := 0, len(numbers); i < nlen; {
+		x := numbers[i]
+		// Optimization 2: stop when x becomes positive
+		if x >= 0 {
 			break
 		}
-		for triplet := range findTwoSumWithOptimizations(numbers[i1+1:], -x1) {
-			triplets[triplet] = struct{}{}
+		for triplet := range findTwoSumWithOptimizations(numbers[i+1:], -x) {
+			triplets[*triplet] = struct{}{}
 		}
-		// Optimization 3: Skip the same x1 values
-		for i1 < nlen && numbers[i1] == x1 {
-			i1 += 1
+		// Optimization 3: Skip the same x values
+		for i < nlen && numbers[i] == x {
+			i += 1
 		}
 	}
 	return collectKeys(triplets)
@@ -86,8 +88,8 @@ func hasOppositeSignEnds(nn []int) bool {
 	return firstSign != lastSign
 }
 
-func findTwoSumWithOptimizations(nn []int, x int) iter.Seq[Triplet] {
-	return func(yield func(Triplet) bool) {
+func findTwoSumWithOptimizations(nn []int, x int) iter.Seq[*Triplet] {
+	return func(yield func(*Triplet) bool) {
 		if len(nn) < 2 {
 			return
 		}
@@ -110,7 +112,7 @@ func findTwoSumWithOptimizations(nn []int, x int) iter.Seq[Triplet] {
 					i2 -= 1
 				}
 			default:
-				triplet := Triplet{-x, x1, x2}
+				triplet := &Triplet{-x, x1, x2}
 				if !yield(triplet) {
 					return
 				}
@@ -124,13 +126,13 @@ func findTwoSumWithOptimizations(nn []int, x int) iter.Seq[Triplet] {
 	}
 }
 
-func collectKeys(m map[Triplet]struct{}) []Triplet {
+func collectKeys(m map[Triplet]struct{}) []*Triplet {
 	if len(m) == 0 {
 		return nil
 	}
-	keys := make([]Triplet, 0, len(m))
+	keys := make([]*Triplet, 0, len(m))
 	for k := range maps.Keys(m) {
-		keys = append(keys, k)
+		keys = append(keys, &k)
 	}
 	return keys
 }
