@@ -14,12 +14,15 @@ const CapMinimum = 1
 type Cache struct {
 	head     *node
 	tail     *node
+	nodes    map[int]*node
 	size     int
 	capacity int
 }
 
 type node struct {
-	k, v int
+	key  int
+	val  int
+	prev *node
 	next *node
 }
 
@@ -28,77 +31,97 @@ func NewCache(capacity int) (*Cache, error) {
 		return nil, ErrCapacity
 	}
 	c := &Cache{
+		nodes:    make(map[int]*node),
 		capacity: capacity,
 	}
 	return c, nil
 }
 
 func (c *Cache) Put(k, v int) {
-	c.add(k, v)
-	if c.size > c.capacity {
-		c.dropLeastRecent()
+	if c.has(k) {
+		c.overwrite(k, v)
+		return
 	}
+	c.add(k, v)
+}
+
+func (c *Cache) has(k int) bool {
+	_, ok := c.nodes[k]
+	return ok
+}
+
+func (c *Cache) overwrite(k, v int) {
+	n := c.nodes[k]
+	n.val = v
+	c.makeMostRecent(n)
 }
 
 func (c *Cache) add(k, v int) {
 	n := &node{
-		k: k,
-		v: v,
+		key: k,
+		val: v,
 	}
+	c.nodes[k] = n
 	switch c.head {
 	case nil:
 		c.head = n
 	default:
 		c.tail.next = n
+		n.prev = c.tail
 	}
 	c.tail = n
 	c.size++
+	if c.size > c.capacity {
+		c.dropLeastRecent()
+	}
 }
 
 func (c *Cache) dropLeastRecent() {
 	next := c.head.next
 	c.head.next = nil
+	next.prev = nil
 	c.head = next
 	c.size--
 }
 
 func (c *Cache) Get(k int) (v int, ok bool) {
-	for prev, curr := (*node)(nil), c.head; curr != nil; curr = curr.next {
-		if curr.k == k {
-			v = curr.v
-			ok = true
-			c.makeMostRecent(prev)
-			break
-		}
-		prev = curr
+	n, ok := c.nodes[k]
+	if !ok {
+		return
 	}
-	return
+	c.makeMostRecent(n)
+	return n.val, true
 }
 
-func (c *Cache) makeMostRecent(prev *node) {
+func (c *Cache) makeMostRecent(n *node) {
 	if c.size == 1 {
 		return
 	}
-	if prev == nil {
+	if n == c.tail {
+		return
+	}
+	if n == c.head {
 		c.makeHeadMostRecent()
 		return
 	}
-	curr := prev.next
-	if curr == c.tail {
-		return
-	}
-	prev.next = curr.next
-	curr.next = nil
-	c.tail.next = curr
-	c.tail = curr
+	prev := n.prev
+	next := n.next
+	prev.next = next
+	next.prev = prev
+	n.next = nil
+	n.prev = c.tail
+	c.tail.next = n
+	c.tail = n
 }
 
 func (c *Cache) makeHeadMostRecent() {
-	curr := c.head
-	c.head = curr.next
-	curr.next = nil
-	c.tail.next = curr
-	c.tail = curr
+	n := c.head
+	c.head = n.next
+	n.next = nil
+	c.head.prev = nil
+	c.tail.next = n
+	n.prev = c.tail
+	c.tail = n
 }
 
 func (c *Cache) String() string {
@@ -108,7 +131,7 @@ func (c *Cache) String() string {
 func (c *Cache) Items() []Item {
 	var ii []Item
 	for n := c.head; n != nil; n = n.next {
-		ii = append(ii, Item{n.k, n.v})
+		ii = append(ii, Item{n.key, n.val})
 	}
 	return ii
 }
