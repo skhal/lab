@@ -28,7 +28,7 @@ func ExampleCache_Put_evictsLeastResentlyUsedItem() {
 	cache.Put(4, 400)
 	fmt.Println(cache)
 	// Output:
-	// [3:300 4:400 1:100]
+	// [3:300 1:100 4:400]
 }
 
 func ExampleCache_Get_makesUsedItemRecent() {
