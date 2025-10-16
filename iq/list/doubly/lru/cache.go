@@ -57,6 +57,11 @@ func (c *Cache) overwrite(k, v int) {
 }
 
 func (c *Cache) add(k, v int) {
+	if c.size == c.capacity {
+		c.dropLeastRecent()
+	} else {
+		c.size++
+	}
 	n := &node{
 		key: k,
 		val: v,
@@ -70,18 +75,14 @@ func (c *Cache) add(k, v int) {
 		n.prev = c.tail
 	}
 	c.tail = n
-	c.size++
-	if c.size > c.capacity {
-		c.dropLeastRecent()
-	}
 }
 
 func (c *Cache) dropLeastRecent() {
-	next := c.head.next
-	c.head.next = nil
-	next.prev = nil
-	c.head = next
-	c.size--
+	n := c.head
+	c.head = n.next
+	n.next = nil
+	c.head.prev = nil
+	delete(c.nodes, n.key)
 }
 
 func (c *Cache) Get(k int) (v int, ok bool) {

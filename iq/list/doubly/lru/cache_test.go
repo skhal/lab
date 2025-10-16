@@ -119,6 +119,11 @@ func TestCacheGet(t *testing.T) {
 			cache: newCache(t, 2, lru.Item{1, 10}, lru.Item{2, 20}),
 			key:   3,
 		},
+		{
+			name:  "cache miss on two items get evicted",
+			cache: newCache(t, 2, lru.Item{1, 10}, lru.Item{2, 20}, lru.Item{3, 30}),
+			key:   1,
+		},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
