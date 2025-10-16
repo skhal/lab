@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/skhal/lab/iq/list/singly/lru"
+	"github.com/skhal/lab/iq/list/doubly/lru"
 )
 
 func newCache(t *testing.T, capacity int, items ...lru.Item) *lru.Cache {
