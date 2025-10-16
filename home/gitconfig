@@ -5,5 +5,8 @@
 [alias]
   x = log --all --decorate --oneline --graph --max-count=10
 
+[core]
+  pager = less -x3,5
+
 [include]
   path = ~/.gitconfig.local
