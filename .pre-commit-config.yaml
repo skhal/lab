@@ -1,24 +1,30 @@
-# See https://pre-commit.com for more information
-# See https://pre-commit.com/hooks.html for more hooks
-#
-# Generated with `pre-commit sample-config > .pre-commit-config.yaml`
-# https://pre-commit.com/#2-add-a-pre-commit-configuration
+# Copyright 2025 Samvel Khalatyan. All rights reserved.
+
 repos:
--   repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v6.0.0
-    hooks:
-    -   id: trailing-whitespace
-    -   id: end-of-file-fixer
-    -   id: check-yaml
-    -   id: check-added-large-files
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: v6.0.0
+  hooks:
+  - id: trailing-whitespace
+  - id: end-of-file-fixer
+  - id: check-yaml
+  - id: check-added-large-files
 # https://github.com/google/keep-sorted/blob/8a4bf359ffcf5b037b700aa506d152a2c762ce31/README.md#pre-commit
--   repo: https://github.com/google/keep-sorted
-    rev: v0.7.1
-    hooks:
-    -   id: keep-sorted
+- repo: https://github.com/google/keep-sorted
+  rev: v0.7.1
+  hooks:
+  - id: keep-sorted
 # https://github.com/bazelbuild/buildtools/blob/2eb4fccefb52eeea5cbae46bd145afc0dc625ad5/.pre-commit-config.yaml
--   repo: https://github.com/keith/pre-commit-buildifier
-    rev: 8.2.1
-    hooks:
-    -   id: buildifier
-    -   id: buildifier-lint
+- repo: https://github.com/keith/pre-commit-buildifier
+  rev: 8.2.1
+  hooks:
+  - id: buildifier
+  - id: buildifier-lint
+- repo: local
+  hooks:
+  # keep-sorted start
+  - id: yaml-format
+    name: yaml-format
+    entry: yamlfmt
+    language: system
+    types_or: [yaml]
+  # keep-sorted end

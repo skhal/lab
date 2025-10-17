@@ -1,0 +1,7 @@
+# Copyright 2025 Samvel Khalatyan. All rights reserved
+
+# https://github.com/google/yamlfmt/blob/main/docs/config-file.md
+formatter:
+  type: basic
+  retain_line_breaks_single: true
+  indentless_arrays: true
