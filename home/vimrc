@@ -142,3 +142,35 @@ function! g:skeleton_replacements_proto.GO_PACKAGE()
   echow 'go_package: ' . l:go_package
   return escape(l:go_package, '/')
 endfunction
+
+" -- Plugin https://github.com/preservim/tagbar
+let g:tagbar_ctags_bin = '/usr/local/bin/uctags'
+let g:go_gotags_bin = '/home/skhalatyan/go/bin/gotags'
+let g:tagbar_type_go = {
+	\ 'ctagstype' : 'go',
+	\ 'kinds'     : [
+		\ 'p:package',
+		\ 'i:imports:1',
+		\ 'c:constants',
+		\ 'v:variables',
+		\ 't:types',
+		\ 'n:interfaces',
+		\ 'w:fields',
+		\ 'e:embedded',
+		\ 'm:methods',
+		\ 'r:constructor',
+		\ 'f:functions'
+	\ ],
+	\ 'sro' : '.',
+	\ 'kind2scope' : {
+		\ 't' : 'ctype',
+		\ 'n' : 'ntype'
+	\ },
+	\ 'scope2kind' : {
+		\ 'ctype' : 't',
+		\ 'ntype' : 'n'
+	\ },
+	\ 'ctagsbin'  : 'gotags',
+	\ 'ctagsargs' : '-sort -silent'
+\ }
+nmap <leader>o :TagbarToggle<CR>
