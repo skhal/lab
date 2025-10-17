@@ -2,7 +2,7 @@
 #
 # Flavor: FreeBSD
 
-INSTALL_TARGETS = templates
+INSTALL_TARGETS = pack templates
 
 install: ${INSTALL_TARGETS} .PHONY
 
