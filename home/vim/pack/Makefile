@@ -25,6 +25,7 @@ ${target}: ${VIM_PACK_PATH} ${PACKAGE_LIST}
 		mkdir -p ${.TARGET:H} \
 			&& cd ${.TARGET:H} \
 			&& git clone -q ${package} \
+			&& vim -es -c 'helptags ${.TARGET}/doc' -c 'exit' \
 		; \
 	 fi
 .endfor
