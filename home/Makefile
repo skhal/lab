@@ -2,7 +2,7 @@
 #
 # Flavor: FreeBSD
 
-INSTALL_PATHS = vim
+INSTALL_PATHS = ctags.d vim
 SOURCES = tcshrc vimrc tmux.conf gitconfig
 INSTALL_TARGETS = ${SOURCES:S,^,${HOME}/.,}
 
