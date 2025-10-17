@@ -20,8 +20,11 @@ ${VIM_PACK_PATH}: .NOTMAIN
 .for package in ${PACKAGES}
 target=${package:${M_target}}
 ${target}: ${VIM_PACK_PATH} ${PACKAGE_LIST}
-	@echo ".. install ${package} to ${.TARGET}"; \
+	@if ! test -d ${.TARGET}; then \
+		echo ".. install ${package} to ${.TARGET}"; \
 		mkdir -p ${.TARGET:H} \
 			&& cd ${.TARGET:H} \
-			&& git clone -q ${package}
+			&& git clone -q ${package} \
+		; \
+	 fi
 .endfor

@@ -35,6 +35,12 @@ repos:
     name: keep-sorted
     entry: keep-sorted
     language: system
+  - id: make-lint
+    name: make-lint
+    entry: make
+    language: system
+    types_or: [makefile]
+    args: ["-N", "-f"]
   - id: yaml-format
     name: yaml-format
     entry: yamlfmt

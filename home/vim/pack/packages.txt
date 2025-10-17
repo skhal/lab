@@ -4,4 +4,5 @@
 
 # keep-sorted start
 https://github.com/noahfrederick/vim-skeleton
+https://github.com/preservim/tagbar
 # keep-sorted end
