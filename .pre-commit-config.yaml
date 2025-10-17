@@ -22,6 +22,12 @@ repos:
 - repo: local
   hooks:
   # keep-sorted start
+  - id: clang-format
+    name: clang-format
+    entry: clang-format -i
+    language: system
+    types_or: [c++, c]
+    args: ["-style=file"]
   - id: yaml-format
     name: yaml-format
     entry: yamlfmt
