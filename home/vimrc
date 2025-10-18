@@ -178,7 +178,6 @@ nmap <leader>o :TagbarToggle<CR>
 " -- Plugin https://github.com/prabirshrestha/vim-lsp
 let g:lsp_log_verbose = 1
 let g:lsp_log_file = expand('~/.log/vim-slp.log')
-let g:asyncomplete_log_file = expand('~/.log/asyncomplete.log')
 
 " Gopls https://go.dev/gopls/editor/vim#a-hrefvimlsp-idvimlspvim-lspa
 augroup LspGo
@@ -193,3 +192,10 @@ augroup LspGo
   autocmd FileType go nmap <buffer> ,n <plug>(lsp-next-error)
   autocmd FileType go nmap <buffer> ,p <plug>(lsp-previous-error)
 augroup END
+
+" -- Plugin https://github.com/prabirshrestha/asyncomplete.vim
+let g:asyncomplete_log_file = expand('~/.log/asyncomplete.log')
+
+inoremap <expr> <Tab>   pumvisible() ? "\<C-n>" : "\<Tab>"
+inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
+inoremap <expr> <cr>    pumvisible() ? asyncomplete#close_popup() : "\<cr>"
