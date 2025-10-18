@@ -177,7 +177,7 @@ nmap <leader>o :TagbarToggle<CR>
 
 " -- Plugin https://github.com/prabirshrestha/vim-lsp
 let g:lsp_log_verbose = 1
-let g:lsp_log_file = expand('~/.log/vim-slp.log')
+let g:lsp_log_file = expand('~/.log/vim-lsp.log')
 
 " Gopls https://go.dev/gopls/editor/vim#a-hrefvimlsp-idvimlspvim-lspa
 augroup LspGo
