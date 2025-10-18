@@ -1,6 +1,6 @@
 # Copyright 2025 Samvel Khalatyan. All rights reserved.
 #
-# List of Vim packages to install. Keep one package per line.
+# List of Go packages to install.
 
 # keep-sorted start
 github.com/bazelbuild/bazel-watcher/cmd/ibazel@v0.27.0
