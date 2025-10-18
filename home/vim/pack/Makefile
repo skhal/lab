@@ -24,8 +24,10 @@ ${target}: ${VIM_PACK_PATH} ${PACKAGE_LIST}
 		echo ".. install ${package} to ${.TARGET}"; \
 		mkdir -p ${.TARGET:H} \
 			&& cd ${.TARGET:H} \
+			&& echo "[+] git clone ${package}" \
 			&& git clone -q ${package} \
-			&& vim -es -c 'helptags ${.TARGET}/doc' -c 'exit' \
+			&& echo "[+] vim generate help tags" \
+			&& vim -c 'helptags ${.TARGET}/doc' -c 'exit' \
 		; \
 	 fi
 .endfor
