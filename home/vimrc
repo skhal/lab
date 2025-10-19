@@ -194,6 +194,19 @@ augroup LspGo
   autocmd FileType go nmap <buffer> ,p <plug>(lsp-previous-error)
 augroup END
 
+augroup LspCpp
+  au!
+  autocmd User lsp_setup call lsp#register_server({
+      \ 'name': 'clangd',
+      \ 'cmd': {server_info->['clangd']},
+      \ 'whitelist': ['c', 'cpp'],
+      \ })
+  autocmd FileType c,cpp setlocal omnifunc=lsp#complete
+  autocmd FileType c,cpp nmap <buffer> gd <plug>(lsp-definition)
+  autocmd FileType c,cpp nmap <buffer> ,n <plug>(lsp-next-error)
+  autocmd FileType c,cpp nmap <buffer> ,p <plug>(lsp-previous-error)
+augroup END
+
 " -- Plugin https://github.com/prabirshrestha/asyncomplete.vim
 let g:asyncomplete_log_file = expand('~/.log/asyncomplete.log')
 
