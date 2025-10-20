@@ -11,12 +11,25 @@ on:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        llvm-version: [21]
+    env:
+      CC: clang-${{ matrix.llvm-version }}
+      CXX: clang++-${{ matrix.llvm-version }}
 
     steps:
     - name: Checkout
       uses: actions/checkout@v5
 
-    - name: Setup Bazel ${{ matrix.bazel }}
+    - name: Install LLVM ${{ matrix.llvm-version }}
+      run: |
+        wget https://apt.llvm.org/llvm.sh
+        chmod +x ./llvm.sh
+        sudo ./llvm.sh ${{ matrix.llvm-version }}
+      shell: bash
+
+    - name: Setup Bazel
       uses: bazel-contrib/setup-bazel@0.15.0
       with:
         # Avoid downloading Bazel every time.
