@@ -1,6 +1,9 @@
 // Copyright 2025 Samvel Khalatyan. All rights reserved.
 //
+// clang-format off-next-line
 //go:build ignore
+
+#include "iq/twopointer/lexiseq/solution.h"
 
 #include <algorithm>
 #include <iterator>
@@ -8,8 +11,6 @@
 #include <string_view>
 #include <tuple>
 #include <utility>
-
-#include "iq/twopointer/lexiseq/solution.h"
 
 namespace iq::twopointer::lexiseq {
 namespace {
