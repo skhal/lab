@@ -1,0 +1,35 @@
+# Copyright 2025 Samvel Khalatyan. All rights reserved.
+
+name: IQ Bazel CI
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v5
+
+    - name: Setup Bazel ${{ matrix.bazel }}
+      uses: bazel-contrib/setup-bazel@0.15.0
+      with:
+        # Avoid downloading Bazel every time.
+        bazelisk-cache: true
+        # Store build cache per workflow.
+        disk-cache: ${{ github.workflow }}
+        # Share repository cache between workflows.
+        repository-cache: true
+
+    - name: Build and test
+      run: |
+        bazel test \
+          --keep_going \
+          --test_verbose_timeout_warnings \
+          --test_output=errors \
+          //iq/...
