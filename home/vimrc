@@ -34,7 +34,7 @@ augroup Format
   au!
   " keep-sorted start
   au FileType bzl set equalprg=buildifier
-  au FileType c,cpp set equalprg=clang-format
+  au FileType c,cpp set equalprg=clang-format\ -assume-filename=%
   au FileType go set equalprg=goimports
   au FileType yaml set equalprg=yamlfmt\ -in
   " keep-sorted end
