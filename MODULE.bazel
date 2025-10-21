@@ -11,8 +11,8 @@ bazel_dep(name = "platforms", version = "1.0.0")
 
 register_toolchains("//toolchain:cc_toolchain_linux_x86_64")
 
-bazel_dep(name = "googletest", version = "1.17.0", dev_dependency = True)
-bazel_dep(name = "abseil-cpp", version = "20250814.1", dev_dependency = True)
+bazel_dep(name = "googletest", version = "1.17.0")
+bazel_dep(name = "abseil-cpp", version = "20250814.1")
 
 # Hedron's Compile Commands Extractor for Bazel
 # https://github.com/hedronvision/bazel-compile-commands-extractor
