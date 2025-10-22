@@ -36,11 +36,12 @@ augroup Format
   au FileType bzl set equalprg=buildifier
   au FileType c,cpp set equalprg=clang-format\ -assume-filename=%
   au FileType go set equalprg=goimports
+  au FileType sh set equalprg=shfmt\ -i\ 2\ -ci\ -bn
   au FileType yaml set equalprg=yamlfmt\ -in
   " keep-sorted end
   " Format entire buffer `=G` or selection `=` with shortcut `<leader>fc`
-  au FileType bzl,c,cpp,go,yaml map <leader>fc gg=G<c-o><c-o>
-  au FileType bzl,c,cpp,go,yaml imap <leader>fc <esc>gg=G<c-o><c-o>
+  au FileType bzl,c,cpp,go,sh,yaml map <leader>fc gg=G<c-o><c-o>
+  au FileType bzl,c,cpp,go,sh,yaml imap <leader>fc <esc>gg=G<c-o><c-o>
 augroup END
 
 " -- Plugin github.com:noahfrederick/vim-skeleton

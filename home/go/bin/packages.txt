@@ -11,4 +11,5 @@ github.com/google/yamlfmt/cmd/yamlfmt@v0.18.1
 github.com/jstemmer/gotags@latest
 golang.org/x/tools/cmd/goimports@latest
 golang.org/x/tools/gopls@latest
+mvdan.cc/sh/v3/cmd/shfmt@latest
 # keep-sorted end

@@ -41,6 +41,18 @@ repos:
     language: system
     types_or: [makefile]
     args: ["-N", "-f"]
+  - id: shell-format
+    name: shell-format
+    entry: shfmt
+    language: system
+    types_or: [shell]
+    exclude_types: [csh, tcsh]
+    args:
+    - "--binary-next-line"
+    - "--case-indent"
+    - "--indent=2"
+    - "--posix"
+    - "--write"
   - id: yaml-format
     name: yaml-format
     entry: yamlfmt
