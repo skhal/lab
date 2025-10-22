@@ -6,6 +6,8 @@ repos:
   hooks:
   # keep-sorted start
   - id: check-added-large-files
+  - id: check-executables-have-shebangs
+  - id: check-shebang-scripts-are-executable
   - id: check-yaml
   - id: end-of-file-fixer
   - id: trailing-whitespace
@@ -58,6 +60,12 @@ repos:
     - "--indent=2"
     - "--posix"
     - "--write"
+  - id: shell-no-extension
+    name: shell-no-extension
+    entry: "Shell executable scripts should not have an extension"
+    language: fail
+    types: [shell, executable]
+    files: "\\.sh$"
   - id: yaml-format
     name: yaml-format
     entry: yamlfmt
