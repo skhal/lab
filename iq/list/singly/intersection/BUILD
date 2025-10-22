@@ -1,0 +1,20 @@
+# Copyright 2025 Samvel Khalatyan. All rights reserved.
+
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
+
+cc_library(
+    name = "find",
+    srcs = ["find.cc"],
+    hdrs = ["find.h"],
+    visibility = ["//visibility:public"],
+)
+
+cc_test(
+    name = "find_test",
+    srcs = ["find_test.cc"],
+    deps = [
+        ":find",
+        "@abseil-cpp//absl/strings",
+        "@googletest//:gtest_main",
+    ],
+)
