@@ -1,4 +1,7 @@
 // Copyright 2025 Samvel Khalatyan. All rights reserved.
+//
+// clang-format off-next-line
+//go:build ignore
 
 #include "iq/list/singly/intersection/find.h"
 
