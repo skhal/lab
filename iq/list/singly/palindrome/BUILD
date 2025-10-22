@@ -15,6 +15,7 @@ cc_test(
     deps = [
         ":is",
         "@abseil-cpp//absl/strings",
+        "@googletest//:gtest",
         "@googletest//:gtest_main",
     ],
 )
