@@ -7,6 +7,7 @@ cc_library(
     name = "find_cc",
     srcs = ["find.cc"],
     hdrs = ["find.h"],
+    visibility = ["//visibility:public"],
 )
 
 cc_test(

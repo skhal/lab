@@ -7,6 +7,7 @@ cc_library(
     name = "solution_cc",
     srcs = ["solution.cc"],
     hdrs = ["solution.h"],
+    visibility = ["//visibility:public"],
 )
 
 cc_test(

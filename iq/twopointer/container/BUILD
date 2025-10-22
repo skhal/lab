@@ -7,6 +7,7 @@ cc_library(
     name = "solution_cc",
     srcs = ["solution.cc"],
     hdrs = ["solution.h"],
+    visibility = ["//visibility:public"],
 )
 
 cc_test(
@@ -14,7 +15,6 @@ cc_test(
     srcs = ["solution_test.cc"],
     deps = [
         ":solution_cc",
-        "@googletest//:gtest",
         "@googletest//:gtest_main",
     ],
 )

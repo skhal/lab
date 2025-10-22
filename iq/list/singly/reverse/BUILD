@@ -7,6 +7,7 @@ cc_library(
     name = "reverse_cc",
     srcs = ["reverse.cc"],
     hdrs = ["reverse.h"],
+    visibility = ["//visibility:public"],
 )
 
 cc_test(

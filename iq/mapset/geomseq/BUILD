@@ -7,9 +7,8 @@ cc_library(
     name = "find_cc",
     srcs = ["find.cc"],
     hdrs = ["find.h"],
-    deps = [
-        "@abseil-cpp//absl/strings:str_format",
-    ],
+    visibility = ["//visibility:public"],
+    deps = ["@abseil-cpp//absl/strings:str_format"],
 )
 
 cc_test(

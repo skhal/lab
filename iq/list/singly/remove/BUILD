@@ -7,6 +7,7 @@ cc_library(
     name = "last_nth_cc",
     srcs = ["last_nth.cc"],
     hdrs = ["last_nth.h"],
+    visibility = ["//visibility:public"],
 )
 
 cc_test(
