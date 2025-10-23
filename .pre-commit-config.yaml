@@ -43,6 +43,12 @@ repos:
     language: system
     types_or: [makefile]
     args: ["-N", "-f"]
+  - id: markdown-format
+    name: markdown-format
+    entry: markdownfmt
+    language: system
+    types_or: [markdown]
+    args: ["-w"]
   - id: no-binary
     name: no-binary
     entry: "Binaries are not allowed"

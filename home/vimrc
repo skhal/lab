@@ -36,6 +36,7 @@ augroup Format
   au FileType bzl setlocal equalprg=buildifier
   au FileType c,cpp setlocal equalprg=clang-format\ -assume-filename=%
   au FileType go setlocal equalprg=goimports
+  au FileType markdown setlocal equalprg=markdownfmt
   au FileType sh setlocal equalprg=shfmt\ -i\ 2\ -ci\ -bn
   au FileType yaml setlocal equalprg=yamlfmt\ -in
   " keep-sorted end
@@ -238,4 +239,5 @@ inoremap <expr><S-Tab> pumvisible() ? "\<C-p>" : "\<C-h>"
 augroup Keyword
   au!
   autocmd FileType c,cpp setlocal keywordprg=cppman
+  autocmd FileType go    setlocal keywordprg=go\ doc
 augroup END
