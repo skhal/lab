@@ -12,6 +12,7 @@ cc_test(
     srcs = ["do_test.cc"],
     deps = [
         ":do",
+        "@googletest//:gtest",
         "@googletest//:gtest_main",
     ],
 )
