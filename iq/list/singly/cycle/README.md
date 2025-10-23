@@ -5,25 +5,7 @@
 
 # DESCRIPTION
 
-## Problem
+## Problems
 
-Given a singly linked list, report whether it has cycles. Do not use a hash set
-to keep track of visited nodes.
-
-## Example
-
-Input:
-
-```
-1 - 2 - 3 - 4
-    ^       |
-    |       |
-    +-------+
-```
-
-Has cycle from item 4 to item 2
-
-
-# SEE ALSO
-
-* [Solution](./solution.md)
+* [Cycle](./doc/cycle.md)
+* [Happy number](./doc/happy_number.md)
