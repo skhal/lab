@@ -1,0 +1,22 @@
+# Copyright 2025 Samvel Khalatyan. All rights reserved.
+
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
+
+cc_library(
+    name = "cache",
+    srcs = ["cache.cc"],
+    hdrs = ["cache.h"],
+    visibility = ["//visibility:public"],
+    deps = ["@abseil-cpp//absl/base:core_headers"],
+)
+
+cc_test(
+    name = "cache_test",
+    srcs = ["cache_test.cc"],
+    deps = [
+        ":cache",
+        "@abseil-cpp//absl/strings",
+        "@googletest//:gtest",
+        "@googletest//:gtest_main",
+    ],
+)
