@@ -111,8 +111,10 @@ struct CacheGetTestParam {
   std::size_t cap;
   std::vector<std::pair<Cache::Key, Cache::Value>> items;
   Cache::Key key;
-  std::optional<Cache::Key> wantVal;
-  std::vector<Cache::Key> wantKeys;
+  struct {
+    std::optional<Cache::Key> val;
+    std::vector<Cache::Key> keys;
+  } want;
 
   friend std::ostream& operator<<(std::ostream& os,
                                   const CacheGetTestParam& tp) {
@@ -132,8 +134,8 @@ TEST_P(CacheGetTest, Get) {
 
   const std::optional<Cache::Value> got = cache.Get(tp.key);
 
-  EXPECT_THAT(got, Eq(tp.wantVal));
-  EXPECT_THAT(cache.Keys(), ContainerEq(tp.wantKeys));
+  EXPECT_THAT(got, Eq(tp.want.val));
+  EXPECT_THAT(cache.Keys(), ContainerEq(tp.want.keys));
 }
 
 const CacheGetTestParam kCacheGetTestParams[]{
@@ -143,16 +145,22 @@ const CacheGetTestParam kCacheGetTestParams[]{
         .cap = 1,
         .items = {{1, 10}},
         .key = 1,
-        .wantVal = 10,
-        .wantKeys = {1},
+        .want =
+            {
+                .val = 10,
+                .keys = {1},
+            },
     },
     {
         .name = "cap one get miss",
         .cap = 1,
         .items = {{1, 10}},
         .key = 2,
-        .wantVal = std::nullopt,
-        .wantKeys = {1},
+        .want =
+            {
+                .val = std::nullopt,
+                .keys = {1},
+            },
     },
     // capacity=2
     {
@@ -160,40 +168,55 @@ const CacheGetTestParam kCacheGetTestParams[]{
         .cap = 2,
         .items = {{1, 10}},
         .key = 1,
-        .wantVal = 10,
-        .wantKeys = {1},
+        .want =
+            {
+                .val = 10,
+                .keys = {1},
+            },
     },
     {
         .name = "cap two one item get miss",
         .cap = 2,
         .items = {{1, 10}},
         .key = 2,
-        .wantVal = std::nullopt,
-        .wantKeys = {1},
+        .want =
+            {
+                .val = std::nullopt,
+                .keys = {1},
+            },
     },
     {
         .name = "cap two two items get least recent makes it most recent",
         .cap = 2,
         .items = {{1, 10}, {2, 20}},
         .key = 1,
-        .wantVal = 10,
-        .wantKeys = {1, 2},
+        .want =
+            {
+                .val = 10,
+                .keys = {1, 2},
+            },
     },
     {
         .name = "cap two two items get most recent",
         .cap = 2,
         .items = {{1, 10}, {2, 20}},
         .key = 2,
-        .wantVal = 20,
-        .wantKeys = {2, 1},
+        .want =
+            {
+                .val = 20,
+                .keys = {2, 1},
+            },
     },
     {
         .name = "cap two two items get miss",
         .cap = 2,
         .items = {{1, 10}, {2, 20}},
         .key = 3,
-        .wantVal = std::nullopt,
-        .wantKeys = {2, 1},
+        .want =
+            {
+                .val = std::nullopt,
+                .keys = {2, 1},
+            },
     },
     // capacity=3
     {
@@ -201,72 +224,99 @@ const CacheGetTestParam kCacheGetTestParams[]{
         .cap = 3,
         .items = {{1, 10}},
         .key = 1,
-        .wantVal = 10,
-        .wantKeys = {1},
+        .want =
+            {
+                .val = 10,
+                .keys = {1},
+            },
     },
     {
         .name = "cap three one item get miss",
         .cap = 3,
         .items = {{1, 10}},
         .key = 2,
-        .wantVal = std::nullopt,
-        .wantKeys = {1},
+        .want =
+            {
+                .val = std::nullopt,
+                .keys = {1},
+            },
     },
     {
         .name = "cap three two items get least recent makes it most recent",
         .cap = 3,
         .items = {{1, 10}, {2, 20}},
         .key = 1,
-        .wantVal = 10,
-        .wantKeys = {1, 2},
+        .want =
+            {
+                .val = 10,
+                .keys = {1, 2},
+            },
     },
     {
         .name = "cap three two items get most recent",
         .cap = 3,
         .items = {{1, 10}, {2, 20}},
         .key = 2,
-        .wantVal = 20,
-        .wantKeys = {2, 1},
+        .want =
+            {
+                .val = 20,
+                .keys = {2, 1},
+            },
     },
     {
         .name = "cap three two items get miss",
         .cap = 3,
         .items = {{1, 10}, {2, 20}},
         .key = 3,
-        .wantVal = std::nullopt,
-        .wantKeys = {2, 1},
+        .want =
+            {
+                .val = std::nullopt,
+                .keys = {2, 1},
+            },
     },
     {
         .name = "cap three three items get least recent makes it most recent",
         .cap = 3,
         .items = {{1, 10}, {2, 20}, {3, 30}},
         .key = 1,
-        .wantVal = 10,
-        .wantKeys = {1, 3, 2},
+        .want =
+            {
+                .val = 10,
+                .keys = {1, 3, 2},
+            },
     },
     {
         .name = "cap three three items get middle item",
         .cap = 3,
         .items = {{1, 10}, {2, 20}, {3, 30}},
         .key = 2,
-        .wantVal = 20,
-        .wantKeys = {2, 3, 1},
+        .want =
+            {
+                .val = 20,
+                .keys = {2, 3, 1},
+            },
     },
     {
         .name = "cap three three items get most recent",
         .cap = 3,
         .items = {{1, 10}, {2, 20}, {3, 30}},
         .key = 3,
-        .wantVal = 30,
-        .wantKeys = {3, 2, 1},
+        .want =
+            {
+                .val = 30,
+                .keys = {3, 2, 1},
+            },
     },
     {
         .name = "cap three three items get miss",
         .cap = 3,
         .items = {{1, 10}, {2, 20}, {3, 30}},
         .key = 4,
-        .wantVal = std::nullopt,
-        .wantKeys = {3, 2, 1},
+        .want =
+            {
+                .val = std::nullopt,
+                .keys = {3, 2, 1},
+            },
     },
 };
 

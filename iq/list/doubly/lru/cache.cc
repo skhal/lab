@@ -85,7 +85,7 @@ void Cache::makeMostRecent(std::shared_ptr<Node> node) {
   }
   node->next = head_;
   head_->prev = node;
-  head_ = node;
+  head_ = std::move(node);
 }
 
 void Cache::removeLeastRecent() {
@@ -96,7 +96,7 @@ void Cache::removeLeastRecent() {
   } else {
     prev->next.reset();
     tail_->prev.reset();
-    tail_ = prev;
+    tail_ = std::move(prev);
   }
   --size_;
 }
