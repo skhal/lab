@@ -6,17 +6,33 @@ module(
     compatibility_level = 1,
 )
 
-bazel_dep(name = "rules_cc", version = "0.2.9")
+# keep-sorted start
+bazel_dep(name = "abseil-cpp", version = "20250814.1")
+bazel_dep(name = "gazelle", version = "0.45.0")
+bazel_dep(name = "gazelle_cc", version = "0.1.0")
+bazel_dep(name = "googletest", version = "1.17.0")
 bazel_dep(name = "platforms", version = "1.0.0")
+bazel_dep(name = "rules_cc", version = "0.2.9")
+bazel_dep(name = "rules_go", version = "0.57.0")
+# keep-sorted end
 
 register_toolchains("//toolchain:cc_toolchain_linux_x86_64")
 
-bazel_dep(name = "googletest", version = "1.17.0")
-bazel_dep(name = "abseil-cpp", version = "20250814.1")
-bazel_dep(name = "rules_go", version = "0.57.0")
-bazel_dep(name = "gazelle", version = "0.45.0")
-bazel_dep(name = "gazelle_cc", version = "0.1.0")
-
+# Lab runs Bazel in a FreeBSD jail using Linux Binary Compatibility:
+# https://docs.freebsd.org/en/books/handbook/linuxemu/
+#
+# Unfortunately, Go is confused by this hybrid setup (as of Oct 2025). The
+# linker fails at calling ld.Mmap:
+# https://cs.opensource.google/go/go/+/master:src/cmd/link/internal/ld/main.go;l=453;drc=839da71f8907ac4434299db4353db31835c916df
+#
+# Fortunately, FreeBSD jail can run both Linux and FreeBSD binaries in this
+# setup - Linux binaries expect to find Linux libraries, installed under
+# /compat/<name>, otherwise everything else is the same.
+#
+# A short-term solution is to make a custom install of Go for Linux under
+# /compat/<name>. It uses Linux distributiion with FreeBSD linker swapped in.
+#
+# See: ./go_install.sh
 go_sdk = use_extension("@rules_go//go:extensions.bzl", "go_sdk")
 go_sdk.host()
 
