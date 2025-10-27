@@ -13,6 +13,7 @@ github.com/protocolbuffers/txtpbfmt/cmd/txtpbfmt@latest
 github.com/shurcooL/markdownfmt@latest
 golang.org/x/tools/cmd/goimports@latest
 golang.org/x/tools/gopls@latest
+google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
 google.golang.org/protobuf/cmd/protoc-gen-go@v1.36.10
 mvdan.cc/sh/v3/cmd/shfmt@latest
 # keep-sorted end
