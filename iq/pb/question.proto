@@ -1,0 +1,31 @@
+// Copyright 2025 Samvel Khalatyan. All rights reserved.
+
+edition = "2023";
+
+package iq.pb;
+
+import "google/protobuf/go_features.proto";
+
+option features.(.pb.go).api_level = API_OPAQUE;
+option go_package = "github.com/skhal/lab/iq/pb";
+
+// QuestionSet is a container for questions in the database.
+//
+// Next ID: 2
+message QuestionSet {
+  repeated Question questions = 1;
+}
+
+// Question holds metadata for a single question.
+//
+// Next ID: 4
+message Question {
+  // id is the questino identifier.
+  int32 id = 1;
+
+  // description is a short desription of the question.
+  string description = 2;
+
+  // tags are free-form strings to group questions into sets.
+  repeated string tags = 3;
+}

@@ -1,0 +1,10 @@
+# Copyright 2025 Samvel Khalatyan. All rights reserved.
+#
+# proto-file: iq/proto/iq.proto
+# proto-message: QuestionSet
+
+questions {
+  id: 1
+  description: "pair sum in a sorted array"
+  tags: "two-pointer"
+}
