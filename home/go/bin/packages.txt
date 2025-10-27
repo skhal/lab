@@ -9,6 +9,7 @@ github.com/bazelbuild/buildtools/buildozer@latest
 github.com/google/keep-sorted@v0.7.1
 github.com/google/yamlfmt/cmd/yamlfmt@v0.18.1
 github.com/jstemmer/gotags@latest
+github.com/protocolbuffers/txtpbfmt/cmd/txtpbfmt@latest
 github.com/shurcooL/markdownfmt@latest
 golang.org/x/tools/cmd/goimports@latest
 golang.org/x/tools/gopls@latest

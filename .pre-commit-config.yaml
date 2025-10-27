@@ -72,6 +72,11 @@ repos:
     language: fail
     types: [shell, executable]
     files: "\\.sh$"
+  - id: txtpb-format
+    name: txtpb-format
+    entry: txtpbfmt
+    language: system
+    types: [textproto]
   - id: yaml-format
     name: yaml-format
     entry: yamlfmt
