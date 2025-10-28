@@ -8,8 +8,12 @@ import (
 )
 
 func Find(s string) string {
+	return findWith(newSlowWindow(s))
+}
+
+func findWith(w window) string {
 	var longest []byte
-	for buf := range findUnique(s) {
+	for buf := range findUnique(w) {
 		if len(buf) > len(longest) {
 			longest = buf
 		}
@@ -17,31 +21,50 @@ func Find(s string) string {
 	return string(longest)
 }
 
-type window struct {
-	buf   []byte
-	seen  map[rune]struct{}
+type window interface {
+	end() bool
+	expand()
+	shrink()
+	bytes() []byte
+}
+
+func findUnique(w window) iter.Seq[[]byte] {
+	return func(yield func([]byte) bool) {
+		for !w.end() {
+			w.expand()
+			if !yield(w.bytes()) {
+				break
+			}
+			w.shrink()
+		}
+	}
+}
+
+type slowWindow struct {
+	buf  []byte
+	seen map[rune]struct{}
 
 	left  int
 	right int
 	stop  rune
 }
 
-func newWindow(s string) *window {
-	return &window{
+func newSlowWindow(s string) *slowWindow {
+	return &slowWindow{
 		buf:  []byte(s),
 		seen: make(map[rune]struct{}),
 	}
 }
 
-func (w *window) end() bool {
+func (w *slowWindow) end() bool {
 	return w.right == len(w.buf)
 }
 
-func (w *window) bytes() []byte {
+func (w *slowWindow) bytes() []byte {
 	return w.buf[w.left:w.right]
 }
 
-func (w *window) expand() {
+func (w *slowWindow) expand() {
 	for w.right < len(w.buf) {
 		r, rs := utf8.DecodeRune(w.buf[w.right:])
 		if r == utf8.RuneError {
@@ -62,7 +85,7 @@ func (w *window) expand() {
 	}
 }
 
-func (w *window) shrink() {
+func (w *slowWindow) shrink() {
 	for w.left < w.right {
 		r, rs := utf8.DecodeRune(w.buf[w.left:])
 		if r == utf8.RuneError {
@@ -78,19 +101,6 @@ func (w *window) shrink() {
 		if r == w.stop {
 			w.stop = utf8.RuneError
 			break
-		}
-	}
-}
-
-func findUnique(s string) iter.Seq[[]byte] {
-	return func(yield func([]byte) bool) {
-		w := newWindow(s)
-		for !w.end() {
-			w.expand()
-			if !yield(w.bytes()) {
-				break
-			}
-			w.shrink()
 		}
 	}
 }

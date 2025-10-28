@@ -14,3 +14,10 @@ func ExampleFind() {
 	// Output:
 	// bcad
 }
+
+func ExampleFindFast() {
+	s := substring.FindFast("abcad")
+	fmt.Println(s)
+	// Output:
+	// bcad
+}
