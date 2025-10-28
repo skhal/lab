@@ -117,3 +117,8 @@ questions {
   description: "find anagrams in a string"
   tags: "sliding-window"
 }
+questions {
+  id: 22
+  description: "largest substring with unique chars"
+  tags: "sliding-window"
+}
