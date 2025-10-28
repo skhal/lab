@@ -14,8 +14,8 @@ import (
 
 const registryFile = "questions.txtpb"
 
-func TestErrQuestion_Is(t *testing.T) {
-	err := new(registry.ErrQuestion)
+func TestErrDuplicateQuestion_Is(t *testing.T) {
+	err := new(registry.ErrDuplicateQuestion)
 
 	got := errors.Is(err, registry.ErrRegistry)
 
@@ -41,15 +41,16 @@ func TestRegistry_Load(t *testing.T) {
 }
 
 func TestRegistry_WithQuestions_errorsOnDuplciates(t *testing.T) {
+	hasQuestion := newQuestion(t, 1, "one")
 	dupQuestion := newQuestion(t, 1, "two")
 	qq := []*pb.Question{
-		newQuestion(t, 1, "one"),
+		hasQuestion,
 		dupQuestion,
 	}
 
 	_, err := registry.WithQuestions(qq)
 
-	wantErr := &registry.ErrQuestion{Question: dupQuestion}
+	wantErr := &registry.ErrDuplicateQuestion{Has: hasQuestion, New: dupQuestion}
 	if diff := cmp.Diff(wantErr, err, protocmp.Transform()); diff != "" {
 		t.Errorf("registry.WithQuestions(%v) mismatch (-want, +got):\n%s", qq, diff)
 	}

@@ -17,21 +17,20 @@ import (
 // ErrRegistry is a catch all error in the registry.
 var ErrRegistry = errors.New("registry error")
 
-// ErrQuestion indicates an error in a given question.
-type ErrQuestion struct {
-	Question *pb.Question
+// ErrDuplicateQuestion indicates an error in a given question.
+type ErrDuplicateQuestion struct {
+	Has *pb.Question
+	New *pb.Question
 }
 
 // Error prints the question information.
-func (e *ErrQuestion) Error() string {
-	q := e.Question
-	if q == nil {
-		return fmt.Sprintf("%s: <nil> question", ErrRegistry)
-	}
-	return fmt.Sprintf("%s: %d: %s", ErrRegistry, q.GetId(), q.GetDescription())
+func (e *ErrDuplicateQuestion) Error() string {
+	qhas := e.Has
+	qnew := e.New
+	return fmt.Sprintf("%s: duplicate question %d: has %q, new %q", ErrRegistry, qhas.GetId(), qhas.GetDescription(), qnew.GetDescription())
 }
 
-func (e *ErrQuestion) Is(err error) bool {
+func (e *ErrDuplicateQuestion) Is(err error) bool {
 	return err == ErrRegistry
 }
 
@@ -61,8 +60,8 @@ func WithQuestions(qq []*pb.Question) (*R, error) {
 	qset := make(map[QuestionID]*pb.Question)
 	for _, q := range qq {
 		qid := QuestionID(q.GetId())
-		if _, ok := qset[qid]; ok {
-			return nil, &ErrQuestion{Question: q}
+		if got, ok := qset[qid]; ok {
+			return nil, &ErrDuplicateQuestion{Has: got, New: q}
 		}
 		qset[qid] = q
 	}
