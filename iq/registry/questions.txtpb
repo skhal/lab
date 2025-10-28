@@ -122,3 +122,8 @@ questions {
   description: "largest substring with unique chars"
   tags: "sliding-window"
 }
+questions {
+  id: 23
+  description: "longest uniform substring"
+  tags: "sliding-window"
+}
