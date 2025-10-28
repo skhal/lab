@@ -3,8 +3,117 @@
 # proto-file: iq/proto/iq.proto
 # proto-message: QuestionSet
 
+# Two Pointers
 questions {
   id: 1
   description: "pair sum in a sorted array"
   tags: "two-pointer"
+}
+questions {
+  id: 2
+  description: "unique triplets that sum up to zero"
+  tags: "two-pointer"
+}
+questions {
+  id: 3
+  description: "is string with non-alphanumberic chars a palindrome"
+  tags: "two-pointer"
+}
+questions {
+  id: 4
+  description: "find a box with maximum volume"
+  tags: "two-pointer"
+}
+questions {
+  id: 5
+  description: "shift zeros to the end of the array"
+  tags: "two-pointer"
+}
+questions {
+  id: 6
+  description: "next lexicographical sequence"
+  tags: "two-pointer"
+}
+
+# Maps and Sets
+questions {
+  id: 7
+  description: "pair sum in unosrted array"
+  tags: "map"
+}
+questions {
+  id: 8
+  description: "validate sudoku board"
+  tags: "map"
+}
+questions {
+  id: 9
+  description: "zero out rows and columns in a matrix"
+  tags: "map"
+}
+questions {
+  id: 10
+  description: "longest chain of integers in the array"
+  tags: "map"
+}
+questions {
+  id: 11
+  description: "geometic sequence in a collection"
+  tags: "map"
+}
+
+# Lists
+questions {
+  id: 12
+  description: "reverse a singly linked list"
+  tags: "list"
+}
+questions {
+  id: 13
+  description: "remove last nth from a singly linked list"
+  tags: "list"
+}
+questions {
+  id: 14
+  description: "intersection of singly linked lists"
+  tags: "list"
+}
+questions {
+  id: 15
+  description: "implement lru cache"
+  tags: "list"
+}
+questions {
+  id: 16
+  description: "is singly linked list a palindrome"
+  tags: "list"
+}
+questions {
+  id: 17
+  description: "flatten multi layered singly linked list"
+  tags: "list"
+}
+questions {
+  id: 18
+  description: "detect cycles in a singly linked list"
+  tags: "list"
+  tags: "fast-slow"
+}
+questions {
+  id: 19
+  description: "find midpoint of a singly linked list"
+  tags: "list"
+  tags: "fast-slow"
+}
+questions {
+  id: 20
+  description: "is happy number"
+  tags: "fast-slow"
+}
+
+# Sliding Window
+questions {
+  id: 21
+  description: "find anagrams in a string"
+  tags: "sliding-window"
 }
