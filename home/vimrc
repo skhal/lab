@@ -242,5 +242,5 @@ inoremap <expr><S-Tab> pumvisible() ? "\<C-p>" : "\<C-h>"
 augroup Keyword
   au!
   autocmd FileType c,cpp setlocal keywordprg=cppman
-  autocmd FileType go    setlocal keywordprg=go\ doc
+  autocmd FileType go    setlocal keywordprg=:GoDoc
 augroup END
