@@ -4,7 +4,7 @@ hi clear
 if exists ("syntax_on")
   syntax reset
 endif
-let g:colors_name = 'skhal'
+let g:colors_name = 'lab'
 let s:none = ['NONE', 'NONE']
 
 " s:h configures highlights for the scope.
