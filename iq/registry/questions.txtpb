@@ -149,3 +149,8 @@ questions {
   description: "lower bound of sorted numbers"
   tags: "binary-search"
 }
+questions {
+  id: 28
+  description: "upper bound of sorted numbers"
+  tags: "binary-search"
+}
