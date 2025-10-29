@@ -139,3 +139,8 @@ questions {
   description: "find range of number indices"
   tags: "binary-search"
 }
+questions {
+  id: 26
+  description: "max cut"
+  tags: "binary-search"
+}
