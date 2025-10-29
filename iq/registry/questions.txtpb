@@ -134,3 +134,8 @@ questions {
   description: "find the insertion index"
   tags: "binary-search"
 }
+questions {
+  id: 25
+  description: "find range of number indices"
+  tags: "binary-search"
+}
