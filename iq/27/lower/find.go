@@ -3,10 +3,12 @@
 package lower
 
 func Find(nn []int, x int) (lb int, ok bool) {
+	left := 0
 	right := len(nn)
-	for left := 0; left < right; {
+	for left < right {
 		mid := left + (right-left)/2
-		switch n := nn[mid]; {
+		n := nn[mid]
+		switch {
 		case n < x:
 			left = mid + 1
 		case x < n:
