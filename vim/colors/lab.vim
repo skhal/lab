@@ -1,4 +1,4 @@
-" Copyright (c) 2025, Samvel Khalatyan. All rights reserved.
+" Copyright 2025 Samvel Khalatyan. All rights reserved.
 
 hi clear
 if exists ("syntax_on")
@@ -44,7 +44,7 @@ if &background ==# 'dark'
   call s:h('javaAnnotation', ['#9dbed9', '110'])
   call s:h('Keyword', ['#d8884b', '173'])
   call s:h('LineNr', ['#858585', '102'])
-  call s:h('Normal', ['#b5bcc5', '250'], ['#1c1d21', '232'])
+  call s:h('Normal', ['#b5bcc5', '250'])
   call s:h('Number', ['#79a9c4', '74'])
   call s:h('Operator', ['#acb4be', '249'])
   call s:h('Pmenu', ['#acb4be', '249'], ['#3a4659', '238'])
