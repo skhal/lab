@@ -127,3 +127,10 @@ questions {
   description: "longest uniform substring"
   tags: "sliding-window"
 }
+
+# Binary Search
+questions {
+  id: 24
+  description: "find the insertion index"
+  tags: "binary-search"
+}
