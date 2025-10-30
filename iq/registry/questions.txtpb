@@ -3,7 +3,6 @@
 # proto-file: iq/proto/iq.proto
 # proto-message: QuestionSet
 
-# Two Pointers
 questions {
   id: 1
   description: "pair sum in a sorted array"
@@ -34,8 +33,6 @@ questions {
   description: "next lexicographical sequence"
   tags: "two-pointer"
 }
-
-# Maps and Sets
 questions {
   id: 7
   description: "pair sum in unosrted array"
@@ -61,8 +58,6 @@ questions {
   description: "geometic sequence in a collection"
   tags: "map"
 }
-
-# Lists
 questions {
   id: 12
   description: "reverse a singly linked list"
@@ -110,8 +105,6 @@ questions {
   description: "is happy number"
   tags: "fast-slow"
 }
-
-# Sliding Window
 questions {
   id: 21
   description: "find anagrams in a string"
@@ -127,8 +120,6 @@ questions {
   description: "longest uniform substring"
   tags: "sliding-window"
 }
-
-# Binary Search
 questions {
   id: 24
   description: "find the insertion index"
