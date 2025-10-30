@@ -154,3 +154,8 @@ questions {
   description: "upper bound of sorted numbers"
   tags: "binary-search"
 }
+questions {
+  id: 29
+  description: "find in rotated sorted array"
+  tags: "binary search"
+}
