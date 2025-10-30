@@ -150,3 +150,8 @@ questions {
   description: "find in rotated sorted array"
   tags: "binary search"
 }
+questions {
+  id: 30
+  description: "median of two sorted arrays"
+  tags: "binary search"
+}
