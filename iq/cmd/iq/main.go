@@ -20,18 +20,19 @@ import (
 	"github.com/skhal/lab/iq/registry"
 )
 
-var file = flag.String("file", "iq/registry/questions.txtpb", "questions list (txtpb)")
+var registryConfig = new(registry.Config)
 
 func main() {
+	registryConfig.RegisterFlags(flag.CommandLine)
 	flag.Parse()
-	if err := run(*file); err != nil {
+	if err := run(registryConfig); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 }
 
-func run(file string) error {
-	reg, err := registry.Load(file)
+func run(registryConfig *registry.Config) error {
+	reg, err := registry.Load(registryConfig)
 	if err != nil {
 		return err
 	}

@@ -4,6 +4,7 @@ package registry
 
 import (
 	"errors"
+	"flag"
 	"fmt"
 	"maps"
 	"os"
@@ -42,10 +43,20 @@ type R struct {
 	qset map[QuestionID]*pb.Question
 }
 
+// Config holds registry configuration paramters, to be extracted from flags.
+type Config struct {
+	// File is the registry filename
+	File string
+}
+
+func (c *Config) RegisterFlags(fs *flag.FlagSet) {
+	fs.StringVar(&c.File, "file", "iq/registry/questions.txtpb", "questions list (txtpb)")
+}
+
 // Load reads registry from the input file in Protobuf text format. It returns
 // an error if the file does not exist or loading fails to parse text proto.
-func Load(file string) (*R, error) {
-	b, err := os.ReadFile(file)
+func Load(cfg *Config) (*R, error) {
+	b, err := os.ReadFile(cfg.File)
 	if err != nil {
 		return nil, err
 	}
