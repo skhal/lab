@@ -12,8 +12,6 @@ import (
 	"google.golang.org/protobuf/testing/protocmp"
 )
 
-const registryFile = "questions.txtpb"
-
 func TestErrDuplicateQuestion_Is(t *testing.T) {
 	err := new(registry.ErrDuplicateQuestion)
 
@@ -33,10 +31,11 @@ func newQuestion(t *testing.T, id int, desc string) *pb.Question {
 }
 
 func TestRegistry_Load(t *testing.T) {
-	_, err := registry.Load(registryFile)
+	cfg := &registry.Config{File: "questions.txtpb"}
+	_, err := registry.Load(cfg)
 
 	if err != nil {
-		t.Errorf("registry.Load(%q) = _, %s; want no error", registryFile, err)
+		t.Errorf("registry.Load(%v) = _, %s; want no error", cfg, err)
 	}
 }
 
