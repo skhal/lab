@@ -12,34 +12,47 @@ Without arguments, iq dumps a list of questions, sorted by ID.
 package main
 
 import (
+	"errors"
 	"flag"
 	"fmt"
 	"os"
 
-	"github.com/skhal/lab/iq/pb"
+	"github.com/skhal/lab/iq/info"
 	"github.com/skhal/lab/iq/registry"
 )
 
-var registryConfig = new(registry.Config)
+var commands = map[string]command{
+	"info": func(r *registry.R) error { return info.Run(r) },
+}
+
+type command func(*registry.R) error
 
 func main() {
+	registryConfig := new(registry.Config)
 	registryConfig.RegisterFlags(flag.CommandLine)
 	flag.Parse()
-	if err := run(registryConfig); err != nil {
+	if err := run(registryConfig, flag.Args()); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 }
 
-func run(registryConfig *registry.Config) error {
+func run(registryConfig *registry.Config, args []string) error {
+	if len(args) == 0 {
+		return errors.New("missing command")
+	}
 	reg, err := registry.Load(registryConfig)
 	if err != nil {
 		return err
 	}
-	reg.Visit(printQuestion)
-	return nil
+	return runCommand(reg, args)
 }
 
-func printQuestion(q *pb.Question) {
-	fmt.Printf("%d\t%s\n", q.GetId(), q.GetDescription())
+func runCommand(reg *registry.R, args []string) error {
+	cmdName := args[0]
+	cmd, ok := commands[cmdName]
+	if !ok {
+		return fmt.Errorf("invalid command -- %s", cmdName)
+	}
+	return cmd(reg)
 }
