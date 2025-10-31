@@ -93,6 +93,12 @@ func (r *R) Visit(v func(*pb.Question)) {
 	}
 }
 
+// Get retrieves the question with a given identifier form the registry. It
+// returns nil if the question does not exist.
+func (r *R) Get(qid QuestionID) *pb.Question {
+	return r.qset[qid]
+}
+
 type sortableQuestionIDs []QuestionID
 
 // Len reports the number of question ids.

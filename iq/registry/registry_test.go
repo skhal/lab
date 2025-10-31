@@ -55,6 +55,46 @@ func TestRegistry_WithQuestions_errorsOnDuplciates(t *testing.T) {
 	}
 }
 
+func TestRegistry_Get(t *testing.T) {
+	tests := []struct {
+		name string
+		qq   []*pb.Question
+		id   registry.QuestionID
+		want *pb.Question
+	}{
+		{
+			name: "empty",
+			id:   registry.QuestionID(1),
+		},
+		{
+			name: "hit",
+			qq:   []*pb.Question{newQuestion(t, 1, "one")},
+			id:   registry.QuestionID(1),
+			want: newQuestion(t, 1, "one"),
+		},
+		{
+			name: "miss",
+			qq:   []*pb.Question{newQuestion(t, 1, "one")},
+			id:   registry.QuestionID(2),
+		},
+	}
+	for _, tc := range tests {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
+			reg, err := registry.WithQuestions(tc.qq)
+			if err != nil {
+				t.Fatalf("registry.WithQuestions(%v) failed", tc.qq)
+			}
+
+			got := reg.Get(tc.id)
+
+			if diff := cmp.Diff(tc.want, got, protocmp.Transform()); diff != "" {
+				t.Errorf("registry.Get(%d) mismatch (-want, +got):\n%s", tc.id, diff)
+			}
+		})
+	}
+}
+
 func TestRegistry_Visit_allOrderByID(t *testing.T) {
 	qq := []*pb.Question{
 		newQuestion(t, 2, "two"),

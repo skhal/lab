@@ -22,10 +22,10 @@ import (
 )
 
 var commands = map[string]command{
-	"info": func(r *registry.R) error { return info.Run(r) },
+	"info": runInfo,
 }
 
-type command func(*registry.R) error
+type command func(reg *registry.R, args []string) error
 
 func main() {
 	registryConfig := new(registry.Config)
@@ -45,14 +45,19 @@ func run(registryConfig *registry.Config, args []string) error {
 	if err != nil {
 		return err
 	}
-	return runCommand(reg, args)
+	cmdName := args[0]
+	cmdArgs := args[1:]
+	return runCommand(reg, cmdName, cmdArgs)
 }
 
-func runCommand(reg *registry.R, args []string) error {
-	cmdName := args[0]
-	cmd, ok := commands[cmdName]
+func runCommand(reg *registry.R, name string, args []string) error {
+	cmd, ok := commands[name]
 	if !ok {
-		return fmt.Errorf("invalid command -- %s", cmdName)
+		return fmt.Errorf("invalid command -- %s", name)
 	}
-	return cmd(reg)
+	return cmd(reg, args)
+}
+
+func runInfo(reg *registry.R, args []string) error {
+	return info.Run(reg, args)
 }
