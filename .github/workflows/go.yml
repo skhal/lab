@@ -6,8 +6,20 @@ name: Go
 on:
   push:
     branches: ["main"]
+    paths:
+    # keep-sorted start
+    - 'go/**'
+    - 'iq/**'
+    - 'x/**'
+    # keep-sorted end
   pull_request:
     branches: ["main"]
+    paths:
+    # keep-sorted start
+    - 'go/**'
+    - 'iq/**'
+    - 'x/**'
+    # keep-sorted end
 
 jobs:
 

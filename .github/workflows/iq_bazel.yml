@@ -5,8 +5,16 @@ name: IQ Bazel CI
 on:
   push:
     branches: ["main"]
+    paths:
+    # keep-sorted start
+    - 'iq/**'
+    # keep-sorted end
   pull_request:
     branches: ["main"]
+    paths:
+    # keep-sorted start
+    - 'iq/**'
+    # keep-sorted end
 
 jobs:
   build-and-test:
