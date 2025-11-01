@@ -39,86 +39,86 @@ func TestLoad(t *testing.T) {
 }
 
 func TestWrite(t *testing.T) {
-	opts := []registry.Option{
-		registry.QuestionOption(newQuestion(t, 1, "one")),
-	}
-	reg := mustCreateRegistry(t, opts...)
-	tmpfile := filepath.Join(t.TempDir(), "registry.txtpb")
-	cfg := &registry.Config{File: tmpfile}
-	golden := tests.GoldenFile("testdata/registry_one_question.txtpb")
-
-	err := registry.Write(reg, cfg)
-
-	if err != nil {
-		t.Fatalf("registry.Write() unexpected error: %v", err)
-	}
-	got := mustReadFile(t, tmpfile)
-	if *update {
-		golden.Write(t, got)
-	}
-	if diff := golden.Diff(t, got); diff != "" {
-		t.Errorf("registry.Write() mismatch (-want, +got):\n%s", diff)
-	}
-}
-
-func TestWrite_withHeader(t *testing.T) {
-	opts := []registry.Option{
-		registry.HeaderOption(strings.Split(`# proto-file: path/to/foo.proto
+	tests := []struct {
+		name   string
+		opts   []registry.Option
+		golden tests.GoldenFile
+	}{
+		{
+			name: "no header",
+			opts: []registry.Option{
+				registry.QuestionOption(newQuestion(t, 1, "one")),
+			},
+			golden: tests.GoldenFile("testdata/registry_one_question.txtpb"),
+		},
+		{
+			name: "with header",
+			opts: []registry.Option{
+				registry.HeaderOption(strings.Split(`# proto-file: path/to/foo.proto
 # proto-message: Foo`, "\n")),
-		registry.QuestionOption(newQuestion(t, 1, "one")),
+				registry.QuestionOption(newQuestion(t, 1, "one")),
+			},
+			golden: tests.GoldenFile("testdata/registry_one_question_with_header.txtpb"),
+		},
 	}
-	reg := mustCreateRegistry(t, opts...)
-	tmpfile := filepath.Join(t.TempDir(), "registry.txtpb")
-	cfg := &registry.Config{File: tmpfile}
-	golden := tests.GoldenFile("testdata/registry_one_question_with_header.txtpb")
+	for _, tc := range tests {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
+			reg := mustCreateRegistry(t, tc.opts...)
+			tmpfile := filepath.Join(t.TempDir(), "registry.txtpb")
+			cfg := &registry.Config{File: tmpfile}
 
-	err := registry.Write(reg, cfg)
+			err := registry.Write(reg, cfg)
 
-	if err != nil {
-		t.Fatalf("registry.Write() unexpected error: %v", err)
-	}
-	got := mustReadFile(t, tmpfile)
-	if *update {
-		golden.Write(t, got)
-	}
-	if diff := golden.Diff(t, got); diff != "" {
-		t.Errorf("registry.Write() mismatch (-want, +got):\n%s", diff)
+			if err != nil {
+				t.Fatalf("registry.Write() unexpected error: %v", err)
+			}
+			got := mustReadFile(t, tmpfile)
+			if *update {
+				tc.golden.Write(t, got)
+			}
+			if diff := tc.golden.Diff(t, got); diff != "" {
+				t.Errorf("registry.Write() mismatch (-want, +got):\n%s", diff)
+			}
+		})
 	}
 }
 
 func TestWrite_afterLoad(t *testing.T) {
-	reg := mustLoad(t, "testdata/registry_one_question.txtpb")
-	tmpfile := filepath.Join(t.TempDir(), "registry.txtpb")
-	cfg := &registry.Config{File: tmpfile}
-	golden := tests.GoldenFile("testdata/registry_one_question.txtpb")
-
-	err := registry.Write(reg, cfg)
-
-	if err != nil {
-		t.Fatalf("registry.Write(_, %v) unexpected error: %v", cfg, err)
+	tests := []struct {
+		name   string
+		file   string
+		golden tests.GoldenFile
+	}{
+		{
+			name:   "no header",
+			file:   "testdata/registry_one_question.txtpb",
+			golden: tests.GoldenFile("testdata/registry_one_question.txtpb"),
+		},
+		{
+			name:   "with header",
+			file:   "testdata/registry_one_question_with_header.txtpb",
+			golden: tests.GoldenFile("testdata/registry_one_question_with_header.txtpb"),
+		},
 	}
-	got := mustReadFile(t, tmpfile)
-	// do not update golden
-	if diff := golden.Diff(t, got); diff != "" {
-		t.Errorf("registry.Write() mismatch (-want, +got):\n%s", diff)
-	}
-}
+	for _, tc := range tests {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
+			reg := mustLoad(t, tc.file)
+			tmpfile := filepath.Join(t.TempDir(), "registry.txtpb")
+			cfg := &registry.Config{File: tmpfile}
 
-func TestWrite_afterLoadWithHeader(t *testing.T) {
-	reg := mustLoad(t, "testdata/registry_one_question_with_header.txtpb")
-	tmpfile := filepath.Join(t.TempDir(), "registry.txtpb")
-	cfg := &registry.Config{File: tmpfile}
-	golden := tests.GoldenFile("testdata/registry_one_question_with_header.txtpb")
+			err := registry.Write(reg, cfg)
 
-	err := registry.Write(reg, cfg)
-
-	if err != nil {
-		t.Fatalf("registry.Write(_, %v) unexpected error: %v", cfg, err)
-	}
-	got := mustReadFile(t, tmpfile)
-	// do not update golden
-	if diff := golden.Diff(t, got); diff != "" {
-		t.Errorf("registry.Write(_, %v) mismatch (-want, +got):\n%s", cfg, diff)
+			if err != nil {
+				t.Fatalf("registry.Write(_, %v) unexpected error: %v", cfg, err)
+			}
+			got := mustReadFile(t, tmpfile)
+			// do not update golden
+			if diff := tc.golden.Diff(t, got); diff != "" {
+				t.Errorf("registry.Write() mismatch (-want, +got):\n%s", diff)
+			}
+		})
 	}
 }
 
