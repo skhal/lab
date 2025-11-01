@@ -29,17 +29,6 @@ func TestDuplicateQuestionError_Is(t *testing.T) {
 	}
 }
 
-func newQuestion(t *testing.T, id int, desc string, tags ...string) *pb.Question {
-	t.Helper()
-	q := new(pb.Question)
-	q.SetId(int32(id))
-	q.SetDescription(desc)
-	if len(tags) != 0 {
-		q.SetTags(tags)
-	}
-	return q
-}
-
 func TestLoad(t *testing.T) {
 	cfg := &registry.Config{File: "questions.txtpb"}
 	_, err := registry.Load(cfg)
@@ -95,16 +84,6 @@ func TestWrite_withHeader(t *testing.T) {
 	if diff := golden.Diff(t, got); diff != "" {
 		t.Errorf("registry.Write() mismatch (-want, +got):\n%s", diff)
 	}
-}
-
-func mustLoad(t *testing.T, file string) *registry.R {
-	t.Helper()
-	cfg := &registry.Config{File: file}
-	reg, err := registry.Load(cfg)
-	if err != nil {
-		t.Fatalf("load %s: %v", file, err)
-	}
-	return reg
 }
 
 func TestWrite_afterLoad(t *testing.T) {
@@ -207,10 +186,7 @@ func TestRegistry_Get(t *testing.T) {
 	for _, tc := range tests {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
-			opts := []registry.Option{
-				registry.QuestionSetOption(tc.qq),
-			}
-			reg := mustCreateRegistry(t, opts...)
+			reg := mustCreateRegistry(t, registry.QuestionSetOption(tc.qq))
 
 			got := reg.Get(tc.id)
 
@@ -241,6 +217,17 @@ func TestRegistry_Visit_allOrderByID(t *testing.T) {
 	}
 }
 
+func newQuestion(t *testing.T, id int, desc string, tags ...string) *pb.Question {
+	t.Helper()
+	q := new(pb.Question)
+	q.SetId(int32(id))
+	q.SetDescription(desc)
+	if len(tags) != 0 {
+		q.SetTags(tags)
+	}
+	return q
+}
+
 func mustCreateRegistry(t *testing.T, opts ...registry.Option) *registry.R {
 	t.Helper()
 	reg, err := registry.With(opts...)
@@ -257,4 +244,14 @@ func mustReadFile(t *testing.T, file string) string {
 		t.Fatalf("read file %s: %v", file, err)
 	}
 	return string(data)
+}
+
+func mustLoad(t *testing.T, file string) *registry.R {
+	t.Helper()
+	cfg := &registry.Config{File: file}
+	reg, err := registry.Load(cfg)
+	if err != nil {
+		t.Fatalf("load %s: %v", file, err)
+	}
+	return reg
 }
