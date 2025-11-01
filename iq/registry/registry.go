@@ -40,7 +40,8 @@ type QuestionID int
 
 // R holds interview questions, keyed by the question ID.
 type R struct {
-	qset map[QuestionID]*pb.Question
+	qset   map[QuestionID]*pb.Question
+	lastid QuestionID
 }
 
 // Config holds registry configuration paramters, to be extracted from flags.
@@ -94,6 +95,9 @@ func (r *R) add(q *pb.Question) error {
 		return &ErrDuplicateQuestion{Has: got, New: q}
 	}
 	r.qset[id] = q
+	if id > r.lastid {
+		r.lastid = id
+	}
 	return nil
 }
 
