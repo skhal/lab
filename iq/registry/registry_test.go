@@ -30,7 +30,7 @@ func TestDuplicateQuestionError_Is(t *testing.T) {
 }
 
 func TestLoad(t *testing.T) {
-	cfg := &registry.Config{File: "questions.txtpb"}
+	cfg := &registry.Config{File: "testdata/registry_one_question.txtpb"}
 	_, err := registry.Load(cfg)
 
 	if err != nil {
