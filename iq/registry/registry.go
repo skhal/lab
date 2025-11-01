@@ -69,11 +69,11 @@ func Load(cfg *Config) (*R, error) {
 	if err != nil {
 		return nil, err
 	}
-	questionSet := new(pb.QuestionSet)
-	if err := prototext.Unmarshal(data, questionSet); err != nil {
+	qset := new(pb.QuestionSet)
+	if err := prototext.Unmarshal(data, qset); err != nil {
 		return nil, err
 	}
-	r, err := WithQuestions(questionSet.GetQuestions())
+	r, err := With(QuestionSetOption(qset.GetQuestions()))
 	if err != nil {
 		return nil, err
 	}
@@ -130,10 +130,6 @@ func write(header []string, data []byte, cfg *Config) error {
 	}
 	_, err = f.Write(data)
 	return err
-}
-
-func WithQuestions(qq []*pb.Question) (*R, error) {
-	return With(QuestionSetOption(qq))
 }
 
 // Option customizes registry.

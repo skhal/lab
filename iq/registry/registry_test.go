@@ -143,27 +143,27 @@ func TestWrite_afterLoadWithHeader(t *testing.T) {
 	}
 }
 
-func TestRegistry_WithQuestions_errorsOnDuplciates(t *testing.T) {
+func TestRegistry_With_errorsOnDuplciates(t *testing.T) {
 	hasQuestion := newQuestion(t, 1, "one")
 	dupQuestion := newQuestion(t, 1, "two")
-	qq := []*pb.Question{
-		hasQuestion,
-		dupQuestion,
+	opts := []registry.Option{
+		registry.QuestionOption(hasQuestion),
+		registry.QuestionOption(dupQuestion),
 	}
 
-	_, err := registry.WithQuestions(qq)
+	_, err := registry.With(opts...)
 
 	wantErr := &registry.DuplicateQuestionError{Has: hasQuestion, New: dupQuestion}
 	if diff := cmp.Diff(wantErr, err, protocmp.Transform()); diff != "" {
-		t.Errorf("registry.WithQuestions(%v) mismatch (-want, +got):\n%s", qq, diff)
+		t.Errorf("registry.WithQuestions() error mismatch (-want, +got):\n%s", diff)
 	}
 }
 
 func TestRegistry_CreateQuestion(t *testing.T) {
-	qq := []*pb.Question{
-		newQuestion(t, 1, "one"),
+	opts := []registry.Option{
+		registry.QuestionOption(newQuestion(t, 1, "one")),
 	}
-	reg, _ := registry.WithQuestions(qq)
+	reg := mustCreateRegistry(t, opts...)
 	desc := "test-description"
 	tags := []string{"tag-one", "tag-two"}
 
@@ -207,10 +207,10 @@ func TestRegistry_Get(t *testing.T) {
 	for _, tc := range tests {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
-			reg, err := registry.WithQuestions(tc.qq)
-			if err != nil {
-				t.Fatalf("registry.WithQuestions(%v) failed", tc.qq)
+			opts := []registry.Option{
+				registry.QuestionSetOption(tc.qq),
 			}
+			reg := mustCreateRegistry(t, opts...)
 
 			got := reg.Get(tc.id)
 
@@ -222,12 +222,12 @@ func TestRegistry_Get(t *testing.T) {
 }
 
 func TestRegistry_Visit_allOrderByID(t *testing.T) {
-	qq := []*pb.Question{
-		newQuestion(t, 2, "two"),
-		newQuestion(t, 1, "one"),
-		newQuestion(t, 3, "three"),
+	opts := []registry.Option{
+		registry.QuestionOption(newQuestion(t, 2, "two")),
+		registry.QuestionOption(newQuestion(t, 1, "one")),
+		registry.QuestionOption(newQuestion(t, 3, "three")),
 	}
-	reg, _ := registry.WithQuestions(qq)
+	reg := mustCreateRegistry(t, opts...)
 	var got []int
 	visitor := func(q *pb.Question) {
 		got = append(got, int(q.GetId()))
