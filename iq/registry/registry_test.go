@@ -22,11 +22,14 @@ func TestErrDuplicateQuestion_Is(t *testing.T) {
 	}
 }
 
-func newQuestion(t *testing.T, id int, desc string) *pb.Question {
+func newQuestion(t *testing.T, id int, desc string, tags ...string) *pb.Question {
 	t.Helper()
 	q := new(pb.Question)
 	q.SetId(int32(id))
 	q.SetDescription(desc)
+	if len(tags) != 0 {
+		q.SetTags(tags)
+	}
 	return q
 }
 
@@ -52,6 +55,28 @@ func TestRegistry_WithQuestions_errorsOnDuplciates(t *testing.T) {
 	wantErr := &registry.ErrDuplicateQuestion{Has: hasQuestion, New: dupQuestion}
 	if diff := cmp.Diff(wantErr, err, protocmp.Transform()); diff != "" {
 		t.Errorf("registry.WithQuestions(%v) mismatch (-want, +got):\n%s", qq, diff)
+	}
+}
+
+func TestRegistry_CreateQuestion(t *testing.T) {
+	qq := []*pb.Question{
+		newQuestion(t, 1, "one"),
+	}
+	reg, _ := registry.WithQuestions(qq)
+	desc := "test-description"
+	tags := []string{"tag-one", "tag-two"}
+
+	got, err := reg.CreateQuestion(desc, tags)
+
+	if err != nil {
+		t.Fatalf("registry.R.CreateQuestion(%s, %v) = _, %s; want no error", desc, tags, err)
+	}
+	want := newQuestion(t, 2, desc, tags...)
+	if diff := cmp.Diff(want, got, protocmp.Transform()); diff != "" {
+		t.Errorf("registry.R.CreateQuestion(%s, %v) mismatch (-want, +got):\n%s", desc, tags, diff)
+	}
+	if got, want := reg.Updated(), true; want != got {
+		t.Errorf("registry.R.Updated() = %v; want %v", got, want)
 	}
 }
 

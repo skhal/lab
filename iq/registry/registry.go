@@ -43,6 +43,8 @@ type QuestionID int
 type R struct {
 	qset   map[QuestionID]*pb.Question
 	lastid QuestionID
+
+	updated bool
 }
 
 // Config holds registry configuration paramters, to be extracted from flags.
@@ -100,6 +102,18 @@ func (r *R) sortedQuestions() iter.Seq[*pb.Question] {
 	}
 }
 
+func (r *R) CreateQuestion(desc string, tags []string) (*pb.Question, error) {
+	q := new(pb.Question)
+	q.SetId(int32(r.lastid + 1))
+	q.SetDescription(desc)
+	q.SetTags(tags)
+	if err := r.add(q); err != nil {
+		return nil, err
+	}
+	r.updated = true
+	return q, nil
+}
+
 func (r *R) add(q *pb.Question) error {
 	id := QuestionID(q.GetId())
 	if got, ok := r.qset[id]; ok {
@@ -116,6 +130,10 @@ func (r *R) add(q *pb.Question) error {
 // returns nil if the question does not exist.
 func (r *R) Get(qid QuestionID) *pb.Question {
 	return r.qset[qid]
+}
+
+func (r *R) Updated() bool {
+	return r.updated
 }
 
 type sortableQuestionIDs []QuestionID
