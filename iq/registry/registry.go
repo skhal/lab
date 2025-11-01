@@ -42,6 +42,16 @@ func (e *DuplicateQuestionError) Is(err error) bool {
 // QuestionID is the question unique identifier.
 type QuestionID int
 
+// Config holds registry configuration paramters, to be extracted from flags.
+type Config struct {
+	// File is the registry filename
+	File string
+}
+
+func (c *Config) RegisterFlags(fs *flag.FlagSet) {
+	fs.StringVar(&c.File, "file", "iq/registry/questions.txtpb", "questions list (txtpb)")
+}
+
 // R holds interview questions, keyed by the question ID.
 type R struct {
 	header []string
@@ -52,14 +62,49 @@ type R struct {
 	updated bool
 }
 
-// Config holds registry configuration paramters, to be extracted from flags.
-type Config struct {
-	// File is the registry filename
-	File string
+// Option customizes registry.
+type Option func(*R) error
+
+// QuestionOption adds a single question to the registry.
+func QuestionOption(q *pb.Question) Option {
+	return func(reg *R) error {
+		return reg.add(q)
+	}
 }
 
-func (c *Config) RegisterFlags(fs *flag.FlagSet) {
-	fs.StringVar(&c.File, "file", "iq/registry/questions.txtpb", "questions list (txtpb)")
+// QuestionSetOption adds multiple questions to the registry.
+func QuestionSetOption(qq []*pb.Question) Option {
+	return func(reg *R) error {
+		for _, q := range qq {
+			if err := reg.add(q); err != nil {
+				return err
+			}
+		}
+		return nil
+	}
+}
+
+// HeaderOption adds header to the registry. It returns an error if used
+// multiple times to avoid header overwrite.
+func HeaderOption(h []string) Option {
+	return func(reg *R) error {
+		if len(reg.header) != 0 {
+			return errors.New("header exists")
+		}
+		reg.header = h
+		return nil
+	}
+}
+
+// With builds a registry with options.
+func With(opts ...Option) (*R, error) {
+	r := &R{qset: make(map[QuestionID]*pb.Question)}
+	for _, opt := range opts {
+		if err := opt(r); err != nil {
+			return nil, err
+		}
+	}
+	return r, nil
 }
 
 // Load reads registry from the input file in Protobuf text format. It returns
@@ -130,51 +175,6 @@ func write(header []string, data []byte, cfg *Config) error {
 	}
 	_, err = f.Write(data)
 	return err
-}
-
-// Option customizes registry.
-type Option func(*R) error
-
-// QuestionOption adds a single question to the registry.
-func QuestionOption(q *pb.Question) Option {
-	return func(reg *R) error {
-		return reg.add(q)
-	}
-}
-
-// QuestionSetOption adds multiple questions to the registry.
-func QuestionSetOption(qq []*pb.Question) Option {
-	return func(reg *R) error {
-		for _, q := range qq {
-			if err := reg.add(q); err != nil {
-				return err
-			}
-		}
-		return nil
-	}
-}
-
-// HeaderOption adds header to the registry. It returns an error if used
-// multiple times to avoid header overwrite.
-func HeaderOption(h []string) Option {
-	return func(reg *R) error {
-		if len(reg.header) != 0 {
-			return errors.New("header exists")
-		}
-		reg.header = h
-		return nil
-	}
-}
-
-// With builds a registry with options.
-func With(opts ...Option) (*R, error) {
-	r := &R{qset: make(map[QuestionID]*pb.Question)}
-	for _, opt := range opts {
-		if err := opt(r); err != nil {
-			return nil, err
-		}
-	}
-	return r, nil
 }
 
 // Visit passes every question in the registry to the visitor v. The questions
