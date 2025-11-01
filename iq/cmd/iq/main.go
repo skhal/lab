@@ -59,5 +59,5 @@ func runCommand(reg *registry.R, name string, args []string) error {
 }
 
 func runInfo(reg *registry.R, args []string) error {
-	return info.Run(reg, args)
+	return info.Run(reg, args...)
 }

@@ -17,7 +17,7 @@ import (
 var ErrQuestionID = errors.New("invalid question id")
 
 // Run prints questions from the registry.
-func Run(reg *registry.R, args []string) error {
+func Run(reg *registry.R, args ...string) error {
 	printer := newPrinter(reg)
 	if len(args) == 0 {
 		return printer.PrintAll()
