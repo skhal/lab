@@ -17,12 +17,16 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/skhal/lab/iq/create"
 	"github.com/skhal/lab/iq/info"
 	"github.com/skhal/lab/iq/registry"
 )
 
 var commands = map[string]command{
-	"info": runInfo,
+	// keep-sorted start
+	"create": runCreate,
+	"info":   runInfo,
+	// keep-sorted end
 }
 
 type command func(reg *registry.R, args []string) error
@@ -47,7 +51,13 @@ func run(registryConfig *registry.Config, args []string) error {
 	}
 	cmdName := args[0]
 	cmdArgs := args[1:]
-	return runCommand(reg, cmdName, cmdArgs)
+	if err := runCommand(reg, cmdName, cmdArgs); err != nil {
+		return fmt.Errorf("%s: %v", cmdName, err)
+	}
+	if reg.Updated() {
+		return registry.Write(reg, registryConfig)
+	}
+	return nil
 }
 
 func runCommand(reg *registry.R, name string, args []string) error {
@@ -56,6 +66,16 @@ func runCommand(reg *registry.R, name string, args []string) error {
 		return fmt.Errorf("invalid command -- %s", name)
 	}
 	return cmd(reg, args)
+}
+
+func runCreate(reg *registry.R, args []string) error {
+	fs := flag.NewFlagSet("iq create", flag.ContinueOnError)
+	cfg := new(create.Config)
+	cfg.RegisterFlags(fs)
+	if err := fs.Parse(args); err != nil {
+		return err
+	}
+	return create.Run(cfg, reg)
 }
 
 func runInfo(reg *registry.R, args []string) error {
