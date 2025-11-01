@@ -4,9 +4,11 @@ package tests
 
 import (
 	"os"
+	"strings"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
+	"github.com/google/go-cmp/cmp/cmpopts"
 )
 
 const newFileMode = 0644
@@ -22,7 +24,10 @@ func (f GoldenFile) Diff(t *testing.T, buf string) string {
 	if err != nil {
 		t.Fatalf("golden file %s: read: %v", f, err)
 	}
-	return cmp.Diff(string(data), buf)
+	splitStrings := cmpopts.AcyclicTransformer("SplitString", func(s string) []string {
+		return strings.Split(s, "\n")
+	})
+	return cmp.Diff(string(data), buf, splitStrings)
 }
 
 // Write updates contents of the golden file with data. It fails the test if it
