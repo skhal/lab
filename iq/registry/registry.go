@@ -6,6 +6,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"iter"
 	"maps"
 	"os"
 	"slices"
@@ -81,11 +82,21 @@ func WithQuestions(qq []*pb.Question) (*R, error) {
 // Visit passes every question in the registry to the visitor v. The questions
 // are ordered by identifiers.
 func (r *R) Visit(v func(*pb.Question)) {
-	sortedIDs := sortableQuestionIDs(slices.Collect(maps.Keys(r.qset)))
-	sort.Sort(sortedIDs)
-	for _, qid := range sortedIDs {
-		q := r.qset[qid]
+	for q := range r.sortedQuestions() {
 		v(q)
+	}
+}
+
+func (r *R) sortedQuestions() iter.Seq[*pb.Question] {
+	return func(yield func(*pb.Question) bool) {
+		sortedIDs := sortableQuestionIDs(slices.Collect(maps.Keys(r.qset)))
+		sort.Sort(sortedIDs)
+		for _, id := range sortedIDs {
+			q := r.qset[id]
+			if !yield(q) {
+				break
+			}
+		}
 	}
 }
 
