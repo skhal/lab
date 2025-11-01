@@ -19,8 +19,8 @@ import (
 
 var update = flag.Bool("update", false, "update golden files")
 
-func TestErrDuplicateQuestion_Is(t *testing.T) {
-	err := new(registry.ErrDuplicateQuestion)
+func TestDuplicateQuestionError_Is(t *testing.T) {
+	err := new(registry.DuplicateQuestionError)
 
 	got := errors.Is(err, registry.ErrRegistry)
 
@@ -153,7 +153,7 @@ func TestRegistry_WithQuestions_errorsOnDuplciates(t *testing.T) {
 
 	_, err := registry.WithQuestions(qq)
 
-	wantErr := &registry.ErrDuplicateQuestion{Has: hasQuestion, New: dupQuestion}
+	wantErr := &registry.DuplicateQuestionError{Has: hasQuestion, New: dupQuestion}
 	if diff := cmp.Diff(wantErr, err, protocmp.Transform()); diff != "" {
 		t.Errorf("registry.WithQuestions(%v) mismatch (-want, +got):\n%s", qq, diff)
 	}

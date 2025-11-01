@@ -22,20 +22,20 @@ import (
 // ErrRegistry is a catch all error in the registry.
 var ErrRegistry = errors.New("registry error")
 
-// ErrDuplicateQuestion indicates an error in a given question.
-type ErrDuplicateQuestion struct {
+// DuplicateQuestionError indicates an error in a given question.
+type DuplicateQuestionError struct {
 	Has *pb.Question
 	New *pb.Question
 }
 
 // Error prints the question information.
-func (e *ErrDuplicateQuestion) Error() string {
+func (e *DuplicateQuestionError) Error() string {
 	qhas := e.Has
 	qnew := e.New
 	return fmt.Sprintf("%s: duplicate question %d: has %q, new %q", ErrRegistry, qhas.GetId(), qhas.GetDescription(), qnew.GetDescription())
 }
 
-func (e *ErrDuplicateQuestion) Is(err error) bool {
+func (e *DuplicateQuestionError) Is(err error) bool {
 	return err == ErrRegistry
 }
 
@@ -217,7 +217,7 @@ func (r *R) CreateQuestion(desc string, tags []string) (*pb.Question, error) {
 func (r *R) add(q *pb.Question) error {
 	id := QuestionID(q.GetId())
 	if got, ok := r.qset[id]; ok {
-		return &ErrDuplicateQuestion{Has: got, New: q}
+		return &DuplicateQuestionError{Has: got, New: q}
 	}
 	r.qset[id] = q
 	if id > r.lastid {
