@@ -33,7 +33,7 @@ func newQuestion(t *testing.T, id int, desc string, tags ...string) *pb.Question
 	return q
 }
 
-func TestRegistry_Load(t *testing.T) {
+func TestLoad(t *testing.T) {
 	cfg := &registry.Config{File: "questions.txtpb"}
 	_, err := registry.Load(cfg)
 
