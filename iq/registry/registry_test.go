@@ -4,13 +4,20 @@ package registry_test
 
 import (
 	"errors"
+	"flag"
+	"os"
+	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
+	"github.com/skhal/lab/go/tests"
 	"github.com/skhal/lab/iq/pb"
 	"github.com/skhal/lab/iq/registry"
 	"google.golang.org/protobuf/testing/protocmp"
 )
+
+var update = flag.Bool("update", false, "update golden files")
 
 func TestErrDuplicateQuestion_Is(t *testing.T) {
 	err := new(registry.ErrDuplicateQuestion)
@@ -39,6 +46,100 @@ func TestLoad(t *testing.T) {
 
 	if err != nil {
 		t.Errorf("registry.Load(%v) = _, %s; want no error", cfg, err)
+	}
+}
+
+func TestWrite(t *testing.T) {
+	opts := []registry.Option{
+		registry.QuestionOption(newQuestion(t, 1, "one")),
+	}
+	reg := mustCreateRegistry(t, opts...)
+	tmpfile := filepath.Join(t.TempDir(), "registry.txtpb")
+	cfg := &registry.Config{File: tmpfile}
+	golden := tests.GoldenFile("testdata/registry_one_question.txtpb")
+
+	err := registry.Write(reg, cfg)
+
+	if err != nil {
+		t.Fatalf("registry.Write() unexpected error: %v", err)
+	}
+	got := mustReadFile(t, tmpfile)
+	if *update {
+		golden.Write(t, got)
+	}
+	if diff := golden.Diff(t, got); diff != "" {
+		t.Errorf("registry.Write() mismatch (-want, +got):\n%s", diff)
+	}
+}
+
+func TestWrite_withHeader(t *testing.T) {
+	opts := []registry.Option{
+		registry.HeaderOption(strings.Split(`# proto-file: path/to/foo.proto
+# proto-message: Foo`, "\n")),
+		registry.QuestionOption(newQuestion(t, 1, "one")),
+	}
+	reg := mustCreateRegistry(t, opts...)
+	tmpfile := filepath.Join(t.TempDir(), "registry.txtpb")
+	cfg := &registry.Config{File: tmpfile}
+	golden := tests.GoldenFile("testdata/registry_one_question_with_header.txtpb")
+
+	err := registry.Write(reg, cfg)
+
+	if err != nil {
+		t.Fatalf("registry.Write() unexpected error: %v", err)
+	}
+	got := mustReadFile(t, tmpfile)
+	if *update {
+		golden.Write(t, got)
+	}
+	if diff := golden.Diff(t, got); diff != "" {
+		t.Errorf("registry.Write() mismatch (-want, +got):\n%s", diff)
+	}
+}
+
+func mustLoad(t *testing.T, file string) *registry.R {
+	t.Helper()
+	cfg := &registry.Config{File: file}
+	reg, err := registry.Load(cfg)
+	if err != nil {
+		t.Fatalf("load %s: %v", file, err)
+	}
+	return reg
+}
+
+func TestWrite_afterLoad(t *testing.T) {
+	reg := mustLoad(t, "testdata/registry_one_question.txtpb")
+	tmpfile := filepath.Join(t.TempDir(), "registry.txtpb")
+	cfg := &registry.Config{File: tmpfile}
+	golden := tests.GoldenFile("testdata/registry_one_question.txtpb")
+
+	err := registry.Write(reg, cfg)
+
+	if err != nil {
+		t.Fatalf("registry.Write(_, %v) unexpected error: %v", cfg, err)
+	}
+	got := mustReadFile(t, tmpfile)
+	// do not update golden
+	if diff := golden.Diff(t, got); diff != "" {
+		t.Errorf("registry.Write() mismatch (-want, +got):\n%s", diff)
+	}
+}
+
+func TestWrite_afterLoadWithHeader(t *testing.T) {
+	reg := mustLoad(t, "testdata/registry_one_question_with_header.txtpb")
+	tmpfile := filepath.Join(t.TempDir(), "registry.txtpb")
+	cfg := &registry.Config{File: tmpfile}
+	golden := tests.GoldenFile("testdata/registry_one_question_with_header.txtpb")
+
+	err := registry.Write(reg, cfg)
+
+	if err != nil {
+		t.Fatalf("registry.Write(_, %v) unexpected error: %v", cfg, err)
+	}
+	got := mustReadFile(t, tmpfile)
+	// do not update golden
+	if diff := golden.Diff(t, got); diff != "" {
+		t.Errorf("registry.Write(_, %v) mismatch (-want, +got):\n%s", cfg, diff)
 	}
 }
 
@@ -138,4 +239,22 @@ func TestRegistry_Visit_allOrderByID(t *testing.T) {
 	if diff := cmp.Diff(want, got); diff != "" {
 		t.Errorf("registry.R.Visit() mismatch (-want, +got):\n%s", diff)
 	}
+}
+
+func mustCreateRegistry(t *testing.T, opts ...registry.Option) *registry.R {
+	t.Helper()
+	reg, err := registry.With(opts...)
+	if err != nil {
+		t.Fatalf("registry.With() unexpected error: %v", err)
+	}
+	return reg
+}
+
+func mustReadFile(t *testing.T, file string) string {
+	t.Helper()
+	data, err := os.ReadFile(file)
+	if err != nil {
+		t.Fatalf("read file %s: %v", file, err)
+	}
+	return string(data)
 }
