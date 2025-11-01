@@ -68,18 +68,13 @@ func Load(cfg *Config) (*R, error) {
 }
 
 func WithQuestions(qq []*pb.Question) (*R, error) {
-	qset := make(map[QuestionID]*pb.Question)
+	r := &R{qset: make(map[QuestionID]*pb.Question)}
 	for _, q := range qq {
-		qid := QuestionID(q.GetId())
-		if got, ok := qset[qid]; ok {
-			return nil, &ErrDuplicateQuestion{Has: got, New: q}
+		if err := r.add(q); err != nil {
+			return nil, err
 		}
-		qset[qid] = q
 	}
-	reg := &R{
-		qset: qset,
-	}
-	return reg, nil
+	return r, nil
 }
 
 // Visit passes every question in the registry to the visitor v. The questions
@@ -91,6 +86,15 @@ func (r *R) Visit(v func(*pb.Question)) {
 		q := r.qset[qid]
 		v(q)
 	}
+}
+
+func (r *R) add(q *pb.Question) error {
+	id := QuestionID(q.GetId())
+	if got, ok := r.qset[id]; ok {
+		return &ErrDuplicateQuestion{Has: got, New: q}
+	}
+	r.qset[id] = q
+	return nil
 }
 
 // Get retrieves the question with a given identifier form the registry. It
