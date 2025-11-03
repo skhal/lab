@@ -17,8 +17,8 @@ type Config struct {
 }
 
 func (cfg *Config) RegisterFlags(fs *flag.FlagSet) {
-	fs.StringVar(&cfg.Description, "description", "", "one-line description")
-	fs.Var(&cfg.Tags, "tag", "list of tags")
+	fs.StringVar(&cfg.Description, "d", "", "one-line description")
+	fs.Var(&cfg.Tags, "t", "list of tags")
 }
 
 func Run(cfg *Config, reg *registry.R) error {

@@ -49,7 +49,7 @@ type Config struct {
 }
 
 func (c *Config) RegisterFlags(fs *flag.FlagSet) {
-	fs.StringVar(&c.File, "file", "iq/registry/questions.txtpb", "questions list (txtpb)")
+	fs.StringVar(&c.File, "f", "iq/registry/questions.txtpb", "questions list (txtpb)")
 }
 
 // R holds interview questions, keyed by the question ID.
