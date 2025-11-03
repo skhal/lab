@@ -13,6 +13,7 @@ package main
 
 import (
 	"bytes"
+	"errors"
 	"flag"
 	"fmt"
 	"os"
@@ -44,7 +45,7 @@ func init() {
 	flag.Usage = func() {
 		header := func() string {
 			buf := new(bytes.Buffer)
-			fmt.Fprintf(buf, "Usage: %s [-f <file>] <command> [<args>]\n", os.Args[0])
+			fmt.Fprintf(buf, "Usage: %s [-f <file>] <command> [<args>]\n", flag.CommandLine.Name())
 			fmt.Fprintln(buf)
 			fmt.Fprintln(buf, "Commands:")
 			for name, cmd := range commands {
@@ -103,9 +104,22 @@ func runCommand(reg *registry.R, name string, args []string) error {
 
 func runCreate(reg *registry.R, args []string) error {
 	fs := flag.NewFlagSet("iq create", flag.ContinueOnError)
+	fs.Usage = func() {
+		header := func() string {
+			buf := new(bytes.Buffer)
+			fmt.Fprintf(buf, "Usage: %s <args>\n", fs.Name())
+			fmt.Fprintln(buf)
+			fmt.Fprintln(buf, "Arguments:")
+			return buf.String()
+		}
+		fmt.Fprint(fs.Output(), header())
+		fs.PrintDefaults()
+	}
 	cfg := new(create.Config)
 	cfg.RegisterFlags(fs)
-	if err := fs.Parse(args); err != nil {
+	if err := fs.Parse(args); errors.Is(err, flag.ErrHelp) {
+		return nil
+	} else if err != nil {
 		return err
 	}
 	return create.Run(cfg, reg)
