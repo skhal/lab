@@ -148,7 +148,8 @@ func Write(r *R, cfg *Config) error {
 	if err != nil {
 		return err
 	}
-	return write(r.header, data, cfg)
+	buf := format(r.header, data)
+	return write(buf, cfg)
 }
 
 func marshal(r *R) ([]byte, error) {
@@ -156,23 +157,28 @@ func marshal(r *R) ([]byte, error) {
 	qset.SetQuestions(slices.Collect(r.sortedQuestions()))
 	opts := prototext.MarshalOptions{
 		Multiline: true,
-		Indent:    "  ",
 	}
 	return opts.Marshal(qset)
 }
 
-func write(header []string, data []byte, cfg *Config) error {
+func format(header []string, data []byte) []byte {
+	buf := new(bytes.Buffer)
+	if len(header) != 0 {
+		for _, h := range header {
+			fmt.Fprintln(buf, h)
+		}
+		fmt.Fprintln(buf)
+	}
+	buf.Write(data)
+	return buf.Bytes()
+}
+
+func write(data []byte, cfg *Config) error {
 	f, err := os.OpenFile(cfg.File, os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		return err
 	}
 	defer f.Close()
-	if len(header) != 0 {
-		for _, h := range header {
-			fmt.Fprintln(f, h)
-		}
-		fmt.Fprintln(f)
-	}
 	_, err = f.Write(data)
 	return err
 }
