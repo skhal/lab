@@ -7,7 +7,6 @@ import (
 	"flag"
 	"os"
 	"path/filepath"
-	"strings"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -54,8 +53,8 @@ func TestWrite(t *testing.T) {
 		{
 			name: "with header",
 			opts: []registry.Option{
-				registry.HeaderOption(strings.Split(`# proto-file: path/to/foo.proto
-# proto-message: Foo`, "\n")),
+				registry.HeaderOption(`# proto-file: path/to/foo.proto
+# proto-message: Foo`),
 				registry.QuestionOption(newQuestion(t, 1, "one")),
 			},
 			golden: tests.GoldenFile("testdata/registry_one_question_with_header.txtpb"),

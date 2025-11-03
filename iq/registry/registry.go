@@ -3,7 +3,6 @@
 package registry
 
 import (
-	"bufio"
 	"bytes"
 	"errors"
 	"flag"
@@ -55,7 +54,7 @@ func (c *Config) RegisterFlags(fs *flag.FlagSet) {
 
 // R holds interview questions, keyed by the question ID.
 type R struct {
-	header []string
+	header []byte
 	qset   map[QuestionID]*pb.Question
 
 	lastid QuestionID
@@ -87,12 +86,13 @@ func QuestionSetOption(qq []*pb.Question) Option {
 
 // HeaderOption adds header to the registry. It returns an error if used
 // multiple times to avoid header overwrite.
-func HeaderOption(h []string) Option {
+func HeaderOption(h string) Option {
 	return func(reg *R) error {
 		if len(reg.header) != 0 {
 			return errors.New("header exists")
 		}
-		reg.header = h
+		h = strings.TrimSpace(h)
+		reg.header = []byte(h)
 		return nil
 	}
 }
@@ -129,18 +129,16 @@ func Load(cfg *Config) (*R, error) {
 	return r, nil
 }
 
-func extractHeader(data []byte) []string {
-	var header []string
-	buf := bytes.NewBuffer(data)
-	scanner := bufio.NewScanner(buf)
-	for scanner.Scan() {
-		line := scanner.Text()
-		if !strings.HasPrefix(line, "#") {
+func extractHeader(data []byte) []byte {
+	var prefix = []byte("#")
+	buf := new(bytes.Buffer)
+	for line := range bytes.Lines(data) {
+		if !bytes.HasPrefix(line, prefix) {
 			break
 		}
-		header = append(header, line)
+		buf.Write(line)
 	}
-	return header
+	return bytes.TrimSpace(buf.Bytes())
 }
 
 // Write stores registry in the file in Protobu text format.
@@ -165,13 +163,13 @@ func marshal(r *R) ([]byte, error) {
 	return opts.Marshal(qset)
 }
 
-func format(header []string, data []byte) ([]byte, error) {
+func format(header []byte, data []byte) ([]byte, error) {
+	const eol = '\n'
 	buf := new(bytes.Buffer)
 	if len(header) != 0 {
-		for _, h := range header {
-			fmt.Fprintln(buf, h)
-		}
-		fmt.Fprintln(buf)
+		buf.Write(header)
+		buf.WriteByte(eol) // end of header
+		buf.WriteByte(eol) // header / body separator
 	}
 	buf.Write(data)
 	data, err := parser.FormatWithConfig(buf.Bytes(), parser.Config{
