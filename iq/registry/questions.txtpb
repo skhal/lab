@@ -165,3 +165,8 @@ questions {
   description: "local maxima"
   tags: "binary-search"
 }
+questions {
+  id: 33
+  description: "weighted random number"
+  tags: "binary-search"
+}
