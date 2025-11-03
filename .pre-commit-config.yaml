@@ -78,6 +78,7 @@ repos:
     language: system
     types: [textproto]
     exclude: "testdata"
+    args: ["-skip_all_colons"]
   - id: yaml-format
     name: yaml-format
     entry: yamlfmt
