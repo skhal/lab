@@ -160,3 +160,8 @@ questions {
   description: "matrix search"
   tags: "binary search"
 }
+questions {
+  id: 32
+  description: "local maxima"
+  tags: "binary-search"
+}
