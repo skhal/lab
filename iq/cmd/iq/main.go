@@ -12,7 +12,7 @@ Without arguments, iq dumps a list of questions, sorted by ID.
 package main
 
 import (
-	"errors"
+	"bytes"
 	"flag"
 	"fmt"
 	"os"
@@ -23,18 +23,54 @@ import (
 )
 
 var commands = map[string]command{
-	// keep-sorted start
-	"create": runCreate,
-	"info":   runInfo,
+	// keep-sorted start block=yes
+	"create": {
+		Desc: "create a question",
+		Run:  runCreate,
+	},
+	"info": {
+		Desc: "display information for questions",
+		Run:  runInfo,
+	},
 	// keep-sorted end
 }
 
-type command func(reg *registry.R, args []string) error
+type command struct {
+	Desc string
+	Run  func(reg *registry.R, args []string) error
+}
+
+func init() {
+	flag.Usage = func() {
+		header := func() string {
+			buf := new(bytes.Buffer)
+			fmt.Fprintf(buf, "Usage: %s [-f <file>] <command> [<args>]\n", os.Args[0])
+			fmt.Fprintln(buf)
+			fmt.Fprintln(buf, "Commands:")
+			for name, cmd := range commands {
+				fmt.Fprintf(buf, "  %-10s%s\n", name, cmd.Desc)
+			}
+			fmt.Fprintln(buf)
+			fmt.Fprintln(buf, "Common flags:")
+			return buf.String()
+		}
+		fmt.Fprint(flag.CommandLine.Output(), header())
+		flag.PrintDefaults()
+	}
+}
+
+func parseFlags() {
+	flag.Parse()
+	if args := flag.Args(); len(args) == 0 {
+		flag.Usage()
+		os.Exit(1)
+	}
+}
 
 func main() {
 	registryConfig := new(registry.Config)
 	registryConfig.RegisterFlags(flag.CommandLine)
-	flag.Parse()
+	parseFlags()
 	if err := run(registryConfig, flag.Args()); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
@@ -42,9 +78,6 @@ func main() {
 }
 
 func run(registryConfig *registry.Config, args []string) error {
-	if len(args) == 0 {
-		return errors.New("missing command")
-	}
 	reg, err := registry.Load(registryConfig)
 	if err != nil {
 		return err
@@ -65,7 +98,7 @@ func runCommand(reg *registry.R, name string, args []string) error {
 	if !ok {
 		return fmt.Errorf("invalid command -- %s", name)
 	}
-	return cmd(reg, args)
+	return cmd.Run(reg, args)
 }
 
 func runCreate(reg *registry.R, args []string) error {
