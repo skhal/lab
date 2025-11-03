@@ -15,6 +15,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/protocolbuffers/txtpbfmt/parser"
 	"github.com/skhal/lab/iq/pb"
 	"google.golang.org/protobuf/encoding/prototext"
 )
@@ -148,7 +149,10 @@ func Write(r *R, cfg *Config) error {
 	if err != nil {
 		return err
 	}
-	buf := format(r.header, data)
+	buf, err := format(r.header, data)
+	if err != nil {
+		return err
+	}
 	return write(buf, cfg)
 }
 
@@ -161,7 +165,7 @@ func marshal(r *R) ([]byte, error) {
 	return opts.Marshal(qset)
 }
 
-func format(header []string, data []byte) []byte {
+func format(header []string, data []byte) ([]byte, error) {
 	buf := new(bytes.Buffer)
 	if len(header) != 0 {
 		for _, h := range header {
@@ -170,7 +174,13 @@ func format(header []string, data []byte) []byte {
 		fmt.Fprintln(buf)
 	}
 	buf.Write(data)
-	return buf.Bytes()
+	data, err := parser.FormatWithConfig(buf.Bytes(), parser.Config{
+		SkipAllColons: true,
+	})
+	if err != nil {
+		return nil, errors.Join(ErrRegistry, err)
+	}
+	return data, nil
 }
 
 func write(data []byte, cfg *Config) error {

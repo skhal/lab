@@ -1,7 +1,7 @@
 # proto-file: path/to/foo.proto
 # proto-message: Foo
 
-questions:  {
-  id:  1
-  description:  "one"
+questions {
+  id: 1
+  description: "one"
 }
