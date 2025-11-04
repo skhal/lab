@@ -1,6 +1,9 @@
 // Copyright 2025 Samvel Khalatyan. All rights reserved.
 //
+// clang-format off-next-line
 //go:build ignore
+
+#include "iq/3/palindrome/solution.h"
 
 #include <algorithm>
 #include <cctype>
@@ -9,9 +12,8 @@
 #include <string>
 
 #include "gtest/gtest.h"
-#include "iq/twopointer/palindrome/solution.h"
 
-namespace iq::twopointer::palindrome {
+namespace iq::palindrome {
 namespace {
 
 using ::testing::TestParamInfo;
@@ -40,7 +42,7 @@ TEST_P(IsTest, pass) {
   ASSERT_EQ(got, tp.want);
 }
 
-const IsTestParam kIsTestParams[] {
+const IsTestParam kIsTestParams[]{
     {.name = "empty", .s = "", .want = true},
     {.name = "one letter", .s = "a", .want = true},
     {.name = "one digit", .s = "1", .want = true},
@@ -66,4 +68,4 @@ INSTANTIATE_TEST_SUITE_P(IsTest, IsTest, ValuesIn(kIsTestParams),
                          });
 
 }  // namespace
-}  // namespace iq::twopointer::palindrome
+}  // namespace iq::palindrome

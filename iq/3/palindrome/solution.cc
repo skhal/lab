@@ -1,13 +1,14 @@
 // Copyright 2025 Samvel Khalatyan. All rights reserved.
 //
+// clang-format off-next-line
 //go:build ignore
+
+#include "iq/3/palindrome/solution.h"
 
 #include <cctype>
 #include <string_view>
 
-#include "iq/twopointer/palindrome/solution.h"
-
-namespace iq::twopointer::palindrome {
+namespace iq::palindrome {
 namespace {
 
 constexpr int kSizeMin = 1;
@@ -32,4 +33,4 @@ bool Is(std::string_view s) {
   return true;
 }
 
-}  // namespace iq::twopointer::palindrome
+}  // namespace iq::palindrome
