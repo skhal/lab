@@ -7,13 +7,17 @@ on:
     branches: ["main"]
     paths:
     # keep-sorted start
-    - 'iq/**'
+    - 'iq/**/*.cc'
+    - 'iq/**/*.h'
+    - 'iq/**/BUILD'
     # keep-sorted end
   pull_request:
     branches: ["main"]
     paths:
     # keep-sorted start
-    - 'iq/**'
+    - 'iq/**/*.cc'
+    - 'iq/**/*.h'
+    - 'iq/**/BUILD'
     # keep-sorted end
 
 jobs:
