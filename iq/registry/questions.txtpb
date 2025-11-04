@@ -170,3 +170,8 @@ questions {
   description: "weighted random number"
   tags: "binary-search"
 }
+questions {
+  id: 34
+  description: "validate parenthesis expression"
+  tags: "stack"
+}
