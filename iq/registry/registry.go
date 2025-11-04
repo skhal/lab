@@ -145,11 +145,13 @@ func Write(r *R, cfg *Config) error {
 	if err != nil {
 		return err
 	}
-	buf, err := format(r.header, data)
+	data, err = parser.FormatWithConfig(data, parser.Config{
+		SkipAllColons: true,
+	})
 	if err != nil {
-		return err
+		return errors.Join(ErrRegistry, err)
 	}
-	return write(buf, cfg)
+	return write(data, cfg)
 }
 
 func marshal(r *R) ([]byte, error) {
@@ -158,25 +160,19 @@ func marshal(r *R) ([]byte, error) {
 	opts := prototext.MarshalOptions{
 		Multiline: true,
 	}
-	return opts.Marshal(qset)
-}
-
-func format(header []byte, data []byte) ([]byte, error) {
+	data, err := opts.Marshal(qset)
+	if err != nil {
+		return nil, err
+	}
 	const eol = '\n'
 	buf := new(bytes.Buffer)
-	if len(header) != 0 {
-		buf.Write(header)
+	if len(r.header) != 0 {
+		buf.Write(r.header)
 		buf.WriteByte(eol) // end of header
 		buf.WriteByte(eol) // header / body separator
 	}
 	buf.Write(data)
-	data, err := parser.FormatWithConfig(buf.Bytes(), parser.Config{
-		SkipAllColons: true,
-	})
-	if err != nil {
-		return nil, errors.Join(ErrRegistry, err)
-	}
-	return data, nil
+	return buf.Bytes(), nil
 }
 
 func write(data []byte, cfg *Config) error {
