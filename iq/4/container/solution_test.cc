@@ -1,15 +1,17 @@
 // Copyright 2025 Samvel Khalatyan. All rights reserved.
 //
+// clang-format off-next-line
 //go:build ignore
+
+#include "iq/4/container/solution.h"
 
 #include <algorithm>
 #include <string>
 #include <vector>
 
 #include "gtest/gtest.h"
-#include "iq/twopointer/container/solution.h"
 
-namespace iq::twopointer::container {
+namespace iq::container {
 namespace {
 
 using ::testing::TestParamInfo;
@@ -60,4 +62,4 @@ INSTANTIATE_TEST_SUITE_P(FindTest, FindTest, ValuesIn(kTestParams),
                          });
 
 }  // namespace
-}  // namespace iq::twopointer::container
+}  // namespace iq::container

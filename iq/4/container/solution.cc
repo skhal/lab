@@ -1,12 +1,13 @@
 // Copyright 2025 Samvel Khalatyan. All rights reserved.
 //
+// clang-format off-next-line
 //go:build ignore
+
+#include "iq/4/container/solution.h"
 
 #include <algorithm>
 
-#include "iq/twopointer/container/solution.h"
-
-namespace iq::twopointer::container {
+namespace iq::container {
 namespace {
 
 constexpr Volume kVolumeEmpty = Volume{0};
@@ -44,4 +45,4 @@ Volume Find(const std::vector<int>& nn) {
   return vol_max;
 }
 
-}  // namespace iq::twopointer::container
+}  // namespace iq::container

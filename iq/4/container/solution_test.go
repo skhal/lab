@@ -5,7 +5,7 @@ package container_test
 import (
 	"testing"
 
-	"github.com/skhal/lab/iq/twopointer/container"
+	"github.com/skhal/lab/iq/4/container"
 )
 
 func TestFind(t *testing.T) {
