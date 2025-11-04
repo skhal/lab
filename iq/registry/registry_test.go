@@ -10,6 +10,7 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
+	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/skhal/lab/go/tests"
 	"github.com/skhal/lab/iq/pb"
 	"github.com/skhal/lab/iq/registry"
@@ -191,6 +192,60 @@ func TestRegistry_Get(t *testing.T) {
 
 			if diff := cmp.Diff(tc.want, got, protocmp.Transform()); diff != "" {
 				t.Errorf("registry.Get(%d) mismatch (-want, +got):\n%s", tc.id, diff)
+			}
+		})
+	}
+}
+
+func TestRegistry_GetTag(t *testing.T) {
+	tests := []struct {
+		name string
+		qq   []*pb.Question
+		tag  registry.Tag
+		want []*pb.Question
+	}{
+		{
+			name: "empty",
+			tag:  registry.Tag("foo"),
+		},
+		{
+			name: "hit",
+			qq:   []*pb.Question{newQuestion(t, 1, "one", "foo")},
+			tag:  registry.Tag("foo"),
+			want: []*pb.Question{newQuestion(t, 1, "one", "foo")},
+		},
+		{
+			name: "hit several",
+			qq: []*pb.Question{
+				newQuestion(t, 1, "one", "foo"),
+				newQuestion(t, 2, "two", "bar"),
+				newQuestion(t, 3, "three", "foo"),
+			},
+			tag: registry.Tag("foo"),
+			want: []*pb.Question{
+				newQuestion(t, 1, "one", "foo"),
+				newQuestion(t, 3, "three", "foo"),
+			},
+		},
+		{
+			name: "miss",
+			qq:   []*pb.Question{newQuestion(t, 1, "one", "foo")},
+			tag:  registry.Tag("bar"),
+		},
+	}
+	for _, tc := range tests {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
+			reg := mustCreateRegistry(t, registry.QuestionSetOption(tc.qq))
+
+			got := reg.GetTag(tc.tag)
+
+			opts := []cmp.Option{
+				protocmp.Transform(),
+				cmpopts.EquateEmpty(),
+			}
+			if diff := cmp.Diff(tc.want, got, opts...); diff != "" {
+				t.Errorf("registry.GetTag(%s) mismatch (-want, +got):\n%s", tc.tag, diff)
 			}
 		})
 	}

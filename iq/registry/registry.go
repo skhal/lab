@@ -38,9 +38,6 @@ func (e *DuplicateQuestionError) Is(err error) bool {
 	return err == ErrRegistry
 }
 
-// QuestionID is the question unique identifier.
-type QuestionID int
-
 // Config holds registry configuration paramters, to be extracted from flags.
 type Config struct {
 	// File is the registry filename
@@ -51,13 +48,23 @@ func (c *Config) RegisterFlags(fs *flag.FlagSet) {
 	fs.StringVar(&c.File, "f", "iq/registry/questions.txtpb", "questions list")
 }
 
+// QuestionID is the question unique identifier.
+type QuestionID int
+
+// Tag is the question tag.
+type Tag string
+
+type index struct {
+	byid  map[QuestionID]*pb.Question
+	bytag map[Tag][]*pb.Question
+}
+
 // R holds interview questions, keyed by the question ID.
 type R struct {
 	header []byte
-	qset   map[QuestionID]*pb.Question
+	index  index
 
-	lastid QuestionID
-
+	lastid  QuestionID
 	updated bool
 }
 
@@ -98,7 +105,12 @@ func HeaderOption(data []byte) Option {
 
 // With builds a registry with options.
 func With(opts ...Option) (*R, error) {
-	r := &R{qset: make(map[QuestionID]*pb.Question)}
+	r := &R{
+		index: index{
+			byid:  make(map[QuestionID]*pb.Question),
+			bytag: make(map[Tag][]*pb.Question),
+		},
+	}
 	for _, opt := range opts {
 		if err := opt(r); err != nil {
 			return nil, err
@@ -195,10 +207,10 @@ func (r *R) Visit(v func(*pb.Question)) {
 
 func (r *R) sortedQuestions() iter.Seq[*pb.Question] {
 	return func(yield func(*pb.Question) bool) {
-		sortedIDs := sortableQuestionIDs(slices.Collect(maps.Keys(r.qset)))
+		sortedIDs := sortableQuestionIDs(slices.Collect(maps.Keys(r.index.byid)))
 		sort.Sort(sortedIDs)
 		for _, id := range sortedIDs {
-			q := r.qset[id]
+			q := r.index.byid[id]
 			if !yield(q) {
 				break
 			}
@@ -219,21 +231,41 @@ func (r *R) CreateQuestion(desc string, tags []string) (*pb.Question, error) {
 }
 
 func (r *R) add(q *pb.Question) error {
+	if err := r.addToIndexByID(q); err != nil {
+		return err
+	}
+	r.addToIndexByTag(q)
+	return nil
+}
+
+func (r *R) addToIndexByID(q *pb.Question) error {
 	id := QuestionID(q.GetId())
-	if got, ok := r.qset[id]; ok {
+	if got, ok := r.index.byid[id]; ok {
 		return &DuplicateQuestionError{Has: got, New: q}
 	}
-	r.qset[id] = q
+	r.index.byid[id] = q
 	if id > r.lastid {
 		r.lastid = id
 	}
 	return nil
 }
 
+func (r *R) addToIndexByTag(q *pb.Question) {
+	for _, tag := range q.GetTags() {
+		qq := r.index.bytag[Tag(tag)]
+		qq = append(qq, q)
+		r.index.bytag[Tag(tag)] = qq
+	}
+}
+
 // Get retrieves the question with a given identifier form the registry. It
 // returns nil if the question does not exist.
 func (r *R) Get(qid QuestionID) *pb.Question {
-	return r.qset[qid]
+	return r.index.byid[qid]
+}
+
+func (r *R) GetTag(t Tag) []*pb.Question {
+	return r.index.bytag[t]
 }
 
 func (r *R) Updated() bool {
