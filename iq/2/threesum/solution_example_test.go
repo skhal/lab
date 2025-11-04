@@ -5,7 +5,7 @@ package threesum_test
 import (
 	"fmt"
 
-	"github.com/skhal/lab/iq/twopointer/threesum"
+	"github.com/skhal/lab/iq/2/threesum"
 )
 
 func Example() {

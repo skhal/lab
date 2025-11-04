@@ -1,15 +1,16 @@
 // Copyright 2025 Samvel Khalatyan. All rights reserved.
 //
+// clang-format off-next-line
 //go:build ignore
+
+#include "iq/2/threesum/solution.h"
 
 #include <algorithm>
 #include <cstddef>
 #include <utility>
 #include <vector>
 
-#include "iq/twopointer/threesum/solution.h"
-
-namespace iq::twopointer::threesum {
+namespace iq::threesum {
 namespace {
 
 constexpr int kSizeMin = 3;
@@ -100,4 +101,4 @@ std::vector<Triplet> Find(const std::vector<int>& nn) {
   return triplets;
 }
 
-}  // namespace iq::twopointer::threesum
+}  // namespace iq::threesum

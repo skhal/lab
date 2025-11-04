@@ -1,6 +1,9 @@
 // Copyright 2025 Samvel Khalatyan. All rights reserved.
 //
+// clang-format off-next-line
 //go:build ignore
+
+#include "iq/2/threesum/solution.h"
 
 #include <algorithm>
 #include <cctype>
@@ -13,9 +16,8 @@
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
-#include "iq/twopointer/threesum/solution.h"
 
-namespace iq::twopointer::threesum {
+namespace iq::threesum {
 namespace {
 
 using ::testing::TestParamInfo;
@@ -101,4 +103,4 @@ INSTANTIATE_TEST_SUITE_P(FindTest, FindTest, ValuesIn(kFindTestParams),
                          });
 
 }  // namespace
-}  // namespace iq::twopointer::threesum
+}  // namespace iq::threesum

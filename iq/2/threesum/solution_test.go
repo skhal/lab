@@ -8,7 +8,7 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
-	"github.com/skhal/lab/iq/twopointer/threesum"
+	"github.com/skhal/lab/iq/2/threesum"
 )
 
 type Triplet = threesum.Triplet
