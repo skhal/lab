@@ -175,3 +175,8 @@ questions {
   description: "validate parenthesis expression"
   tags: "stack"
 }
+questions {
+  id: 35
+  description: "next largest number"
+  tags: "stack"
+}
