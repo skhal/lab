@@ -1,6 +1,9 @@
 // Copyright 2025 Samvel Khalatyan. All rights reserved.
 //
+// clang-format off-next-line
 //go:build ignore
+
+#include "iq/5/shiftzeros/solution.h"
 
 #include <algorithm>
 #include <cctype>
@@ -13,9 +16,8 @@
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
-#include "iq/twopointer/shiftzeros/solution.h"
 
-namespace iq::twopointer::shiftzeros {
+namespace iq::shiftzeros {
 namespace {
 
 using ::testing::ElementsAreArray;
@@ -86,4 +88,4 @@ INSTANTIATE_TEST_SUITE_P(ShiftTest, ShiftTest, ValuesIn(kShiftTestParams),
                          });
 
 }  // namespace
-}  // namespace iq::twopointer::shiftzeros
+}  // namespace iq::shiftzeros

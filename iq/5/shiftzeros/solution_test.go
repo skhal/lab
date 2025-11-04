@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/skhal/lab/iq/twopointer/shiftzeros"
+	"github.com/skhal/lab/iq/5/shiftzeros"
 )
 
 func TestShift(t *testing.T) {

@@ -5,7 +5,7 @@ package shiftzeros_test
 import (
 	"fmt"
 
-	"github.com/skhal/lab/iq/twopointer/shiftzeros"
+	"github.com/skhal/lab/iq/5/shiftzeros"
 )
 
 func ExampleShift() {

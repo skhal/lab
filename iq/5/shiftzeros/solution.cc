@@ -1,14 +1,15 @@
 // Copyright 2025 Samvel Khalatyan. All rights reserved.
 //
+// clang-format off-next-line
 //go:build ignore
+
+#include "iq/5/shiftzeros/solution.h"
 
 #include <cstddef>
 #include <utility>
 #include <vector>
 
-#include "iq/twopointer/shiftzeros/solution.h"
-
-namespace iq::twopointer::shiftzeros {
+namespace iq::shiftzeros {
 namespace {
 
 constexpr int kZero = 0;
@@ -44,4 +45,4 @@ void Shift(std::vector<int>& nn) {
   }
 }
 
-}  // namespace iq::twopointer::shiftzeros
+}  // namespace iq::shiftzeros
