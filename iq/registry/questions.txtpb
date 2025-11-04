@@ -148,17 +148,17 @@ questions {
 questions {
   id: 29
   description: "find in rotated sorted array"
-  tags: "binary search"
+  tags: "binary-search"
 }
 questions {
   id: 30
   description: "median of two sorted arrays"
-  tags: "binary search"
+  tags: "binary-search"
 }
 questions {
   id: 31
   description: "matrix search"
-  tags: "binary search"
+  tags: "binary-search"
 }
 questions {
   id: 32
