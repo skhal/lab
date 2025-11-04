@@ -126,5 +126,24 @@ func runCreate(reg *registry.R, args []string) error {
 }
 
 func runInfo(reg *registry.R, args []string) error {
-	return info.Run(reg, args...)
+	fs := flag.NewFlagSet("iq info", flag.ContinueOnError)
+	fs.Usage = func() {
+		header := func() string {
+			buf := new(bytes.Buffer)
+			fmt.Fprintf(buf, "Usage: %s <args>\n", fs.Name())
+			fmt.Fprintln(buf)
+			fmt.Fprintln(buf, "Arguments:")
+			return buf.String()
+		}
+		fmt.Fprint(fs.Output(), header())
+		fs.PrintDefaults()
+	}
+	cfg := new(info.Config)
+	cfg.RegisterFlags(fs)
+	if err := fs.Parse(args); errors.Is(err, flag.ErrHelp) {
+		return nil
+	} else if err != nil {
+		return err
+	}
+	return info.Run(cfg, reg, fs.Args()...)
 }
