@@ -12,7 +12,6 @@ import (
 	"os"
 	"slices"
 	"sort"
-	"strings"
 
 	"github.com/protocolbuffers/txtpbfmt/parser"
 	"github.com/skhal/lab/iq/pb"
@@ -86,13 +85,13 @@ func QuestionSetOption(qq []*pb.Question) Option {
 
 // HeaderOption adds header to the registry. It returns an error if used
 // multiple times to avoid header overwrite.
-func HeaderOption(h string) Option {
+func HeaderOption(data []byte) Option {
 	return func(reg *R) error {
 		if len(reg.header) != 0 {
 			return errors.New("header exists")
 		}
-		h = strings.TrimSpace(h)
-		reg.header = []byte(h)
+		data = bytes.TrimSpace(data)
+		reg.header = data
 		return nil
 	}
 }
@@ -119,14 +118,13 @@ func Load(cfg *Config) (*R, error) {
 	if err := prototext.Unmarshal(data, qset); err != nil {
 		return nil, err
 	}
-	r, err := With(QuestionSetOption(qset.GetQuestions()))
-	if err != nil {
-		return nil, err
+	opts := []Option{
+		QuestionSetOption(qset.GetQuestions()),
 	}
 	if header := extractHeader(data); len(header) != 0 {
-		r.header = header
+		opts = append(opts, HeaderOption(header))
 	}
-	return r, nil
+	return With(opts...)
 }
 
 func extractHeader(data []byte) []byte {

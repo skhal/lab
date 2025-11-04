@@ -53,8 +53,8 @@ func TestWrite(t *testing.T) {
 		{
 			name: "with header",
 			opts: []registry.Option{
-				registry.HeaderOption(`# proto-file: path/to/foo.proto
-# proto-message: Foo`),
+				registry.HeaderOption([]byte(`# proto-file: path/to/foo.proto
+# proto-message: Foo`)),
 				registry.QuestionOption(newQuestion(t, 1, "one")),
 			},
 			golden: tests.GoldenFile("testdata/registry_one_question_with_header.txtpb"),
