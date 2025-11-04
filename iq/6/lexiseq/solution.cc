@@ -3,7 +3,7 @@
 // clang-format off-next-line
 //go:build ignore
 
-#include "iq/twopointer/lexiseq/solution.h"
+#include "iq/6/lexiseq/solution.h"
 
 #include <algorithm>
 #include <iterator>
@@ -12,7 +12,7 @@
 #include <tuple>
 #include <utility>
 
-namespace iq::twopointer::lexiseq {
+namespace iq::lexiseq {
 namespace {
 
 constexpr int kSizeMin = 2;
@@ -77,4 +77,4 @@ std::string Next(std::string_view s) {
   return buf;
 }
 
-}  // namespace iq::twopointer::lexiseq
+}  // namespace iq::lexiseq

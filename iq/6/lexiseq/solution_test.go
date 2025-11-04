@@ -5,7 +5,7 @@ package lexiseq_test
 import (
 	"testing"
 
-	"github.com/skhal/lab/iq/twopointer/lexiseq"
+	"github.com/skhal/lab/iq/6/lexiseq"
 )
 
 func TestNext(t *testing.T) {

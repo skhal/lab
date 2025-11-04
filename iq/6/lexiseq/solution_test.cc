@@ -3,7 +3,7 @@
 // clang-format off-next-line
 //go:build ignore
 
-#include "iq/twopointer/lexiseq/solution.h"
+#include "iq/6/lexiseq/solution.h"
 
 #include <algorithm>
 #include <cctype>
@@ -13,7 +13,7 @@
 
 #include "gtest/gtest.h"
 
-namespace iq::twopointer::lexiseq {
+namespace iq::lexiseq {
 namespace {
 
 using ::testing::TestParamInfo;
@@ -65,4 +65,4 @@ INSTANTIATE_TEST_SUITE_P(NextTest, NextTest, ValuesIn(kTestParams),
                          });
 
 }  // namespace
-}  // namespace iq::twopointer::lexiseq
+}  // namespace iq::lexiseq
