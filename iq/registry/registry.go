@@ -129,14 +129,14 @@ func Load(cfg *Config) (*R, error) {
 
 func extractHeader(data []byte) []byte {
 	var prefix = []byte("#")
-	buf := new(bytes.Buffer)
+	size := 0
 	for line := range bytes.Lines(data) {
 		if !bytes.HasPrefix(line, prefix) {
 			break
 		}
-		buf.Write(line)
+		size += len(line)
 	}
-	return bytes.TrimSpace(buf.Bytes())
+	return bytes.TrimSpace(data[:size])
 }
 
 // Write stores registry in the file in Protobu text format.
