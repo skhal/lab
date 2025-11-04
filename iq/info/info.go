@@ -3,9 +3,11 @@
 package info
 
 import (
+	"bytes"
 	"errors"
 	"flag"
 	"fmt"
+	"sort"
 	"strconv"
 	"strings"
 
@@ -16,24 +18,41 @@ import (
 // ErrQuestionID represents a group of errors due to invalid question
 // identifier.
 var ErrQuestionID = errors.New("invalid question id")
+var ErrConfig = errors.New("invalid config")
 
 // Config holds parameters to for info command.
 type Config struct {
-	Tag string
+	Tag  string
+	Tags bool
 }
 
 func (cfg *Config) RegisterFlags(fs *flag.FlagSet) {
 	fs.StringVar(&cfg.Tag, "t", "", "tag")
+	fs.BoolVar(&cfg.Tags, "tt", false, "list tags")
+}
+
+func (cfg *Config) Validate() error {
+	if cfg.Tags {
+		if cfg.Tag != "" {
+			return fmt.Errorf("%v: -t and -tt flags are exclusive", ErrConfig)
+		}
+	}
+	return nil
 }
 
 // Run prints questions from the registry.
 func Run(cfg *Config, reg *registry.R, args ...string) error {
+	if err := cfg.Validate(); err != nil {
+		return err
+	}
 	ids, err := ParseQuestionIDs(args)
 	if err != nil {
 		return err
 	}
 	printer := newPrinter(reg)
 	switch {
+	case cfg.Tags:
+		err = printer.PrintTags()
 	case cfg.Tag != "":
 		err = printer.PrintByTag(registry.Tag(cfg.Tag), ids)
 	case len(ids) != 0:
@@ -116,6 +135,22 @@ func (p *printer) PrintByID(ids []registry.QuestionID) error {
 	if len(invalidIDs) != 0 {
 		return &MultiQuestionIDError{IDs: invalidIDs}
 	}
+	return nil
+}
+
+func (p *printer) PrintTags() error {
+	tt := append([]registry.Tag(nil), p.reg.GetTags()...)
+	if len(tt) == 0 {
+		return nil
+	}
+	sort.Slice(tt, func(i, j int) bool {
+		return strings.Compare(string(tt[i]), string(tt[j])) < 0
+	})
+	buf := new(bytes.Buffer)
+	for _, t := range tt {
+		fmt.Fprintln(buf, t)
+	}
+	fmt.Print(buf.String())
 	return nil
 }
 

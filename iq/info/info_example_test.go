@@ -63,6 +63,34 @@ func ExampleRun_printByTagAndID() {
 	// 3	demo question three
 }
 
+func ExampleRun_printTags() {
+	reg := mustCreateRegistry()
+	cfg := &info.Config{
+		Tags: true,
+	}
+	if err := info.Run(cfg, reg); err != nil {
+		fmt.Println(err)
+		return
+	}
+	// Output:
+	// bar
+	// foo
+}
+
+func ExampleRun_invalidConfig_exclusiveTagAndTags() {
+	reg := mustCreateRegistry()
+	cfg := &info.Config{
+		Tags: true,
+		Tag:  "foo",
+	}
+	if err := info.Run(cfg, reg); err != nil {
+		fmt.Println(err)
+		return
+	}
+	// Output:
+	// invalid config: -t and -tt flags are exclusive
+}
+
 func mustCreateRegistry() *registry.R {
 	opts := []registry.Option{
 		registry.QuestionOption(newQuestion(1, "demo question one", "foo")),
