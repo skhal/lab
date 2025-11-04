@@ -1,12 +1,13 @@
 // Copyright 2025 Samvel Khalatyan. All rights reserved.
 //
+// clang-format off-next-line
 //go:build ignore
 
 #include <optional>
 #include <utility>
 #include <vector>
 
-namespace iq::twopointer::twosum {
+namespace iq::twosum {
 namespace {
 
 constexpr int kSizeMin = 2;
@@ -32,4 +33,4 @@ std::optional<std::pair<int, int>> Find(const std::vector<int>& nn, int x) {
   return std::nullopt;
 }
 
-}  // namespace iq::twopointer::twosum
+}  // namespace iq::twosum

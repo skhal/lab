@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/skhal/lab/iq/twopointer/twosum"
+	"github.com/skhal/lab/iq/1/twosum"
 )
 
 func TestFind(t *testing.T) {

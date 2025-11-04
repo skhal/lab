@@ -1,6 +1,9 @@
 // Copyright 2025 Samvel Khalatyan. All rights reserved.
 //
+// clang-format off-next-line
 //go:build ignore
+
+#include "iq/1/twosum/solution.h"
 
 #include <algorithm>
 #include <optional>
@@ -9,9 +12,8 @@
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
-#include "iq/twopointer/twosum/solution.h"
 
-namespace iq::twopointer::twosum {
+namespace iq::twosum {
 namespace {
 
 using ::testing::Eq;
@@ -72,4 +74,4 @@ INSTANTIATE_TEST_SUITE_P(FindTest, FindTest, ValuesIn(kFindTestCases),
                          });
 
 }  // namespace
-}  // namespace iq::twopointer::twosum
+}  // namespace iq::twosum

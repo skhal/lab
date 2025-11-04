@@ -5,7 +5,7 @@ package twosum_test
 import (
 	"fmt"
 
-	"github.com/skhal/lab/iq/twopointer/twosum"
+	"github.com/skhal/lab/iq/1/twosum"
 )
 
 func Example() {
