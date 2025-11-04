@@ -258,13 +258,15 @@ func (r *R) addToIndexByTag(q *pb.Question) {
 	}
 }
 
-// Get retrieves the question with a given identifier form the registry. It
+// GetByID retrieves the question with a given identifier form the registry. It
 // returns nil if the question does not exist.
-func (r *R) Get(qid QuestionID) *pb.Question {
+func (r *R) GetByID(qid QuestionID) *pb.Question {
 	return r.index.byid[qid]
 }
 
-func (r *R) GetTag(t Tag) []*pb.Question {
+// GetByTag retrieves questions for a given tag or nil of no questions are
+// registered for the tag.
+func (r *R) GetByTag(t Tag) []*pb.Question {
 	return r.index.bytag[t]
 }
 

@@ -160,7 +160,7 @@ func TestRegistry_CreateQuestion(t *testing.T) {
 	}
 }
 
-func TestRegistry_Get(t *testing.T) {
+func TestRegistry_GetByID(t *testing.T) {
 	tests := []struct {
 		name string
 		qq   []*pb.Question
@@ -188,16 +188,16 @@ func TestRegistry_Get(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			reg := mustCreateRegistry(t, registry.QuestionSetOption(tc.qq))
 
-			got := reg.Get(tc.id)
+			got := reg.GetByID(tc.id)
 
 			if diff := cmp.Diff(tc.want, got, protocmp.Transform()); diff != "" {
-				t.Errorf("registry.Get(%d) mismatch (-want, +got):\n%s", tc.id, diff)
+				t.Errorf("registry.GetByID(%d) mismatch (-want, +got):\n%s", tc.id, diff)
 			}
 		})
 	}
 }
 
-func TestRegistry_GetTag(t *testing.T) {
+func TestRegistry_GetByTag(t *testing.T) {
 	tests := []struct {
 		name string
 		qq   []*pb.Question
@@ -238,14 +238,14 @@ func TestRegistry_GetTag(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			reg := mustCreateRegistry(t, registry.QuestionSetOption(tc.qq))
 
-			got := reg.GetTag(tc.tag)
+			got := reg.GetByTag(tc.tag)
 
 			opts := []cmp.Option{
 				protocmp.Transform(),
 				cmpopts.EquateEmpty(),
 			}
 			if diff := cmp.Diff(tc.want, got, opts...); diff != "" {
-				t.Errorf("registry.GetTag(%s) mismatch (-want, +got):\n%s", tc.tag, diff)
+				t.Errorf("registry.GetByTag(%s) mismatch (-want, +got):\n%s", tc.tag, diff)
 			}
 		})
 	}

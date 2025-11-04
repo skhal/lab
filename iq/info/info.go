@@ -106,7 +106,7 @@ func (err *MultiQuestionIDError) Error() string {
 func (p *printer) PrintByID(ids []registry.QuestionID) error {
 	var invalidIDs []string
 	for _, id := range ids {
-		q := p.reg.Get(id)
+		q := p.reg.GetByID(id)
 		if q == nil {
 			invalidIDs = append(invalidIDs, strconv.Itoa(int(id)))
 			continue
@@ -125,7 +125,7 @@ func (p *printer) PrintByTag(tag registry.Tag, ids []registry.QuestionID) error 
 		return p.printByTagAll(tag)
 	}
 	qset := make(map[registry.QuestionID]*pb.Question)
-	for _, q := range p.reg.GetTag(tag) {
+	for _, q := range p.reg.GetByTag(tag) {
 		qset[registry.QuestionID(q.GetId())] = q
 	}
 	var invalidIDs []string
@@ -144,7 +144,7 @@ func (p *printer) PrintByTag(tag registry.Tag, ids []registry.QuestionID) error 
 }
 
 func (p *printer) printByTagAll(tag registry.Tag) error {
-	for _, q := range p.reg.GetTag(tag) {
+	for _, q := range p.reg.GetByTag(tag) {
 		printQuestion(q)
 	}
 	return nil
