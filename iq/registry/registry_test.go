@@ -7,6 +7,8 @@ import (
 	"flag"
 	"os"
 	"path/filepath"
+	"sort"
+	"strings"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -246,6 +248,66 @@ func TestRegistry_GetByTag(t *testing.T) {
 			}
 			if diff := cmp.Diff(tc.want, got, opts...); diff != "" {
 				t.Errorf("registry.GetByTag(%s) mismatch (-want, +got):\n%s", tc.tag, diff)
+			}
+		})
+	}
+}
+
+func TestRegistry_GetTags(t *testing.T) {
+	tests := []struct {
+		name string
+		qq   []*pb.Question
+		want []registry.Tag
+	}{
+		{
+			name: "empty",
+		},
+		{
+			name: "one question one tag",
+			qq:   []*pb.Question{newQuestion(t, 1, "one", "foo")},
+			want: []registry.Tag{"foo"},
+		},
+		{
+			name: "one question two tags",
+			qq:   []*pb.Question{newQuestion(t, 1, "one", "foo", "bar")},
+			want: []registry.Tag{"foo", "bar"},
+		},
+		{
+			name: "two questions one tag",
+			qq: []*pb.Question{
+				newQuestion(t, 1, "one", "foo"),
+				newQuestion(t, 2, "two", "foo"),
+			},
+			want: []registry.Tag{"foo"},
+		},
+		{
+			name: "two questions two tags",
+			qq: []*pb.Question{
+				newQuestion(t, 1, "one", "foo"),
+				newQuestion(t, 2, "two", "bar"),
+			},
+			want: []registry.Tag{"foo", "bar"},
+		},
+	}
+	for _, tc := range tests {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
+			reg := mustCreateRegistry(t, registry.QuestionSetOption(tc.qq))
+
+			got := reg.GetTags()
+
+			opts := []cmp.Option{
+				cmp.Transformer("SortTags", func(tags []registry.Tag) []registry.Tag {
+					// Do not mutate the input - copy
+					tt := append([]registry.Tag(nil), tags...)
+					sort.Slice(tt, func(i, j int) bool {
+						return strings.Compare(string(tt[i]), string(tt[j])) < 0
+					})
+					return tt
+				}),
+			}
+			if diff := cmp.Diff(tc.want, got, opts...); diff != "" {
+				t.Errorf("registry.GetTags() mismatch (-want, +got):\n%s", diff)
 			}
 		})
 	}

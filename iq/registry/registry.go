@@ -270,6 +270,11 @@ func (r *R) GetByTag(t Tag) []*pb.Question {
 	return r.index.bytag[t]
 }
 
+// GetTags retrieves a set of available tags.
+func (r *R) GetTags() []Tag {
+	return slices.Collect(maps.Keys(r.index.bytag))
+}
+
 func (r *R) Updated() bool {
 	return r.updated
 }
