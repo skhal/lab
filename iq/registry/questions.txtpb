@@ -180,3 +180,8 @@ questions {
   description: "next largest number"
   tags: "stack"
 }
+questions {
+  id: 36
+  description: "evaluate calculator expression"
+  tags: "stack"
+}
