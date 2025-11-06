@@ -6,6 +6,9 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"os"
+	"path/filepath"
+	"strconv"
 
 	"github.com/skhal/lab/go/flags"
 	"github.com/skhal/lab/iq/registry"
@@ -29,6 +32,18 @@ func Run(cfg *Config, reg *registry.R) error {
 	if err != nil {
 		return err
 	}
-	fmt.Printf("added question %d\n", q.GetId())
+	p, err := createQuestionPath(reg.RootPath(), int(q.GetId()))
+	if err != nil {
+		return err
+	}
+	fmt.Printf("iniailized path %s\n", p)
 	return nil
+}
+
+func createQuestionPath(prefix string, id int) (string, error) {
+	p := filepath.Join(prefix, strconv.Itoa(int(id)))
+	if err := os.Mkdir(p, 0755); err != nil {
+		return "", err
+	}
+	return p, nil
 }

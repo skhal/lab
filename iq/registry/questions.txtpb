@@ -3,6 +3,8 @@
 # proto-file: iq/pb/question.proto
 # proto-message: QuestionSet
 
+root_path: "iq/"
+
 questions {
   id: 1
   description: "pair sum in a sorted array"
