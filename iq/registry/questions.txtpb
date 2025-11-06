@@ -3,8 +3,6 @@
 # proto-file: iq/pb/question.proto
 # proto-message: QuestionSet
 
-root_path: "iq/"
-
 questions {
   id: 1
   description: "pair sum in a sorted array"
@@ -192,3 +190,9 @@ questions {
   description: "remove adjacent duplicates"
   tags: "stack"
 }
+questions {
+  id: 38
+  description: "remove adjacent duplicate pairs"
+  tags: "stack"
+}
+root_path: "iq/"
