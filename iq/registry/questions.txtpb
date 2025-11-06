@@ -185,3 +185,8 @@ questions {
   description: "evaluate calculator expression"
   tags: "stack"
 }
+questions {
+  id: 37
+  description: "remove adjacent duplicates"
+  tags: "stack"
+}
