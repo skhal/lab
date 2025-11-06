@@ -1,6 +1,6 @@
 # Copyright 2025 Samvel Khalatyan. All rights reserved.
 #
-# proto-file: iq/proto/iq.proto
+# proto-file: iq/pb/question.proto
 # proto-message: QuestionSet
 
 questions {
