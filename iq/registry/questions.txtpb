@@ -200,4 +200,9 @@ questions {
   description: "queue using stack"
   tags: "stack"
 }
+questions {
+  id: 40
+  description: "max of a sliding window"
+  tags: "stack"
+}
 root_path: "iq/"
