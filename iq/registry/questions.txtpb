@@ -195,4 +195,9 @@ questions {
   description: "remove adjacent duplicate pairs"
   tags: "stack"
 }
+questions {
+  id: 39
+  description: "queue using stack"
+  tags: "stack"
+}
 root_path: "iq/"
