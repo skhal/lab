@@ -62,6 +62,13 @@ func TestWrite(t *testing.T) {
 			},
 			golden: tests.GoldenFile("testdata/registry_one_question_with_header.txtpb"),
 		},
+		{
+			name: "root path",
+			opts: []registry.Option{
+				registry.RootPathOption("test/prefix"),
+			},
+			golden: tests.GoldenFile("testdata/registry_with_root_path.txtpb"),
+		},
 	}
 	for _, tc := range tests {
 		tc := tc
@@ -102,6 +109,11 @@ func TestWrite_afterLoad(t *testing.T) {
 			file:   "testdata/registry_one_question_with_header.txtpb",
 			golden: tests.GoldenFile("testdata/registry_one_question_with_header.txtpb"),
 		},
+		{
+			name:   "root path",
+			file:   "testdata/registry_with_root_path.txtpb",
+			golden: tests.GoldenFile("testdata/registry_with_root_path.txtpb"),
+		},
 	}
 	for _, tc := range tests {
 		tc := tc
@@ -116,7 +128,7 @@ func TestWrite_afterLoad(t *testing.T) {
 				t.Fatalf("registry.Write(_, %v) unexpected error: %v", cfg, err)
 			}
 			got := mustReadFile(t, tmpfile)
-			// do not update golden
+			// do not update golden file
 			if diff := tc.golden.Diff(t, got); diff != "" {
 				t.Errorf("registry.Write() mismatch (-want, +got):\n%s", diff)
 			}
@@ -324,7 +336,7 @@ func TestRegistry_RootPath_option(t *testing.T) {
 }
 
 func TestRegistry_RootPath_load(t *testing.T) {
-	reg := mustLoad(t,  "testdata/registry_with_root_path.txtpb")
+	reg := mustLoad(t, "testdata/registry_with_root_path.txtpb")
 
 	got := reg.RootPath()
 

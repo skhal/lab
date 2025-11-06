@@ -181,9 +181,17 @@ func Write(r *R, cfg *Config) error {
 	return write(data, cfg)
 }
 
-func marshal(r *R) ([]byte, error) {
+func (r *R) questionSet() *pb.QuestionSet {
 	qset := new(pb.QuestionSet)
 	qset.SetQuestions(slices.Collect(r.sortedQuestions()))
+	if r.rootPath != "" {
+		qset.SetRootPath(r.rootPath)
+	}
+	return qset
+}
+
+func marshal(r *R) ([]byte, error) {
+	qset := r.questionSet()
 	opts := prototext.MarshalOptions{
 		Multiline: true,
 	}
