@@ -61,6 +61,8 @@ type index struct {
 
 // R holds interview questions, keyed by the question ID.
 type R struct {
+	rootPath string
+
 	header []byte
 	index  index
 
@@ -86,6 +88,16 @@ func QuestionSetOption(qq []*pb.Question) Option {
 				return err
 			}
 		}
+		return nil
+	}
+}
+
+func RootPathOption(p string) Option {
+	return func(reg *R) error {
+		if reg.rootPath != "" {
+			return errors.New("root path exists")
+		}
+		reg.rootPath = p
 		return nil
 	}
 }
@@ -132,6 +144,9 @@ func Load(cfg *Config) (*R, error) {
 	}
 	opts := []Option{
 		QuestionSetOption(qset.GetQuestions()),
+	}
+	if qset.HasRootPath() {
+		opts = append(opts, RootPathOption(qset.GetRootPath()))
 	}
 	if header := extractHeader(data); len(header) != 0 {
 		opts = append(opts, HeaderOption(header))
@@ -273,6 +288,10 @@ func (r *R) GetByTag(t Tag) []*pb.Question {
 // GetTags retrieves a set of available tags.
 func (r *R) GetTags() []Tag {
 	return slices.Collect(maps.Keys(r.index.bytag))
+}
+
+func (r *R) RootPath() string {
+	return r.rootPath
 }
 
 func (r *R) Updated() bool {

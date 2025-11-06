@@ -14,6 +14,9 @@ option go_package = "github.com/skhal/lab/iq/pb";
 // Next ID: 2
 message QuestionSet {
   repeated Question questions = 1;
+
+  // root_path is the path to the questions directory.
+  string root_path = 2;
 }
 
 // Question holds metadata for a single question.

@@ -313,6 +313,26 @@ func TestRegistry_GetTags(t *testing.T) {
 	}
 }
 
+func TestRegistry_RootPath_option(t *testing.T) {
+	reg := mustCreateRegistry(t, registry.RootPathOption("test/prefix"))
+
+	got := reg.RootPath()
+
+	if want := "test/prefix"; got != want {
+		t.Errorf("registry.(*R).RootPath() = %q; want %q", got, want)
+	}
+}
+
+func TestRegistry_RootPath_load(t *testing.T) {
+	reg := mustLoad(t,  "testdata/registry_with_root_path.txtpb")
+
+	got := reg.RootPath()
+
+	if want := "test/prefix"; got != want {
+		t.Errorf("registry.(*R).RootPath() = %q; want %q", got, want)
+	}
+}
+
 func TestRegistry_Visit_allOrderByID(t *testing.T) {
 	opts := []registry.Option{
 		registry.QuestionOption(newQuestion(t, 2, "two")),

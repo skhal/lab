@@ -27,10 +27,13 @@ const (
 //
 // Next ID: 2
 type QuestionSet struct {
-	state                protoimpl.MessageState `protogen:"opaque.v1"`
-	xxx_hidden_Questions *[]*Question           `protobuf:"bytes,1,rep,name=questions"`
-	unknownFields        protoimpl.UnknownFields
-	sizeCache            protoimpl.SizeCache
+	state                  protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Questions   *[]*Question           `protobuf:"bytes,1,rep,name=questions"`
+	xxx_hidden_RootPath    *string                `protobuf:"bytes,2,opt,name=root_path,json=rootPath"`
+	XXX_raceDetectHookData protoimpl.RaceDetectHookData
+	XXX_presence           [1]uint32
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
 }
 
 func (x *QuestionSet) Reset() {
@@ -67,14 +70,43 @@ func (x *QuestionSet) GetQuestions() []*Question {
 	return nil
 }
 
+func (x *QuestionSet) GetRootPath() string {
+	if x != nil {
+		if x.xxx_hidden_RootPath != nil {
+			return *x.xxx_hidden_RootPath
+		}
+		return ""
+	}
+	return ""
+}
+
 func (x *QuestionSet) SetQuestions(v []*Question) {
 	x.xxx_hidden_Questions = &v
+}
+
+func (x *QuestionSet) SetRootPath(v string) {
+	x.xxx_hidden_RootPath = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 2)
+}
+
+func (x *QuestionSet) HasRootPath() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
+}
+
+func (x *QuestionSet) ClearRootPath() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
+	x.xxx_hidden_RootPath = nil
 }
 
 type QuestionSet_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
 	Questions []*Question
+	// root_path is the path to the questions directory.
+	RootPath *string
 }
 
 func (b0 QuestionSet_builder) Build() *QuestionSet {
@@ -82,6 +114,10 @@ func (b0 QuestionSet_builder) Build() *QuestionSet {
 	b, x := &b0, m0
 	_, _ = b, x
 	x.xxx_hidden_Questions = &b.Questions
+	if b.RootPath != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 2)
+		x.xxx_hidden_RootPath = b.RootPath
+	}
 	return m0
 }
 
@@ -217,9 +253,10 @@ var File_question_proto protoreflect.FileDescriptor
 
 const file_question_proto_rawDesc = "" +
 	"\n" +
-	"\x0equestion.proto\x12\x05iq.pb\x1a!google/protobuf/go_features.proto\"<\n" +
+	"\x0equestion.proto\x12\x05iq.pb\x1a!google/protobuf/go_features.proto\"Y\n" +
 	"\vQuestionSet\x12-\n" +
-	"\tquestions\x18\x01 \x03(\v2\x0f.iq.pb.QuestionR\tquestions\"P\n" +
+	"\tquestions\x18\x01 \x03(\v2\x0f.iq.pb.QuestionR\tquestions\x12\x1b\n" +
+	"\troot_path\x18\x02 \x01(\tR\brootPath\"P\n" +
 	"\bQuestion\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x05R\x02id\x12 \n" +
 	"\vdescription\x18\x02 \x01(\tR\vdescription\x12\x12\n" +
