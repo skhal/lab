@@ -1,6 +1,9 @@
 // Copyright 2025 Samvel Khalatyan. All rights reserved.
 //
+// clang-format off-next-line
 //go:build ignore
+
+#include "iq/11/geomseq/find.h"
 
 #include <cctype>
 #include <iomanip>
@@ -15,9 +18,8 @@
 #include "absl/strings/str_join.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
-#include "iq/mapset/geomseq/find.h"
 
-namespace iq::mapset::geomseq {
+namespace iq::geomseq {
 
 // Must be in the same namesapce with Triplet:
 // https://google.github.io/googletest/advanced.html#teaching-googletest-how-to-print-your-values
@@ -103,4 +105,4 @@ INSTANTIATE_TEST_SUITE_P(FindTest, FindTest, ValuesIn(kFindTestParams),
                          });
 
 }  // namespace
-}  // namespace iq::mapset::geomseq
+}  // namespace iq::geomseq

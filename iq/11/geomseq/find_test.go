@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/skhal/lab/iq/mapset/geomseq"
+	"github.com/skhal/lab/iq/11/geomseq"
 )
 
 func TestFind(t *testing.T) {

@@ -5,7 +5,7 @@ package geomseq_test
 import (
 	"fmt"
 
-	"github.com/skhal/lab/iq/mapset/geomseq"
+	"github.com/skhal/lab/iq/11/geomseq"
 )
 
 func Example() {

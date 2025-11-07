@@ -1,6 +1,9 @@
 // Copyright 2025 Samvel Khalatyan. All rights reserved.
 //
+// clang-format off-next-line
 //go:build ignore
+
+#include "iq/11/geomseq/find.h"
 
 #include <cstddef>
 #include <initializer_list>
@@ -9,9 +12,8 @@
 #include <vector>
 
 #include "absl/strings/str_format.h"
-#include "iq/mapset/geomseq/find.h"
 
-namespace iq::mapset::geomseq {
+namespace iq::geomseq {
 namespace {
 
 using Index = std::size_t;
@@ -112,4 +114,4 @@ std::vector<Triplet> Find(const std::vector<int>& nn, int ratio) {
   return triplets;
 }
 
-}  // namespace iq::mapset::geomseq
+}  // namespace iq::geomseq
