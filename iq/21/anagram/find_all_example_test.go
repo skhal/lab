@@ -5,7 +5,7 @@ package anagram_test
 import (
 	"fmt"
 
-	"github.com/skhal/lab/iq/string/anagram"
+	"github.com/skhal/lab/iq/21/anagram"
 )
 
 func ExampleFindAll() {

@@ -1,7 +1,7 @@
 NAME
 ====
 
-**anagram** - find anagrams in a string
+**21** - find anagrams in a string
 
 DESCRIPTION
 ===========
