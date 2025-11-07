@@ -5,7 +5,7 @@ package chain_test
 import (
 	"fmt"
 
-	"github.com/skhal/lab/iq/mapset/chain"
+	"github.com/skhal/lab/iq/10/chain"
 )
 
 func Example() {

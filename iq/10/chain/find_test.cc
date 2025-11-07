@@ -1,6 +1,9 @@
 // Copyright 2025 Samvel Khalatyan. All rights reserved.
 //
+// clang-format off-next-line
 //go:build ignore
+
+#include "iq/10/chain/find.h"
 
 #include <algorithm>
 #include <cctype>
@@ -12,9 +15,8 @@
 #include "absl/strings/str_join.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
-#include "iq/mapset/chain/find.h"
 
-namespace iq::mapset::chain {
+namespace iq::chain {
 namespace {
 
 using ::testing::AnyOfArray;
@@ -82,4 +84,4 @@ INSTANTIATE_TEST_SUITE_P(FindTest, FindTest, ValuesIn(kFindTestParams),
                          });
 
 }  // namespace
-}  // namespace iq::mapset::chain
+}  // namespace iq::chain

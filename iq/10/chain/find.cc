@@ -1,13 +1,14 @@
 // Copyright 2025 Samvel Khalatyan. All rights reserved.
 //
+// clang-format off-next-line
 //go:build ignore
+
+#include "iq/10/chain/find.h"
 
 #include <unordered_set>
 #include <vector>
 
-#include "iq/mapset/chain/find.h"
-
-namespace iq::mapset::chain {
+namespace iq::chain {
 namespace {
 
 std::vector<int> makeChain(const std::unordered_set<int>& nn, int n) {
@@ -38,4 +39,4 @@ std::vector<int> Find(const std::vector<int>& nn) {
   return longest_chain;
 }
 
-}  // namespace iq::mapset::chain
+}  // namespace iq::chain

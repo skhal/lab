@@ -6,7 +6,7 @@ import (
 	"slices"
 	"testing"
 
-	"github.com/skhal/lab/iq/mapset/chain"
+	"github.com/skhal/lab/iq/10/chain"
 )
 
 func contains(t *testing.T, want []chain.C, got chain.C) bool {
