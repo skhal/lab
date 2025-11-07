@@ -3,7 +3,7 @@
 // clang-format off-next-line
 //go:build ignore
 
-#include "iq/list/doubly/lru/cache.h"
+#include "iq/15/lru/cache.h"
 
 #include <memory>
 #include <optional>
@@ -11,7 +11,7 @@
 
 #include "absl/base/macros.h"
 
-namespace iq::list::doubly::lru {
+namespace iq::lru {
 
 Cache::Cache(std::size_t capacity) : capacity_(capacity) {
   ABSL_ASSERT(capacity > 0);
@@ -101,4 +101,4 @@ void Cache::removeLeastRecent() {
   --size_;
 }
 
-}  // namespace iq::list::doubly::lru
+}  // namespace iq::lru

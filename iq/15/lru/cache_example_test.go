@@ -5,7 +5,7 @@ package lru_test
 import (
 	"fmt"
 
-	"github.com/skhal/lab/iq/list/doubly/lru"
+	"github.com/skhal/lab/iq/15/lru"
 )
 
 func ExampleCache_Put_evictsLeastResentlyPutItem() {

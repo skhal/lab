@@ -1,13 +1,13 @@
 // Copyright 2025 Samvel Khalatyan. All rights reserved.
 
-#ifndef IQ_LIST_DOUBLY_LRU_CACHE_H_
-#define IQ_LIST_DOUBLY_LRU_CACHE_H_
+#ifndef IQ_LRU_CACHE_H_
+#define IQ_LRU_CACHE_H_
 
 #include <memory>
 #include <optional>
 #include <vector>
 
-namespace iq::list::doubly::lru {
+namespace iq::lru {
 
 class Cache {
  public:
@@ -44,6 +44,6 @@ class Cache {
   std::shared_ptr<Node> tail_;  // least recent
 };
 
-}  // namespace iq::list::doubly::lru
+}  // namespace iq::lru
 
-#endif  // IQ_LIST_DOUBLY_LRU_CACHE_H_
+#endif  // IQ_LRU_CACHE_H_

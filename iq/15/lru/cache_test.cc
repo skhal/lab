@@ -3,7 +3,7 @@
 // clang-format off-next-line
 //go:build ignore
 
-#include "iq/list/doubly/lru/cache.h"
+#include "iq/15/lru/cache.h"
 
 #include <algorithm>
 #include <cctype>
@@ -18,7 +18,7 @@
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
-namespace iq::list::doubly::lru {
+namespace iq::lru {
 namespace {
 
 using ::testing::ContainerEq;
@@ -330,4 +330,4 @@ INSTANTIATE_TEST_SUITE_P(CacheTest, CacheGetTest, ValuesIn(kCacheGetTestParams),
                          });
 
 }  // namespace
-}  // namespace iq::list::doubly::lru
+}  // namespace iq::lru
