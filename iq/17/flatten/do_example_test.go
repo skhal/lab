@@ -5,7 +5,7 @@ package flatten_test
 import (
 	"fmt"
 
-	"github.com/skhal/lab/iq/list/singly/flatten"
+	"github.com/skhal/lab/iq/17/flatten"
 )
 
 func ExampleDo() {

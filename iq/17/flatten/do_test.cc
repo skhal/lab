@@ -3,7 +3,7 @@
 // clang-format off-next-line
 //go:build ignore
 
-#include "iq/list/singly/flatten/do.h"
+#include "iq/17/flatten/do.h"
 
 #include <cctype>
 #include <initializer_list>
@@ -13,7 +13,7 @@
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
-namespace iq::list::singly::flatten {
+namespace iq::flatten {
 namespace {
 
 using ::testing::ContainerEq;
@@ -152,4 +152,4 @@ TEST(DoTest, Level1TwoLeve2TwoOnEach) {
 }
 
 }  // namespace
-}  // namespace iq::list::singly::flatten
+}  // namespace iq::flatten

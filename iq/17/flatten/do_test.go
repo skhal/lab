@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/skhal/lab/iq/list/singly/flatten"
+	"github.com/skhal/lab/iq/17/flatten"
 )
 
 var toSlice = cmp.Transformer("ToSlice", func(n *flatten.Node) []int {

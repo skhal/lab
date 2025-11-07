@@ -3,14 +3,14 @@
 // clang-format off-next-line
 //go:build ignore
 
-#include "iq/list/singly/flatten/do.h"
+#include "iq/17/flatten/do.h"
 
 #include <functional>
 #include <memory>
 #include <queue>
 #include <utility>
 
-namespace iq::list::singly::flatten {
+namespace iq::flatten {
 namespace {
 
 std::pair<std::shared_ptr<Node>, std::shared_ptr<Node>> toList(
@@ -55,4 +55,4 @@ std::shared_ptr<Node> Do([[maybe_unused]] std::shared_ptr<TreeNode> tree) {
   return head;
 }
 
-}  // namespace iq::list::singly::flatten
+}  // namespace iq::flatten

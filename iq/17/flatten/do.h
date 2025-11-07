@@ -1,10 +1,11 @@
 // Copyright 2025 Samvel Khalatyan. All rights reserved.
 
-#ifndef IQ_LIST_SINGLY_FLATTEN_DO_H_
-#define IQ_LIST_SINGLY_FLATTEN_DO_H_
+#ifndef IQ_FLATTEN_DO_H_
+#define IQ_FLATTEN_DO_H_
 
 #include <memory>
-namespace iq::list::singly::flatten {
+
+namespace iq::flatten {
 
 struct TreeNode {
   int val;
@@ -19,6 +20,6 @@ struct Node {
 
 std::shared_ptr<Node> Do(std::shared_ptr<TreeNode> tree);
 
-}  // namespace iq::list::singly::flatten
+}  // namespace iq::flatten
 
-#endif  // IQ_LIST_SINGLY_FLATTEN_DO_H_
+#endif  // IQ_FLATTEN_DO_H_
