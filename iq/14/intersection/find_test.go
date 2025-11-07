@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/skhal/lab/iq/list/singly/intersection"
+	"github.com/skhal/lab/iq/14/intersection"
 )
 
 func TestFind(t *testing.T) {

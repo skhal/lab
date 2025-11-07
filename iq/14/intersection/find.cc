@@ -3,12 +3,12 @@
 // clang-format off-next-line
 //go:build ignore
 
-#include "iq/list/singly/intersection/find.h"
+#include "iq/14/intersection/find.h"
 
 #include <memory>
 #include <tuple>
 
-namespace iq::list::singly::intersection {
+namespace iq::intersection {
 namespace {
 
 struct Chain {
@@ -75,4 +75,4 @@ std::shared_ptr<Node> Find(std::shared_ptr<Node> a, std::shared_ptr<Node> b) {
   return find(Chain(a, b), Chain(b, a));
 }
 
-}  // namespace iq::list::singly::intersection
+}  // namespace iq::intersection

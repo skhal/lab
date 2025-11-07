@@ -3,7 +3,7 @@
 // clang-format off-next-line
 //go:build ignore
 
-#include "iq/list/singly/intersection/find.h"
+#include "iq/14/intersection/find.h"
 
 #include <initializer_list>
 #include <iterator>
@@ -17,7 +17,7 @@
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
-namespace iq::list::singly::intersection {
+namespace iq::intersection {
 namespace {
 
 using ::testing::ContainerEq;
@@ -149,4 +149,4 @@ const FindTestParam kFindTestParams[]{
 INSTANTIATE_TEST_SUITE_P(FindTest, FindTest, ValuesIn(kFindTestParams));
 
 }  // namespace
-}  // namespace iq::list::singly::intersection
+}  // namespace iq::intersection

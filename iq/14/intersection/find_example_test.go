@@ -5,7 +5,7 @@ package intersection_test
 import (
 	"fmt"
 
-	"github.com/skhal/lab/iq/list/singly/intersection"
+	"github.com/skhal/lab/iq/14/intersection"
 )
 
 func ExampleFind() {
