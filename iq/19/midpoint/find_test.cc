@@ -3,7 +3,7 @@
 // clang-format off-next-line
 //go:build ignore
 
-#include "iq/list/singly/midpoint/find.h"
+#include "iq/19/midpoint/find.h"
 
 #include <algorithm>
 #include <cctype>
@@ -17,7 +17,7 @@
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
-namespace iq::list::singly::midpoint {
+namespace iq::midpoint {
 namespace {
 
 using ::testing::Eq;
@@ -98,4 +98,4 @@ INSTANTIATE_TEST_SUITE_P(FindTest, FindTest, ValuesIn(kFindTestParams),
                          });
 
 }  // namespace
-}  // namespace iq::list::singly::midpoint
+}  // namespace iq::midpoint

@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/skhal/lab/iq/list/singly/midpoint"
+	"github.com/skhal/lab/iq/19/midpoint"
 )
 
 type list midpoint.Node

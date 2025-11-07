@@ -3,11 +3,11 @@
 // clang-format off-next-line
 //go:build ignore
 
-#include "iq/list/singly/midpoint/find.h"
+#include "iq/19/midpoint/find.h"
 
 #include <memory>
 
-namespace iq::list::singly::midpoint {
+namespace iq::midpoint {
 
 std::shared_ptr<Node> Find(std::shared_ptr<Node> list) {
   std::shared_ptr<Node> slow = list;
@@ -18,4 +18,4 @@ std::shared_ptr<Node> Find(std::shared_ptr<Node> list) {
   return slow;
 }
 
-}  // namespace iq::list::singly::midpoint
+}  // namespace iq::midpoint

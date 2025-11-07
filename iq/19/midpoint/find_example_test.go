@@ -5,7 +5,7 @@ package midpoint_test
 import (
 	"fmt"
 
-	"github.com/skhal/lab/iq/list/singly/midpoint"
+	"github.com/skhal/lab/iq/19/midpoint"
 )
 
 func ExampleFind_oddNumberOfItems() {
