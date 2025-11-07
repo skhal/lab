@@ -3,7 +3,7 @@
 // clang-format off-next-line
 //go:build ignore
 
-#include "iq/18/cycle/is_happy_number.h"
+#include "iq/20/number/is_happy_number.h"
 
 #include <ostream>
 
@@ -11,7 +11,7 @@
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
-namespace iq::cycle {
+namespace iq::number {
 namespace {
 
 using ::testing::Eq;
@@ -44,7 +44,7 @@ const IsHappyNumberTestParam kIsHappyNumberTestParam[]{
     {.n = 1, .want = true},
     {.n = 7, .want = true},
     {.n = 10, .want = true},
-    {.n = 188, .want = true},
+    {.n = 208, .want = true},
     {.n = 931, .want = true},
     // Not happy numbers
     {.n = 2, .want = false},
@@ -59,4 +59,4 @@ INSTANTIATE_TEST_SUITE_P(IsHappyNumberTest, IsHappyNumberTest,
                          });
 
 }  // namespace
-}  // namespace iq::cycle
+}  // namespace iq::number

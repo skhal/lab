@@ -3,9 +3,9 @@
 // clang-format off-next-line
 //go:build ignore
 
-#include "iq/18/cycle/is_happy_number.h"
+#include "iq/20/number/is_happy_number.h"
 
-namespace iq::cycle {
+namespace iq::number {
 namespace {
 
 int getNextNumber(int n) {
@@ -36,4 +36,4 @@ bool IsHappyNumber(int n) {
   return true;
 }
 
-}  // namespace iq::cycle
+}  // namespace iq::number

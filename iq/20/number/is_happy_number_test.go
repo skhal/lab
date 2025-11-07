@@ -1,12 +1,12 @@
 // Copyright 2025 Samvel Khalatyan. All rights reserved.
 
-package cycle_test
+package number_test
 
 import (
 	"strconv"
 	"testing"
 
-	"github.com/skhal/lab/iq/18/cycle"
+	"github.com/skhal/lab/iq/20/number"
 )
 
 func TestIsHappyNumber(t *testing.T) {
@@ -18,7 +18,7 @@ func TestIsHappyNumber(t *testing.T) {
 		{1, true},
 		{7, true},
 		{10, true},
-		{188, true},
+		{208, true},
 		{931, true},
 		// Not happy
 		{2, false},
@@ -28,10 +28,10 @@ func TestIsHappyNumber(t *testing.T) {
 	for _, tc := range tests {
 		tc := tc
 		t.Run(strconv.Itoa(tc.n), func(t *testing.T) {
-			got := cycle.IsHappyNumber(tc.n)
+			got := number.IsHappyNumber(tc.n)
 
 			if got != tc.want {
-				t.Errorf("cycle.IsHappyNubmer(%d) = %v; want %v", tc.n, got, tc.want)
+				t.Errorf("number.IsHappyNubmer(%d) = %v; want %v", tc.n, got, tc.want)
 			}
 		})
 	}

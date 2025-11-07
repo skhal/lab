@@ -1,7 +1,7 @@
 NAME
 ====
 
-**happy number** - is number happy
+**20** - is number happy
 
 DESCRIPTION
 ===========
@@ -29,4 +29,4 @@ Output: Yes, because:
 SEE ALSO
 ========
 
--	[Solution](./happy_number_solution.md)
+-	[Solution](./solution.md)

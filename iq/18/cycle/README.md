@@ -1,13 +1,31 @@
 NAME
 ====
 
-**18** - detect cycles in a singly linked list
+**18** - detect cycle in a singly linked list
 
 DESCRIPTION
 ===========
 
-Problems
---------
+Problem
+-------
 
--	[Cycle](./doc/cycle.md)
--	[Happy number](./doc/happy_number.md)
+Given a singly linked list, report whether it has cycles. Do not use a hash set to keep track of visited nodes.
+
+Example
+-------
+
+Input:
+
+```
+1 - 2 - 3 - 4
+    ^       |
+    |       |
+    +-------+
+```
+
+Has cycle from item 4 to item 2
+
+SEE ALSO
+========
+
+-	[Solution](./solution.md)
