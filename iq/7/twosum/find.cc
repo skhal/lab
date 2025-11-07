@@ -1,6 +1,9 @@
 // Copyright 2025 Samvel Khalatyan. All rights reserved.
 //
+// clang-format off-next-line
 //go:build ignore
+
+#include "iq/7/twosum/find.h"
 
 #include <cstddef>
 #include <optional>
@@ -8,9 +11,7 @@
 #include <utility>
 #include <vector>
 
-#include "iq/mapset/twosum/find.h"
-
-namespace iq::mapset::twosum {
+namespace iq::twosum {
 namespace {
 
 using Index = std::size_t;
@@ -31,4 +32,4 @@ std::optional<Indices> Find([[maybe_unused]] const std::vector<int>& nn,
   return std::nullopt;
 }
 
-}  // namespace iq::mapset::twosum
+}  // namespace iq::twosum

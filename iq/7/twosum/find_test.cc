@@ -1,6 +1,9 @@
 // Copyright 2025 Samvel Khalatyan. All rights reserved.
 //
+// clang-format off-next-line
 //go:build ignore
+
+#include "iq/7/twosum/find.h"
 
 #include <algorithm>
 #include <cctype>
@@ -13,9 +16,8 @@
 #include "absl/strings/str_join.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
-#include "iq/mapset/twosum/find.h"
 
-namespace iq::mapset::twosum {
+namespace iq::twosum {
 namespace {
 
 using ::testing::Eq;
@@ -65,4 +67,4 @@ INSTANTIATE_TEST_SUITE_P(FindTest, FindTest, ValuesIn(kFindTestParams),
                          });
 
 }  // namespace
-}  // namespace iq::mapset::twosum
+}  // namespace iq::twosum

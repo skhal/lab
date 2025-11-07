@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"sort"
 
-	"github.com/skhal/lab/iq/mapset/twosum"
+	"github.com/skhal/lab/iq/7/twosum"
 )
 
 func Example() {
