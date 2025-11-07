@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/skhal/lab/iq/list/singly/remove"
+	"github.com/skhal/lab/iq/13/remove"
 )
 
 func TestRemoveNth(t *testing.T) {

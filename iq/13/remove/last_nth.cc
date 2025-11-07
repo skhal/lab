@@ -3,13 +3,13 @@
 // clang-format off-next-line
 //go:build ignore
 
-#include "iq/list/singly/remove/last_nth.h"
+#include "iq/13/remove/last_nth.h"
 
 #include <cstddef>
 #include <memory>
 #include <utility>
 
-namespace iq::list::singly::remove {
+namespace iq::remove {
 namespace {
 
 std::pair<std::shared_ptr<Node>, bool> findPrevToLastNth(
@@ -56,4 +56,4 @@ std::shared_ptr<Node> RemoveLastNth(std::shared_ptr<Node> list, std::size_t n) {
   return list;
 }
 
-}  // namespace iq::list::singly::remove
+}  // namespace iq::remove

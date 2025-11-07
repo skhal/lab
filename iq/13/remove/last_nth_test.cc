@@ -3,7 +3,7 @@
 // clang-format off-next-line
 //go:build ignore
 
-#include "iq/list/singly/remove/last_nth.h"
+#include "iq/13/remove/last_nth.h"
 
 #include <algorithm>
 #include <cctype>
@@ -18,7 +18,7 @@
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
-namespace iq::list::singly::remove {
+namespace iq::remove {
 namespace {
 
 using ::testing::ContainerEq;
@@ -136,4 +136,4 @@ INSTANTIATE_TEST_SUITE_P(LastNthTest, LastNthTest, ValuesIn(kLastNthTestParams),
                          });
 
 }  // namespace
-}  // namespace iq::list::singly::remove
+}  // namespace iq::remove

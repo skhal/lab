@@ -5,7 +5,7 @@ package remove_test
 import (
 	"fmt"
 
-	"github.com/skhal/lab/iq/list/singly/remove"
+	"github.com/skhal/lab/iq/13/remove"
 )
 
 func ExampleLastNth() {
