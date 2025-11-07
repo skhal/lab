@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/skhal/lab/iq/list/singly/reverse"
+	"github.com/skhal/lab/iq/12/reverse"
 )
 
 func EquateLists() cmp.Option {

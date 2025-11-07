@@ -3,7 +3,7 @@
 // clang-format off-next-line
 //go:build ignore
 
-#include "iq/list/singly/reverse/reverse.h"
+#include "iq/12/reverse/reverse.h"
 
 #include <algorithm>
 #include <cctype>
@@ -17,7 +17,7 @@
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
-namespace iq::list::singly::reverse {
+namespace iq::reverse {
 namespace {
 
 using ::testing::ContainerEq;
@@ -101,4 +101,4 @@ INSTANTIATE_TEST_SUITE_P(
     });
 
 }  // namespace
-}  // namespace iq::list::singly::reverse
+}  // namespace iq::reverse

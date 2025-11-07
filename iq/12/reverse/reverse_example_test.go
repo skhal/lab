@@ -5,7 +5,7 @@ package reverse_test
 import (
 	"fmt"
 
-	"github.com/skhal/lab/iq/list/singly/reverse"
+	"github.com/skhal/lab/iq/12/reverse"
 )
 
 func Example() {

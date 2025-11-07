@@ -3,11 +3,11 @@
 // clang-format off-next-line
 //go:build ignore
 
-#include "iq/list/singly/reverse/reverse.h"
+#include "iq/12/reverse/reverse.h"
 
 #include <memory>
 
-namespace iq::list::singly::reverse {
+namespace iq::reverse {
 
 std::shared_ptr<Node> Reverse(std::shared_ptr<Node> list) {
   std::shared_ptr<Node> head;
@@ -17,4 +17,4 @@ std::shared_ptr<Node> Reverse(std::shared_ptr<Node> list) {
   return head;
 }
 
-}  // namespace iq::list::singly::reverse
+}  // namespace iq::reverse
