@@ -3,11 +3,11 @@
 // clang-format off-next-line
 //go:build ignore
 
-#include "iq/list/singly/cycle/is.h"
+#include "iq/18/cycle/is.h"
 
 #include <memory>
 
-namespace iq::list::singly::cycle {
+namespace iq::cycle {
 
 bool Is([[maybe_unused]] std::shared_ptr<Node> node) {
   std::shared_ptr<Node> slow = node;
@@ -21,4 +21,4 @@ bool Is([[maybe_unused]] std::shared_ptr<Node> node) {
   return false;
 }
 
-}  // namespace iq::list::singly::cycle
+}  // namespace iq::cycle

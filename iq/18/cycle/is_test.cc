@@ -3,13 +3,13 @@
 // clang-format off-next-line
 //go:build ignore
 
-#include "iq/list/singly/cycle/is.h"
+#include "iq/18/cycle/is.h"
 
 #include <memory>
 
 #include "gtest/gtest.h"
 
-namespace iq::list::singly::cycle {
+namespace iq::cycle {
 namespace {
 
 TEST(IsTest, empty) {
@@ -67,4 +67,4 @@ TEST(IsTest, twoItemsCycleToSecond) {
 }
 
 }  // namespace
-}  // namespace iq::list::singly::cycle
+}  // namespace iq::cycle

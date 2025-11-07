@@ -5,7 +5,7 @@ package cycle_test
 import (
 	"fmt"
 
-	"github.com/skhal/lab/iq/list/singly/cycle"
+	"github.com/skhal/lab/iq/18/cycle"
 )
 
 func ExampleIsHappyNumber() {

@@ -3,7 +3,7 @@
 // clang-format off-next-line
 //go:build ignore
 
-#include "iq/list/singly/cycle/is_happy_number.h"
+#include "iq/18/cycle/is_happy_number.h"
 
 #include <ostream>
 
@@ -11,7 +11,7 @@
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
-namespace iq::list::singly::cycle {
+namespace iq::cycle {
 namespace {
 
 using ::testing::Eq;
@@ -59,4 +59,4 @@ INSTANTIATE_TEST_SUITE_P(IsHappyNumberTest, IsHappyNumberTest,
                          });
 
 }  // namespace
-}  // namespace iq::list::singly::cycle
+}  // namespace iq::cycle
