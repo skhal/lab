@@ -5,7 +5,7 @@ package stripzero_test
 import (
 	"fmt"
 
-	"github.com/skhal/lab/iq/mapset/stripzero"
+	"github.com/skhal/lab/iq/9/stripzero"
 )
 
 func Example() {

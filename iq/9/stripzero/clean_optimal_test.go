@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/skhal/lab/iq/mapset/stripzero"
+	"github.com/skhal/lab/iq/9/stripzero"
 )
 
 func TestCleanOptimal(t *testing.T) {

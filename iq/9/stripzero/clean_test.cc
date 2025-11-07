@@ -3,6 +3,8 @@
 // clang-format off-next-line: skip file in `go build`
 //go:build ignore
 
+#include "iq/9/stripzero/clean.h"
+
 #include <cctype>
 #include <ostream>
 #include <string>
@@ -12,9 +14,8 @@
 #include "absl/strings/str_join.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
-#include "iq/mapset/stripzero/clean.h"
 
-namespace iq::mapset::stripzero {
+namespace iq::stripzero {
 
 class RowFormatter {
  public:
@@ -264,4 +265,4 @@ INSTANTIATE_TEST_SUITE_P(CleanTest, CleanTest, ValuesIn(kCleanTestParams),
                          });
 
 }  // namespace
-}  // namespace iq::mapset::stripzero
+}  // namespace iq::stripzero

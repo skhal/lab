@@ -3,11 +3,11 @@
 // clang-format off-next-line: skip file in `go build`
 //go:build ignore
 
+#include "iq/9/stripzero/clean.h"
+
 #include <cstddef>
 
-#include "iq/mapset/stripzero/clean.h"
-
-namespace iq::mapset::stripzero {
+namespace iq::stripzero {
 namespace {
 
 constexpr int kZero = 0;
@@ -91,4 +91,4 @@ void Clean(Matrix& m) {
   cleanMatrix(m, opts);
 }
 
-}  // namespace iq::mapset::stripzero
+}  // namespace iq::stripzero
