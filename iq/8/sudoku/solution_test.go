@@ -5,7 +5,7 @@ package sudoku_test
 import (
 	"testing"
 
-	"github.com/skhal/lab/iq/mapset/sudoku"
+	"github.com/skhal/lab/iq/8/sudoku"
 )
 
 func TestSudoku_IsValid(t *testing.T) {

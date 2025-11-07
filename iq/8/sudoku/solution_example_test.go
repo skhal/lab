@@ -5,7 +5,7 @@ package sudoku_test
 import (
 	"fmt"
 
-	"github.com/skhal/lab/iq/mapset/sudoku"
+	"github.com/skhal/lab/iq/8/sudoku"
 )
 
 func Example() {
