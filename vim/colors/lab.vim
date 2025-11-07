@@ -26,6 +26,7 @@ function! s:h(scope, fg, ...) " bg, attr_list
 endfunction
 
 if &background ==# 'dark'
+  " keep-sorted start
   call s:h('Boolean', ['#cf7ea9', '175'])
   call s:h('Character', ['#d8884b', '173'])
   call s:h('ColorColumn', s:none, ['#2b2c2f', '236'])
@@ -41,7 +42,6 @@ if &background ==# 'dark'
   call s:h('Folded', s:none, ['#1f2c3b', '235'])
   call s:h('Function', ['#75b3db', '74'])
   call s:h('Identifier', ['#75b3db', '74'])
-  call s:h('javaAnnotation', ['#9dbed9', '110'])
   call s:h('Keyword', ['#d8884b', '173'])
   call s:h('LineNr', ['#858585', '102'])
   call s:h('Normal', ['#b5bcc5', '250'])
@@ -60,7 +60,10 @@ if &background ==# 'dark'
   call s:h('Type', ['#eede7b', '173'])
   call s:h('VertSplit', ['#a2a7ac', '248'])
   call s:h('Visual', s:none, ['#264f78', '24'])
+  call s:h('javaAnnotation', ['#9dbed9', '110'])
+  " keep-sorted end
 else
+  " keep-sorted start
   call s:h('Boolean', ['#221199', '19'])
   call s:h('Character', ['#770088', '90'])
   call s:h('ColorColumn', s:none, ['#f3f3f3', '255'])
@@ -76,7 +79,6 @@ else
   call s:h('Folded', s:none, ['#e6f2ff', '255'])
   call s:h('Function' , ['#0000ff', '21'])
   call s:h('Identifier', ['#0000ff', '21'])
-  call s:h('javaAnnotation', ['#555555', '240'])
   call s:h('Keyword', ['#770088', '90'])
   call s:h('LineNr', ['#999999', '247'])
   call s:h('Normal', ['#3c4043', '238'], ['#ffffff', '231'])
@@ -95,16 +97,20 @@ else
   call s:h('Type', ['#008855', '29'])
   call s:h('VertSplit', ['#b1b1b1', '249'])
   call s:h('Visual', s:none, ['#add6ff', '153'])
+  call s:h('javaAnnotation', ['#555555', '240'])
+  " keep-sorted end
 endif
 
-hi! link Statement Keyword
-hi! link SpecialChar Character
+" keep-sorted start
 hi! link FoldColumn Folded
 hi! link NonText Normal
+hi! link SpecialChar Character
+hi! link Statement Keyword
 hi! link cCustomClass Identifier
+hi! link javaCommentTitle Comment
+hi! link javaDocTags Comment
 hi! link javaExternal Statement
 hi! link javaScopeDecl Statement
 hi! link javaStorageClass Statement
-hi! link javaCommentTitle Comment
-hi! link javaDocTags Comment
 hi! link pbStructure Keyword
+" keep-sorted end
