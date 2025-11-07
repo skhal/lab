@@ -5,7 +5,7 @@ package palindrome_test
 import (
 	"fmt"
 
-	"github.com/skhal/lab/iq/list/singly/palindrome"
+	"github.com/skhal/lab/iq/16/palindrome"
 )
 
 func ExampleIs() {

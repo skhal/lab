@@ -3,7 +3,7 @@
 // clang-format off-next-line
 //go:build ignore
 
-#include "iq/list/singly/palindrome/is.h"
+#include "iq/16/palindrome/is.h"
 
 #include <algorithm>
 #include <cctype>
@@ -17,7 +17,7 @@
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
-namespace iq::list::singly::palindrome {
+namespace iq::palindrome {
 namespace {
 
 using ::testing::Eq;
@@ -98,4 +98,4 @@ INSTANTIATE_TEST_SUITE_P(IsTest, IsTest, ValuesIn(kIsTestParams),
                          });
 
 }  // namespace
-}  // namespace iq::list::singly::palindrome
+}  // namespace iq::palindrome

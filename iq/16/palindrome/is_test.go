@@ -5,7 +5,7 @@ package palindrome_test
 import (
 	"testing"
 
-	"github.com/skhal/lab/iq/list/singly/palindrome"
+	"github.com/skhal/lab/iq/16/palindrome"
 )
 
 func TestIs(t *testing.T) {

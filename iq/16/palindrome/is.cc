@@ -3,13 +3,13 @@
 // clang-format off-next-line
 //go:build ignore
 
-#include "iq/list/singly/palindrome/is.h"
+#include "iq/16/palindrome/is.h"
 
 #include <cstddef>
 #include <memory>
 #include <utility>
 
-namespace iq::list::singly::palindrome {
+namespace iq::palindrome {
 namespace {
 
 std::pair<std::shared_ptr<Node>, std::shared_ptr<Node>> findMidpoint(
@@ -51,4 +51,4 @@ bool Is(const std::shared_ptr<Node>& list) {
   return prev == nullptr && next == nullptr;
 }
 
-}  // namespace iq::list::singly::palindrome
+}  // namespace iq::palindrome
