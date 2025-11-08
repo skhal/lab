@@ -37,6 +37,10 @@ repos:
     name: keep-sorted
     entry: keep-sorted
     language: system
+  - id: lint-todo
+    name: lint-todo
+    entry: lint-todo
+    language: system
   - id: make-lint
     name: make-lint
     entry: make
