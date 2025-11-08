@@ -8,6 +8,7 @@ on:
     branches: ["main"]
     paths:
     # keep-sorted start
+    - 'check/**'
     - 'go/**'
     - 'iq/**'
     - 'x/**'
@@ -16,6 +17,7 @@ on:
     branches: ["main"]
     paths:
     # keep-sorted start
+    - 'check/**'
     - 'go/**'
     - 'iq/**'
     - 'x/**'
@@ -38,7 +40,7 @@ jobs:
         go-version: ${{ matrix.go-version }}
 
     - name: Build
-      run: go build -v ./iq/... ./x/... ./go/...
+      run: go build -v ./check/... ./iq/... ./x/... ./go/...
 
     - name: Test
-      run: go test -v ./iq/... ./x/... ./go/...
+      run: go test -v ./check/... ./iq/... ./x/... ./go/...
