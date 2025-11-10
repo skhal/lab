@@ -20,6 +20,10 @@ func Run(files ...string) (err error) {
 	}
 	r := NewTester()
 	for _, p := range packages {
+		// Gotest is a pre-commit check. Git reports changed files with respect
+		// to the wortree, without leading "./". `go test` assumes that packages
+		// without "./" prefix are non-local.
+		p = filepath.FromSlash("./" + p)
 		if err = r.Test(p); err != nil {
 			return
 		}
