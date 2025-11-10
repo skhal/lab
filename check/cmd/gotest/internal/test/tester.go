@@ -73,13 +73,9 @@ func decodeEvents(r io.Reader) iter.Seq2[EventID, *Event] {
 // VisitFails calls f on failed tests.
 func (t *Tester) VisitFails(f func(*FailedTest)) {
 	for _, id := range t.fails {
-		t.visitFailedTest(t.events[id], f)
+		ft := newFailedTest(t.events[id])
+		f(ft)
 	}
-}
-
-func (t *Tester) visitFailedTest(ee []*Event, f func(*FailedTest)) {
-	ft := newFailedTest(ee)
-	f(ft)
 }
 
 // NewEventID constructs an EventID for a given event.
