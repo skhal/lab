@@ -33,6 +33,12 @@ repos:
     language: system
     types_or: [c++, c]
     args: ["-style=file"]
+  - id: gotest
+    name: gotest
+    entry: gotest
+    language: system
+    types_or: [go]
+    pass_filenames: true
   - id: keep-sorted
     name: keep-sorted
     entry: keep-sorted
