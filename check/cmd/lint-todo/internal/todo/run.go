@@ -17,8 +17,12 @@ import (
 var ErrLint = errors.New("lint error")
 
 var (
-	todoPrefix = regexp.MustCompile(`(?i)\s+\btodo\b`)
+	todoPrefix = regexp.MustCompile(`(?i)(?://|#|")\s+\btodo\b.*`)
 	todoRegexp = regexp.MustCompile(`TODO\(github.com/\w+/\w+/issues/\d+\):\s.+$`)
+)
+
+var (
+	nolintRegexp = regexp.MustCompile(`^(?://|#|") lint-todo off(?:: .*)?$`)
 )
 
 // ReadFileFunc reads file and returns data or error.
@@ -98,6 +102,9 @@ func findViolations(data []byte) iter.Seq[*Violation] {
 		s := bufio.NewScanner(bytes.NewBuffer(data))
 		for row := 1; s.Scan(); row += 1 {
 			line := s.Text()
+			if nolintRegexp.MatchString(line) {
+				break
+			}
 			if !todoPrefix.MatchString(line) {
 				continue
 			}

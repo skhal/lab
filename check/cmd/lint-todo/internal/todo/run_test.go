@@ -1,4 +1,6 @@
 // Copyright 2025 Samvel Khalatyan. All rights reserved.
+//
+// lint-todo off
 
 package todo_test
 
@@ -8,7 +10,7 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/skhal/lab/check/todo"
+	"github.com/skhal/lab/check/cmd/lint-todo/internal/todo"
 )
 
 func ExampleRun() {
@@ -58,7 +60,7 @@ func TestLinter(t *testing.T) {
 			file: "test.txt",
 		},
 		{
-			name: "valid data violations",
+			name: "no violations",
 			readFileFn: func(string) ([]byte, error) {
 				return []byte(`// TODO(github.com/foo/bar/issues/123): test`), nil
 			},
@@ -96,6 +98,16 @@ func TestLinter(t *testing.T) {
 				makeViolation("test.txt", 1, `// TODO(github.com/foo/bar/issues/123)`),
 				makeViolation("test.txt", 2, `// TODO(): test`),
 			},
+		},
+		{
+			name: "disable lint on multiple violations",
+			readFileFn: func(string) ([]byte, error) {
+				return []byte(`// lint-todo off
+// TODO(github.com/foo/bar/issues/123)
+// TODO(): test
+				`), nil
+			},
+			file: "test.txt",
 		},
 	}
 	for _, tc := range tests {

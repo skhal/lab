@@ -15,7 +15,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/skhal/lab/check/todo"
+	"github.com/skhal/lab/check/cmd/lint-todo/internal/todo"
 )
 
 func main() {
