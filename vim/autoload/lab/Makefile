@@ -2,15 +2,13 @@
 #
 # Flavor: FreeBSD
 
-INSTALL_PATHS = lab
-
-VIM_AUTOLOAD_PATH = ${HOME}/.vim/autoload
+LAB_PATH = ${HOME}/.vim/autoload/lab
 SOURCES = ${find . -maxdepth 1 -type f -name \*.vim:L:sh:S,./,,}
-INSTALL_TARGETS = ${SOURCES:S,^,${VIM_AUTOLOAD_PATH}/,}
+INSTALL_TARGETS = ${SOURCES:S,^,${LAB_PATH}/,}
 
-install: ${INSTALL_TARGETS} ${INSTALL_PATHS} .PHONY
+install: ${INSTALL_TARGETS} .PHONY
 
-${VIM_AUTOLOAD_PATH}: .NOTMAIN
+${LAB_PATH}: .NOTMAIN
 	@if ! test -d ${.TARGET}; then \
 		echo ".. create ${.TARGET}"; \
 		mkdir -p ${.TARGET}; \
@@ -23,10 +21,5 @@ INSTALL_TARGET: .NOTMAIN .USE
 		cp ${SOURCE} ${.TARGET}
 
 .for target in ${INSTALL_TARGETS}
-${target}: ${VIM_AUTOLOAD_PATH} ${SOURCE} INSTALL_TARGET
-.endfor
-
-.for target in ${INSTALL_PATHS}
-${target}: .PHONY
-	@${MAKE} -C ${.CURDIR}/${.TARGET} install
+${target}: ${LAB_PATH} ${SOURCE} INSTALL_TARGET
 .endfor

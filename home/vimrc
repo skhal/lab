@@ -331,10 +331,13 @@ augroup Keyword
 augroup END
 
 " -- Plugin https://github.com/preservim/nerdtree
-let g:NERDTreeWinPos = "right"
-let g:NERDTreeMinimalUI = 1
+" keep-sorted start
+let g:NERDTreeHijackNetrw = 0
 let g:NERDTreeMinimalMenu = 1
+let g:NERDTreeMinimalUI = 1
+let g:NERDTreeWinPos = "right"
+" keep-sorted end
 
-augroup NERDTree
-  autocmd VimEnter * nnoremap <Leader>t <plug>(nerdtree-toggle)
+augroup LabNERDTree
+  autocmd VimEnter * nnoremap <Leader>t <plug>(lab-nerdtree-toggle)
 augroup END

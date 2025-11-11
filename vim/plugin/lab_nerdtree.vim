@@ -3,9 +3,9 @@
 " Use of this source code is governed by a BSD-style
 " license that can be found in the LICENSE file.
 
-if exists('g:nerdtree_loaded')
+if exists('g:lab_nerdtree_loaded')
   finish
 endif
-let g:nerdtree_loaded=1
+let g:lab_nerdtree_loaded=1
 
-nnoremap <silent> <plug>(nerdtree-toggle) :<c-u>NERDTreeToggle<cr>
+nnoremap <silent> <plug>(lab-nerdtree-toggle) :<c-u>call lab#nerdtree#Toggle()<cr>
