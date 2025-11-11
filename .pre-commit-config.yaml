@@ -43,6 +43,10 @@ repos:
     name: keep-sorted
     entry: keep-sorted
     language: system
+  - id: lint-nosubmit
+    name: lint-nosubmit
+    entry: lint-nosubmit
+    language: system
   - id: lint-todo
     name: lint-todo
     entry: lint-todo
