@@ -1,4 +1,7 @@
 # Copyright @YEAR@ Samvel Khalatyan. All rights reserved.
 #
+# Use of this source code is governed by a BSD-style
+#  license that can be found in the LICENSE file.
+#
 # proto-file: some/proto/my_file.proto
 # proto-message: MyMessage
