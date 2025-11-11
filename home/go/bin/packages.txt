@@ -14,6 +14,7 @@ github.com/shurcooL/markdownfmt@latest
 github.com/skhal/lab/check/cmd/gotest@latest
 github.com/skhal/lab/check/cmd/lint-nosubmit@latest
 github.com/skhal/lab/check/cmd/lint-todo@latest
+github.com/skhal/lab/iq/cmd/iq@latest
 golang.org/x/tools/cmd/goimports@latest
 golang.org/x/tools/cmd/stringer@latest
 golang.org/x/tools/gopls@latest
