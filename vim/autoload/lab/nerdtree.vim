@@ -13,9 +13,3 @@ function! lab#nerdtree#Toggle()
     endif
   endif
 endfunction
-
-" s:isNERDTreeOpen checks whether NERDTre is open.
-" https://codeyarns.com/tech/2014-05-05-how-to-highlight-current-file-in-nerdtree.html#gsc.tab=0
-function! s:isNERDTreeOpen()
-  return exists("t:NERDTreeBufName") && (bufwinnr(t:NERDTreeBufName) != -1)
-endfunction
