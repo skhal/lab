@@ -329,3 +329,12 @@ augroup Keyword
   autocmd FileType c,cpp setlocal keywordprg=cppman
   autocmd FileType go    setlocal keywordprg=:GoDoc
 augroup END
+
+" -- Plugin https://github.com/preservim/nerdtree
+let g:NERDTreeWinPos = "right"
+let g:NERDTreeMinimalUI = 1
+let g:NERDTreeMinimalMenu = 1
+
+augroup NERDTree
+  autocmd VimEnter * nnoremap <Leader>t <plug>(nerdtree-toggle)
+augroup END
