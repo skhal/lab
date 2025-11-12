@@ -19,6 +19,12 @@ Download FreeBSD user land into `/jail/image/`:
     https://download.freebsd.org/ftp/releases/amd64/amd64/14.3-RELEASE/base.txz
 ```
 
+Create a new ZFS dataset for the template:
+
+```console
+# zfs create zroot/jail/template/14.3-RELEASE
+```
+
 Open the archive into `/jail/template/` sub-folder:
 
 ```console
