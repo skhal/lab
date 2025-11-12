@@ -88,7 +88,7 @@ Default timezone is set to UTC. Switch to US Central Time:
 
 ```console
 # chroot /jail/template/14.3-RELEASE \
-    tzsetup /usr/share/zoneinfo/America/Chicago
+    tzsetup America/Chicago
 # chroot /jail/template/14.3-RELEASE \
     tzsetup -r
 ```
