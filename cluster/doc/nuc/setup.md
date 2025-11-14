@@ -1,20 +1,19 @@
-# NAME
+NAME
+====
 
 **setup** - basic setup of `nuc.lab.net`
 
+DESCRIPTION
+===========
 
-# DESCRIPTION
+Basic setup brings a fresh installation of FreeBSD to minimal setup, suitable for operations. It covers:
 
-Basic setup brings a fresh installation of FreeBSD to minimal setup,
-suitable for operations. It covers:
+-	Create a user `op` to operate the OS through `wheel` group membership.
+-	Move service configs from global `/etc/rc.conf` to per-service configuration file under `/etc/rc.conf.d/`.
+-	Install few applications to manage the system.
 
-  * Create a user `op` to operate the OS through `wheel` group membership.
-  * Move service configs from global `/etc/rc.conf` to per-service configuration
-    file under `/etc/rc.conf.d/`.
-  * Install few applications to manage the system.
-
-
-# USERS
+USERS
+=====
 
 Create an operator user `op` to manage the node:
 
@@ -35,8 +34,7 @@ Create an operator user `op` to manage the node:
 # passwd -l op
 ```
 
-Isolate user home folder in a dedicated ZFS dataaset and let the user
-manage it:
+Isolate user home folder in a dedicated ZFS dataaset and let the user manage it:
 
 ```console
 # zfs create zroot/home/op
@@ -51,23 +49,19 @@ Change root-user shell to tcsh(1):
 # chsh -s /bin/tcsh root
 ```
 
+SERVICES
+========
 
-# SERVICES
-
-FreeBSD boot process uses `init(8)`. It triggers `rc(8)` to start services.
-Every service has a script in one of `rc.d/` folders: standard location
-`/etc/rc.d` and folders set by `local_startup` flag:
+FreeBSD boot process uses `init(8)`. It triggers `rc(8)` to start services. Every service has a script in one of `rc.d/` folders: standard location `/etc/rc.d` and folders set by `local_startup` flag:
 
 ```console
 % sysrc local_startup
 local_startup: /usr/local/etc/rc.d
 ```
 
-Service scripts define dependencies, rc-variables, actions (start, stop, etc.)
-and function to execute the actions.
+Service scripts define dependencies, rc-variables, actions (start, stop, etc.) and function to execute the actions.
 
-Use `rcorder(8)` to dump services dependency graph in topological order (`-p`
-groups services that can start in parallel`):
+Use `rcorder(8)` to dump services dependency graph in topological order (`-p` groups services that can start in parallel`):
 
 ```console
 % rcorder -p /etc/rc.d/* | head -n 2
@@ -75,16 +69,11 @@ groups services that can start in parallel`):
 /etc/rc.d/ddb /etc/rc.d/hostid
 ```
 
-Service scripts use variables, aka flags, set in `rc.conf(5)` files, loaded
-in the following order (the last loaded value wins):
+Service scripts use variables, aka flags, set in `rc.conf(5)` files, loaded in the following order (the last loaded value wins):
 
-  * A default value is set in `/etc/default/rc.conf` with optional override
-    from `/etc/default/vendor.conf` (if exists).
-  * `/etc/rc.conf` and `/etc/rc.conf.local` (legacy) are global containers,
-    loaded by all services including `rc(8)` itself.
-  * `<dir>/rc.conf.d/<name>` is only loaded by the service `<name>`, where
-    `<dir>/` is either the standard location `/etc` or folders listed in
-    `local_startup` with `rc.d/` suffix removed.
+-	A default value is set in `/etc/default/rc.conf` with optional override from `/etc/default/vendor.conf` (if exists).
+-	`/etc/rc.conf` and `/etc/rc.conf.local` (legacy) are global containers, loaded by all services including `rc(8)` itself.
+-	`<dir>/rc.conf.d/<name>` is only loaded by the service `<name>`, where`<dir>/` is either the standard location `/etc` or folders listed in`local_startup` with `rc.d/` suffix removed.
 
 Use `sysrc(8)` to list supported configuration files for a given service:
 
@@ -93,26 +82,23 @@ Use `sysrc(8)` to list supported configuration files for a given service:
 /etc/rc.conf /etc/rc.conf.local /etc/rc.conf.d/hostname /usr/local/etc/rc.conf.d/hostname
 ```
 
-> [!WARNING]
-> `/etc/rc.conf` is a global container of flags, shared between all services
-> and `rc(8)`. In order to limit the visibility of flags, place flags into
-> shared files under `<dir>/rc.conf.d/`.
->
-> For example, `dhclient` and `netif` services share DHCP settings via
-> `/etc/rc.conf.d/network`.
->
-> ```console
-> % sysrc -s dhclient -l
-> /etc/rc.conf /etc/rc.conf.local /etc/rc.conf.d/dhclient /usr/local/etc/rc.conf.d/dhclient /etc/rc.conf.d/network /usr/local/etc/rc.conf.d/network
-> % sysrc -s netif -l
-> /etc/rc.conf /etc/rc.conf.local /etc/rc.conf.d/network /usr/local/etc/rc.conf.d/network /etc/rc.conf.d/netif /usr/local/etc/rc.conf.d/netif
-> ```
+**WARNING**
 
-The instructions below move flags from `/etc/rc.conf` to per-service
-configuration file under `/etc/rc.conf.d/`. It preserves `/usr/local/etc` 
-for services installed by ports and packages.
+`/etc/rc.conf` is a global container of flags, shared between all services and `rc(8)`. In order to limit the visibility of flags, place flags into shared files under `<dir>/rc.conf.d/`.
 
-## Hostname
+For example, `dhclient` and `netif` services share DHCP settings via `/etc/rc.conf.d/network`.
+
+```console
+% sysrc -s dhclient -l
+/etc/rc.conf /etc/rc.conf.local /etc/rc.conf.d/dhclient /usr/local/etc/rc.conf.d/dhclient /etc/rc.conf.d/network /usr/local/etc/rc.conf.d/network
+% sysrc -s netif -l
+/etc/rc.conf /etc/rc.conf.local /etc/rc.conf.d/network /usr/local/etc/rc.conf.d/network /etc/rc.conf.d/netif /usr/local/etc/rc.conf.d/netif
+```
+
+The instructions below move flags from `/etc/rc.conf` to per-service configuration file under `/etc/rc.conf.d/`. It preserves `/usr/local/etc` for services installed by ports and packages.
+
+Hostname
+--------
 
 ```console
 % sysrc -s hostname -l
@@ -122,7 +108,8 @@ for services installed by ports and packages.
 # service hostname restart
 ```
 
-## Moused
+Moused
+------
 
 ```console
 % sysrc -s moused -l
@@ -132,11 +119,10 @@ for services installed by ports and packages.
 moused_nondefault_enable: YES -> no
 ```
 
-## Network
+Network
+-------
 
-`netif` manages network interfaces. It shares some of the DHCP configurations
-with `dhclient` via `/etc/rc.conf.d/network`, therefore keep configuration in
-this file.
+`netif` manages network interfaces. It shares some of the DHCP configurations with `dhclient` via `/etc/rc.conf.d/network`, therefore keep configuration in this file.
 
 ```console
 % sysrc -s netif -l
@@ -152,8 +138,7 @@ It is best to reboot the host for all the services to pick up the network file.
 
 Ref: https://docs.freebsd.org/en/books/handbook/network/#network-wireless
 
-First, create a `wpa_supplicant.conf(5)` with wireless Service Set Identifier
-(SSID) and Pre-Shared Key (PSK) (the contents are redacted):
+First, create a `wpa_supplicant.conf(5)` with wireless Service Set Identifier (SSID) and Pre-Shared Key (PSK) (the contents are redacted):
 
 ```console
 % cat /etc/wpa_supplicant.conf
@@ -180,7 +165,8 @@ wlans_iwm0:  -> wlan0
 ifconfig_wlan0:  -> WPA DHCP
 ```
 
-## Network Time server
+Network Time server
+-------------------
 
 ```console
 % sysrc -s ntpd -l
@@ -192,7 +178,8 @@ ifconfig_wlan0:  -> WPA DHCP
 # service ntpd restart
 ```
 
-## Routing
+Routing
+-------
 
 ```console
 % sysrc -s routing -l
@@ -215,7 +202,7 @@ Verify that DNS resolution uses router:
 ```console
  % drill freebsd.org
 ;; ->>HEADER<<- opcode: QUERY, rcode: NOERROR, id: 5988
-;; flags: qr rd ra ; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 0 
+;; flags: qr rd ra ; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 0
 ;; QUESTION SECTION:
 ;; freebsd.org.	IN	A
 
@@ -231,7 +218,8 @@ freebsd.org.	3600	IN	A	96.47.72.84
 ;; WHEN: Mon Sep  1 09:
 ```
 
-## RC
+RC
+--
 
 Enable rc debug and info logging:
 
@@ -240,7 +228,8 @@ Enable rc debug and info logging:
 # sysrc rc_info=yes
 ```
 
-## Syslog
+Syslog
+------
 
 ```console
 % sysrc -s syslogd -l
@@ -250,19 +239,16 @@ Enable rc debug and info logging:
 # service syslogd restart
 ```
 
-`rc(8)` scripts log messages using `logger(1)`, backed to `syslog(3)`. This
-writes messages to console and any other sinks configured in `systlogd(8)`.
-Unfortunately, `syslogd(8)` starts at some later stage in `rc(8)` sequence:
+`rc(8)` scripts log messages using `logger(1)`, backed to `syslog(3)`. This writes messages to console and any other sinks configured in `systlogd(8)`. Unfortunately, `syslogd(8)` starts at some later stage in `rc(8)` sequence:
 
 ```console
 % rcorder -p | cat -n | grep -C 1 syslogd
-    29	/etc/rc.d/accounting /etc/rc.d/cleartmp /etc/rc.d/devfs /etc/rc.d/dmesg /etc/rc.d/gptboot /etc/rc.d/hostapd /etc/rc.d/mdconfig2 /etc/rc.d/motd /etc/rc.d/newsyslog /etc/rc.d/os-release /etc/rc.d/virecover /etc/rc.d/wpa_supplicant 
-    30	/etc/rc.d/syslogd 
-    31	/etc/rc.d/auditd /etc/rc.d/bsnmpd /etc/rc.d/hastd /etc/rc.d/ntpdate /etc/rc.d/power_profile /etc/rc.d/pwcheck /etc/rc.d/savecore /etc/rc.d/watchdogd 
+    29	/etc/rc.d/accounting /etc/rc.d/cleartmp /etc/rc.d/devfs /etc/rc.d/dmesg /etc/rc.d/gptboot /etc/rc.d/hostapd /etc/rc.d/mdconfig2 /etc/rc.d/motd /etc/rc.d/newsyslog /etc/rc.d/os-release /etc/rc.d/virecover /etc/rc.d/wpa_supplicant
+    30	/etc/rc.d/syslogd
+    31	/etc/rc.d/auditd /etc/rc.d/bsnmpd /etc/rc.d/hastd /etc/rc.d/ntpdate /etc/rc.d/power_profile /etc/rc.d/pwcheck /etc/rc.d/savecore /etc/rc.d/watchdogd
 ```
 
-In result, rc-messages prior to `syslogd(8)` are only availalbe in console. The
-first ones are from `auditd` service in `/var/log/messages`:
+In result, rc-messages prior to `syslogd(8)` are only availalbe in console. The first ones are from `auditd` service in `/var/log/messages`:
 
 ```
 Aug 29 14:40:08 nuc kernel: em0: link state changed to UP
@@ -272,11 +258,12 @@ Aug 29 14:40:08 nuc root[26487]: /etc/rc: DEBUG: checkyesno: auditd_enable is se
 Configure `syslog(3)` to log all console messages:
 
 ```console
-% grep console.info /etc/syslog.conf 
+% grep console.info /etc/syslog.conf
 console.info					/var/log/console.log
 ```
 
-## SSH
+SSH
+---
 
 ```console
 % sysrc -s sshd -l
@@ -286,8 +273,7 @@ console.info					/var/log/console.log
 # service sshd restart
 ```
 
-By default, SSH server listens on all IP addresses. Restrict it to the host IP
-on LAN `em0` and WLAN `wlan0` and only allow operator user `op` to connect:
+By default, SSH server listens on all IP addresses. Restrict it to the host IP on LAN `em0` and WLAN `wlan0` and only allow operator user `op` to connect:
 
 ```console
 # sockstat -4 | grep sshd
@@ -299,7 +285,8 @@ root     sshd       32886 7   tcp4   192.168.1.101:22      *:*
 root     sshd       32886 8   tcp4   192.168.1.100:22      *:*
 ```
 
-## ZFS
+ZFS
+---
 
 ```console
 % sysrc -s zfs -l
@@ -309,19 +296,18 @@ root     sshd       32886 8   tcp4   192.168.1.100:22      *:*
 # shutdown -r now
 ```
 
-# APPLICATIONS
+APPLICATIONS
+============
 
 Ref: https://docs.freebsd.org/en/books/handbook/ports/
 
-Ports build software from the source. Packages are pre-built binaries. There
-might be multiple packages for the same port representing the same application
-with different configuraiton options. Not every port has a binary package.
+Ports build software from the source. Packages are pre-built binaries. There might be multiple packages for the same port representing the same application with different configuraiton options. Not every port has a binary package.
 
 Switch from Quarterly to Latest packages:
 
 ```console
 # mkdir -p /usr/local/etc/pkg/repos
-# cat <<eof > /usr/local/etc/pkg/repos/FreeBSD.conf 
+# cat <<eof > /usr/local/etc/pkg/repos/FreeBSD.conf
 FreeBSD: { url: "pkg+http://pkg.FreeBSD.org/${ABI}/latest" }
 eof
 # pkg update -f
@@ -339,7 +325,8 @@ vim-tiny
 wifi-firmware-iwlwifi-kmod-8000
 ```
 
-## Doas
+Doas
+----
 
 Let the operator monitor the system:
 
@@ -350,11 +337,10 @@ permit nopass op cmd sockstat
 eof
 ```
 
-## Vim
+Vim
+---
 
-There are different pre-built configurations of
-[vim](https://www.freshports.org/editors/vim/). `vim-tiny` only includes binary
-without runtime files. It makes `vim-tiny` suitable for minimal installations.
+There are different pre-built configurations of [vim](https://www.freshports.org/editors/vim/). `vim-tiny` only includes binary without runtime files. It makes `vim-tiny` suitable for minimal installations.
 
 ```console
 # pkg install vim-tiny
