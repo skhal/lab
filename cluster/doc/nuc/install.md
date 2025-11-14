@@ -1,29 +1,26 @@
-# NAME
+NAME
+====
 
-**install** - install FreeBSD on `nuc.lab.net`
+**install** - install FreeBSD on ASUS NUC
 
-
-# DESCRIPTION
+DESCRIPTION
+===========
 
 Ref: https://docs.freebsd.org/en/books/handbook/bsdinstall/
 
-## Create the Installation Media
-
-*Note*: The instructions use MacOS to create the installation media. The OS does not
-include include `xz(1)` to uncompress images from `.xg` files.
+Create the Installation Media
+-----------------------------
 
 Download AMD64 image and verify the checksum.
 
 ```console
 % curl -O https://download.freebsd.org/releases/amd64/amd64/ISO-IMAGES/14.3/FreeBSD-14.3-RELEASE-amd64-mini-memstick.img
 % curl -O https://download.freebsd.org/releases/amd64/amd64/ISO-IMAGES/14.3/CHECKSUM.SHA512-FreeBSD-14.3-RELEASE-amd64
-% shasum \
-    -c CHECKSUM.SHA512-FreeBSD-14.3-RELEASE-amd64 \
-    --ignore-missing
+% shasum -c CHECKSUM.SHA512-FreeBSD-14.3-RELEASE-amd64 --ignore-missing
 FreeBSD-14.3-RELEASE-amd64-mini-memstick.img: OK
 ```
 
-Write the image to the memstick:
+Write the image to the USB drive:
 
 ```console
 % disktuil list
@@ -50,36 +47,38 @@ Unmount of all volumes on disk6 was successful
 Disk /dev/disk6 ejected
 ```
 
-## Install the OS
+Install FreeBSD
+---------------
 
-Boot from the memstick and follow the instructions:
+Boot from the USB drive and follow the instructions:
 
-  * Keyboard: default layout (US)
-  * Hostname: `nuc.lab.net`
-  * Network: `em0` IPv4 DHCP
-  * Filesystem: ZFS with mirrored pool
-  * Enable services:
-    - `dumpdev` to dump kernel crashes to `/var/crash`
-    - `ntpd` for clock synchronization
-    - `ntpd_sync_on_start` to sync time on `ntpd` start
-    - `sshd` for SSH server
-  * Turn on security hardening:
-    - `hide_uids` hide processes as other users
-    - `hide_gids` hide processes as other groups
-    - `hide_jail` hide processes in jails
-    - `read_msgbuf` no kernel msgbuf read for unprivileged
-    - `proc_debug` no proc debug for unprivileged
-    - `random_pid` random PID for new processes
-    - `clear_tmp` clean `/tmp` on startup
-    - `disable_syslogd` no syslogd network socket
-    - `secure_console` console password prompt
+-	Keyboard: default layout (US)
+-	Hostname: `nuc.lab.net`
+-	Network: `igc0` IPv4 DHCP
+-	Filesystem: ZFS with one disk stripe and [4g swap size](https://forums.freebsd.org/threads/swap-size-on-zfs-with-high-amount-of-ram.71059/) (increase for Kernel development)
+-	Enable services:
+	-	`dumpdev` - dump kernel crashes to `/var/crash`
+	-	`ntpd` - clock synchronization
+	-	`ntpd_sync_on_start` - sync time on `ntpd` start
+	-	`powerd` - system power control utility
+	-	`sshd` - SSH server
+-	Turn on security hardening:
+	-	`hide_uids` hide processes as other users
+	-	`hide_gids` hide processes as other groups
+	-	`hide_jail` hide processes in jails
+	-	`read_msgbuf` no kernel msgbuf read for unprivileged
+	-	`proc_debug` no proc debug for unprivileged
+	-	`random_pid` random PID for new processes
+	-	`clear_tmp` clean `/tmp` on startup
+	-	`disable_syslogd` no syslogd network socket
+	-	`secure_console` console password prompt
 
-## Update the OS
+Update the OS
+-------------
 
 Ref: https://docs.freebsd.org/en/books/handbook/cutting-edge/
 
-Check the running version of installed kernel `-k`, running kernel `-r`,
-and running userland `-u`:
+Check the running version of installed kernel `-k`, running kernel `-r`, and running userland `-u`:
 
 ```console
 % freebsd-version -kru
@@ -88,9 +87,7 @@ and running userland `-u`:
 14.3-RELEASE
 ```
 
-Fetch and install updates. The system will auto-reboot if there is
-a kernel update, otherwise it restarts the updated services only.
-It is still a good idea to restart the node.
+Fetch and install updates. The system will auto-reboot if there is a kernel update, otherwise it restarts the updated services only. It is still a good idea to restart the node.
 
 ```console
 # freebsd-update fetch
