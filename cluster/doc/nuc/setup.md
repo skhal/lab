@@ -419,40 +419,33 @@ Configure `syslog(3)` to log all console messages:
 console.info					/var/log/console.log
 ```
 
-APPLICATIONS
+Applications
 ============
-
-Ref: https://docs.freebsd.org/en/books/handbook/ports/
 
 Installed packages:
 
 ```console
 % pkg prime-list
 doas
-gpu-firmware-intel-kmod-skylake
+pam_mkhomedir
+pftop
 pkg
-rsync
 vim-tiny
-wifi-firmware-iwlwifi-kmod-8000
+wifi-firmware-iwlwifi-kmod-bz
 ```
 
 Doas
 ----
 
-Let the operator monitor the system:
+Give the system operator permissions to run basic tools. Everything else is to be managed by root:
 
 ```console
 # pkg install doas
-# cat <<eof >/usr/local/etc/doas.conf
+% cat /usr/local/etc/doas.conf
+permit nopass op cmd pftop
+permit nopass op cmd pkg
+permit nopass op cmd service
+permit nopass op cmd shutdown
 permit nopass op cmd sockstat
-eof
-```
-
-Vim
----
-
-There are different pre-built configurations of [vim](https://www.freshports.org/editors/vim/). `vim-tiny` only includes binary without runtime files. It makes `vim-tiny` suitable for minimal installations.
-
-```console
-# pkg install vim-tiny
+permit nopass op cmd top
 ```
