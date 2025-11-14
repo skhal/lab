@@ -186,32 +186,10 @@ clear_tmp_enable="YES"
 dumpdev="AUTO"
 ```
 
-SERVICES
+Services
 ========
 
-Ref: [rc](./rc.md)
-
-Hostname
---------
-
-```console
-% sysrc -s hostname -l
-/etc/rc.conf /etc/rc.conf.local /etc/rc.conf.d/hostname /usr/local/etc/rc.conf.d/hostname
-# sysrc -x hostname
-# sysrc -f /etc/rc.conf.d/hostname hostname="nuc.lab.net"
-# service hostname restart
-```
-
-Moused
-------
-
-```console
-% sysrc -s moused -l
-/etc/rc.conf /etc/rc.conf.local /etc/rc.conf.d/moused /usr/local/etc/rc.conf.d/moused
-# sysrc -x moused_nondefault_enable
-# sysrc -f /etc/rc.conf.d/moused moused_nondefault_enable=no
-moused_nondefault_enable: YES -> no
-```
+The instructions below skip basic service setup, covered in the Bootstrap section.
 
 Network
 -------
@@ -259,19 +237,6 @@ wlans_iwm0:  -> wlan0
 ifconfig_wlan0:  -> WPA DHCP
 ```
 
-Network Time server
--------------------
-
-```console
-% sysrc -s ntpd -l
-/etc/rc.conf /etc/rc.conf.local /etc/rc.conf.d/ntpd /usr/local/etc/rc.conf.d/ntpd
-# sysrc -x ntpd_sync_on_start
-# sysrc -x ntpd_enable
-# sysrc -f /etc/rc.conf.d/ntpd ntpd_enable=yes
-# sysrc -f /etc/rc.conf.d/ntpd ntpd_sync_on_start=yes
-# service ntpd restart
-```
-
 Routing
 -------
 
@@ -310,16 +275,6 @@ freebsd.org.	3600	IN	A	96.47.72.84
 ;; Query time: 25 msec
 ;; SERVER: 192.168.1.1
 ;; WHEN: Mon Sep  1 09:
-```
-
-RC
---
-
-Enable rc debug and info logging:
-
-```console
-# sysrc rc_debug=yes
-# sysrc rc_info=yes
 ```
 
 Syslog
@@ -377,17 +332,6 @@ root     sshd          21 7   tcp4   *:22                  *:*
 # sockstat -4 | grep sshd
 root     sshd       32886 7   tcp4   192.168.1.101:22      *:*
 root     sshd       32886 8   tcp4   192.168.1.100:22      *:*
-```
-
-ZFS
----
-
-```console
-% sysrc -s zfs -l
-/etc/rc.conf /etc/rc.conf.local /etc/rc.conf.d/zfs /usr/local/etc/rc.conf.d/zfs
-# sysrc -x zfs_enable
-# sysrc -f /etc/rc.conf.d/zfs zfs_enable=yes
-# shutdown -r now
 ```
 
 APPLICATIONS
