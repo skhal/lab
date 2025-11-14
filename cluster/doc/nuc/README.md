@@ -25,14 +25,16 @@ The update runs for about 5 minutes.
 2.	Download "BIOS Full Package" .ZIP file from the [Support](https://www.asus.com/us/supportonly/nuc15crsu7/helpdesk_bios/) page and verify the checksum:
 
 	```console
+	% # generate a checksum file
 	% sha256 ./CRARL579.0027.zip > bios.checksum
-	% # update checksum in the file
+	% # update the checksum in bios.checksum
+	% # verify the checksum
 	% shasum -c bios.checksum --ignore-missing
 	./CRARL579.0027.zip: OK
 	```
 
 3.	Copy .CAP file from "Capsule File for BIOS Flash through F7" folder to the USB drive.
 
-4.	Start ASUS NUC with USB drive with F7 pressed
+4.	Start ASUS NUC with the USB drive in and F7 pressed
 
-5.	Select USB drive with .CAP file to run the update.
+5.	Select the USB drive with .CAP file to update BIOS.
