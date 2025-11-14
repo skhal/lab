@@ -1,21 +1,88 @@
 NAME
 ====
 
-**setup** - basic setup of `nuc.lab.net`
+**setup** - setup FreeBSD
 
-DESCRIPTION
-===========
+Summary
+=======
 
-Basic setup brings a fresh installation of FreeBSD to minimal setup, suitable for operations. It covers:
+The setup instructions configure FreeBSD to host virtual nodes using classic, thick [jails](https://docs.freebsd.org/en/books/handbook/jails/).
 
--	Create a user `op` to operate the OS through `wheel` group membership.
--	Move service configs from global `/etc/rc.conf` to per-service configuration file under `/etc/rc.conf.d/`.
--	Install few applications to manage the system.
+The server has minimal setup:
 
-USERS
-=====
+-	Networking: two bridges for jails to separate internal and Internet traffic.
+-	Security: packet filtering
+-	Packages: doas, vim-tiny
+-	Users: an operator user `op` to manage the system with SSH access.
 
-Create an operator user `op` to manage the node:
+The jails have the following setup:
+
+-	Networking: full networking stack virtualisation through VNET.
+-	Security: packet filtering
+-	Packages: minimal set of packages to run jailed services or unrestricted for development jails.
+-	Users: LDAP
+
+Running jails:
+
+-	Infrastructure:
+	-	dns - BIND server
+	-	ldap - OpenLDAP server
+-	Development:
+	-	dev - FreeBSD environment
+	-	jammy - Linux environment via FreeBSD [Linux Binary Compatibility](https://docs.freebsd.org/en/books/handbook/linuxemu/)
+
+Bootstrap
+=========
+
+Boot menu
+---------
+
+Disable boot menu to speed up restarts:
+
+```console
+# echo 'autoboot_delay="0"' >> /boot/loader.conf
+```
+
+System Update
+-------------
+
+Update to the latest patch available:
+
+```console
+# uname -a
+# freebsd-update fetch
+# freebsd-update install
+```
+
+Verify the updated applied as expected by checking the Kernel version:
+
+```console
+# uname -a
+```
+
+Packages
+--------
+
+Use latest packages available:
+
+```console
+# mkdir /usr/local/etc/pkg
+# mkdir /usr/local/etc/pkg/repos
+# cat /usr/local/etc/pkg/repos/FreeBSD.conf
+FreeBSD: { url: "pkg+http://pkg.FreeBSD.org/${ABI}/latest" }
+```
+
+Update packages:
+
+```console
+# pkg update
+# pkg install
+```
+
+Users
+-----
+
+Create a system operator:
 
 ```console
 # pw groupadd \
@@ -34,19 +101,87 @@ Create an operator user `op` to manage the node:
 # passwd -l op
 ```
 
-Isolate user home folder in a dedicated ZFS dataaset and let the user manage it:
-
-```console
-# zfs create zroot/home/op
-# zfs allow -u op create,destroy,mount,snapshot zroot/home/op
-# sh -c 'for f in /usr/share/skel/*; do cp $f ~/.${f##*/dot.}; done'
-# chown -R op:op /home/op
-```
-
 Change root-user shell to tcsh(1):
 
 ```console
 # chsh -s /bin/tcsh root
+```
+
+Pluggable Authentication Modules (PAM)
+--------------------------------------
+
+Let PAM initialize user home folder.
+
+```console
+# pkg install pam_mkhomedir
+```
+
+Place the
+
+```console
+# grep pam_mkhomedir /etc/pam.d/login
+session         required        /usr/local/lib/pam_mkhomedir.so
+```
+
+Resource configuration
+----------------------
+
+Break monolith `/etc/rc.conf` into per-service configuration file to isolate service flags.
+
+```console
+# sysrc -s hostname -l
+/etc/rc.conf /etc/rc.conf.local /etc/rc.conf.d/hostname /usr/local/etc/rc.conf.d/hostname
+```
+
+Move appropriate flags:
+
+```console
+# # add flag
+# sysrc -f /etc/rc.conf.d/hostname hostname_foo=...
+hostname_foo: ... -> ...
+# # remove flag
+# sysrc -x hostname_foo=...
+```
+
+Per-service configurations:
+
+```console
+# head /etc/rc.conf.d/*
+==> /etc/rc.conf.d/hostname <==
+hostname="nuc.lab.net"
+
+==> /etc/rc.conf.d/moused <==
+moused_nondefault_enable="no"
+
+==> /etc/rc.conf.d/network <==
+ifconfig_igc0="DHCP"
+
+==> /etc/rc.conf.d/ntpd <==
+ntpd_enable="yes"
+ntpd_sync_on_start="yes"
+
+==> /etc/rc.conf.d/powerd <==
+powerd_enable="yes"
+
+==> /etc/rc.conf.d/routing <==
+defaultrouter="192.168.1.1"
+
+==> /etc/rc.conf.d/sshd <==
+sshd_enable="yes"
+
+==> /etc/rc.conf.d/syslogd <==
+syslogd_flags="-ss"
+
+==> /etc/rc.conf.d/zfs <==
+zfs_enable="yes"
+```
+
+Catch-all RC configuration:
+
+```console
+# cat /etc/rc.conf
+clear_tmp_enable="YES"
+dumpdev="AUTO"
 ```
 
 SERVICES
