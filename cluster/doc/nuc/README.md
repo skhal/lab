@@ -1,24 +1,25 @@
 Name
 ====
 
-**nuc** - ASUS NUC setup
+**nuc** - ASUS NUC
 
-Description
-===========
+Hardware
+========
 
-Hardware:
-
--	ASUS NUC 15 Pro+, NUC15CRSU7, [Support](https://www.asus.com/us/supportonly/nuc15crsu9/helpdesk_bios/)
+-	ASUS NUC 15 Pro+ NUC15CRSU7, [Support](https://www.asus.com/us/supportonly/nuc15crsu9/helpdesk_bios/)
 	-	Intel Core Ultra 7 [255H](https://www.intel.com/content/www/us/en/products/sku/241751/intel-core-ultra-7-processor-255h-24m-cache-up-to-5-10-ghz/specifications.html)
 	-	G.SKILL Ripjaws SO-DIMM 32GB (16GB x2) DDR5 5600
 	-	WD Black SN8100 2TB PCIe 5.0x4 M.2 2280 NVMe
 
 BIOS
+====
 
--	Disable "Secure Boot" as it prevents non-Windows OS from booting, [ref](https://www.asus.com/global/support/faq/1044664/).
+-	Disable "Secure Boot" to let non-Windows OS boot, [ref](https://www.asus.com/global/support/faq/1044664/).
 
-BIOS Update
------------
+Update
+------
+
+The update runs for about 5 minutes.
 
 1.	Format a USB drive as FAT16
 2.	Download "BIOS Full Package" .ZIP file from the [Support](https://www.asus.com/us/supportonly/nuc15crsu7/helpdesk_bios/) page and verify the checksum:
@@ -35,5 +36,3 @@ BIOS Update
 4.	Start ASUS NUC with USB drive with F7 pressed
 
 5.	Select USB drive with .CAP file to run the update.
-
-BIOS update takes about 5 minutes.
