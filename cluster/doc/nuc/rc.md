@@ -1,7 +1,7 @@
 Name
 ====
 
-**rc** - resource configuration
+**rc** - FreeBSD resource configuration
 
 Description
 ===========

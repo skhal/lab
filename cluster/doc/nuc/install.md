@@ -1,7 +1,7 @@
 NAME
 ====
 
-**install** - install FreeBSD on ASUS NUC
+**install** - install FreeBSD
 
 DESCRIPTION
 ===========
