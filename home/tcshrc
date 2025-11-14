@@ -40,20 +40,20 @@ setenv CLICOLOR 1
 # -- GO SETUP
 # Pick up system install
 set go_base_ = "/usr/local/go125"
-if ( -d ${go_base_} ) then
+if ( ! $?TMUX && -d ${go_base_} ) then
   set path = (${path} ${go_base_}/bin)
 endif
 unset go_base_
 # Pick up user binaries from `go install`.
 set go_user_base_ = "$HOME"/go
-if ( -d ${go_user_base_} ) then
+if ( ! $?TMUX && -d ${go_user_base_} ) then
   set path = (${path} ${go_user_base_}/bin)
 endif
 unset go_user_base_
 
 # -- C++ SETUP
 set llvm_base_ = "/usr/local/llvm19"
-if ( -d ${llvm_base_} ) then
+if ( ! $?TMUX && -d ${llvm_base_} ) then
   set path = (${path} ${llvm_base_}/bin)
 endif
 unset llvm_base_
