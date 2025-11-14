@@ -45,8 +45,8 @@ augroup Format
   au FileType yaml setlocal equalprg=yamlfmt\ -in
   " keep-sorted end
   " Format entire buffer `=G` or selection `=` with shortcut `<leader>fc`
-  au FileType bzl,c,cpp,go,pbtxt,sh,yaml map <leader>fc gg=G<c-o><c-o>
-  au FileType bzl,c,cpp,go,pbtxt,sh,yaml imap <leader>fc <esc>gg=G<c-o><c-o>
+  au FileType bzl,c,cpp,go,markdown,pbtxt,sh,yaml map <leader>fc gg=G<c-o><c-o>
+  au FileType bzl,c,cpp,go,markdown,pbtxt,sh,yaml imap <leader>fc <esc>gg=G<c-o><c-o>
 augroup END
 
 " -- Plugin github.com:noahfrederick/vim-skeleton
