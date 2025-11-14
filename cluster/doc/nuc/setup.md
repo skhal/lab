@@ -54,7 +54,7 @@ Update to the latest patch available:
 # freebsd-update install
 ```
 
-Verify the updated applied as expected by checking the Kernel version:
+Verify the updates applied as expected by checking the Kernel version:
 
 ```console
 # uname -a
@@ -126,6 +126,8 @@ session         required        /usr/local/lib/pam_mkhomedir.so
 Resource configuration
 ----------------------
 
+Ref: [rc](./rc.md)
+
 Break monolith `/etc/rc.conf` into per-service configuration file to isolate service flags.
 
 ```console
@@ -187,50 +189,7 @@ dumpdev="AUTO"
 SERVICES
 ========
 
-FreeBSD boot process uses `init(8)`. It triggers `rc(8)` to start services. Every service has a script in one of `rc.d/` folders: standard location `/etc/rc.d` and folders set by `local_startup` flag:
-
-```console
-% sysrc local_startup
-local_startup: /usr/local/etc/rc.d
-```
-
-Service scripts define dependencies, rc-variables, actions (start, stop, etc.) and function to execute the actions.
-
-Use `rcorder(8)` to dump services dependency graph in topological order (`-p` groups services that can start in parallel`):
-
-```console
-% rcorder -p /etc/rc.d/* | head -n 2
-/etc/rc.d/dhclient /etc/rc.d/dumpon /etc/rc.d/dnctl /etc/rc.d/natd /etc/rc.d/sysctl
-/etc/rc.d/ddb /etc/rc.d/hostid
-```
-
-Service scripts use variables, aka flags, set in `rc.conf(5)` files, loaded in the following order (the last loaded value wins):
-
--	A default value is set in `/etc/default/rc.conf` with optional override from `/etc/default/vendor.conf` (if exists).
--	`/etc/rc.conf` and `/etc/rc.conf.local` (legacy) are global containers, loaded by all services including `rc(8)` itself.
--	`<dir>/rc.conf.d/<name>` is only loaded by the service `<name>`, where`<dir>/` is either the standard location `/etc` or folders listed in`local_startup` with `rc.d/` suffix removed.
-
-Use `sysrc(8)` to list supported configuration files for a given service:
-
-```console
-% sysrc -s hostname -l
-/etc/rc.conf /etc/rc.conf.local /etc/rc.conf.d/hostname /usr/local/etc/rc.conf.d/hostname
-```
-
-**WARNING**
-
-`/etc/rc.conf` is a global container of flags, shared between all services and `rc(8)`. In order to limit the visibility of flags, place flags into shared files under `<dir>/rc.conf.d/`.
-
-For example, `dhclient` and `netif` services share DHCP settings via `/etc/rc.conf.d/network`.
-
-```console
-% sysrc -s dhclient -l
-/etc/rc.conf /etc/rc.conf.local /etc/rc.conf.d/dhclient /usr/local/etc/rc.conf.d/dhclient /etc/rc.conf.d/network /usr/local/etc/rc.conf.d/network
-% sysrc -s netif -l
-/etc/rc.conf /etc/rc.conf.local /etc/rc.conf.d/network /usr/local/etc/rc.conf.d/network /etc/rc.conf.d/netif /usr/local/etc/rc.conf.d/netif
-```
-
-The instructions below move flags from `/etc/rc.conf` to per-service configuration file under `/etc/rc.conf.d/`. It preserves `/usr/local/etc` for services installed by ports and packages.
+Ref: [rc](./rc.md)
 
 Hostname
 --------
