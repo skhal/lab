@@ -14,6 +14,7 @@ Hardware
 BIOS
 ====
 
+-	Set date and time in UTC
 -	Disable "Secure Boot" to boot non-Windows OS, [ref](https://www.asus.com/global/support/faq/1044664/).
 
 Update
