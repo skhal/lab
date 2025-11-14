@@ -17,7 +17,7 @@ var (
 	ErrFormat = errors.New("invalid format")
 )
 
-const dateFormat = "01/02/2006"
+const dateFormat = "1/02/2006"
 
 // Transaction represents a financial transaction.
 type Transaction struct {

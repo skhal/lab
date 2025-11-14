@@ -36,8 +36,8 @@ func ExampleTransaction_formatScan() {
 	}
 	fmt.Println(tx)
 	// Output:
-	// example 03/10/2000 1.23
-	// example 03/10/2000 1.23
+	// example 3/10/2000 1.23
+	// example 3/10/2000 1.23
 }
 
 func TestTransaction_String(t *testing.T) {
