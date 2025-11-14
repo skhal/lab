@@ -51,9 +51,9 @@ func (pq *unorderedArrayPQ[T]) Top() T {
 	}
 	if !pq.ordered {
 		pq.order()
+		pq.ordered = true
 	}
 	v := pq.items[len(pq.items)-1]
-	pq.ordered = false
 	return v
 }
 
@@ -63,7 +63,7 @@ func (pq *unorderedArrayPQ[T]) order() {
 	}
 	itop := 0
 	for i, v := range pq.items {
-		if pq.less(pq.items[itop], v) {
+		if itop != i && pq.less(pq.items[itop], v) {
 			itop = i
 		}
 	}
