@@ -11,7 +11,7 @@ import (
 	"math/rand/v2"
 	"slices"
 
-	"github.com/skhal/lab/book/algorithms/c2/s4/queue"
+	"github.com/skhal/lab/book/algos/c2/s4/queue"
 )
 
 type PriorityQueue[T comparable] interface {
