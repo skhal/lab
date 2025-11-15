@@ -1,20 +1,16 @@
-# NAME
+NAME
+====
 
 **dns.lab.net** - DNS server named(8)
 
+DESCRIPTION
+===========
 
-# DESCRIPTION
+`dns.lab.net` virtual host runs a DNS server named(8), provided by `bind9` package.
 
-`dns.lab.net` virtual host runs a DNS server named(8), provided by `bind9`
-package.
-
-## Sync
+Sync
+----
 
 ```console
 % rsync -arvz --files-from=./rsync.files-from op@nuc.lab.net:/jail/container/dns/ ./
 ```
-
-
-# SEE ALSO
-
-* [Setup](./doc/setup.md)

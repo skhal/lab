@@ -1,11 +1,13 @@
-# NAME
+NAME
+====
 
 **setup** - setup local authoritative DNS
 
+DESCRIPTION
+===========
 
-# DESCRIPTION
-
-## Bootstrap jail
+Bootstrap jail
+--------------
 
 ```console
 # zfs clone zroot/jail/template/14.3-RELEASE@p2.4 zroot/jail/container/dns
@@ -90,7 +92,8 @@ PING freebsd.org (96.47.72.84): 56 data bytes
 round-trip min/avg/max/stddev = 32.784/32.784/32.784/0.000 ms
 ```
 
-## Bind
+Bind
+----
 
 ```console
 % doas jexec dns pkg install bind920
@@ -128,7 +131,8 @@ s jexec dns sysrc -f /etc/rc.conf.d/named named_enable=yes
 named_enable:  -> yes
 ```
 
-## Configuration
+Configuration
+-------------
 
 Run DNS on local address only:
 
@@ -183,7 +187,8 @@ search lab.net
 nameserver 127.0.0.1
 ```
 
-## Zone lab.net
+Zone lab.net
+------------
 
 ```
 // file: usr/local/etc/namedb/zones.conf.d/lab.net.conf
@@ -243,7 +248,8 @@ $TTL  1h
 91    IN  PTR dns.lab.net.
 ```
 
-## Validation
+Validation
+----------
 
 Start DNS:
 
@@ -346,7 +352,7 @@ Validate reverse lookups:
 ;; MSG SIZE  rcvd: 106
 ```
 
+SEE ALSO
+========
 
-# SEE ALSO
-
-* [FreeBSD wiki - named.conf](http://www.freebsdwiki.net/index.php/BIND_(configuring))
+-	[FreeBSD wiki - named.conf](http://www.freebsdwiki.net/index.php/BIND_(configuring))
