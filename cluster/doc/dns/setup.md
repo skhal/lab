@@ -177,95 +177,79 @@ Starting named.
 Validate forward lookups:
 
 ```console
-% dig dns.lab.net
-
-; <<>> DiG 9.20.13 <<>> dns.lab.net
-;; global options: +cmd
-;; Got answer:
-;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 57223
-;; flags: qr aa rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 1
-
-;; OPT PSEUDOSECTION:
-; EDNS: version: 0, flags:; udp: 1232
-; COOKIE: 9f2833a5ec7f000f0100000068e29bce811d2b1a22c63fab (good)
+% doas jexec dns drill dns.lab.net
+;; ->>HEADER<<- opcode: QUERY, rcode: NOERROR, id: 47488
+;; flags: qr aa rd ra ; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 0
 ;; QUESTION SECTION:
-;dns.lab.net.     IN  A
+;; dns.lab.net.	IN	A
 
 ;; ANSWER SECTION:
-dns.lab.net.    3600  IN  A 10.0.1.91
+dns.lab.net.	3600	IN	A	10.0.1.2
+
+;; AUTHORITY SECTION:
+
+;; ADDITIONAL SECTION:
 
 ;; Query time: 0 msec
-;; SERVER: 127.0.0.1#53(127.0.0.1) (UDP)
-;; WHEN: Sun Oct 05 11:24:46 CDT 2025
-;; MSG SIZE  rcvd: 84
-% dig freebsd.org
-
-; <<>> DiG 9.20.13 <<>> freebsd.org
-;; global options: +cmd
-;; Got answer:
-;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 61939
-;; flags: qr rd ra ad; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 1
-
-;; OPT PSEUDOSECTION:
-; EDNS: version: 0, flags:; udp: 1232
-; COOKIE: 8a565b03e2f364600100000068e29bea439e4bd9c791cb28 (good)
+;; SERVER: 127.0.0.1
+;; WHEN: Sat Nov 15 11:05:43 2025
+;; MSG SIZE  rcvd: 45
+% doas jexec dns drill freebsd.org
+;; ->>HEADER<<- opcode: QUERY, rcode: NOERROR, id: 7773
+;; flags: qr rd ra ; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 0
 ;; QUESTION SECTION:
-;freebsd.org.     IN  A
+;; freebsd.org.	IN	A
 
 ;; ANSWER SECTION:
-freebsd.org.    3600  IN  A 96.47.72.84
+freebsd.org.	3532	IN	A	96.47.72.84
 
-;; Query time: 130 msec
-;; SERVER: 127.0.0.1#53(127.0.0.1) (UDP)
-;; WHEN: Sun Oct 05 11:25:14 CDT 2025
-;; MSG SIZE  rcvd: 84
+;; AUTHORITY SECTION:
+
+;; ADDITIONAL SECTION:
+
+;; Query time: 0 msec
+;; SERVER: 127.0.0.1
+;; WHEN: Sat Nov 15 11:06:11 2025
+;; MSG SIZE  rcvd: 45
 ```
 
 Validate reverse lookups:
 
 ```console
-% dig -x 10.0.1.91
-
-; <<>> DiG 9.20.13 <<>> -x 10.0.1.91
-;; global options: +cmd
-;; Got answer:
-;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 31107
-;; flags: qr aa rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 1
-
-;; OPT PSEUDOSECTION:
-; EDNS: version: 0, flags:; udp: 1232
-; COOKIE: d15a3c19b635b8a80100000068e29c0de19c0ecdee9fec17 (good)
+% doas jexec dns drill -x 10.0.1.2
+;; ->>HEADER<<- opcode: QUERY, rcode: NOERROR, id: 51164
+;; flags: qr aa rd ra ; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 0
 ;; QUESTION SECTION:
-;91.1.0.10.in-addr.arpa.    IN  PTR
+;; 2.1.0.10.in-addr.arpa.	IN	PTR
 
 ;; ANSWER SECTION:
-91.1.0.10.in-addr.arpa. 3600  IN  PTR dns.lab.net.
+2.1.0.10.in-addr.arpa.	3600	IN	PTR	dns.lab.net.
+
+;; AUTHORITY SECTION:
+
+;; ADDITIONAL SECTION:
 
 ;; Query time: 0 msec
-;; SERVER: 127.0.0.1#53(127.0.0.1) (UDP)
-;; WHEN: Sun Oct 05 11:25:49 CDT 2025
-;; MSG SIZE  rcvd: 104
-% dig -x 1.1.1.1
-
-; <<>> DiG 9.20.13 <<>> -x 1.1.1.1
-;; global options: +cmd
-;; Got answer:
-;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 36782
-;; flags: qr rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 1
-
-;; OPT PSEUDOSECTION:
-; EDNS: version: 0, flags:; udp: 1232
-; COOKIE: 8dba48aa9230e82c0100000068e29c31497c2c2cf91e64c9 (good)
+;; SERVER: 127.0.0.1
+;; WHEN: Sat Nov 15 11:06:28 2025
+;; MSG SIZE  rcvd: 64
+% doas jexec dns drill -x 1.1.1.1
+;; ->>HEADER<<- opcode: QUERY, rcode: NOERROR, id: 18731
+;; flags: qr rd ra ; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 0
 ;; QUESTION SECTION:
-;1.1.1.1.in-addr.arpa.    IN  PTR
+;; 1.1.1.1.in-addr.arpa.	IN	PTR
 
 ;; ANSWER SECTION:
-1.1.1.1.in-addr.arpa. 1262  IN  PTR one.one.one.one.
+1.1.1.1.in-addr.arpa.	378	IN	PTR	one.one.one.one.
 
-;; Query time: 261 msec
-;; SERVER: 127.0.0.1#53(127.0.0.1) (UDP)
-;; WHEN: Sun Oct 05 11:26:25 CDT 2025
-;; MSG SIZE  rcvd: 106
+;; AUTHORITY SECTION:
+
+;; ADDITIONAL SECTION:
+
+;; Query time: 425 msec
+;; SERVER: 127.0.0.1
+;; WHEN: Sat Nov 15 11:06:50 2025
+;; MSG SIZE  rcvd: 67
 ```
 
 SEE ALSO
