@@ -77,3 +77,14 @@ func ExampleNewUnorderedArrayPriorityQueue() {
 	// max 3 items: [99 98 97]
 	// min 3 items: [0 1 2]
 }
+
+func ExampleNewOrderedArrayPriorityQueue() {
+	newPQ := func(less queue.LessFunc[int]) PriorityQueue[int] {
+		return queue.NewOrderedArrayPriorityQueue[int](less)
+	}
+	less := func(x, y int) bool { return x < y }
+	example(rand.Perm(100), newPQ, less)
+	// Output:
+	// max 3 items: [99 98 97]
+	// min 3 items: [0 1 2]
+}

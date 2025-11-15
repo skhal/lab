@@ -15,28 +15,106 @@ import (
 	"fmt"
 	"io"
 	"iter"
+	"maps"
 	"os"
 	"slices"
+	"strings"
 
 	"github.com/skhal/lab/book/algos/c1/s2/fin"
 	"github.com/skhal/lab/book/algos/c2/s4/queue"
 )
 
-var count = flag.Int("n", 3, "number of top transactions")
+var ErrKind = errors.New("invalid priority queue kind")
+
+var (
+	flagCount = 3
+	flagKind  = KindUnorderedArray
+)
+
+func init() {
+	flag.IntVar(&flagCount, "n", 3, "number of top transactions")
+	vals := slices.Collect(maps.Values(kindNames))
+	usage := fmt.Sprintf("priority queue kind [%s]", strings.Join(vals, ", "))
+	flag.Var(&flagKind, "k", usage)
+}
+
+type Kind int
+
+const (
+	KindUnspecified Kind = iota
+	KindUnorderedArray
+	KindOrderedArray
+)
+
+var kindNames = map[Kind]string{
+	KindUnspecified:    "unspecified",
+	KindUnorderedArray: "unordered-array",
+	KindOrderedArray:   "ordered-array",
+}
+
+func (k Kind) String() string {
+	name, ok := kindNames[k]
+	if !ok {
+		return "unknown"
+	}
+	return name
+}
+
+func (k *Kind) Set(s string) error {
+	switch s {
+	default:
+		return ErrKind
+	case "unordered-array":
+		*k = KindUnorderedArray
+	case "ordered-array":
+		*k = KindOrderedArray
+	}
+	return nil
+}
 
 func main() {
 	flag.Parse()
-	if err := run(*count); err != nil {
+	if err := run(flagCount, flagKind); err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
 }
 
-func run(count int) error {
-	// Use Min-PQ to keep track of largest items and remove smallest of (count+1).
-	pq := queue.NewUnorderedArrayPriorityQueue[*fin.Transaction](func(a, b *fin.Transaction) bool {
-		return b.Amount < a.Amount
-	})
+type PriorityQueue interface {
+	// keep-sorted start
+	Empty() bool
+	Pop()
+	Push(*fin.Transaction)
+	Size() int
+	Top() *fin.Transaction
+	// keep-sorted end
+}
+
+type LessFunc queue.LessFunc[*fin.Transaction]
+type NewPQFunc func(LessFunc) PriorityQueue
+
+var newPQFuncs = map[Kind]NewPQFunc{
+	KindUnorderedArray: func(less LessFunc) PriorityQueue {
+		l := queue.LessFunc[*fin.Transaction](less)
+		return queue.NewUnorderedArrayPriorityQueue[*fin.Transaction](l)
+	},
+	KindOrderedArray: func(less LessFunc) PriorityQueue {
+		l := queue.LessFunc[*fin.Transaction](less)
+		return queue.NewOrderedArrayPriorityQueue[*fin.Transaction](l)
+	},
+}
+
+// Use Min-PQ to keep track of largest items and remove smallest.
+func less(a, b *fin.Transaction) bool {
+	return b.Amount < a.Amount
+}
+
+func run(count int, kind Kind) error {
+	f, ok := newPQFuncs[kind]
+	if !ok {
+		return ErrKind
+	}
+	pq := f(less)
 	s := newTxScanner(os.Stdin)
 	for tx := range s.Scan() {
 		pq.Push(tx)
