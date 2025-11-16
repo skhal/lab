@@ -1,15 +1,19 @@
 NAME
 ====
 
-**setup** - setup local authoritative DNS
+**server** - local authoritative DNS server
 
 DESCRIPTION
 ===========
 
-Use a FreeBSD jail to run DNS server.
+-	*Port*: `bind920`
+-	*Service*: `named`
+-	*Config*: `/usr/local/etc/namedb/named.conf`
 
-Bind
-----
+*Note*: run local authoritative DNS server in a FreeBSD jail.
+
+Install
+-------
 
 ```console
 % doas jexec dns pkg install bind920
@@ -19,9 +23,9 @@ Bind
 <summary>Message from pkg</summary>
 
 ```
-Message from bind920-9.20.13:
-
---
+% bind info -D bind920
+bind920-9.20.15_1:
+On install:
 BIND requires configuration of rndc, including a "secret"
 key.  The easiest, and most secure way to configure rndc is
 to run 'rndc-confgen -a' to generate the proper conf file,
@@ -43,58 +47,48 @@ And then restarting syslogd with: service syslogd restart
 Enable the service:
 
 ```console
-s jexec dns sysrc -f /etc/rc.conf.d/named named_enable=yes
+% doas jexec dns sysrc -f /etc/rc.conf.d/named named_enable=yes
 named_enable:  -> yes
 ```
 
 Configuration
 -------------
 
-Run DNS on local address only:
+Make following changes to DNS server configuration:
 
-```
-// file: /usr/local/etc/namedb/named.conf
-options {
-  listen-on { 127.0.0.1; 10.0.1.91; };
-}
-```
+-	Listen on local address only (use Jail internal network).
+-	Restrict DNS clients to local network.
+-	Do no use slave DNS servers.
+-	Forward unknown DNS queries to default gateway.
+-	Store zone information in `zones.conf.d` folder.
 
-Restrict DNS clients to local network:
+See [named.conf.diff](./named.conf.diff):
 
-```
-// file: /usr/local/etc/namedb/named.conf
-acl jail-lo { 10.0.1.0/24; };
-options {
-  allow-query { 127.0.0.1; jail-lo; };
-}
-```
-
-Do not use slaves:
-
-```
-// file: /usr/local/etc/namedb/named.conf
-options {
-  allow-transfer  { "none"; };
-}
-```
-
-Forward unknown DNS requests to the default gateway:
-
-```
-// file: /usr/local/etc/namedb/named.conf
-options {
-  forwarders  { 192.168.1.1; };
-}
+```console
+% doas jexec dns diff /usr/local/etc/namedb/named.conf{.sample,}
+7a8
+> acl jail-lo { 10.0.1.0/24; };
+20c21,26
+<   listen-on   { 127.0.0.1; };
+---
+>   listen-on   { 127.0.0.1; 10.0.1.2; };
+>   allow-query { 127.0.0.1; jail-lo; };
+>   allow-transfer  { "none"; };
+>   forwarders {
+>       192.168.1.1;
+>   };
+378a385,386
+>
+> include "/usr/local/etc/namedb/zones.conf.d/lab.net.conf";
 ```
 
-We'll store zones in separate files:
+Apply patch
 
-```
-// file: /usr/local/etc/namedb/named.conf
-include "/usr/local/etc/namedb/zones.conf.d/lab.net.conf";
+```console
+% patch /usr/local/etc/namedb/named.conf < ~/named.conf.diff
 ```
 
-Use local DNS server.
+Configure resolver to use local DNS server:
 
 ```console
 % cat /etc/resolv.conf
@@ -105,6 +99,8 @@ nameserver 127.0.0.1
 
 Zone lab.net
 ------------
+
+Store forward and reverse mappings in separate files:
 
 ```
 // file: usr/local/etc/namedb/zones.conf.d/lab.net.conf
@@ -164,17 +160,10 @@ $TTL  1h
 91    IN  PTR dns.lab.net.
 ```
 
-Validation
-----------
+Validate
+--------
 
-Start DNS:
-
-```console
-# service named start
-Starting named.
-```
-
-Validate forward lookups:
+Forward lookups:
 
 ```console
 % doas jexec dns drill dns.lab.net
@@ -213,7 +202,7 @@ freebsd.org.	3532	IN	A	96.47.72.84
 ;; MSG SIZE  rcvd: 45
 ```
 
-Validate reverse lookups:
+Reverse lookups:
 
 ```console
 % doas jexec dns drill -x 10.0.1.2

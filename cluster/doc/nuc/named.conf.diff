@@ -1,0 +1,14 @@
+7a8
+> acl jail-lo { 10.0.1.0/24; };
+20c21,26
+< 	listen-on	{ 127.0.0.1; };
+---
+> 	listen-on	{ 127.0.0.1; 10.0.1.2; };
+> 	allow-query	{ 127.0.0.1; jail-lo; };
+> 	allow-transfer	{ "none"; };
+> 	forwarders {
+> 		192.168.1.1;
+> 	};
+378a385,386
+>
+> include "/usr/local/etc/namedb/zones.conf.d/lab.net.conf";
