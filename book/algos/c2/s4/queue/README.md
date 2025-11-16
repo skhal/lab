@@ -19,6 +19,8 @@ Implementations
 
 -	*Binary heap* [eager]: store items in a heap-ordered complete binary tree. Push() appends the new item to the end and promotes it all the way to the root item as long is the parent is less than or equal to the new item. Pop() removes the root item, moves the last one to the root and demotes the new root with the max child. It continues demotion process until the end of array.
 
+-	*Map binary heap* [eager]: a key-value map with keys sorted using a binary heap.
+
 Performance
 -----------
 
@@ -27,3 +29,4 @@ Performance
 | Unordered array | 1      | N     |
 | Ordered array   | N      | 1     |
 | Binary heap     | ln(N)  | ln(N) |
+| Map Binary heap | ln(N)  | ln(N) |
