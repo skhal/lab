@@ -96,11 +96,11 @@ type NewPQFunc func(LessFunc) PriorityQueue
 var newPQFuncs = map[Kind]NewPQFunc{
 	KindUnorderedArray: func(less LessFunc) PriorityQueue {
 		l := queue.LessFunc[*fin.Transaction](less)
-		return queue.NewUnorderedArrayPriorityQueue[*fin.Transaction](l)
+		return queue.NewUnorderedArrayPQ(l)
 	},
 	KindOrderedArray: func(less LessFunc) PriorityQueue {
 		l := queue.LessFunc[*fin.Transaction](less)
-		return queue.NewOrderedArrayPriorityQueue[*fin.Transaction](l)
+		return queue.NewOrderedArrayPQ(l)
 	},
 }
 

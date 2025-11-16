@@ -8,27 +8,27 @@ package queue
 // LessFunc compares two items and returns true if x is logically less than y.
 type LessFunc[T comparable] func(x, y T) bool
 
-// NewUnorderedArrayPriorityQueue stores a Priority Queue in unordered array.
-func NewUnorderedArrayPriorityQueue[T comparable](less LessFunc[T]) *unorderedArrayPQ[T] {
-	return &unorderedArrayPQ[T]{
+// NewUnorderedArrayPQ stores a Priority Queue in unordered array.
+func NewUnorderedArrayPQ[T comparable](less LessFunc[T]) *UnorderedArrayPQ[T] {
+	return &UnorderedArrayPQ[T]{
 		less: less,
 	}
 }
 
-// unorderedArrayPQ stores items in a slice unordered. It restores the order
+// UnorderedArrayPQ stores items in a slice unordered. It restores the order
 // by placing the top item to the end of the slice for fast access on either
 // Pop() or Top() call.
-type unorderedArrayPQ[T comparable] struct {
+type UnorderedArrayPQ[T comparable] struct {
 	less    LessFunc[T]
 	items   []T
 	ordered bool
 }
 
-func (pq *unorderedArrayPQ[T]) Empty() bool {
+func (pq *UnorderedArrayPQ[T]) Empty() bool {
 	return pq.Size() == 0
 }
 
-func (pq *unorderedArrayPQ[T]) Pop() {
+func (pq *UnorderedArrayPQ[T]) Pop() {
 	if pq.Empty() {
 		return
 	}
@@ -39,12 +39,12 @@ func (pq *unorderedArrayPQ[T]) Pop() {
 	pq.ordered = false
 }
 
-func (pq *unorderedArrayPQ[T]) Push(v T) {
+func (pq *UnorderedArrayPQ[T]) Push(v T) {
 	pq.items = append(pq.items, v)
 	pq.ordered = false
 }
 
-func (pq *unorderedArrayPQ[T]) Top() T {
+func (pq *UnorderedArrayPQ[T]) Top() T {
 	if pq.Empty() {
 		var v T
 		return v
@@ -57,7 +57,7 @@ func (pq *unorderedArrayPQ[T]) Top() T {
 	return v
 }
 
-func (pq *unorderedArrayPQ[T]) order() {
+func (pq *UnorderedArrayPQ[T]) order() {
 	if pq.Empty() {
 		return
 	}
@@ -72,6 +72,6 @@ func (pq *unorderedArrayPQ[T]) order() {
 	}
 }
 
-func (pq *unorderedArrayPQ[T]) Size() int {
+func (pq *UnorderedArrayPQ[T]) Size() int {
 	return len(pq.items)
 }

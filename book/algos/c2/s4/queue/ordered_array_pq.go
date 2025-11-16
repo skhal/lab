@@ -5,30 +5,33 @@
 
 package queue
 
-// NewOrderedArrayPriorityQueue stores a Priority Queue in ordered array.
-func NewOrderedArrayPriorityQueue[T comparable](f LessFunc[T]) *orderedArrayPriorityQueue[T] {
-	return &orderedArrayPriorityQueue[T]{
+// NewOrderedArrayPQ stores a Priority Queue in ordered array.
+func NewOrderedArrayPQ[T comparable](f LessFunc[T]) *OrderedArrayPQ[T] {
+	return &OrderedArrayPQ[T]{
 		less: f,
 	}
 }
 
-// orderedArrayPriorityQueue keeps elements sorted by less function. This fact
+// OrderedArrayPQ keeps elements sorted by less function. This fact
 // speeds up access to or remove of the top element at the expense of
 // maintaining the order at the insertion.
-type orderedArrayPriorityQueue[T comparable] struct {
+type OrderedArrayPQ[T comparable] struct {
 	items []T
 	less  LessFunc[T]
 }
 
-func (pq *orderedArrayPriorityQueue[T]) Empty() bool {
+func (pq *OrderedArrayPQ[T]) Empty() bool {
 	return pq.Size() == 0
 }
 
-func (pq *orderedArrayPriorityQueue[T]) Pop() {
+func (pq *OrderedArrayPQ[T]) Pop() {
+	if pq.Empty() {
+		return
+	}
 	pq.items = pq.items[:len(pq.items)-1]
 }
 
-func (pq *orderedArrayPriorityQueue[T]) Push(v T) {
+func (pq *OrderedArrayPQ[T]) Push(v T) {
 	pq.items = append(pq.items, v)
 	if pq.Size() < 2 {
 		return
@@ -41,10 +44,14 @@ func (pq *orderedArrayPriorityQueue[T]) Push(v T) {
 	}
 }
 
-func (pq *orderedArrayPriorityQueue[T]) Size() int {
+func (pq *OrderedArrayPQ[T]) Size() int {
 	return len(pq.items)
 }
 
-func (pq *orderedArrayPriorityQueue[T]) Top() T {
+func (pq *OrderedArrayPQ[T]) Top() T {
+	if pq.Empty() {
+		var v T
+		return v
+	}
 	return pq.items[len(pq.items)-1]
 }
