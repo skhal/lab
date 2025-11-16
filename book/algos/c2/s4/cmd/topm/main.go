@@ -42,14 +42,20 @@ type Kind int
 
 const (
 	KindUnspecified Kind = iota
-	KindUnorderedArray
+	// keep-sorted start
+	KindBinaryHeap
 	KindOrderedArray
+	KindUnorderedArray
+	// keep-sorted end
 )
 
 var kindNames = map[Kind]string{
-	KindUnspecified:    "unspecified",
-	KindUnorderedArray: "unordered-array",
+	// keep-sorted start
+	KindBinaryHeap:     "binary-heap",
 	KindOrderedArray:   "ordered-array",
+	KindUnorderedArray: "unordered-array",
+	KindUnspecified:    "unspecified",
+	// keep-sorted end
 }
 
 func (k Kind) String() string {
@@ -68,6 +74,8 @@ func (k *Kind) Set(s string) error {
 		*k = KindUnorderedArray
 	case "ordered-array":
 		*k = KindOrderedArray
+	case "binary-heap":
+		*k = KindBinaryHeap
 	}
 	return nil
 }
@@ -101,6 +109,10 @@ var newPQFuncs = map[Kind]NewPQFunc{
 	KindOrderedArray: func(less LessFunc) PriorityQueue {
 		l := queue.LessFunc[*fin.Transaction](less)
 		return queue.NewOrderedArrayPQ(l)
+	},
+	KindBinaryHeap: func(less LessFunc) PriorityQueue {
+		l := queue.LessFunc[*fin.Transaction](less)
+		return queue.NewBinaryHeapPQ(l)
 	},
 }
 

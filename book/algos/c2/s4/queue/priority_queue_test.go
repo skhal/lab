@@ -92,6 +92,17 @@ func ExampleNewOrderedArrayPQ() {
 	// min 3 items: [0 1 2]
 }
 
+func ExampleNewBinaryHeapPQ() {
+	newPQ := func(less queue.LessFunc[int]) PriorityQueue[int] {
+		return queue.NewBinaryHeapPQ(less)
+	}
+	less := func(x, y int) bool { return x < y }
+	example(rand.Perm(100), newPQ, less)
+	// Output:
+	// max 3 items: [99 98 97]
+	// min 3 items: [0 1 2]
+}
+
 type pushTestCase struct {
 	name      string
 	items     []int
@@ -145,7 +156,16 @@ func TestUnorderedArrayPQ_Push(t *testing.T) {
 func TestOrderedArrayPQ_Push(t *testing.T) {
 	for _, tc := range pushTestCases {
 		t.Run(tc.name, func(t *testing.T) {
-			pq := queue.NewUnorderedArrayPQ(lessInt)
+			pq := queue.NewOrderedArrayPQ(lessInt)
+			testPush(t, tc, pq)
+		})
+	}
+}
+
+func TestBinaryHeapPQ_Push(t *testing.T) {
+	for _, tc := range pushTestCases {
+		t.Run(tc.name, func(t *testing.T) {
+			pq := queue.NewBinaryHeapPQ(lessInt)
 			testPush(t, tc, pq)
 		})
 	}
@@ -202,6 +222,15 @@ func TestOrderedArrayPQ_Pop(t *testing.T) {
 	for _, tc := range popTestCases {
 		t.Run(tc.name, func(t *testing.T) {
 			pq := queue.NewOrderedArrayPQ(lessInt)
+			testPop(t, tc, pq)
+		})
+	}
+}
+
+func TestBinaryHeapPQ_Pop(t *testing.T) {
+	for _, tc := range popTestCases {
+		t.Run(tc.name, func(t *testing.T) {
+			pq := queue.NewBinaryHeapPQ(lessInt)
 			testPop(t, tc, pq)
 		})
 	}
