@@ -4,7 +4,7 @@
 
 set -e
 
-readonly GO_VERSION=${GO_VERSION:-1.25.3}
+readonly GO_VERSION=${GO_VERSION:-1.25.4}
 readonly GO_ROOT_PREFIX=/usr/local
 readonly LOG_PATH=go_install.log # relative to TMPDIR
 
