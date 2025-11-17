@@ -70,7 +70,7 @@ augroup LspCpp
   au!
   autocmd User lsp_setup call lsp#register_server({
       \ 'name': 'clangd',
-      \ 'cmd': {server_info->['clangd']},
+      \ 'cmd': {server_info->['clangd21']},
       \ 'whitelist': ['c', 'cpp'],
       \ })
   autocmd FileType c,cpp setlocal omnifunc=lsp#complete

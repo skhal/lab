@@ -7,7 +7,7 @@ augroup Format
   au!
   " keep-sorted start
   au FileType bzl setlocal equalprg=buildifier
-  au FileType c,cpp setlocal equalprg=clang-format\ -assume-filename=%
+  au FileType c,cpp setlocal equalprg=clang-format21\ -assume-filename=%
   au FileType go setlocal equalprg=goimports
   au FileType markdown setlocal equalprg=markdownfmt
   au FileType pbtxt setlocal equalprg=txtpbfmt
