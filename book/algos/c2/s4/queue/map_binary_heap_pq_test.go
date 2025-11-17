@@ -16,9 +16,9 @@ func ExampleMapBinaryHeapPQ() {
 	// Multiway merge: merge N sorted arrays using a priority queue to pick up
 	// the next array with min element.
 	nnn := [][]int{
-		[]int{1, 5, 7, 9},
-		[]int{2, 6},
-		[]int{3, 4, 8},
+		{1, 5, 7, 9},
+		{2, 6},
+		{3, 4, 8},
 	}
 	// Inverse lessInt to form a MinPQ, e.g. pick up next smallest item.
 	pq := queue.NewMapBinaryHeapPQ[int, int](func(x, y int) bool {
