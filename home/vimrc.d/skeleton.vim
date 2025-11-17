@@ -1,0 +1,105 @@
+" Copyright 2025 Samvel Khalatyan. All rights reserved.
+"
+" Use of this source code is governed by a BSD-style
+" license that can be found in the LICENSE file.
+"
+" -- Plugin github.com:noahfrederick/vim-skeleton
+let g:skeleton_replacements = {}
+function! g:skeleton_replacements.YEAR()
+  let l:year = strftime('%Y')
+  echow 'year: ' . l:year
+  return l:year
+endfunction
+
+" Go
+let g:skeleton_replacements_go = {}
+function! g:skeleton_replacements_go.PACKAGE()
+  let l:package = expand('%:p:h:t')
+  echow 'package: ' . l:package
+  return l:package
+endfunction
+
+let g:skeleton_find_template = {}
+function! g:skeleton_find_template.go(path)
+  let l:skel = 'skel.go'
+  let l:filename = fnamemodify(a:path, ':t')
+  if l:filename =~ '_example_test\.go$'
+    let l:skel = 'skel_example_test.go'
+  elseif l:filename =~ '_test\.go$'
+    let l:skel = 'skel_test.go'
+  endif
+  echow 'skel: ' . l:skel
+  return l:skel
+endfunction
+
+" C++
+function! g:skeleton_find_template.cpp(path)
+  let l:filename = 'skel.cc'
+  if fnamemodify(a:path, ':t') =~ '_test\.cc$'
+    let l:filename = 'skel_test.cc'
+  endif
+  echow 'skel: ' . l:filename
+  return l:filename
+endfunction
+
+function! s:skeleton_getGitWorktreeRelpath()
+  let l:git_worktree = trim(system('git rev-parse --show-toplevel'))
+  let l:path = expand('%:p')
+  let l:relpath = fnamemodify(l:path, ':s,^' . l:git_worktree . '/,,')
+  return l:relpath
+endfunction
+
+function! s:skeleton_getCCNamespace()
+  let l:relpath = s:skeleton_getGitWorktreeRelpath()
+  let l:namespace = fnamemodify(l:relpath, ':h:gs,/,::,')
+  return l:namespace
+endfunction
+
+let g:skeleton_replacements_c = {}
+function! g:skeleton_replacements_c.NAMESPACE()
+  let l:namespace = s:skeleton_getCCNamespace()
+  echow 'namespace: ' . l:namespace
+  return l:namespace
+endfunction
+
+function! g:skeleton_replacements_c.GUARD()
+  let l:relpath = s:skeleton_getGitWorktreeRelpath()
+  let l:guard = fnamemodify(l:relpath, ':gs,[/.],_,:s,$,_,')
+  let l:guard = toupper(l:guard)
+  echow 'guard: ' . l:guard
+  return l:guard
+endfunction
+
+let g:skeleton_replacements_cpp = {}
+function! g:skeleton_replacements_cpp.NAMESPACE()
+  let l:namespace = s:skeleton_getCCNamespace()
+  echow 'namespace: ' . l:namespace
+  return l:namespace
+endfunction
+
+function! g:skeleton_replacements_cpp.HEADER()
+  let l:relpath = s:skeleton_getGitWorktreeRelpath()
+  let l:header = fnamemodify(l:relpath, ':s,\(_test\)\?.cc$,.h,')
+  echow 'header: ' . l:header
+  return escape(l:header, '/')
+endfunction
+
+" Protobuf
+let g:skeleton_replacements_proto = {}
+function! g:skeleton_replacements_proto.PACKAGE()
+  " Assuming a .proto is in a folder `foo/bar/pb`, the package is `foo/bar`.
+  let l:relpath = s:skeleton_getGitWorktreeRelpath()
+  let l:package = fnamemodify(l:relpath, ':h:gs,/,.,')
+  let l:package = fnamemodify(l:package, ':s,.pb$,,')
+  echow 'package: ' . l:package
+  return l:package
+endfunction
+
+function! g:skeleton_replacements_proto.GO_PACKAGE()
+  let l:go_module = trim(system('go list -m'))
+  let l:relpath = s:skeleton_getGitWorktreeRelpath()
+  let l:relpath = fnamemodify(l:relpath, ':h')
+  let l:go_package = l:go_module . '/' . l:relpath
+  echow 'go_package: ' . l:go_package
+  return escape(l:go_package, '/')
+endfunction
