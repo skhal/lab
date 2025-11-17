@@ -1,0 +1,24 @@
+# Copyright 2025 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+#
+# List of FreeBSD packages to install. Keep one package per line.
+
+# keep-sorted start
+bash
+doas
+git
+go125
+nss_ldap
+openldap26-client
+pam_ldap
+pam_mkhomedir
+pkg
+py311-pre-commit
+tmux
+tree
+universal-ctags
+unzip
+vim
+# keep-sorted end

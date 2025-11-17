@@ -1,8 +1,11 @@
 # Copyright (c) 2025 Samvel Khalatyan. All rights reserved.
 #
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+#
 # Flavor: FreeBSD
 
-INSTALL_PATHS = ctags.d go vim vimrc.d
+INSTALL_PATHS = ctags.d go pkg vim vimrc.d
 SOURCES = tcshrc vimrc tmux.conf gitconfig
 INSTALL_TARGETS = ${SOURCES:S,^,${HOME}/.,}
 
