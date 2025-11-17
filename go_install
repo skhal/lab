@@ -53,7 +53,7 @@ download() {
   url=$(make_url ${os})
   echo ".. download ${url}"
   {
-    wget --quiet ${url}
+    wget --quiet --show-progress ${url}
     shasum -c ${CHECKSUM_FILE} --ignore-missing
   } >>${LOG_PATH}
 }
