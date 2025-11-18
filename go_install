@@ -1,12 +1,18 @@
 #!/bin/sh
 #
 # Copyright 2025 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
 
 set -e
 
-readonly GO_VERSION=${GO_VERSION:-1.25.4}
+# keep-sorted start
+readonly CACHE_PATH=${HOME}/.cache/go_install
 readonly GO_ROOT_PREFIX=/usr/local
+readonly GO_VERSION=${GO_VERSION:-1.25.4}
 readonly LOG_PATH=go_install.log # relative to TMPDIR
+# keep-sorted end
 
 CHECKSUM_FILE=$(realpath go_checksum_sha256)
 readonly CHECKSUM_FILE
@@ -51,10 +57,19 @@ download() {
   local os=${1:?'install: missing os'}
   local url
   url=$(make_url ${os})
+  local archive
+  archive=$(basename ${url})
+  local archive_in_cache
+  archive_in_cache="${CACHE_PATH}/${archive}"
+  if test -e "${archive_in_cache}"; then
+    echo ".. download ${url} (cached)"
+    return
+  fi
   echo ".. download ${url}"
   {
     wget --quiet --show-progress ${url}
     shasum -c ${CHECKSUM_FILE} --ignore-missing
+    mv -nv ${archive} ${archive_in_cache}
   } >>${LOG_PATH}
 }
 
@@ -64,9 +79,11 @@ extract() {
   url=$(make_url ${os})
   local archive
   archive=$(basename ${url})
+  local archive_in_cache
+  archive_in_cache="${CACHE_PATH}/${archive}"
   echo ".. extract ${archive}"
   {
-    tar -xzf ${archive}
+    tar -xzf "${archive_in_cache}"
   } >>${LOG_PATH}
 }
 
@@ -76,11 +93,13 @@ patch_from() {
   url=$(make_url ${os})
   local archive
   archive=$(basename ${url})
+  local archive_in_cache
+  archive_in_cache="${CACHE_PATH}/${archive}"
   local link_freebsd_path=go/pkg/tool/freebsd_amd64/link
   local link_linux_path=go/pkg/tool/linux_amd64/link
   echo ".. patch ${link_linux_path}"
   {
-    tar -xzf ${archive} ${link_freebsd_path}
+    tar -xzf ${archive_in_cache} ${link_freebsd_path}
   } >>${LOG_PATH}
   mv ${link_freebsd_path} ${link_linux_path}
   rm -rf ${link_freebsd_path%/*}
@@ -104,6 +123,9 @@ run() {
   tmpdir=$(mktemp -d)
   trap "rm -rf ${tmpdir}" EXIT
   cd ${tmpdir}
+  if ! test -d "${CACHE_PATH}"; then
+    mkdir ${CACHE_PATH}
+  fi
   download freebsd
   download linux
   extract linux
