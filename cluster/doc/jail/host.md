@@ -1,16 +1,19 @@
-# NAME
+NAME
+====
 
 **host** - host setup for jails
 
+DESCRIPTION
+===========
 
-# DESCRIPTION
-
-## ZFS
+ZFS
+---
 
 Jails reside under `/jail`. There are three folders:
-  * `/jail/image` stores downloaded user lands in compressed format.
-  * `/jail/template` holds base templates to create jails.
-  * `/jail/container` keeps running jail.
+
+-	`/jail/image` stores downloaded user lands in compressed format.
+-	`/jail/template` holds base templates to create jails.
+-	`/jail/container` keeps running jail.
 
 Create datasets:
 
@@ -21,7 +24,8 @@ Create datasets:
 # zfs create zroot/jail/container
 ```
 
-## Permissions
+Permissions
+-----------
 
 Create `jail` user group:
 
@@ -41,7 +45,7 @@ eof
 Members of `jail` can manage jail datasets:
 
 ```console
-# zfs allow -s @mount  mount,canmount,mountpoint zroot/jail
+# zfs allow -s @mount mount,canmount,mountpoint zroot/jail
 # zfs allow -s @create create,destroy,@mount zroot/jail
 # zfs allow -g jail @mount,@create,readonly,snapshot zroot/jail
 ```
@@ -52,10 +56,10 @@ Add system operator to the `jail` group:
 # pw groupmod -m op -n jail
 ```
 
-## Jail service
+Jail service
+------------
 
-`jail(8)` reads configuration from `/etc/jail.conf`. Set default configuration
-parameters and pick up individual jail configurations from `/etc/jail.conf.d/`
+`jail(8)` reads configuration from `/etc/jail.conf`. Set default configuration parameters and pick up individual jail configurations from `/etc/jail.conf.d/`
 
 ```console
 # mkdir /etc/jail.conf.d
@@ -64,8 +68,7 @@ parameters and pick up individual jail configurations from `/etc/jail.conf.d/`
 eof
 ```
 
-Enable `jail` service and stop jails in the reverse order to ensure dependencies
-are satisfied:
+Enable `jail` service and stop jails in the reverse order to ensure dependencies are satisfied:
 
 ```console
 # sysrc -f /etc/rc.conf.d/jail jail_reverse_stop=yes
@@ -74,11 +77,10 @@ jail_reverse_stop: NO -> yes
 jail_enable: NO -> yes
 ```
 
-## Network
+Network
+-------
 
-Jails use vnet(9), virtual network, to isolate networking setup from the host
-environment. Use if_bridge(4) to connect networks - network interfaces that
-are UP and connected to the bridge in the UP state can pass packets.
+Jails use vnet(9), virtual network, to isolate networking setup from the host environment. Use if_bridge(4) to connect networks - network interfaces that are UP and connected to the bridge in the UP state can pass packets.
 
 Setup two bridges to separate local and Internet traffic.
 
@@ -92,9 +94,9 @@ ifconfig_bridge0: '' -> addm em0 up descr jail:em
 ```
 
 There are two Internet access markets in the bridge:
-  1. it has em(4) Ethernet adapter connected.
-  2. it has `jail:em` description to indicate that the bridge is for jails with
-     em(4) adapter.
+
+1.	it has em(4) Ethernet adapter connected.
+2.	it has `jail:em` description to indicate that the bridge is for jails with em(4) adapter.
 
 Create a second bridge for local, intra-jail traffic:
 
@@ -105,16 +107,11 @@ cloned_interfaces: '' -> bridge0
 ifconfig_bridge0: '' -> up descr jail:lo
 ```
 
-Again, it has `jail:lo` marker in the description to indicate that the bridge
-is for jails local traffic.
+Again, it has `jail:lo` marker in the description to indicate that the bridge is for jails local traffic.
 
-For each jail, we'll create an epair(4), a virtual back-to-back connected
-Ethernet interface, with a-side connected to the bridge in the host environment,
-and b-side moved to the jail environment, where it is assigned an IP address
-and brought UP.
+For each jail, we'll create an epair(4), a virtual back-to-back connected Ethernet interface, with a-side connected to the bridge in the host environment, and b-side moved to the jail environment, where it is assigned an IP address and brought UP.
 
-We'll use [`rc.jail`](https://github.com/skhal/lab/blob/main/freebsd/rc/rc.jail)
-script to manage epair(4) setup and tear down on per-bridge, per-jail basis.
+We'll use [`rc.jail`](https://github.com/skhal/lab/blob/main/freebsd/rc/rc.jail) script to manage epair(4) setup and tear down on per-bridge, per-jail basis.
 
 ```console
 # fetch \
@@ -122,7 +119,7 @@ script to manage epair(4) setup and tear down on per-bridge, per-jail basis.
     https://raw.githubusercontent.com/skhal/lab/refs/heads/main/freebsd/rc/rc.jail
 ```
 
+SEE ALSO
+========
 
-# SEE ALSO
-
-  * https://docs.freebsd.org/en/books/handbook/jails/
+-	https://docs.freebsd.org/en/books/handbook/jails/
