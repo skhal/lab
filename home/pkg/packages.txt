@@ -10,6 +10,7 @@ bash
 doas
 git
 go125
+llvm21
 nss_ldap
 openldap26-client
 pam_ldap
