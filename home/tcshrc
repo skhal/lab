@@ -27,6 +27,9 @@ bindkey '^R' i-search-back
 # -- HISTORY
 set history = 10000
 set savehist = (10000 merge)
+if ( "$OSTYPE" == "linux" ) then
+  set histfile = "$HOME"/.history."$OSTYPE"
+endif
 
 # -- COMPLETION
 set autolist = ambiguous
@@ -71,11 +74,15 @@ alias dev '\\
     tmux attach -t "=$PWD:t" \\
     '
 if ( ${?TMUX} ) then
-  # • In tmux(1) session.
+  # In tmux(1) session.
   # Pick up histfile from tmux(1)
   set histfile_ = `tmux show-env HISTFILE >& /dev/stdout`
   if ( ! $? ) then
-    set histfile = "${histfile_:s/HISTFILE=//}"
+    set histfile_ = "${histfile_:s/HISTFILE=//}"
+    if ( "$OSTYPE" == "linux" ) then
+      set histfile_ = "${histfile_}.$OSTYPE"
+    endif
+    set histfile = "${histfile_}"
   endif
   unset histfile_
   # Pick up ssh-agent socket from tmux(1)
