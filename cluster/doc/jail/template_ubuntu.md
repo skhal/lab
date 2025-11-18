@@ -240,11 +240,12 @@ Upgrade user land:
 Install following packages for basic FreeBSD-like tools:
 
 ```console
-% doas jexec ubuntu chroot /compat/jammy apt install ldnsutils man net-tools tcsh vim
+% doas jexec ubuntu chroot /compat/jammy apt apt-file install ldnsutils man net-tools tcsh vim
 ```
 
--	`net-tools` for ifconfig(1)
--	`ldnsutils` for drill(1)
+-	`apt-file` to search for packages that install a file, i.e., `apt-file find /usr/bin/shasum`.
+-	`net-tools` for ifconfig(1).
+-	`ldnsutils` for drill(1).
 
 Locale
 ------
