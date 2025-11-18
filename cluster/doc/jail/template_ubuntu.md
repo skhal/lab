@@ -1,22 +1,19 @@
-NAME
+Name
 ====
 
 **template-ubuntu** - create a Ubuntu jail template
 
-DESCRIPTION
-===========
+Background
+==========
 
 The instructions enable Linux Binary Compatibility on the hosting machine, create a ZFS dataset with bootstrapped Ubuntu user land.
-
-Background
-----------
 
 FreeBSD provides [Linux Binary Compatibility](https://docs.freebsd.org/en/books/handbook/linuxemu/#linuxemu) to run Linux software in FreeBSD environment, controlled by `linux` service.
 
 debootstrap(8) creates Linux environment at a given prefix with minimal set of Linux shared libraries and binaries for Linux user land, including apt(1).
 
 Bootstrap
----------
+=========
 
 Enable Linux Binary Compatibility on the FreeBSD host:
 
@@ -41,8 +38,8 @@ There is a limited number of Linux applications available in pkg(1) with `linux-
 
 Keep in mind that Linux binaries run along FreeBSD binaries. They show up in the process tree, can be traced, etc.
 
-Jail
-----
+Debootstrap
+===========
 
 Create a Ubuntu template jail from FreeBSD template:
 
@@ -55,12 +52,12 @@ zroot/jail/template/14.3-RELEASE@p5.6     0B      -   459M  -
 Start a temporary jail with path set to the template location:
 
 ```console
-% cat /tmp/jammy.conf
-jammy {
+% cat /tmp/ubuntu.conf
+ubuntu {
   host.hostname = "${name}.lab.net";
   path = "/jail/template/Ubuntu-22.04";
 
-  interface = "em0";
+  interface = "igc0";
   ip4.addr = "192.168.1.12";
 
   allow.mount.devfs;
@@ -73,7 +70,7 @@ jammy {
   allow.raw_sockets;
 
   mount.devfs;
-  devfs_ruleset = 4;
+  devfs_ruleset = 5;
 
   enforce_statfs = 1;
 
@@ -83,16 +80,16 @@ jammy {
   exec.start = "/bin/sh /etc/rc";
   exec.stop = "/bin/sh /etc/rc.shutdown";
 }
-% doas jail -cm -f /tmp/jammy.conf
-jammy: created
+% doas jail -cm -f /tmp/ubuntu.conf
+ubuntu: created
 ```
 
 Verify work:
 
 ```console
-% doas jexec jammy ifconfig -ag epair
+% doas jexec ubuntu ifconfig -ag epair
 epair6b: flags=1008843<UP,BROADCAST,RUNNING,SIMPLEX,MULTICAST,LOWER_UP> metric 0 mtu 1500
-	description: jail:jammy:bridge0
+	description: jail:ubuntu:bridge0
 	options=8<VLAN_MTU>
 	ether 02:55:ef:72:1f:0b
 	inet 192.168.1.12 netmask 0xffffff00 broadcast 192.168.1.255
@@ -101,7 +98,7 @@ epair6b: flags=1008843<UP,BROADCAST,RUNNING,SIMPLEX,MULTICAST,LOWER_UP> metric 0
 	status: active
 	nd6 options=29<PERFORMNUD,IFDISABLED,AUTO_LINKLOCAL>
 epair7b: flags=1008843<UP,BROADCAST,RUNNING,SIMPLEX,MULTICAST,LOWER_UP> metric 0 mtu 1500
-	description: jail:jammy:bridge1
+	description: jail:ubuntu:bridge1
 	options=8<VLAN_MTU>
 	ether 02:54:f8:a8:4a:0b
 	inet 10.0.1.12 netmask 0xffffff00 broadcast 10.0.1.255
@@ -109,14 +106,14 @@ epair7b: flags=1008843<UP,BROADCAST,RUNNING,SIMPLEX,MULTICAST,LOWER_UP> metric 0
 	media: Ethernet 10Gbase-T (10Gbase-T <full-duplex>)
 	status: active
 	nd6 options=29<PERFORMNUD,IFDISABLED,AUTO_LINKLOCAL>
-% doas jexec jammy ping -c 1 192.168.1.1
+% doas jexec ubuntu ping -c 1 192.168.1.1
 PING 192.168.1.1 (192.168.1.1): 56 data bytes
 64 bytes from 192.168.1.1: icmp_seq=0 ttl=64 time=0.585 ms
 
 --- 192.168.1.1 ping statistics ---
 1 packets transmitted, 1 packets received, 0.0% packet loss
 round-trip min/avg/max/stddev = 0.585/0.585/0.585/0.000 ms
-% doas jexec jammy nc -uv 1.1.1.1 53
+% doas jexec ubuntu nc -uv 1.1.1.1 53
 Connection to 1.1.1.1 53 port [udp/domain] succeeded!
 ^C
 ```
@@ -124,7 +121,7 @@ Connection to 1.1.1.1 53 port [udp/domain] succeeded!
 Install debootstrap(8):
 
 ```console
-% doas jexec jammy pkg install debootstrap
+% doas jexec ubuntu pkg install debootstrap
 The package management tool is not yet installed on your system.
 Do you want to fetch and install it now? [y/N]: y
 ...
@@ -134,7 +131,7 @@ Do you want to fetch and install it now? [y/N]: y
 <summary>Package messages</summary>
 
 ```
-% doas jexec jammy pkg info -D debootstrap
+% doas jexec ubuntu pkg info -D debootstrap
 debootstrap-1.0.128n2_4:
 On install:
 To successfully create an installation of Debian or Ubuntu
@@ -156,7 +153,7 @@ debootstrap bionic /compat/ubuntu
 Bootstrap Linux land at `/compat/<distribution>`:
 
 ```console
-% doas jexec jammy debootstrap jammy /compat/jammy
+% doas jexec ubuntu debootstrap jammy /compat/jammy
 I: Retrieving InRelease
 ...
 I: Base system installed successfully.
@@ -165,7 +162,7 @@ I: Base system installed successfully.
 Verify work:
 
 ```console
-% doas jexec jammy ls /compat/jammy
+% doas jexec ubuntu ls /compat/jammy
 bin dev home  lib32 libx32  mnt proc  run srv tmp var
 boot  etc lib lib64 media opt root  sbin  sys usr
 ```
@@ -173,11 +170,122 @@ boot  etc lib lib64 media opt root  sbin  sys usr
 Stop the jail:
 
 ```console
-% doas jail -r -f /tmp/jammy.conf jammy
-jammy: removed
+% doas jail -r -f /tmp/ubuntu.conf ubuntu
+ubuntu: removed
 ```
 
-Snapshot the template (include installed FreeBSD patch in the name):
+Configure
+=========
+
+Some of the configuration steps such as apt(8) need access to mountpoints like `/dev`. Modify the jail's temporary configuration to include mounts:
+
+```console
+% cat /tmp/ubuntu.conf
+ubuntu {
+  host.hostname = "${name}.lab.net";
+  path = "/jail/template/Ubuntu-22.04";
+
+  interface = "igc0";
+  ip4.addr = "192.168.1.12";
+
+  allow.mount.devfs;
+  allow.mount.fdescfs;
+  allow.mount.linprocfs;
+  allow.mount.linsysfs;
+  allow.mount.procfs;
+  allow.mount.tmpfs;
+  allow.mount;
+  allow.raw_sockets;
+
+  mount += "devfs     $path/compat/jammy/dev     devfs     rw 0 0";
+  mount += "fdescfs   $path/compat/jammy/dev/fd  fdescfs   rw,linrdlnk 0 0";
+  mount += "linprocfs $path/compat/jammy/proc    linprocfs rw 0 0";
+  mount += "linsysfs  $path/compat/jammy/sys     linsysfs  rw 0 0";
+  mount += "tmpfs     $path/compat/jammy/dev/shm tmpfs     rw,size=1g,mode=1777 0 0";
+  mount.devfs;
+  devfs_ruleset = 5;
+
+  enforce_statfs = 1;
+
+  exec.clean;
+  exec.consolelog = "/var/log/jail_${name}.log";
+
+  exec.start = "/bin/sh /etc/rc";
+  exec.stop = "/bin/sh /etc/rc.shutdown";
+}
+% doas jail -cm -f /tmp/ubuntu.conf
+ubuntu: created
+```
+
+Apt
+---
+
+Use Universe and Multiverse sources to apt(8)
+
+```console
+% doas jexec ubuntu chroot /compat/jammy cat /etc/apt/sources.list
+deb http://archive.ubuntu.com/ubuntu jammy main universe restricted multiverse
+deb http://security.ubuntu.com/ubuntu/ jammy-security universe multiverse restricted main
+deb http://archive.ubuntu.com/ubuntu jammy-backports universe multiverse restricted main
+deb http://archive.ubuntu.com/ubuntu jammy-updates universe multiverse restricted main
+```
+
+Upgrade user land:
+
+```console
+% doas jexec ubuntu chroot /compat/jammy apt update
+% doas jexec ubuntu chroot /compat/jammy apt upgrade
+```
+
+Install following packages for basic FreeBSD-like tools:
+
+```console
+% doas jexec ubuntu chroot /compat/jammy apt install ldnsutils man net-tools tcsh vim
+```
+
+-	`net-tools` for ifconfig(1)
+-	`ldnsutils` for drill(1)
+
+Locale
+------
+
+```console
+% doas jexec ubuntu chroot /compat/jammy locale-gen C.UTF-8
+Generating locales (this might take a while)...
+  C.UTF-8... done
+Generation complete.
+% doas jexec ubuntu chroot /compat/jammy dpkg-reconfigure locales
+```
+
+Root
+----
+
+Change shell to tcsh(1):
+
+```console
+% doas jexec ubuntu chroot /compat/jammy chsh -s /usr/bin/tcsh root
+```
+
+Copy `.cshrc`:
+
+```console
+# cp /root/.cshrc /jail/template/Ubuntu-22.04/root/
+# cp /root/.cshrc /jail/template/Ubuntu-22.04/compat/jammy/root/
+```
+
+Timezone
+--------
+
+```console
+% doas jexec ubuntu chroot /compat/jammy dpkg-reconfigure tzdata
+% doas jexec ubuntu chroot /compat/jammy date
+Tue Nov 18 08:49:04 CST 2025
+```
+
+Snapshot
+========
+
+Snapshot the template with installed patch number `pN` (i.e., `p5` for `14.3-RELEASE-p5`) and local changes number:
 
 ```console
 # zfs snapshot zroot/jail/template/Ubuntu-22.04@p5.0
