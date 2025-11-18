@@ -1,75 +1,67 @@
-# NAME
+NAME
+====
 
 **template-ubuntu** - create a Ubuntu jail template
 
+DESCRIPTION
+===========
 
-# DESCRIPTION
+The instructions enable Linux Binary Compatibility on the hosting machine, create a ZFS dataset with bootstrapped Ubuntu user land.
 
-## Host
+Background
+----------
 
-Enable
-[Linux Binary Compatibility](https://docs.freebsd.org/en/books/handbook/linuxemu/#linuxemu)
-to run Linux user land on FreeBSD:
+FreeBSD provides [Linux Binary Compatibility](https://docs.freebsd.org/en/books/handbook/linuxemu/#linuxemu) to run Linux software in FreeBSD environment, controlled by `linux` service.
+
+debootstrap(8) creates Linux environment at a given prefix with minimal set of Linux shared libraries and binaries for Linux user land, including apt(1).
+
+Bootstrap
+---------
+
+Enable Linux Binary Compatibility on the FreeBSD host:
 
 ```console
 # sysrc -f /etc/rc.conf.d/linux linux_enable=YES
 # service linux start
 ```
 
-The service
-[loads kernel modules](https://github.com/freebsd/freebsd-src/blob/ae5914c0e4478fd35ef9db3f32665b60e04d5a6f/libexec/rc/rc.d/linux#L32-L63)
-and
-[mounts file systems](https://github.com/freebsd/freebsd-src/blob/ae5914c0e4478fd35ef9db3f32665b60e04d5a6f/libexec/rc/rc.d/linux#L74-L80)
-for Linux applications under `/compat/linux` prefix:
+The service [loads kernel modules](https://github.com/freebsd/freebsd-src/blob/ae5914c0e4478fd35ef9db3f32665b60e04d5a6f/libexec/rc/rc.d/linux#L32-L63) and [mounts file systems](https://github.com/freebsd/freebsd-src/blob/ae5914c0e4478fd35ef9db3f32665b60e04d5a6f/libexec/rc/rc.d/linux#L74-L80) for Linux applications under `/compat/linux` prefix:
 
 ```console
-# sysctl -n compat.linux.emul_path
+% sysctl -n compat.linux.emul_path
 /compat/linux
 ```
 
-Now Linux applications can run on the host along native FreeBSD binaries now.
-They show up in the process tree, can be traced, etc. There is a small number
-of such applications available in the FreeBSD Ports tree with `linux-` prefix:
+There is a limited number of Linux applications available in pkg(1) with `linux-` prefix:
 
 ```console
-% pkg search '^linux-*' | head -n 3
-linux-ai-ml-env-1.0.0          Linux Python environment for running Stable Diffusion models and PyTorch CUDA examples
-linux-bcompare-4.4.7           Compare, sync, and merge files and folders (X11)
-linux-bitwarden-cli-1.22.1     Bitwarden CLI
+% pkg search '^linux-' | wc -l
+     279
 ```
 
-## Jail
+Keep in mind that Linux binaries run along FreeBSD binaries. They show up in the process tree, can be traced, etc.
 
-debootstrap(8) installs Linux shared libraries. We'll need to install these
-inside the template. The template also needs to access default FreeBSD setup.
+Jail
+----
 
-### ZFS Bootstrap
-
-Start from FreeBSD template:
+Create a Ubuntu template jail from FreeBSD template:
 
 ```console
-% zfs list -t snapshot zroot/jail/template/14.3-RELEASE
-NAME                                    USED  AVAIL  REFER  MOUNTPOINT
-zroot/jail/template/14.3-RELEASE@p2     144K      -   459M  -
-zroot/jail/template/14.3-RELEASE@p2.1   152K      -   459M  -
-zroot/jail/template/14.3-RELEASE@p2.2   128K      -   459M  -
-zroot/jail/template/14.3-RELEASE@p2.3   120K      -   459M  -
-zroot/jail/template/14.3-RELEASE@p2.4     8K      -   459M  -
-# zfs clone zroot/jail/template/14.3-RELEASE@p2.4 zroot/jail/template/Ubuntu-22.04
+# zfs list -t snapshot zroot/jail/template/14.3-RELEASE | tail -1
+zroot/jail/template/14.3-RELEASE@p5.6     0B      -   459M  -
+# zfs clone zroot/jail/template/14.3-RELEASE@p5.6 zroot/jail/template/Ubuntu-22.04
 ```
 
-### Start template
-
-Manually start a jail with path set to the template:
+Start a temporary jail with path set to the template location:
 
 ```console
-# cat /tmp/jammy.conf
+% cat /tmp/jammy.conf
 jammy {
   host.hostname = "${name}.lab.net";
   path = "/jail/template/Ubuntu-22.04";
 
   interface = "em0";
-  ip4.addr = "192.168.1.10";
+  ip4.addr = "192.168.1.12";
 
   allow.mount.devfs;
   allow.mount.fdescfs;
@@ -91,38 +83,48 @@ jammy {
   exec.start = "/bin/sh /etc/rc";
   exec.stop = "/bin/sh /etc/rc.shutdown";
 }
-# jail -cm -f /tmp/jammy.conf
+% doas jail -cm -f /tmp/jammy.conf
 jammy: created
 ```
 
 Verify work:
 
 ```console
-# jexec jammy ifconfig em0
-em0: flags=1008943<UP,BROADCAST,RUNNING,PROMISC,SIMPLEX,MULTICAST,LOWER_UP> metric 0 mtu 1500
-	options=a520b9<RXCSUM,VLAN_MTU,VLAN_HWTAGGING,JUMBO_MTU,VLAN_HWCSUM,WOL_MAGIC,VLAN_HWFILTER,VLAN_HWTSO,RXCSUM_IPV6,HWSTATS>
-	ether 00:1f:c6:9c:54:f1
-	inet 192.168.1.10 netmask 0xffffffff broadcast 192.168.1.10
-	media: Ethernet autoselect (1000baseT <full-duplex>)
+% doas jexec jammy ifconfig -ag epair
+epair6b: flags=1008843<UP,BROADCAST,RUNNING,SIMPLEX,MULTICAST,LOWER_UP> metric 0 mtu 1500
+	description: jail:jammy:bridge0
+	options=8<VLAN_MTU>
+	ether 02:55:ef:72:1f:0b
+	inet 192.168.1.12 netmask 0xffffff00 broadcast 192.168.1.255
+	groups: epair
+	media: Ethernet 10Gbase-T (10Gbase-T <full-duplex>)
 	status: active
-# jexec jammy ping -c 1 192.168.1.1
+	nd6 options=29<PERFORMNUD,IFDISABLED,AUTO_LINKLOCAL>
+epair7b: flags=1008843<UP,BROADCAST,RUNNING,SIMPLEX,MULTICAST,LOWER_UP> metric 0 mtu 1500
+	description: jail:jammy:bridge1
+	options=8<VLAN_MTU>
+	ether 02:54:f8:a8:4a:0b
+	inet 10.0.1.12 netmask 0xffffff00 broadcast 10.0.1.255
+	groups: epair
+	media: Ethernet 10Gbase-T (10Gbase-T <full-duplex>)
+	status: active
+	nd6 options=29<PERFORMNUD,IFDISABLED,AUTO_LINKLOCAL>
+% doas jexec jammy ping -c 1 192.168.1.1
 PING 192.168.1.1 (192.168.1.1): 56 data bytes
-64 bytes from 192.168.1.1: icmp_seq=0 ttl=64 time=1.446 ms
+64 bytes from 192.168.1.1: icmp_seq=0 ttl=64 time=0.585 ms
 
 --- 192.168.1.1 ping statistics ---
 1 packets transmitted, 1 packets received, 0.0% packet loss
-round-trip min/avg/max/stddev = 1.446/1.446/1.446/0.000 ms
-# jexec jammy nc -uv 1.1.1.1 53
+round-trip min/avg/max/stddev = 0.585/0.585/0.585/0.000 ms
+% doas jexec jammy nc -uv 1.1.1.1 53
 Connection to 1.1.1.1 53 port [udp/domain] succeeded!
 ^C
 ```
 
-### Debian bootstrap
-
 Install debootstrap(8):
 
 ```console
-# jexec jammy pkg install debootstrap
+% doas jexec jammy pkg install debootstrap
 The package management tool is not yet installed on your system.
 Do you want to fetch and install it now? [y/N]: y
 ...
@@ -132,10 +134,9 @@ Do you want to fetch and install it now? [y/N]: y
 <summary>Package messages</summary>
 
 ```
-=====
-Message from debootstrap-1.0.128n2_4:
-
---
+% doas jexec jammy pkg info -D debootstrap
+debootstrap-1.0.128n2_4:
+On install:
 To successfully create an installation of Debian or Ubuntu
 debootstrap requires the following kernel modules to be loaded:
 
@@ -148,21 +149,14 @@ debootstrap bionic /compat/ubuntu
 
 </details>
 
-> [!IMPORTANT]
-> The message from debootstrap(8) includes installed version `1.0.128`.
+> [!IMPORTANT] debootstrap(8) is a Debian shell script, https://wiki.debian.org/Debootstrap. It pulls a bunch of libraries and apps, customized for different Debian distributions by `/usr/local/share/debootstrap/scripts/`. For example, `jammy` script aims to reproduce Ubuntu 22.04 distribution.
 >
-> It is a Debian shell script, https://wiki.debian.org/Debootstrap. The script
-> pulls a number of libraries, customized for different Debian distributions by
-> `/usr/local/share/debootstrap/scripts/`.
->
-> For example, `jammy` script is for Ubuntu 22.04.
->
-> debootstrap(8) v1.0.128 does not include Ubuntu 24.04 Noble.
+> debootstrap(8) v1.0.128 does not include a script for Ubuntu 24.04 Noble.
 
-Install Linux libraries into `/compat/<distribution>`, i.e., `/compat/jammy`:
+Bootstrap Linux land at `/compat/<distribution>`:
 
 ```console
-# jexec jammy debootstrap jammy /compat/jammy
+% doas jexec jammy debootstrap jammy /compat/jammy
 I: Retrieving InRelease
 ...
 I: Base system installed successfully.
@@ -171,30 +165,25 @@ I: Base system installed successfully.
 Verify work:
 
 ```console
-# jexec jammy ls /compat/jammy
+% doas jexec jammy ls /compat/jammy
 bin dev home  lib32 libx32  mnt proc  run srv tmp var
 boot  etc lib lib64 media opt root  sbin  sys usr
 ```
 
-### Stop template
-
 Stop the jail:
 
 ```console
-# jail -r -f /tmp/jammy.conf jammy
+% doas jail -r -f /tmp/jammy.conf jammy
 jammy: removed
 ```
 
-### Snapshot
-
-Create a ZFS Snapshot the template. Name it after FreeBSD patch. Include the
-change version:
+Snapshot the template (include installed FreeBSD patch in the name):
 
 ```console
-# zfs snapshot zroot/jail/template/Ubuntu-22.04@p2.0
+# zfs snapshot zroot/jail/template/Ubuntu-22.04@p5.0
 ```
 
+SEE ALSO
+========
 
-# SEE ALSO
-
-* https://docs.freebsd.org/en/books/handbook/jails/#creating-linux-jail
+-	https://docs.freebsd.org/en/books/handbook/jails/#creating-linux-jail
