@@ -58,7 +58,7 @@ ubuntu {
   path = "/jail/template/Ubuntu-22.04";
 
   interface = "igc0";
-  ip4.addr = "192.168.1.12";
+  ip4.addr = "192.168.1.254";
 
   allow.mount.devfs;
   allow.mount.fdescfs;
@@ -186,7 +186,7 @@ ubuntu {
   path = "/jail/template/Ubuntu-22.04";
 
   interface = "igc0";
-  ip4.addr = "192.168.1.12";
+  ip4.addr = "192.168.1.254";
 
   allow.mount.devfs;
   allow.mount.fdescfs;
