@@ -12,8 +12,8 @@ FreeBSD provides [Linux Binary Compatibility](https://docs.freebsd.org/en/books/
 
 debootstrap(8) creates Linux environment at a given prefix with minimal set of Linux shared libraries and binaries for Linux user land, including apt(1).
 
-Bootstrap
-=========
+Host
+====
 
 Enable Linux Binary Compatibility on the FreeBSD host:
 
@@ -38,8 +38,8 @@ There is a limited number of Linux applications available in pkg(1) with `linux-
 
 Keep in mind that Linux binaries run along FreeBSD binaries. They show up in the process tree, can be traced, etc.
 
-Debootstrap
-===========
+Bootstrap
+=========
 
 Create a Ubuntu template jail from FreeBSD template:
 
