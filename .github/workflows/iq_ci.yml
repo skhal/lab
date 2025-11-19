@@ -1,0 +1,26 @@
+# Copyright 2025 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+name: Interview Questions CI
+
+on:
+  push:
+    branches: ["main"]
+    paths: ['iq/**']
+
+jobs:
+  bootstrap:
+    uses: ./.github/workflows/ci_analyze.yml
+
+  ci:
+    needs: bootstrap
+    if: needs.bootstrap.outputs.go_changes == 'true'
+    strategy:
+      matrix:
+        go-version: ['1.25.x']
+    uses: ./.github/workflows/ci_go.yml
+    with:
+      package: ./iq
+      go-version: ${{ matrix.go-version }}
