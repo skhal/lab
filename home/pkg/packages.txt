@@ -16,6 +16,7 @@ openldap26-client
 pam_ldap
 pam_mkhomedir
 pkg
+py311-cppman
 py311-pre-commit
 tmux
 tree

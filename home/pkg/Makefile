@@ -16,7 +16,7 @@ install: ${INSTALL_TARGETS} .PHONY
 ${package}: ${PACKAGE_LIST}
 	@if ! pkg info -e ${.TARGET}; then \
 		echo ".. install ${.TARGET}"; \
-		pkg install ${.TARGET} \
+		doas pkg install ${.TARGET} \
 		; \
 	 fi
 .endfor
