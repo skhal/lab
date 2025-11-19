@@ -40,7 +40,7 @@ jobs:
       id: bzl_changes
       run: |
         detected=false
-        if $(git diff --name-only --diff-filter=ACMR HEAD^ | grep -q '\(BUILD\|\.bazel\)$'; then
+        if $(git diff --name-only --diff-filter=ACMR HEAD^ | grep -q '\(BUILD\|\.bazel\)$'); then
           detected=true
         fi
         echo "detected=${detected}" | tee $GITHUB_OUTPUT
