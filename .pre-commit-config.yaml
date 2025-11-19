@@ -29,7 +29,7 @@ repos:
     args: ["-mode=diff", "-lint=warn"]
   - id: clang-format
     name: clang-format
-    entry: clang-format -i
+    entry: clang-format21 -i
     language: system
     types_or: [c++, c]
     args: ["-style=file"]
