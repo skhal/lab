@@ -12,29 +12,11 @@ on:
 
 jobs:
   bootstrap:
-    defaults:
-      run:
-        shell: sh
-    runs-on: ubuntu-latest
+    uses: ./.github/workflows/ci_analyze.yml
     outputs:
       go_changes: ${{ steps.go_changes.outputs.go_changes }}
 
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v5
-      with:
-        fetch-depth: 2
-
-    - name: Detect Go Changes
-      id: go_changes
-      run: |
-        go_changes=false
-        if $(git diff --name-only --diff-filter=ACMR HEAD^ | grep -q \.go$); then
-          go_changes=true
-        fi
-        echo "go_changes=${go_changes}" | tee $GITHUB_OUTPUT
-
-  test:
+  ci:
     needs: bootstrap
     if: needs.bootstrap.outputs.go_changes == 'true'
     uses: ./.github/workflows/ci_go.yml

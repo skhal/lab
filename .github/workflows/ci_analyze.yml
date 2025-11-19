@@ -1,0 +1,38 @@
+# Copyright 2025 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+name: CI Analyze
+
+on:
+  # Trigger from other workflows
+  workflow_call:
+    outputs:
+      go_changes:
+        description: "Go changes detected when set to true."
+        value: ${{ jobs.analyze.outputs.go_changes }}
+
+jobs:
+  analyze:
+    defaults:
+      run:
+        shell: sh
+    runs-on: ubuntu-latest
+    outputs:
+      go_changes: ${{ steps.go_changes.outputs.detected }}
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v5
+      with:
+        fetch-depth: 2
+
+    - name: Detect Go Changes
+      id: go_changes
+      run: |
+        detected=false
+        if $(git diff --name-only --diff-filter=ACMR HEAD^ | grep -q \.go$); then
+          detected=true
+        fi
+        echo "detected=${detected}" | tee $GITHUB_OUTPUT
