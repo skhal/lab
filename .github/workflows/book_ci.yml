@@ -17,6 +17,10 @@ jobs:
   ci:
     needs: bootstrap
     if: needs.bootstrap.outputs.go_changes == 'true'
+    strategy:
+      matrix:
+        go-version: ['1.25.x']
     uses: ./.github/workflows/ci_go.yml
     with:
       package: ./book
+      go-version: ${{ matrix.go-version }}
