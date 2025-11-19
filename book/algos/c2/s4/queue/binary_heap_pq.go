@@ -15,7 +15,7 @@ package queue
 // O(log(N)) time complexity by keeping the order of items on Push() and Pop():
 //   - Push() adds new element tot he end of the array and promotes it to the
 //     parent node iteratively as long as less(i/2,i)==true for it.
-//   - Pop() moves the root item to the end, deletest the last item from the
+//   - Pop() moves the root item to the end, deletes the last item from the
 //     array, and restores the order by demoting the root item all the way
 //     through the array as long as at least one child node is larger than the
 //     i-th item starting from the root. It picks up the largest child to
