@@ -11,8 +11,13 @@ on:
     paths: ['book/**']
 
 jobs:
-  test:
+  bootstrap:
+    defaults:
+      run:
+        shell: sh
     runs-on: ubuntu-latest
+    outputs:
+      go_changes: ${{ steps.go_changes.outputs.go_changes }}
 
     steps:
     - name: Checkout
@@ -20,17 +25,19 @@ jobs:
       with:
         fetch-depth: 2
 
-    - name: Detect Changes
+    - name: Detect Go Changes
       id: go_changes
       run: |
-        files=`git diff --name-only --diff-filter=ACMR HEAD^ | grep \.go$ || true`
+        files=$(git diff --name-only --diff-filter=ACMR HEAD^ | grep \.go$ || true)
         if [[ -n "$files" ]]; then
           echo "go_changes=true" | tee $GITHUB_OUTPUT
         else
           echo "go_changes=false" | tee $GITHUB_OUTPUT
         fi
 
-    - name: Go test
-      if: steps.go_changes.outputs.go_changes == 'true'
-      run: |
-        go test -v ./book/...
+  test:
+    needs: bootstrap
+    if: needs.bootstrap.outputs.go_changes == 'true'
+    uses: ./.github/workflows/ci_go.yml
+    with:
+      package: ./book
