@@ -16,7 +16,10 @@ jobs:
 
   ci-go:
     needs: bootstrap
-    if: needs.bootstrap.outputs.go_changes == 'true'
+    # include cc_changes to ensure mixing Go and cc code is fine in the package.
+    if: |
+      needs.bootstrap.outputs.go_changes == 'true' ||
+        needs.bootstrap.outputs.cc_changes == 'true'
     strategy:
       matrix:
         go-version: ['1.25.x']
