@@ -6,7 +6,7 @@
 /*
 Multiway merges multiples sorted files.
 
-The files contain sortes arrays of strings:
+The files contain sorted arrays of strings:
 
     % more a.txt
 		a c d
