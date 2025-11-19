@@ -21,22 +21,21 @@ func ExampleMapBinaryHeapPQ() {
 		{3, 4, 8},
 	}
 	// Inverse lessInt to form a MinPQ, e.g. pick up next smallest item.
-	pq := queue.NewMapBinaryHeapPQ[int, int](func(x, y int) bool {
+	pq := queue.NewMapBinaryHeapPQ[int, []int](func(x, y int) bool {
 		return lessInt(y, x)
 	})
-	for i, nn := range nnn {
-		pq.Push(nn[0], i)
+	for _, nn := range nnn {
+		pq.Push(nn[0], nn[1:])
 	}
 	var sorted []int
 	for !pq.Empty() {
-		n, i := pq.Top()
+		n, nn := pq.Top()
 		pq.Pop()
 		sorted = append(sorted, n)
-		if len(nnn[i]) == 1 {
+		if len(nn) == 0 {
 			continue
 		}
-		nnn[i] = nnn[i][1:]
-		pq.Push(nnn[i][0], i)
+		pq.Push(nn[0], nn[1:])
 	}
 	fmt.Println(sorted)
 	// Output:
