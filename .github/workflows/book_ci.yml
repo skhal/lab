@@ -1,0 +1,33 @@
+# Copyright 2025 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+name: Book CI
+
+on:
+  push:
+    branches: ["main"]
+    paths: ['book/**']
+
+jobs:
+  bootstrap:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v5
+
+    - name: Detect Changes
+      id: go_changes
+      run: |
+        files=`git diff --name-only --diff-filter=ACMR FETCH_HEAD  | grep \.go$ || true`
+        if [[ -n "$files" ]]; then
+          echo "go_changes=true" | tee $GITHUB_OUTPUT
+        else
+          echo "go_changes=false" | tee $GITHUB_OUTPUT
+        fi
+
+    - name: Go test
+      if: steps.go_changes.outputs.go_changes == 'true'
+      run: |
+        go test -v ./book/...
