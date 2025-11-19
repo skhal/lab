@@ -5,6 +5,8 @@
 
 /*
 Topm finds top N transactions in the standard input.
+
+    % topm -n 5 -k binary-heap < tinyBatch.txt
 */
 package main
 
