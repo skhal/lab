@@ -1,13 +1,25 @@
-NAME
+Name
 ====
 
-**geomseq solution** - solution to geometric sequence triplets problem
+**11** - find triplets of geometric sequences in a collection
 
-DESCRIPTION
-===========
+Problem
+=======
+
+Given a collection of numbers, find the number of triples of [geometric sequences](https://en.wikipedia.org/wiki/Geometric_progression) in a collection such that items at indices i, j, and k satisfy the following condition: i < j < k.
+
+Example
+-------
+
+*Input*: [3, 1, 2, 3, 9, 3, 27] and ratio is 3
+
+*Output*: 3 because of triples [0, 4, 6], [3, 4, 6], and [1, 3, 4]
 
 Solution
---------
+========
+
+<details>
+<summary>Details</summary>
 
 For a given ratio `r` and number `n`, a geometric triplet is a sequence of numbers `[n, r * n, (r * r) * n]`.
 
@@ -27,13 +39,13 @@ m_prev * m_next
 
 Algorithm:
 
--	Linearly scan the collection.
--	Keep track of the items on the left and right in separate hash maps - the key is the number, the value is the number of times it is present in the sub-set.
--	When moving to the next item in the collection, move the element between the tho hash maps.
+-   Linearly scan the collection.
+-   Keep track of the items on the left and right in separate hash maps - the key is the number, the value is the number of times it is present in the sub-set.
+-   When moving to the next item in the collection, move the element between the tho hash maps.
 
-Complexity
-----------
+Complexity:
 
-\**Time*: O(n) linear scan.
+- _Time_: O(n) linear scan.
+- _Space_: O(n) two hash maps for left and right sub-collections.
 
-**Space**: O(n) two hash maps for left and right sub-collections.
+</details>
