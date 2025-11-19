@@ -8,7 +8,6 @@ on:
     branches: ["main"]
     paths:
     # keep-sorted start
-    - 'book/**'
     - 'check/**'
     - 'go/**'
     - 'iq/**'
@@ -18,7 +17,6 @@ on:
     branches: ["main"]
     paths:
     # keep-sorted start
-    - 'book/**'
     - 'check/**'
     - 'go/**'
     - 'iq/**'
@@ -42,7 +40,7 @@ jobs:
         go-version: ${{ matrix.go-version }}
 
     - name: Build
-      run: go build -v ./book/... ./check/... ./iq/... ./x/... ./go/...
+      run: go build -v ./check/... ./iq/... ./x/... ./go/...
 
     - name: Test
-      run: go test -v ./book/... ./check/... ./iq/... ./x/... ./go/...
+      run: go test -v  ./check/... ./iq/... ./x/... ./go/...
