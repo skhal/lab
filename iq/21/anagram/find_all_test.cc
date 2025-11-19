@@ -2,6 +2,9 @@
 //
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
+//
+// clang-format off-next-line
+//go:build ignore
 
 #include "iq/21/anagram/find_all.h"
 
