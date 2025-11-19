@@ -14,7 +14,7 @@ jobs:
   bootstrap:
     uses: ./.github/workflows/ci_analyze.yml
 
-  ci:
+  ci-go:
     needs: bootstrap
     if: needs.bootstrap.outputs.go_changes == 'true'
     strategy:
@@ -24,3 +24,16 @@ jobs:
     with:
       package: ./iq
       go-version: ${{ matrix.go-version }}
+
+  ci-cc:
+    needs: bootstrap
+    if: |
+      needs.bootstrap.outputs.bzl_changes == 'true'
+        || needs.bootstrap.outputs.cc_changes == 'true'
+    strategy:
+      matrix:
+        llvm-version: [21]
+    uses: ./.github/workflows/ci_cc_bazel.yml
+    with:
+      llvm-version: ${{ matrix.llvm-version }}
+      package: //iq
