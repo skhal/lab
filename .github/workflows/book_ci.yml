@@ -13,8 +13,6 @@ on:
 jobs:
   bootstrap:
     uses: ./.github/workflows/ci_analyze.yml
-    outputs:
-      go_changes: ${{ steps.go_changes.outputs.go_changes }}
 
   ci:
     needs: bootstrap
