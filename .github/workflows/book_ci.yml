@@ -20,7 +20,7 @@ jobs:
     - name: Detect Changes
       id: go_changes
       run: |
-        files=`git diff --name-only --diff-filter=ACMR FETCH_HEAD  | grep \.go$ || true`
+        files=`git diff --name-only --diff-filter=ACMR HEAD^  | grep \.go$ || true`
         if [[ -n "$files" ]]; then
           echo "go_changes=true" | tee $GITHUB_OUTPUT
         else
