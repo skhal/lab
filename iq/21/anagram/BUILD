@@ -17,6 +17,7 @@ cc_test(
     srcs = ["find_all_test.cc"],
     deps = [
         ":find_all",
+        "@googletest//:gtest",
         "@googletest//:gtest_main",
     ],
 )
