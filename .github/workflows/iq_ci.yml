@@ -9,6 +9,9 @@ on:
   push:
     branches: ["main"]
     paths: ['iq/**']
+  schedule:
+  # Every hour
+  - cron: '0 * * * *'
 
 jobs:
   bootstrap:
@@ -19,7 +22,8 @@ jobs:
     # include cc_changes to ensure mixing Go and cc code is fine in the package.
     if: |
       needs.bootstrap.outputs.go_changes == 'true' ||
-        needs.bootstrap.outputs.cc_changes == 'true'
+        needs.bootstrap.outputs.cc_changes == 'true' ||
+        github.event_name == 'schedule'
     strategy:
       matrix:
         go-version: ['1.25.x']
