@@ -1,7 +1,11 @@
 #!/bin/sh
 #
 # Copyright 2025 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
 
+bazel run :gazelle
 bazel run :refresh_compile_commands
 
 sed \
