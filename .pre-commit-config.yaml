@@ -1,5 +1,9 @@
 # Copyright 2025 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
 
+default_install_hook_types: [pre-commit, commit-msg]
 repos:
 - repo: https://github.com/pre-commit/pre-commit-hooks
   rev: v6.0.0
@@ -33,6 +37,11 @@ repos:
     language: system
     types_or: [go]
     pass_filenames: true
+  - id: check-issue
+    name: check-issue
+    entry: check-issue
+    language: system
+    stages: [commit-msg]
   - id: check-nosubmit
     name: check-nosubmit
     entry: check-nosubmit
