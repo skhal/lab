@@ -49,7 +49,15 @@ func Run(cfg *Config, files []string) error {
 
 var (
 	noissueRegexp = regexp.MustCompile(`^(?i)no_issue(?:: .*)?$`)
-	issueRegexp   = regexp.MustCompile(`^(?i)issue #\d+$`)
+	// lint = keyword [ ":" ] issue .
+	// keyword = close | closes | closed | fix | fixes | fised | resolve | resolves | resolved .
+	// issue = [ owner "/" repo ] "#" number .
+	// ref: https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/using-keywords-in-issues-and-pull-requests
+	//
+	// Enforce sub-set of possible options:
+	// - keyword: issue, close, fix
+	// - issue: local or remote
+	issueRegexp   = regexp.MustCompile(`^(?i)(?:issue|close|fix) (?:\w+/\w+)?#\d+$`)
 )
 
 // Check validates the file with commit message.

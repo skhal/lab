@@ -68,9 +68,44 @@ func TestCheck(t *testing.T) {
 			file: "test.txt",
 		},
 		{
-			name: "issue is present",
+			name: "issue local",
 			readFileFn: func(string) ([]byte, error) {
 				return []byte(`Issue #123`), nil
+			},
+			file: "test.txt",
+		},
+		{
+			name: "issue other owher",
+			readFileFn: func(string) ([]byte, error) {
+				return []byte(`Issue owner/repo#123`), nil
+			},
+			file: "test.txt",
+		},
+		{
+			name: "close local",
+			readFileFn: func(string) ([]byte, error) {
+				return []byte(`Close #123`), nil
+			},
+			file: "test.txt",
+		},
+		{
+			name: "close other owher",
+			readFileFn: func(string) ([]byte, error) {
+				return []byte(`Close owner/repo#123`), nil
+			},
+			file: "test.txt",
+		},
+		{
+			name: "fix local",
+			readFileFn: func(string) ([]byte, error) {
+				return []byte(`Fix #123`), nil
+			},
+			file: "test.txt",
+		},
+		{
+			name: "fix other owher",
+			readFileFn: func(string) ([]byte, error) {
+				return []byte(`Fix owner/repo#123`), nil
 			},
 			file: "test.txt",
 		},
