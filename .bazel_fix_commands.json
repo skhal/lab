@@ -13,5 +13,10 @@
     "regex": "^(\\S+)/[\\w-]+\\.proto:\\d+:\\d+: Import \"\\S+\" was not found or had errors\\.$",
     "command": "bazel",
     "args": [ "run", "//:gazelle", "--", "proto/$1" ]
+  },
+  {
+    "regex": "^(\\S+)/[\\w-]+\\.cc:\\d+:\\d+: fatal error: 'absl/\\S+' file not found$",
+    "command": "bazel",
+    "args": [ "run", "//:gazelle", "--", "$1" ]
   }
 ]
