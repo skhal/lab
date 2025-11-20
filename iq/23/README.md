@@ -22,11 +22,26 @@ Solution
 --------
 
 <details>
-<summary>Simple</summary>
+<summary>Details</summary>
+
+Use sliding window:
+
+- Keep track of frequencies of characters in the window when
+growing and shrinking it.
+- Track maximum frequency in the window.
+- The number of replacements is equal to the window size minus the maximum
+    frequency.
+
+Slide the window when the number of replacements surpasses the number of allowed
+substitutes.
+There is no need to update the maximum frequency since the algorithm is looking
+for the longest window. The next larger window would trigger when slide and get
+valid number of substitutes because a new letter becomes most frequent and
+automatically drops the number of substitutions.
 
 Complexity:
 
-* _time_: O(n)
-* _space_: O(n)
+- _Time_: O(n)
+- _Space_: O(n)
 
 </details>
