@@ -5,7 +5,7 @@ Lint-todo validates todo-comments.
 
 Synopsis:
 
-	lint-todo file [file ...]
+	check-todo file [file ...]
 */
 package main
 
@@ -15,14 +15,14 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/skhal/lab/check/cmd/lint-todo/internal/todo"
+	"github.com/skhal/lab/check/cmd/check-todo/internal/todo"
 )
 
 func main() {
 	flag.Parse()
 	cfg := todo.NewConfig()
 	if err := todo.Run(cfg, flag.Args()...); err != nil {
-		if !errors.Is(err, todo.ErrLint) {
+		if !errors.Is(err, todo.ErrCheck) {
 			fmt.Fprintln(os.Stderr, err)
 		}
 		os.Exit(1)

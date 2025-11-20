@@ -1,6 +1,6 @@
 // Copyright 2025 Samvel Khalatyan. All rights reserved.
 //
-// lint-todo off
+// check-todo off
 
 package todo_test
 
@@ -10,7 +10,7 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/skhal/lab/check/cmd/lint-todo/internal/todo"
+	"github.com/skhal/lab/check/cmd/check-todo/internal/todo"
 )
 
 func ExampleRun() {
@@ -33,12 +33,12 @@ func ExampleRun() {
 	}
 	// Output:
 	// foo.txt:3 // TODO(): invalid item - missing github issue
-	// lint error
+	// check error
 }
 
 var TestErr = errors.New("test error")
 
-func TestLinter(t *testing.T) {
+func TestChecker(t *testing.T) {
 	tests := []struct {
 		name           string
 		readFileFn     todo.ReadFileFunc
@@ -102,7 +102,7 @@ func TestLinter(t *testing.T) {
 		{
 			name: "disable lint on multiple violations",
 			readFileFn: func(string) ([]byte, error) {
-				return []byte(`// lint-todo off
+				return []byte(`// check-todo off
 // TODO(github.com/foo/bar/issues/123)
 // TODO(): test
 				`), nil
@@ -113,18 +113,18 @@ func TestLinter(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			var got []*todo.Violation
-			linter := todo.NewLinter(tc.readFileFn)
+			checker := todo.NewChecker(tc.readFileFn)
 
-			err := linter.Lint(tc.file)
-			linter.Visit(func(v *todo.Violation) {
+			err := checker.Check(tc.file)
+			checker.Visit(func(v *todo.Violation) {
 				got = append(got, v)
 			})
 
 			if !errors.Is(err, tc.wantErr) {
-				t.Errorf("(*todo.Linter).Lint(%q) = %v; want %v", tc.file, err, tc.wantErr)
+				t.Errorf("(*todo.Checker).Check(%q) = %v; want %v", tc.file, err, tc.wantErr)
 			}
 			if diff := cmp.Diff(tc.wantViolations, got); diff != "" {
-				t.Errorf("(*todo.Linter).Visit(%q) mismatch violations (-want, +got):\n%s", tc.file, diff)
+				t.Errorf("(*todo.Checker).Visit(%q) mismatch violations (-want, +got):\n%s", tc.file, diff)
 			}
 		})
 	}

@@ -11,9 +11,9 @@ github.com/google/yamlfmt/cmd/yamlfmt@v0.20.0
 github.com/jstemmer/gotags@latest
 github.com/protocolbuffers/txtpbfmt/cmd/txtpbfmt@latest
 github.com/shurcooL/markdownfmt@latest
+github.com/skhal/lab/check/cmd/check-todo@latest
 github.com/skhal/lab/check/cmd/gotest@latest
 github.com/skhal/lab/check/cmd/lint-nosubmit@latest
-github.com/skhal/lab/check/cmd/lint-todo@latest
 github.com/skhal/lab/iq/cmd/iq@latest
 golang.org/x/tools/cmd/goimports@latest
 golang.org/x/tools/cmd/stringer@latest

@@ -27,6 +27,10 @@ repos:
     language: system
     types_or: [bazel]
     args: ["-mode=diff", "-lint=warn"]
+  - id: check-todo
+    name: check-todo
+    entry: check-todo
+    language: system
   - id: clang-format
     name: clang-format
     entry: clang-format21 -i
@@ -46,10 +50,6 @@ repos:
   - id: lint-nosubmit
     name: lint-nosubmit
     entry: lint-nosubmit
-    language: system
-  - id: lint-todo
-    name: lint-todo
-    entry: lint-todo
     language: system
   - id: make-lint
     name: make-lint

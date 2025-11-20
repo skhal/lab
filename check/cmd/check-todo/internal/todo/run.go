@@ -13,8 +13,8 @@ import (
 	"regexp"
 )
 
-// ErrLint indicates an error in linting inputs.
-var ErrLint = errors.New("lint error")
+// ErrCheck indicates an error in the input.
+var ErrCheck = errors.New("check error")
 
 var (
 	todoPrefix = regexp.MustCompile(`(?i)(?://|#|")\s+\btodo\b.*`)
@@ -22,7 +22,7 @@ var (
 )
 
 var (
-	nolintRegexp = regexp.MustCompile(`^(?://|#|") lint-todo off(?:: .*)?$`)
+	nocheckRegexp = regexp.MustCompile(`^(?://|#|") check-todo off(?:: .*)?$`)
 )
 
 // ReadFileFunc reads file and returns data or error.
@@ -44,55 +44,55 @@ func NewConfig() *Config {
 
 // Run validates todo-lines in files.
 func Run(cfg *Config, files ...string) (err error) {
-	l := NewLinter(cfg.ReadFileFn)
+	chk := NewChecker(cfg.ReadFileFn)
 	for _, file := range files {
-		if err := l.Lint(file); err != nil {
+		if err := chk.Check(file); err != nil {
 			return err
 		}
 	}
-	if !l.HasViolations() {
+	if !chk.HasViolations() {
 		return nil
 	}
-	l.Visit(func(v *Violation) { fmt.Println(v) })
-	return ErrLint
+	chk.Visit(func(v *Violation) { fmt.Println(v) })
+	return ErrCheck
 }
 
-// Linter implements todo-line validation logic.
-type Linter struct {
+// Checker implements todo-line validation logic.
+type Checker struct {
 	readFileFn ReadFileFunc
 	vv         []*Violation
 }
 
-// NewLinter creates a Linter.
-func NewLinter(f ReadFileFunc) *Linter {
-	return &Linter{
+// NewChecker creates a Checker.
+func NewChecker(f ReadFileFunc) *Checker {
+	return &Checker{
 		readFileFn: f,
 	}
 }
 
 // HasViolations reports whether violations were found.
-func (l *Linter) HasViolations() bool {
-	return len(l.vv) != 0
+func (chk *Checker) HasViolations() bool {
+	return len(chk.vv) != 0
 }
 
-// Lint validates file. It reutns an error if reading the file fails. Linter
-// keeps track of found violations. Use (*Linter).HasViolations() to check
+// Check validates file. It reutns an error if reading the file fails. Checker
+// keeps track of found violations. Use (*Checker).HasViolations() to check
 // for findings and (*linter).Visit() to access violations.
-func (l *Linter) Lint(file string) error {
-	data, err := l.readFileFn(file)
+func (chk *Checker) Check(file string) error {
+	data, err := chk.readFileFn(file)
 	if err != nil {
 		return err
 	}
 	for v := range findViolations(data) {
 		v.File = file
-		l.vv = append(l.vv, v)
+		chk.vv = append(chk.vv, v)
 	}
 	return nil
 }
 
 // Visit calls fn for every found violation.
-func (l *Linter) Visit(fn func(v *Violation)) {
-	for _, v := range l.vv {
+func (chk *Checker) Visit(fn func(v *Violation)) {
+	for _, v := range chk.vv {
 		fn(v)
 	}
 }
@@ -102,7 +102,7 @@ func findViolations(data []byte) iter.Seq[*Violation] {
 		s := bufio.NewScanner(bytes.NewBuffer(data))
 		for row := 1; s.Scan(); row += 1 {
 			line := s.Text()
-			if nolintRegexp.MatchString(line) {
+			if nocheckRegexp.MatchString(line) {
 				break
 			}
 			if !todoPrefix.MatchString(line) {
