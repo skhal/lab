@@ -27,6 +27,10 @@ repos:
     language: system
     types_or: [bazel]
     args: ["-mode=diff", "-lint=warn"]
+  - id: check-nosubmit
+    name: check-nosubmit
+    entry: check-nosubmit
+    language: system
   - id: check-todo
     name: check-todo
     entry: check-todo
@@ -46,10 +50,6 @@ repos:
   - id: keep-sorted
     name: keep-sorted
     entry: keep-sorted
-    language: system
-  - id: lint-nosubmit
-    name: lint-nosubmit
-    entry: lint-nosubmit
     language: system
   - id: make-lint
     name: make-lint

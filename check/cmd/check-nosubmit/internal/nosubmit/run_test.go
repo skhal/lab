@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/skhal/lab/check/cmd/lint-nosubmit/internal/nosubmit"
+	"github.com/skhal/lab/check/cmd/check-nosubmit/internal/nosubmit"
 )
 
 func ExampleRun() {
@@ -29,7 +29,7 @@ func ExampleRun() {
 		return
 	}
 	// Output:
-	// lint error
+	// check error
 }
 
 func TestHasNoSubmit(t *testing.T) {
@@ -64,10 +64,10 @@ test data
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			got := nosubmit.Lint([]byte(tc.data))
+			got := nosubmit.Check([]byte(tc.data))
 
 			if tc.want != got {
-				t.Errorf("nosubmit.Lint(...) = %v; want %v", got, tc.want)
+				t.Errorf("nosubmit.Check(...) = %v; want %v", got, tc.want)
 				t.Logf("data:\n%s", tc.data)
 			}
 		})

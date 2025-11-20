@@ -1,7 +1,7 @@
 // Copyright 2025 Samvel Khalatyan. All rights reserved.
 
 /*
-Lint-nosubmit checks for presense of "DO NOT SUBMIT" comment.
+Check-nosubmit checks for presense of "DO NOT SUBMIT" comment.
 */
 package main
 
@@ -11,7 +11,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/skhal/lab/check/cmd/lint-nosubmit/internal/nosubmit"
+	"github.com/skhal/lab/check/cmd/check-nosubmit/internal/nosubmit"
 )
 
 func main() {
