@@ -14,7 +14,7 @@ import (
 	"sort"
 
 	"github.com/protocolbuffers/txtpbfmt/parser"
-	"github.com/skhal/lab/iq/pb"
+	"github.com/skhal/lab/iq/cmd/iq/internal/pb"
 	"google.golang.org/protobuf/encoding/prototext"
 )
 

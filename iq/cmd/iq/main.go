@@ -18,9 +18,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/skhal/lab/iq/create"
-	"github.com/skhal/lab/iq/info"
-	"github.com/skhal/lab/iq/registry"
+	"github.com/skhal/lab/iq/cmd/iq/internal/create"
+	"github.com/skhal/lab/iq/cmd/iq/internal/info"
+	"github.com/skhal/lab/iq/cmd/iq/internal/registry"
 )
 
 var commands = map[string]command{

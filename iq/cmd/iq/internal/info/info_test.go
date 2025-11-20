@@ -8,8 +8,8 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
-	"github.com/skhal/lab/iq/info"
-	"github.com/skhal/lab/iq/registry"
+	"github.com/skhal/lab/iq/cmd/iq/internal/info"
+	"github.com/skhal/lab/iq/cmd/iq/internal/registry"
 )
 
 func TestParseQuestionIDs(t *testing.T) {

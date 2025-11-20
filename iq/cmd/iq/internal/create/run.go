@@ -11,7 +11,7 @@ import (
 	"strconv"
 
 	"github.com/skhal/lab/go/flags"
-	"github.com/skhal/lab/iq/registry"
+	"github.com/skhal/lab/iq/cmd/iq/internal/registry"
 )
 
 type Config struct {

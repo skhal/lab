@@ -11,8 +11,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/skhal/lab/iq/pb"
-	"github.com/skhal/lab/iq/registry"
+	"github.com/skhal/lab/iq/cmd/iq/internal/pb"
+	"github.com/skhal/lab/iq/cmd/iq/internal/registry"
 )
 
 // ErrQuestionID represents a group of errors due to invalid question

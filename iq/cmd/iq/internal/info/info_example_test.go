@@ -5,9 +5,9 @@ package info_test
 import (
 	"fmt"
 
-	"github.com/skhal/lab/iq/info"
-	"github.com/skhal/lab/iq/pb"
-	"github.com/skhal/lab/iq/registry"
+	"github.com/skhal/lab/iq/cmd/iq/internal/info"
+	"github.com/skhal/lab/iq/cmd/iq/internal/pb"
+	"github.com/skhal/lab/iq/cmd/iq/internal/registry"
 )
 
 func ExampleRun_printAll() {

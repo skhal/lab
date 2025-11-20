@@ -260,7 +260,7 @@ const file_question_proto_rawDesc = "" +
 	"\bQuestion\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x05R\x02id\x12 \n" +
 	"\vdescription\x18\x02 \x01(\tR\vdescription\x12\x12\n" +
-	"\x04tags\x18\x03 \x03(\tR\x04tagsB$Z\x1agithub.com/skhal/lab/iq/pb\x92\x03\x05\xd2>\x02\x10\x03b\beditionsp\xe8\a"
+	"\x04tags\x18\x03 \x03(\tR\x04tagsB4Z*github.com/skhal/lab/iq/cmd/iq/internal/pb\x92\x03\x05\xd2>\x02\x10\x03b\beditionsp\xe8\a"
 
 var file_question_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_question_proto_goTypes = []any{

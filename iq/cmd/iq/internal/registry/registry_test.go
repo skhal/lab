@@ -14,8 +14,8 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/skhal/lab/go/tests"
-	"github.com/skhal/lab/iq/pb"
-	"github.com/skhal/lab/iq/registry"
+	"github.com/skhal/lab/iq/cmd/iq/internal/pb"
+	"github.com/skhal/lab/iq/cmd/iq/internal/registry"
 	"google.golang.org/protobuf/testing/protocmp"
 )
 
