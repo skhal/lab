@@ -8,7 +8,7 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
-	"github.com/skhal/lab/check/cmd/gotest/internal/test"
+	"github.com/skhal/lab/check/cmd/check-go-test/internal/test"
 )
 
 func TestFilterFunc(t *testing.T) {

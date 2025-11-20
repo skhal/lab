@@ -5,7 +5,7 @@ Gotest runs `go test` on package for Go files.
 
 Synopsis:
 
-  gotest file [file ...]
+  check-go-test file [file ...]
 */
 package main
 
@@ -15,7 +15,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/skhal/lab/check/cmd/gotest/internal/test"
+	"github.com/skhal/lab/check/cmd/check-go-test/internal/test"
 )
 
 func main() {

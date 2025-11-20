@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/skhal/lab/check/cmd/gotest/internal/test"
+	"github.com/skhal/lab/check/cmd/check-go-test/internal/test"
 )
 
 func TestNewEventID(t *testing.T) {

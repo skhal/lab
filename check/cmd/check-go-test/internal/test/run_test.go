@@ -5,7 +5,7 @@ package test_test
 import (
 	"testing"
 
-	"github.com/skhal/lab/check/cmd/gotest/internal/test"
+	"github.com/skhal/lab/check/cmd/check-go-test/internal/test"
 )
 
 func TestIsGoFile(t *testing.T) {

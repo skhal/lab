@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/skhal/lab/check/cmd/gotest/internal/test"
+	"github.com/skhal/lab/check/cmd/check-go-test/internal/test"
 )
 
 func TestAction_MarshalJSON(t *testing.T) {

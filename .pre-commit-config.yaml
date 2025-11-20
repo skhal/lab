@@ -27,6 +27,12 @@ repos:
     language: system
     types_or: [bazel]
     args: ["-mode=diff", "-lint=warn"]
+  - id: check-go-test
+    name: check-go-test
+    entry: check-go-test
+    language: system
+    types_or: [go]
+    pass_filenames: true
   - id: check-nosubmit
     name: check-nosubmit
     entry: check-nosubmit
@@ -41,12 +47,6 @@ repos:
     language: system
     types_or: [c++, c]
     args: ["-style=file"]
-  - id: gotest
-    name: gotest
-    entry: gotest
-    language: system
-    types_or: [go]
-    pass_filenames: true
   - id: keep-sorted
     name: keep-sorted
     entry: keep-sorted
