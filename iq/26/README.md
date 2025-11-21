@@ -9,11 +9,7 @@ Description
 Problem
 -------
 
-Consider an array of integer numbers {ni} and a number k. Find the maximum integer value m such that for all ni > m the following condition holds:
-
-```
-sum(ni) >= k
-```
+Consider an array of integer numbers {ni} and a number k. Find largest number m, such that: for all nj > m, sum(nj - m) >= k.
 
 Example
 -------
