@@ -4,11 +4,6 @@
 " license that can be found in the LICENSE file.
 "
 " -- Plugin https://github.com/prabirshrestha/asyncomplete.vim
-inoremap <expr> <Tab>   pumvisible() ? "\<C-n>" : "\<Tab>"
-inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
-inoremap <expr> <cr>    pumvisible() ? asyncomplete#close_popup() : "\<cr>"
-
-" Trigger pop up on demand
 let g:asyncomplete_auto_popup = 0
 
 function! s:check_back_space() abort
