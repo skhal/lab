@@ -10,8 +10,8 @@ on:
     branches: ["main"]
     paths: ['check/**']
   schedule:
-  # Every hour
-  - cron: '0 * * * *'
+  # Everyday at 6:00 UTC
+  - cron: '0 6 * * *'
 
 jobs:
   bootstrap:
