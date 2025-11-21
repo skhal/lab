@@ -5,6 +5,7 @@
 "
 " -- Plugin https://github.com/prabirshrestha/asyncomplete.vim
 let g:asyncomplete_auto_popup = 0
+let g:asyncomplete_auto_completeopt = 0
 
 function! s:check_back_space() abort
   let col = col('.') - 1
