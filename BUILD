@@ -32,7 +32,5 @@ gazelle(
 # https://github.com/hedronvision/bazel-compile-commands-extractor?tab=readme-ov-file
 refresh_compile_commands(
     name = "refresh_compile_commands",
-    targets = {
-        "//iq/...": "",
-    },
+    targets = ["//iq/..."],
 )
