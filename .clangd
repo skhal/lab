@@ -3,3 +3,7 @@
 # https://github.com/llvm/llvm-project/issues/117000
 CompileFlags:
   Add: [-Wno-unneeded-internal-declaration]
+
+Diagnostics:
+  UnusedIncludes: Strict
+  MissingIncludes: Strict
