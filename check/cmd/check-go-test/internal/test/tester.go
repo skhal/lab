@@ -34,7 +34,7 @@ func NewTester() *Tester {
 func (t *Tester) Test(pkg string) error {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-	cmd := exec.CommandContext(ctx, "go", "test", "-json", pkg)
+	cmd := exec.CommandContext(ctx, "go", "test", "-json", "-vet=all", pkg)
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
 		return err
