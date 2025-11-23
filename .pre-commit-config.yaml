@@ -56,6 +56,11 @@ repos:
     language: system
     types_or: [c++, c]
     args: ["-style=file"]
+  - id: clang-tidy
+    name: clang-tidy
+    entry: clang-tidy21
+    language: system
+    types_or: [c++, c]
   - id: keep-sorted
     name: keep-sorted
     entry: keep-sorted
