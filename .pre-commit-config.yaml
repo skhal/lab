@@ -61,6 +61,7 @@ repos:
     entry: clang-tidy21
     language: system
     types_or: [c++, c]
+    args: ["--fix"]
   - id: goimports
     name: goimports
     entry: goimports
