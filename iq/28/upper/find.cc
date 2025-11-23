@@ -8,6 +8,7 @@
 
 #include "iq/28/upper/find.h"
 
+#include <cstddef>
 #include <vector>
 
 #include "absl/status/status.h"
@@ -15,8 +16,7 @@
 
 namespace iq::upper {
 
-absl::StatusOr<int> Find([[maybe_unused]] const std::vector<int>& nn,
-                         [[maybe_unused]] int k) {
+absl::StatusOr<int> Find(const std::vector<int>& nn, int k) {
   std::size_t low = 0;
   std::size_t hi = nn.size();
   while (low < hi) {
