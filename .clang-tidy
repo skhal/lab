@@ -1,0 +1,41 @@
+# Copyright 2025 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+#
+# Generated with:
+#   clang-tidy21 -checks=google-\* --dump-config
+
+Checks: 'clang-diagnostic-*,clang-analyzer-*,google-*'
+WarningsAsErrors: ''
+HeaderFileExtensions:
+- ''
+- h
+- hh
+- hpp
+- hxx
+ImplementationFileExtensions:
+- c
+- cc
+- cpp
+- cxx
+HeaderFilterRegex: ''
+ExcludeHeaderFilterRegex: ''
+FormatStyle: none
+User: skhalatyan
+CheckOptions:
+  google-readability-braces-around-statements.ShortStatementLines: '1'
+  google-readability-function-size.BranchThreshold: none
+  google-readability-function-size.CountMemberInitAsStmt: 'true'
+  google-readability-function-size.LineThreshold: none
+  google-readability-function-size.NestingThreshold: none
+  google-readability-function-size.ParameterThreshold: none
+  google-readability-function-size.StatementThreshold: '800'
+  google-readability-function-size.VariableThreshold: none
+  google-readability-namespace-comments.AllowOmittingNamespaceComments: 'false'
+  google-readability-namespace-comments.ShortNamespaceLines: '10'
+  google-readability-namespace-comments.SpacesBeforeComments: '2'
+  google-runtime-int.SignedTypePrefix: int
+  google-runtime-int.TypeSuffix: ''
+  google-runtime-int.UnsignedTypePrefix: uint
+SystemHeaders: false
