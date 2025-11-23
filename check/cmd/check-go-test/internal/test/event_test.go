@@ -4,7 +4,9 @@ package test_test
 
 import (
 	"encoding/json"
+	"errors"
 	"testing"
+	"time"
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/skhal/lab/check/cmd/check-go-test/internal/test"
@@ -148,6 +150,166 @@ func TestAction_UnmarshalJSON(t *testing.T) {
 			}
 			if got != tc.want {
 				t.Errorf("json.Unmarshal(%q, _) got %s; want %s", tc.b, got, tc.want)
+			}
+		})
+	}
+}
+
+func TestEvent_MarshalJSON(t *testing.T) {
+	tests := []struct {
+		name     string
+		event    *test.Event
+		wantJSON string
+		wantErr  error
+	}{
+		{
+			name:     "zero value",
+			event:    &test.Event{},
+			wantJSON: `{}`,
+		},
+		{
+			name: "time",
+			event: &test.Event{
+				Time: time.Date(2006, 01, 02, 03, 04, 05, 0, time.UTC),
+			},
+			wantJSON: `{"Time":"2006-01-02T03:04:05Z"}`,
+		},
+		{
+			name: "action",
+			event: &test.Event{
+				Action: test.ActionStart,
+			},
+			wantJSON: `{"Action":"start"}`,
+		},
+		{
+			name: "package",
+			event: &test.Event{
+				Package: "test-package",
+			},
+			wantJSON: `{"Package":"test-package"}`,
+		},
+		{
+			name: "test",
+			event: &test.Event{
+				Test: "test-name",
+			},
+			wantJSON: `{"Test":"test-name"}`,
+		},
+		{
+			name: "elapsed",
+			event: &test.Event{
+				Elapsed: time.Duration(1.23 * float64(time.Second)),
+			},
+			wantJSON: `{"Elapsed":1.23}`,
+		},
+		{
+			name: "output",
+			event: &test.Event{
+				Output: "test-output",
+			},
+			wantJSON: `{"Output":"test-output"}`,
+		},
+		{
+			name: "failed build",
+			event: &test.Event{
+				FailedBuild: "test-build",
+			},
+			wantJSON: `{"FailedBuild":"test-build"}`,
+		},
+	}
+	for _, tc := range tests {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
+			data, err := json.Marshal(tc.event)
+
+			if !errors.Is(err, tc.wantErr) {
+				t.Errorf("json.Marshal() = %v; want %v", err, tc.wantErr)
+				t.Logf("event:\n%+v", tc.event)
+			}
+			if diff := cmp.Diff(tc.wantJSON, string(data)); diff != "" {
+				t.Errorf("json.Marshal() got unexpected data (-want, +got):\n%s", diff)
+				t.Logf("event:\n%+v", tc.event)
+			}
+		})
+	}
+}
+
+func TestTestEvent_UnmarshalJSON(t *testing.T) {
+	tests := []struct {
+		name      string
+		json      string
+		wantEvent *test.Event
+		wantErr   error
+	}{
+		{
+			name:      "zero value",
+			json:      `{}`,
+			wantEvent: &test.Event{},
+		},
+		{
+			name: "time",
+			json: `{"Time":"2006-01-02T03:04:05Z"}`,
+			wantEvent: &test.Event{
+				Time: time.Date(2006, 01, 02, 03, 04, 05, 0, time.UTC),
+			},
+		},
+		{
+			name: "action",
+			json: `{"Action":"start"}`,
+			wantEvent: &test.Event{
+				Action: test.ActionStart,
+			},
+		},
+		{
+			name: "package",
+			json: `{"Package":"test-package"}`,
+			wantEvent: &test.Event{
+				Package: "test-package",
+			},
+		},
+		{
+			name: "test",
+			json: `{"Test":"test-name"}`,
+			wantEvent: &test.Event{
+				Test: "test-name",
+			},
+		},
+		{
+			name: "elapsed",
+			json: `{"Elapsed":1.23}`,
+			wantEvent: &test.Event{
+				Elapsed: time.Duration(1.23 * float64(time.Second)),
+			},
+		},
+		{
+			name: "output",
+			json: `{"Output":"test-output"}`,
+			wantEvent: &test.Event{
+				Output: "test-output",
+			},
+		},
+		{
+			name: "failed build",
+			json: `{"FailedBuild":"test-build"}`,
+			wantEvent: &test.Event{
+				FailedBuild: "test-build",
+			},
+		},
+	}
+	for _, tc := range tests {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
+			var testEvent *test.Event
+
+			err := json.Unmarshal([]byte(tc.json), &testEvent)
+
+			if !errors.Is(err, tc.wantErr) {
+				t.Errorf("json.Unmarshal() = %v; want %v", err, tc.wantErr)
+				t.Logf("json:\n%q", tc.json)
+			}
+			if diff := cmp.Diff(tc.wantEvent, testEvent); diff != "" {
+				t.Errorf("json.Unmarshal() got unexpected event (-want, +got):\n%s", diff)
+				t.Logf("json:\n%q", tc.json)
 			}
 		})
 	}

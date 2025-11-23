@@ -13,16 +13,47 @@ import (
 // Event is a TestEvent from test2json (see: go doc test2json).
 type Event struct {
 	// Time is the time of the event, omitted for cached test results.
-	Time        time.Time // RFC3339
-	Action      Action    // a JSON stream begins with ActionStart
-	Package     string    // identifies the package under test
-	Test        string
-	Elapsed     Seconds
-	Output      string
-	FailedBuild string
+	Time        time.Time     `json:",omitzero"`  // RFC3339
+	Action      Action        `json:",omitzero"`  // a JSON stream begins with ActionStart
+	Package     string        `json:",omitempty"` // identifies the package under test
+	Test        string        `json:",omitempty"`
+	Elapsed     time.Duration `json:",omitzero"`
+	Output      string        `json:",omitempty"`
+	FailedBuild string        `json:",omitempty"`
 }
 
-type Seconds float64
+func (e *Event) MarshalJSON() ([]byte, error) {
+	// Use an alias to the Event to avoid MarshalJSON() infinite loop - json
+	// package recursively traverses the structure and uses MarshalJSON for the
+	// fields of types with such a method.
+	type EventAlias Event
+	evt := struct {
+		Elapsed float64 `json:",omitempty"`
+		*EventAlias
+	}{
+		Elapsed:    e.Elapsed.Seconds(),
+		EventAlias: (*EventAlias)(e),
+	}
+	return json.Marshal(evt)
+}
+
+func (e *Event) UnmarshalJSON(b []byte) error {
+	// Use an alias to the Event to avoid MarshalJSON() infinite loop - json
+	// package recursively traverses the structure and uses MarshalJSON for the
+	// fields of types with such a method.
+	type EventAlias Event
+	evt := &struct {
+		Elapsed float64
+		*EventAlias
+	}{
+		EventAlias: (*EventAlias)(e),
+	}
+	if err := json.Unmarshal(b, evt); err != nil {
+		return err
+	}
+	e.Elapsed = time.Duration(evt.Elapsed * float64(time.Second))
+	return nil
+}
 
 // Actin is the event state (see go doc test2json)
 type Action int
