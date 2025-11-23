@@ -61,6 +61,12 @@ repos:
     entry: clang-tidy21
     language: system
     types_or: [c++, c]
+  - id: goimports
+    name: goimports
+    entry: goimports
+    language: system
+    types_or: [go]
+    args: ["-w"]
   - id: keep-sorted
     name: keep-sorted
     entry: keep-sorted
