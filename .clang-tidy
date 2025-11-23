@@ -7,7 +7,7 @@
 #   clang-tidy21 -checks=google-\* --dump-config
 
 Checks: 'clang-diagnostic-*,clang-analyzer-*,google-*'
-WarningsAsErrors: ''
+WarningsAsErrors: '*'
 HeaderFileExtensions:
 - ''
 - h
