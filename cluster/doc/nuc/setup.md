@@ -76,7 +76,7 @@ Update packages:
 
 ```console
 # pkg update
-# pkg install
+# pkg upgrade
 ```
 
 Users
