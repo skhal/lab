@@ -19,6 +19,7 @@ pam_mkhomedir
 pkg
 py311-cppman
 py311-pre-commit
+rsync
 tmux
 tree
 universal-ctags
