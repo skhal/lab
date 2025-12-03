@@ -1,5 +1,6 @@
 etc/jail.conf
 etc/jail.conf.d
+etc/pf.conf
 etc/rc.conf
 etc/rc.conf.d
 etc/syslog.conf
