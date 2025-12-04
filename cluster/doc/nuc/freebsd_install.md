@@ -1,23 +1,30 @@
-NAME
+Name
 ====
 
 **install** - install FreeBSD
 
-DESCRIPTION
-===========
-
-Ref: https://docs.freebsd.org/en/books/handbook/bsdinstall/
-
 Create the Installation Media
------------------------------
+=============================
 
-Download AMD64 image and verify the checksum.
+-	Release: FreeBSD 15.0
+-	Architecture: AMD64
+-	Image Type: bootonly
+
+See FreeBSD 15 [Announcement](https://www.freebsd.org/releases/15.0R/announce/) for the difference between image types. Bootonly image is a bootable image and requires network connection to install the OS.
 
 ```console
-% curl -O https://download.freebsd.org/releases/amd64/amd64/ISO-IMAGES/14.3/FreeBSD-14.3-RELEASE-amd64-mini-memstick.img
-% curl -O https://download.freebsd.org/releases/amd64/amd64/ISO-IMAGES/14.3/CHECKSUM.SHA512-FreeBSD-14.3-RELEASE-amd64
-% shasum -c CHECKSUM.SHA512-FreeBSD-14.3-RELEASE-amd64 --ignore-missing
-FreeBSD-14.3-RELEASE-amd64-mini-memstick.img: OK
+% curl -O https://download.freebsd.org/releases/ISO-IMAGES/15.0/FreeBSD-15.0-RELEASE-amd64-bootonly.iso.xz
+% https://download.freebsd.org/releases/ISO-IMAGES/15.0/CHECKSUM.SHA512-FreeBSD-15.0-RELEASE-amd64
+% shasum -c CHECKSUM.SHA512-FreeBSD-15.0-RELEASE-amd64 --ignore-missing
+FreeBSD-15.0-RELEASE-amd64-bootonly.iso.xz: OK
+```
+
+Use xz(1) to decompress the file (OS X does not include xz(1), use Homebrew to install it `brew install xz`\):
+
+```console
+% xz -d ./FreeBSD-15.0-RELEASE-amd64-bootonly.iso.xz
+% shasum -c CHECKSUM.SHA256-FreeBSD-15.0-RELEASE-amd64 --ignore-missing
+FreeBSD-15.0-RELEASE-amd64-bootonly.iso: OK
 ```
 
 Write the image to the USB drive:
@@ -31,24 +38,19 @@ Write the image to the USB drive:
 1:                       0xEF                         34.1 MB    disk6s1
 2:                    FreeBSD                         1.4 GB     disk6s2
 	      (free space)                         6.5 GB     -
-# diskutil umountDisk /dev/disk6
+% sudo diskutil umountDisk /dev/disk6
 Unmount of all volumes on disk6 was successful
-# dd \
-    status=progress \
-    if=FreeBSD-14.3-RELEASE-amd64-mini-memstick.img \
-    of=/dev/disk6 \
-    bs=1m \
-    conv=sync
+% sudo dd status=progress if=FreeBSD-15.0-RELEASE-amd64-bootonly.iso of=/dev/disk6 bs=1m conv=sync
 532676608 bytes (533 MB, 508 MiB) transferred 22.021s, 24 MB/s
 508+0 records in
 508+0 records out
 532676608 bytes transferred in 22.059363 secs (24147416 bytes/sec)
-# diskutil eject /dev/disk6
+% sudo diskutil eject /dev/disk6
 Disk /dev/disk6 ejected
 ```
 
 Install FreeBSD
----------------
+===============
 
 Boot from the USB drive and follow the instructions:
 
@@ -74,7 +76,7 @@ Boot from the USB drive and follow the instructions:
 	-	`secure_console` console password prompt
 
 Update the OS
--------------
+=============
 
 Ref: https://docs.freebsd.org/en/books/handbook/cutting-edge/
 
@@ -103,3 +105,8 @@ Verify the running version is up to date, all three should match:
 14.3-RELEASE-p2
 14.3-RELEASE-p2
 ```
+
+See Also
+========
+
+-	[FreeBSD Handbook - Install](https://docs.freebsd.org/en/books/handbook/bsdinstall/)
