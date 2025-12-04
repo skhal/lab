@@ -1,19 +1,16 @@
-NAME
+Name
 ====
 
-**host** - host setup for jails
-
-DESCRIPTION
-===========
+**boostrap** - bootstrap FreeBSD to host jails
 
 ZFS
----
+===
 
-Jails reside under `/jail`. There are three folders:
+Jails file hierarchy under `/jail`:
 
--	`/jail/image` stores downloaded user lands in compressed format.
--	`/jail/template` holds base templates to create jails.
--	`/jail/container` keeps running jail.
+-	`/jail/image` stores downloaded userlands in compressed format.
+-	`/jail/template` keeps base templates to create jails.
+-	`/jail/container` holds running jails.
 
 Create datasets:
 
@@ -25,35 +22,28 @@ Create datasets:
 ```
 
 Permissions
------------
+===========
 
-Create `jail` user group:
+Create `jail` user group to let members of the group manage jails:
 
 ```console
 # pw groupadd -g 1001 -n jail
+# pw groupmod -n jail -m op
 ```
 
 `jail` members can manage and enter jails:
 
 ```console
-# cat <<eof >> /usr/local/etc/doas.conf
+# cat <<EOF >> /usr/local/etc/doas.conf
 permit nopass :jail cmd jail
 permit nopass :jail cmd jexec
-eof
+EOF
 ```
 
-Members of `jail` can manage jail datasets:
+Members of `jail` can snapshot jails:
 
 ```console
-# zfs allow -s @mount mount,canmount,mountpoint zroot/jail
-# zfs allow -s @create create,destroy,@mount zroot/jail
-# zfs allow -g jail @mount,@create,readonly,snapshot zroot/jail
-```
-
-Add system operator to the `jail` group:
-
-```console
-# pw groupmod -m op -n jail
+# zfs allow -g jail snapshot zroot/jail
 ```
 
 Jail service
@@ -63,17 +53,17 @@ Jail service
 
 ```console
 # mkdir /etc/jail.conf.d
-# cat <<eof >/etc/jail.conf
+# cat <<EOF >/etc/jail.conf
 .include "/etc/jail.conf.d/*.conf";
-eof
+EOF
 ```
 
 Enable `jail` service and stop jails in the reverse order to ensure dependencies are satisfied:
 
 ```console
-# sysrc -f /etc/rc.conf.d/jail jail_reverse_stop=yes
+% doas sysrc -f /etc/rc.conf.d/jail jail_reverse_stop=yes
 jail_reverse_stop: NO -> yes
-# sysrc -f /etc/rc.conf.d/jail jail_enable=yes
+% doas sysrc -f /etc/rc.conf.d/jail jail_enable=yes
 jail_enable: NO -> yes
 ```
 
@@ -87,39 +77,44 @@ Setup two bridges to separate local and Internet traffic.
 Create a bridge for Internet traffic:
 
 ```console
-# sysrc -f /etc/rc.conf.d/network cloned_interfaces+=bridge0
+% doas sysrc -f /etc/rc.conf.d/network cloned_interfaces+=bridge0
 cloned_interfaces: '' -> bridge0
-# sysrc -f /etc/rc.conf.d/network ifconfig_bridge0='addm em0 up descr jail:em'
-ifconfig_bridge0: '' -> addm em0 up descr jail:em
+% doas sysrc -f /etc/rc.conf.d/network ifconfig_bridge0='addm igc0 up descr jail:ext'
+ifconfig_bridge0: '' -> addm igc0 up descr jail:ext
 ```
 
-There are two Internet access markets in the bridge:
+The bridge has following properties:
 
-1.	it has em(4) Ethernet adapter connected.
-2.	it has `jail:em` description to indicate that the bridge is for jails with em(4) adapter.
+1.	it has igc(4) Ethernet adapter connected for external connections.
+2.	it has `jail:ext` description to indicate that the bridge is with external connection.
 
 Create a second bridge for local, intra-jail traffic:
 
 ```console
-# sysrc -f /etc/rc.conf.d/network cloned_interfaces+=bridge1
-cloned_interfaces: '' -> bridge0
-# sysrc -f /etc/rc.conf.d/network ifconfig_bridge1='up descr jail:lo'
-ifconfig_bridge0: '' -> up descr jail:lo
+% doas sysrc -f /etc/rc.conf.d/network cloned_interfaces+=bridge1
+cloned_interfaces: 'bridge0' -> bridge0 bridge1
+% doas sysrc -f /etc/rc.conf.d/network ifconfig_bridge1='up descr jail:int'
+ifconfig_bridge1: '' -> up descr jail:int
 ```
 
-Again, it has `jail:lo` marker in the description to indicate that the bridge is for jails local traffic.
+The new bridge has the following properties:
 
-For each jail, we'll create an epair(4), a virtual back-to-back connected Ethernet interface, with a-side connected to the bridge in the host environment, and b-side moved to the jail environment, where it is assigned an IP address and brought UP.
+1.	there are no connected Ethernet adapters.
+2.	it has `jail:int` marker in the description to indicate that the bridge is for intra-jail traffic.
 
-We'll use [`rc.jail`](https://github.com/skhal/lab/blob/main/freebsd/rc/rc.jail) script to manage epair(4) setup and tear down on per-bridge, per-jail basis.
+Create an epair(4) for each jail, a virtual back-to-back connected Ethernet interface, with two sides:
+
+-	the a-side connects to the bridge in the host environment and remain in the hosting environment.
+-	the b-side moves to the jail environment. The jail manages this side of the interface. It assigns an IP address, brings it UP, etc.
+
+Use [`rc.jail`](https://github.com/skhal/lab/blob/main/freebsd/rc/rc.jail) script to manage epair(4) setup and tear down on per-bridge, per-jail basis.
 
 ```console
-# fetch \
-    -o /usr/local/etc/rc.jail \
-    https://raw.githubusercontent.com/skhal/lab/refs/heads/main/freebsd/rc/rc.jail
+# fetch -o /tmp https://raw.githubusercontent.com/skhal/lab/refs/heads/main/freebsd/rc/rc.jail
+# mv -nv /tmp/rc.jail /usr/local/etc/rc.jail
 ```
 
-SEE ALSO
-========
+References
+==========
 
 -	https://docs.freebsd.org/en/books/handbook/jails/
