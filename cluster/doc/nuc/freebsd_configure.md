@@ -1,41 +1,10 @@
-NAME
+Name
 ====
 
 **setup** - setup FreeBSD
 
-Summary
-=======
-
-The setup instructions configure FreeBSD to host virtual nodes using classic, thick [jails](https://docs.freebsd.org/en/books/handbook/jails/).
-
-The server has minimal setup:
-
--	Networking: two bridges for jails to separate internal and Internet traffic.
--	Security: packet filtering
--	Packages: doas, vim-tiny
--	Users: an operator user `op` to manage the system with SSH access.
-
-The jails have the following setup:
-
--	Networking: full networking stack virtualisation through VNET.
--	Security: packet filtering
--	Packages: minimal set of packages to run jailed services or unrestricted for development jails.
--	Users: LDAP
-
-Running jails:
-
--	Infrastructure:
-	-	dns - BIND server
-	-	ldap - OpenLDAP server
--	Development:
-	-	dev - FreeBSD environment
-	-	jammy - Linux environment via FreeBSD [Linux Binary Compatibility](https://docs.freebsd.org/en/books/handbook/linuxemu/)
-
 Bootstrap
 =========
-
-Boot menu
----------
 
 Disable boot menu to speed up restarts:
 
@@ -43,62 +12,27 @@ Disable boot menu to speed up restarts:
 # echo 'autoboot_delay="0"' >> /boot/loader.conf
 ```
 
-System Update
--------------
-
-Update to the latest patch available:
+Use default pkg(8) repositories, configured in /etc/pkg/FreeBSD.conf:
 
 ```console
-# uname -a
-# freebsd-update fetch
-# freebsd-update install
+% pkg repos -l
+FreeBSD-ports
+FreeBSD-ports-kmods
+FreeBSD-base
 ```
 
-Verify the updates applied as expected by checking the Kernel version:
+The main system will host jails to emulate virtual machines with infrastructure and development environment. As such, it will include include minimal configuration based on quarterly software updates:
 
 ```console
-# uname -a
-```
-
-Packages
---------
-
-Use latest packages available:
-
-```console
-# mkdir /usr/local/etc/pkg
-# mkdir /usr/local/etc/pkg/repos
-# cat /usr/local/etc/pkg/repos/FreeBSD.conf
-FreeBSD: { url: "pkg+http://pkg.FreeBSD.org/${ABI}/latest" }
-```
-
-Update packages:
-
-```console
-# pkg update
-# pkg upgrade
-```
-
-Users
------
-
-Create a system operator:
-
-```console
-# pw groupadd \
-    -g 1000 \
-    -n op
-# pw useradd \
-    -c 'System Operator' \
-    -d /home/op \
-    -g op \
-    -G wheel \
-    -m \
-    -n op \
-    -s /bin/tcsh \
-    -u 1000 \
-    -w no
-# passwd -l op
+% pkg repos FreeBSD-ports
+FreeBSD-ports: {
+    url             : "pkg+https://pkg.FreeBSD.org/FreeBSD:15:amd64/quarterly",
+    enabled         : yes,
+    priority        : 0,
+    mirror_type     : "SRV",
+    signature_type  : "FINGERPRINTS",
+    fingerprints    : "/usr/share/keys/pkg"
+  }
 ```
 
 Change root-user shell to tcsh(1):
@@ -107,48 +41,30 @@ Change root-user shell to tcsh(1):
 # chsh -s /bin/tcsh root
 ```
 
-Pluggable Authentication Modules (PAM)
---------------------------------------
-
-Let PAM initialize user home folder.
-
-```console
-# pkg install pam_mkhomedir
-```
-
-Place the
-
-```console
-# grep pam_mkhomedir /etc/pam.d/login
-session         required        /usr/local/lib/pam_mkhomedir.so
-```
-
 Resource configuration
 ----------------------
 
-Ref: [rc](./rc.md)
+Goal: move service configuration flags from `/etc/rc.conf` to per-service config to isolate the flags (see [rc](./rc.md)).
 
-Break monolith `/etc/rc.conf` into per-service configuration file to isolate service flags.
+**Background**: use `sysrc -s <service> -l` to get a list of configuration files:
 
 ```console
-# sysrc -s hostname -l
-/etc/rc.conf /etc/rc.conf.local /etc/rc.conf.d/hostname /usr/local/etc/rc.conf.d/hostname
+% sysrc -s sshd -l
+/etc/rc.conf /etc/rc.conf.local /etc/rc.conf.d/sshd /usr/local/etc/rc.conf.d/sshd
 ```
 
-Move appropriate flags:
+When moving a flag, first add it to the new location, then remove it from `/etc/rc.conf`:
 
 ```console
-# # add flag
-# sysrc -f /etc/rc.conf.d/hostname hostname_foo=...
-hostname_foo: ... -> ...
-# # remove flag
-# sysrc -x hostname_foo=...
+# sysrc -f /etc/rc.conf.d/sshd sshd_enable=yes
+sshd_enable: no -> yes
+# sysrc -x sshd_enable
 ```
 
 Per-service configurations:
 
 ```console
-# head /etc/rc.conf.d/*
+% tail -n +1 /etc/rc.conf.d/*
 ==> /etc/rc.conf.d/hostname <==
 hostname="nuc.lab.net"
 
@@ -156,6 +72,7 @@ hostname="nuc.lab.net"
 moused_nondefault_enable="no"
 
 ==> /etc/rc.conf.d/network <==
+ifconfig_igc0_ipv6="inet6 accept_rtadv"
 ifconfig_igc0="DHCP"
 
 ==> /etc/rc.conf.d/ntpd <==
@@ -171,29 +88,30 @@ defaultrouter="192.168.1.1"
 ==> /etc/rc.conf.d/sshd <==
 sshd_enable="yes"
 
+==> /etc/rc.conf.d/syslogd <==
+syslogd_flags="-ss"
+
 ==> /etc/rc.conf.d/zfs <==
 zfs_enable="yes"
 ```
 
-Catch-all RC configuration:
+Left overs in `/etc/rc.conf`:
 
 ```console
-# cat /etc/rc.conf
-clear_tmp_enable="YES"
-dumpdev="AUTO"
+% sysrc -a
+clear_tmp_enable: YES
+dumpdev: AUTO
 ```
 
 Services
 ========
-
-The instructions below skip basic service setup, covered in the Bootstrap section.
 
 Network time protocol (NTP)
 ---------------------------
 
 Limit open ports by ntpd:
 
-```
+```console
 % tail -n 3 /etc/ntp.conf
 interface ignore wildcard
 interface listen 127.0.0.1
@@ -215,7 +133,7 @@ Packet filter (firewall)
 Use pf(4) to filter network traffic along with pflog(4) to access logs:
 
 ```console
-% head /etc/rc.conf.d/pf*
+% tail -n +1 /etc/rc.conf.d/pf*
 ==> /etc/rc.conf.d/pf <==
 pf_enable="yes"
 
@@ -336,14 +254,14 @@ root     sshd       39929 7   tcp4   192.168.1.102:22      *:*
 Syslog
 ------
 
-Close network socket:
+Make sure Syslog does not open a network port, `-ss` flag should be present in the service RC-script:
 
 ```console
 % cat /etc/rc.conf.d/syslogd
 syslogd_flags="-ss"
 ```
 
-Restart the service and verify work:
+Verify:
 
 ```
 % doas sockstat -l4 | grep syslog
@@ -426,12 +344,14 @@ Installed packages:
 
 ```console
 % pkg prime-list
+FreeBSD-kernel-generic
+FreeBSD-set-base
+FreeBSD-set-lib32
+FreeBSD-set-minimal
 doas
-pam_mkhomedir
 pftop
 pkg
 vim-tiny
-wifi-firmware-iwlwifi-kmod-bz
 ```
 
 Doas
@@ -447,5 +367,6 @@ permit nopass op cmd pkg
 permit nopass op cmd service
 permit nopass op cmd shutdown
 permit nopass op cmd sockstat
+permit nopass op cmd sysrc
 permit nopass op cmd top
 ```

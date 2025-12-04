@@ -1,13 +1,15 @@
-# NAME
+NAME
+====
 
 **setup** - setup instructions for `snk.nuc.lab.net`
 
-# DESCRIPTION
+DESCRIPTION
+===========
 
-The setup runs a VNET jail `snk.nuc.lab.net` with Internet connection. It
-uses LDAP for Single Sign On and SSH.
+The setup runs a VNET jail `snk.nuc.lab.net` with Internet connection. It uses LDAP for Single Sign On and SSH.
 
-## Bootstrap VNET jail
+Bootstrap VNET jail
+-------------------
 
 ```console
 # zfs clone zroot/jail/template/14.3-RELEASE@p2.3 zroot/jail/container/snk
@@ -38,7 +40,8 @@ snk {
 # service jail start snk
 ```
 
-## OpenLDAP client
+OpenLDAP client
+---------------
 
 ```console
 # pkg install openldap26-client
@@ -88,8 +91,7 @@ Try `man ldap.conf' and visit the OpenLDAP FAQ-O-Matic at
 
 </details>
 
-Patch LDAP client configuration with [`ldap.conf.diff`](./ldap.conf.diff) to
-set LDAP instance and base DN for lookups.
+Patch LDAP client configuration with [`ldap.conf.diff`](./ldap.conf.diff) to set LDAP instance and base DN for lookups.
 
 https://github.com/skhal/lab/blob/0d47a18e2a4a68a668ff4164971160e17baba8bd/cluster/net.lab.nuc.snk/doc/ldap.conf.diff#L7-L10
 
@@ -117,10 +119,10 @@ dn: uid=op,ou=people,dc=lab,dc=net
 dn: cn=op,ou=groups,dc=lab,dc=net
 ```
 
-## Single Sign On
+Single Sign On
+--------------
 
-We'll use Name Switch Service (NSS) integration with LDAP to pull users and
-passwords from LDAP after trying local users first.
+We'll use Name Switch Service (NSS) integration with LDAP to pull users and passwords from LDAP after trying local users first.
 
 ```console
 # pkg install nss_ldap
@@ -143,9 +145,7 @@ LDAP secret (optional): /usr/local/etc/nss_ldap.secret
 
 </details>
 
-Patch nss_ldap(5) configuration with
-[`nss_ldap.conf.diff`](./nss_ldap.conf.diff) to set LDAP instance and base DN
-for lookupds.
+Patch nss_ldap(5) configuration with [`nss_ldap.conf.diff`](./nss_ldap.conf.diff) to set LDAP instance and base DN for lookupds.
 
 https://github.com/skhal/lab/blob/0d47a18e2a4a68a668ff4164971160e17baba8bd/cluster/net.lab.nuc.snk/doc/nss_ldap.conf.diff#L7-L20
 
@@ -163,8 +163,7 @@ Hunk #2 succeeded at 24.
 done
 ```
 
-Patch NSS configuration with [`nsswitch.conf.diff`](./nsswitch.conf.diff) to
-use local files and LDAP for lookups in that order.
+Patch NSS configuration with [`nsswitch.conf.diff`](./nsswitch.conf.diff) to use local files and LDAP for lookups in that order.
 
 https://github.com/skhal/lab/blob/0d47a18e2a4a68a668ff4164971160e17baba8bd/cluster/net.lab.nuc.snk/doc/nsswitch.conf.diff#L7-L14
 
@@ -181,8 +180,7 @@ Hunk #1 succeeded at 1.
 done
 ```
 
-Now PAM LDAP searches for entries with matching uid under LDAP base. It will
-bind with the found record only if a single record is found.
+Now PAM LDAP searches for entries with matching uid under LDAP base. It will bind with the found record only if a single record is found.
 
 ```console
 # getent group op
@@ -191,7 +189,8 @@ op:*:1000:op
 op:*:1000:1000:Operator:/home/op:/bin/tcsh
 ```
 
-## SSH
+SSH
+---
 
 Use Pluggable Authentication Modules to configure SSH with LDAP:
 
@@ -215,15 +214,9 @@ login	auth	sufficient	/usr/local/lib/pam_ldap.so
 
 </details>
 
-> [!IMPORTANT]
-> PAM LDAP uses a different `ldap.conf` file, located at
-> `/usr/local/etc/ldap.conf`. Recall that LDAP client configuration used
-> `/usr/local/etc/opendlap/ldap.conf` to run `ldapsearch` and other LDAP
-> commands.
+> [!IMPORTANT] PAM LDAP uses a different `ldap.conf` file, located at `/usr/local/etc/ldap.conf`. Recall that LDAP client configuration used `/usr/local/etc/opendlap/ldap.conf` to run `ldapsearch` and other LDAP commands.
 
-Patch PAM's LDAP configuration with
-[`pam_ldap.conf.diff`](./pam_ldap.conf.diff) to set LDAP instance and base DN
-for lookups.
+Patch PAM's LDAP configuration with [`pam_ldap.conf.diff`](./pam_ldap.conf.diff) to set LDAP instance and base DN for lookups.
 
 https://github.com/skhal/lab/blob/140a3ff61a03f0aec264775a7b5251971be1123d/cluster/net.lab.nuc.snk/doc/pam_ldap.conf.diff#L7-L20
 
@@ -241,8 +234,7 @@ Hunk #2 succeeded at 24.
 done
 ```
 
-PAM policies use pam.conf(5) format. Per-service policies are under
-`/etc/pam.d/` or `/usr/local/etc/pam.d/` for installed packages respectively.
+PAM policies use pam.conf(5) format. Per-service policies are under `/etc/pam.d/` or `/usr/local/etc/pam.d/` for installed packages respectively.
 
 Patch PAM policy for SSH server with [`pam_sshd.diff`](./pam_sshd.diff).
 
@@ -285,4 +277,20 @@ root     sshd        2662 7   tcp4   192.168.1.112:22      *:*
 (op@192.168.1.112) Password:
 Could not chdir to home directory /home/op: No such file or directory
 op
+```
+
+Pluggable Authentication Modules (PAM)
+--------------------------------------
+
+Let PAM initialize user home folder.
+
+```console
+# pkg install pam_mkhomedir
+```
+
+Place the
+
+```console
+# grep pam_mkhomedir /etc/pam.d/login
+session         required        /usr/local/lib/pam_mkhomedir.so
 ```
