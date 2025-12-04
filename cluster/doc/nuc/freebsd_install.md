@@ -14,7 +14,7 @@ See FreeBSD 15 [Announcement](https://www.freebsd.org/releases/15.0R/announce/) 
 
 ```console
 % curl -O https://download.freebsd.org/releases/ISO-IMAGES/15.0/FreeBSD-15.0-RELEASE-amd64-bootonly.iso.xz
-% https://download.freebsd.org/releases/ISO-IMAGES/15.0/CHECKSUM.SHA512-FreeBSD-15.0-RELEASE-amd64
+% curl -O https://download.freebsd.org/releases/ISO-IMAGES/15.0/CHECKSUM.SHA512-FreeBSD-15.0-RELEASE-amd64
 % shasum -c CHECKSUM.SHA512-FreeBSD-15.0-RELEASE-amd64 --ignore-missing
 FreeBSD-15.0-RELEASE-amd64-bootonly.iso.xz: OK
 ```
@@ -56,9 +56,15 @@ Boot from the USB drive and follow the instructions:
 
 -	Keyboard: default layout (US)
 -	Hostname: `nuc.lab.net`
+-	Installation type: Packages (aka pkgbase)
 -	Network: `igc0` IPv4 DHCP
--	Filesystem: ZFS with one disk stripe and [4g swap size](https://forums.freebsd.org/threads/swap-size-on-zfs-with-high-amount-of-ram.71059/) (increase for Kernel development)
--	Enable services:
+-	Partition: guided ZFS
+	-	Stripe with 1 disk
+	-	[4g swap size](https://forums.freebsd.org/threads/swap-size-on-zfs-with-high-amount-of-ram.71059/) (increase for Kernel development)
+-	Packages to install: base, lib32
+-	Set root password
+-	Time zone: America / USA / Central
+-	Services at boot:
 	-	`dumpdev` - dump kernel crashes to `/var/crash`
 	-	`ntpd` - clock synchronization
 	-	`ntpd_sync_on_start` - sync time on `ntpd` start
@@ -74,36 +80,36 @@ Boot from the USB drive and follow the instructions:
 	-	`clear_tmp` clean `/tmp` on startup
 	-	`disable_syslogd` no syslogd network socket
 	-	`secure_console` console password prompt
+-	Install firmware packages: none (skip WiFi, we'll install it later, as needed)
+-	Add users: yes
+	-	Name: op
+	-	UID: 1000
+	-	Invite to other groups: wheel
+	-	Shell: tcsh
 
 Update the OS
 =============
 
-Ref: https://docs.freebsd.org/en/books/handbook/cutting-edge/
+The setup uses "Packages mechanism". It uses pkg(1) to install base system. There is no need to use freebsd-update(8) any more.
 
-Check the running version of installed kernel `-k`, running kernel `-r`, and running userland `-u`:
-
-```console
-% freebsd-version -kru
-14.3-RELEASE
-14.3-RELEASE
-14.3-RELEASE
-```
-
-Fetch and install updates. The system will auto-reboot if there is a kernel update, otherwise it restarts the updated services only. It is still a good idea to restart the node.
-
-```console
-# freebsd-update fetch
-# freebsd-update install
-# reboot
-```
-
-Verify the running version is up to date, all three should match:
+Keep an eye on the version of installed Kernel (-k), running Kernel (-r), and installed userland (-u). Reboot if the versions are out of sync after an upgrade of the packages:
 
 ```console
 % freebsd-version -kru
-14.3-RELEASE-p2
-14.3-RELEASE-p2
-14.3-RELEASE-p2
+15.0-RELEASE
+15.0-RELEASE
+15.0-RELEASE
+```
+
+The list of intalled packages is minimal. It includes the kernel, minimal packages set to run multi-user environment, base userland, and 32-bit compatibility libraries:
+
+```console
+% pkg prime-list
+FreeBSD-kernel-generic
+FreeBSD-set-base
+FreeBSD-set-lib32
+FreeBSD-set-minimal
+pkg
 ```
 
 See Also
