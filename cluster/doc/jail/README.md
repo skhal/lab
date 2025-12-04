@@ -6,20 +6,20 @@ Name
 Summary
 -------
 
-This section describes how to setup and manage thick jails using base tools, jail(8) and jexec(8).
+This section describes how to setup and manage thick jails using basic tools, jail(8) and jexec(8).
 
-First, [bootstrap](./bootstrap.md) the OS to host jails. It creates ZFS datasets, sets up networking stack, and configures jail service.
+There are two parts to jails setup:
 
-In order to simplify maintenance, jails split into a template and a running container. This setup makes it very quick to create a new jail using a ZFS clone of a template.
+1.	[Bootstrap](./bootstrap.md): prepare the OS to host jails. The steps include create ZFS datasets, configure the networking, setup the jail service.
 
-The instructions distinguish two types kinds of jails:
+2.	Create and manage jails. The jails split into a template and a running container using ZFS datasets. Such setup allows quick spawn of jails by cloning templates into new containers.
 
--	FreeBSD: hosts FreeBSD userland suitable to run FreeBSD binaries, create an isolated environment to mimic a virtual machine, etc.
+Start with FreeBSD jail instructions to create an isolated userland:
 
-	-	[FreeBSD template](./freebsd_template.md)
-	-	[FreeBSD jail](./freebsd_jail.md)
+-	[FreeBSD template](./freebsd_template.md)
+-	[FreeBSD jail](./freebsd_jail.md)
 
--	Linux: a FreeBSD jail with Linux userland bootstrapped at `/compat/<distribution>`. Even though it combines FreeBSD and Linux environment, Linux jails are designed to be primarily used as a Linux environment chroot'ed at `/compat/<distribution>`.
+A Linux environment departures from the FreeBSD setup. It adds Linux Compatibility layer to the FreeBSD setup, bootstrapped at `/compat/<distribution>` prefix, to provide Linux userland:
 
-	-	[Ubuntu template](./ubuntu_template.md)
-	-	[Ubuntu jail](./ubuntu_jail.md)
+-	[Ubuntu template](./ubuntu_template.md)
+-	[Ubuntu jail](./ubuntu_jail.md)
