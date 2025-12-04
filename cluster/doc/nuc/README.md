@@ -15,5 +15,5 @@ Docs
 ====
 
 -	[BIOS Configuration](./bios.md)
--	[FreeBSD Install](./install.md)
--	[FreeBSD Configuration](./setup.md)
+-	[FreeBSD Install](./freebsd_install.md)
+-	[FreeBSD Configure](./freebs_configure.md)
