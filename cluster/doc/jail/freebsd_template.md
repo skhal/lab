@@ -1,14 +1,15 @@
-# NAME
+NAME
+====
 
 **template-freebsd** - create a FreeBSD jail template
 
+DESCRIPTION
+===========
 
-# DESCRIPTION
+The instructions will create a ZFS dataset with patched FreeBSD user land and ready to create a new jail. It uses FreeBSD 14.3 release for amd64 architecture.
 
-The instructions will create a ZFS dataset with patched FreeBSD user land and
-ready to create a new jail. It uses FreeBSD 14.3 release for amd64 architecture.
-
-## Bootstrap
+Bootstrap
+---------
 
 Download FreeBSD user land into `/jail/image/`:
 
@@ -35,10 +36,10 @@ Open the archive into `/jail/template/` sub-folder:
     --unlink
 ```
 
-## Patch
+Patch
+-----
 
-Update the release with latest patches. Use `PAGER=cat` to suppress
-interactivity in freebsd-update(8).
+Update the release with latest patches. Use `PAGER=cat` to suppress interactivity in freebsd-update(8).
 
 ```console
 # env PAGER=cat freebsd-update -b /jail/template/14.3-RELEASE/ fetch install
@@ -51,7 +52,8 @@ Verify work:
 14.3-RELEASE-p2
 ```
 
-## Configure
+Configure
+---------
 
 ### Root
 
@@ -93,20 +95,18 @@ Default timezone is set to UTC. Switch to US Central Time:
     tzsetup -r
 ```
 
-## Snapshot
+Snapshot
+--------
 
-Create a ZFS snapshot for the template using the release patch number `pN` and
-local changes number:
+Create a ZFS snapshot for the template using the release patch number `pN` and local changes number:
 
 ```console
 # zfs snapshot zroot/jail/template/14.3-RELEASE@p2.0
 ```
 
-If the template is updated in the future with local changes, say a change to
-one of the RC-files, then re-snapshot the dataset with `p2.1` (assuming the
-FreeBSD version is still `14.3-RELEASE-p2`).
+If the template is updated in the future with local changes, say a change to one of the RC-files, then re-snapshot the dataset with `p2.1` (assuming the FreeBSD version is still `14.3-RELEASE-p2`).
 
+SEE ALSO
+========
 
-# SEE ALSO
-
-* https://docs.freebsd.org/en/books/handbook/jails/#creating-classic-jail
+-	https://docs.freebsd.org/en/books/handbook/jails/#creating-classic-jail
