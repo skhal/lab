@@ -36,7 +36,10 @@ Verify work:
 ```
 
 Configure
----------
+=========
+
+Root
+----
 
 Change root shell to `tcsh(1)`:
 
@@ -64,7 +67,8 @@ Run in local mode to close listening socket:
 # chroot /jail/template/15.0-RELEASE/ sysrc -f /etc/rc.conf.d/syslogd syslogd_flags="-ss"
 ```
 
-### Timezone
+Timezone
+--------
 
 Default timezone is set to UTC. Switch to US Central Time:
 
@@ -82,7 +86,7 @@ Create a ZFS snapshot for the template using the release patch number `pN` and l
 # zfs snapshot zroot/jail/template/15.0-RELEASE@p0.0
 ```
 
-SEE ALSO
-========
+References
+==========
 
 -	https://docs.freebsd.org/en/books/handbook/jails/#creating-classic-jail
