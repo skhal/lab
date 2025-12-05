@@ -1,11 +1,13 @@
-# NAME
+NAME
+====
 
 **ldap server setup** - how to setup an LDAP server
 
+DESCRIPTION
+===========
 
-# DESCRIPTION
-
-## Install
+Install
+-------
 
 Install OpenLDAP server:
 
@@ -91,25 +93,19 @@ for additional upgrade instructions.
 ```
 </details>
 
-## Configure
+Configure
+---------
 
-A running OpenLDAP server slapd(8) holds the configuration in a configuration
-database under `/usr/local/etc/openldap/slapd.d`. The installation package comes
-with a default configuration file `/usr/local/etc/openldap/slapd.ldif`, which is
-to be imported into the configuration database with `slapadd(8)` tool.
+A running OpenLDAP server slapd(8) holds the configuration in a configuration database under `/usr/local/etc/openldap/slapd.d`. The installation package comes with a default configuration file `/usr/local/etc/openldap/slapd.ldif`, which is to be imported into the configuration database with `slapadd(8)` tool.
 
-First, modify the default configuration settings in `slapd.ldif` configuration
-file using [`slapd.ldif.diff`](./slapd.ldif.diff). It makes the following
-changes:
+First, modify the default configuration settings in `slapd.ldif` configuration file using [`slapd.ldif.diff`](./slapd.ldif.diff). It makes the following changes:
 
-  * Load additional LDAP schemas to manage users & groups: `cosine.ldif` and
-    `nis.ldif`.
-  * Create a database `dc=lab,dc=net`:
-    - Configure the administrator's account `olcRootDN` and password
-      `olcRootPW`. Use slappasswd(8) to generate encoded password.
-    - Isolate the database under `/var/db/opendal-data/lab.net`.
-    - Add indices to speed up user account lookups.
-    - Restrict DB access using Access Control Lists (ACLs)
+-	Load additional LDAP schemas to manage users & groups: `cosine.ldif` and`nis.ldif`.
+-	Create a database `dc=lab,dc=net`:
+	-	Configure the administrator's account `olcRootDN` and password`olcRootPW`. Use slappasswd(8) to generate encoded password.
+	-	Isolate the database under `/var/db/opendal-data/lab.net`.
+	-	Add indices to speed up user account lookups.
+	-	Restrict DB access using Access Control Lists (ACLs)
 
 Patch the configuration file:
 
@@ -135,7 +131,8 @@ The configuration file is ready, import it into a configuration database:
 # /usr/local/sbin/slapadd -n0 -F /usr/local/etc/openldap/slapd.d/ -l /usr/local/etc/openldap/slapd.ldif
 ```
 
-## Bootstrap filesystem
+Bootstrap filesystem
+--------------------
 
 Create a folder to store `dc=lab,dc=net` database:
 
@@ -143,15 +140,15 @@ Create a folder to store `dc=lab,dc=net` database:
 # mkdir /var/db/openldap-data/lab.net
 ```
 
-slapd(8) will run as `ldap:ldap` user. Fix permissions to the server
-configuration and databases:
+slapd(8) will run as `ldap:ldap` user. Fix permissions to the server configuration and databases:
 
 ```console
 # chown -R ldap:ldap /var/db/openldap-data /usr/local/etc/openldap/slapd.d
 # chmod -R 700 /var/db/openldap-data /usr/local/etc/openldap/slapd.d
 ```
 
-## Service
+Service
+-------
 
 Configure slapd(8) service:
 
@@ -167,10 +164,7 @@ slapd_flags:  -> -h 'ldapi://%2Fvar%2Frun%2Fopenldap%2Fldapi ldap://192.168.1.90
 slapd_cn_config:  -> yes
 ```
 
-> [!NOTE]
-> The `slapd_sockets` flag forces the `slapd` rc-script to
-> [fix](https://github.com/freebsd/freebsd-ports/blob/c2991243dbb2dfc9f932d1560af12061ed998cf2/net/openldap26-server/files/slapd.in#L153)
-> the owner and permissions for `slapd:slapd` user.
+> [!NOTE] The `slapd_sockets` flag forces the `slapd` rc-script to [fix](https://github.com/freebsd/freebsd-ports/blob/c2991243dbb2dfc9f932d1560af12061ed998cf2/net/openldap26-server/files/slapd.in#L153) the owner and permissions for `slapd:slapd` user.
 
 Start the service
 
@@ -180,33 +174,31 @@ Start the service
 
 Verify that:
 
-  * the service runs under `ldap` user.
-  * slapd(8) listens on a single IP address at port `:389`.
-  * A server socket and other files under `/var/run/openldap` have `ldap:ldap`
-    ownership.
+-	the service runs under `ldap` user.
+-	slapd(8) listens on a single IP address at port `:389`.
+-	A server socket and other files under `/var/run/openldap` have `ldap:ldap` ownership.
 
-```console
-# sockstat -l4
-USER     COMMAND    PID   FD  PROTO  LOCAL ADDRESS         FOREIGN ADDRESS
-ldap     slapd      56701 7   tcp4   10.0.1.3:389          *:*
-# ls -l /var/run/openldap/
-total 6
-srw-rw-rw-  1 ldap ldap   0 Sep 26 18:25 ldapi
--rw-r--r--  1 ldap ldap 105 Sep 26 18:25 slapd.args
--rw-r--r--  1 ldap ldap   6 Sep 26 18:25 slapd.pid
-```
+	```console
+	# sockstat -l4
+	USER     COMMAND    PID   FD  PROTO  LOCAL ADDRESS         FOREIGN ADDRESS
+	ldap     slapd      56701 7   tcp4   10.0.1.3:389          *:*
+	# ls -l /var/run/openldap/
+	total 6
+	srw-rw-rw-  1 ldap ldap   0 Sep 26 18:25 ldapi
+	-rw-r--r--  1 ldap ldap 105 Sep 26 18:25 slapd.args
+	-rw-r--r--  1 ldap ldap   6 Sep 26 18:25 slapd.pid
+	```
 
-## Root ACL for `cn=config`
+Root ACL for `cn=config`
+------------------------
 
-By default, slapd(8) prevents access to `cn=config`, where all the server
-configurations reside:
+By default, slapd(8) prevents access to `cn=config`, where all the server configurations reside:
 
 ```
 olcAccess: to * by * none
 ```
 
-We want to grant permissions to the root user when connected to slapd(8) locally
-via Unix sockets, e.g.:
+We want to grant permissions to the root user when connected to slapd(8) locally via Unix sockets, e.g.:
 
 ```console
 # ldapsearch -H ldapi://%2Fvar%2Frun%2Fopenldap%2Fldapi -Y EXTERNAL ...
@@ -220,15 +212,11 @@ gidNumber=0+uidNumber=0,cn=peercred,cn=external,cn=auth
 
 The process consists of the following steps while the service is down:
 
-  * Dump the configuration database into a temporary LDIF configuration file.
-  * Update the configuration file.
-  * Re-create the configuration database.
+-	Dump the configuration database into a temporary LDIF configuration file.
+-	Update the configuration file.
+-	Re-create the configuration database.
 
-> [!CAUTION]
-> Do not edit `/usr/local/etc/openldap/slapd.d` files manually. It may break
-> consistency of the configuration directory. Change `.ldif` file and then
-> import it into the directory configuration instead. See
-> [doc](https://openldap.org/doc/admin26/slapdconf2.html).
+> [!CAUTION] Do not edit `/usr/local/etc/openldap/slapd.d` files manually. It may break consistency of the configuration directory. Change `.ldif` file and then import it into the directory configuration instead. See [doc](https://openldap.org/doc/admin26/slapdconf2.html).
 
 Stop the service:
 
@@ -284,9 +272,7 @@ Start the service:
 
 Verify:
 
-> [!TIP]
-> Use the following tcsh(1) alias to speed up search commands:<br/>
-> `alias ldapisearch /usr/local/bin/ldapsearch -Y EXTERNAL -H ldapi://%2Fvar%2Frun%2Fopenldap%2Fldapi`
+> [!TIP] Use the following tcsh(1) alias to speed up search commands:<br/> `alias ldapisearch /usr/local/bin/ldapsearch -Y EXTERNAL -H ldapi://%2Fvar%2Frun%2Fopenldap%2Fldapi`
 
 ```console
 # ldapisearch -b cn=config dn | grep '^dn:'

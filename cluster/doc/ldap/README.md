@@ -1,8 +1,12 @@
-# NAME
+Name
+====
 
 **ldap** - Lightweight Directory Access Protocol
 
+Description
+===========
 
-# SEE ALSO
+The instructions describe how to setup an LDAP server and configure clients to use LDAP for authentication, local or SSH.
 
-* [Server setup](./server_setup.md)
+-	[Server setup](./setup_server.md)
+-	[Client setup](./setup_client.md)
