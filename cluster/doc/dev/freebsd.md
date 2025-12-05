@@ -3,8 +3,8 @@ Name
 
 **freebsd** - development setup under FreeBSD
 
-Description
-===========
+Install
+=======
 
 The repository comes with FreeBSD make files to install software:
 
@@ -24,3 +24,23 @@ It also installs statically linked Go [binaries](https://github.com/skhal/lab/bl
 -	`ibazel` interactive Bazel
 -	`gopls` Go LSP for Vim
 -	various pre-commit checks
+
+Applications
+============
+
+Git
+---
+
+Set user name and email for commit messages:
+
+```console
+% git config --global user.name 'Samvel Khalatyan'
+% git config --global user.email sn.khalatyan@gmail.com
+```
+
+Use SSH keys to sign commits. Generate a key with ssh-keygen(1). Upload the public key to GitHub. Place the public key into the environment with git(1), say `~/.ssh//id_github.pub`\):
+
+```console
+% git config --global gpg.format ssh
+% git config --global user.signingkey $HOME/.ssh/id_github.pub
+```
