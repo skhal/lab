@@ -54,7 +54,7 @@ named_enable:  -> yes
 Configuration
 -------------
 
-Make following changes to DNS server configuration:
+Make following changes to DNS server configuration ([named.conf.diff](./named.conf.diff)\):
 
 -	Listen on local address only (use Jail internal network).
 -	Restrict DNS clients to local network.
@@ -62,30 +62,12 @@ Make following changes to DNS server configuration:
 -	Forward unknown DNS queries to default gateway.
 -	Store zone information in `zones.conf.d` folder.
 
-See [named.conf.diff](./named.conf.diff):
+Patch the configuration file:
 
 ```console
-% doas jexec dns diff /usr/local/etc/namedb/named.conf{.sample,}
-7a8
-> acl jail-lo { 10.0.1.0/24; };
-20c21,26
-<   listen-on   { 127.0.0.1; };
----
->   listen-on   { 127.0.0.1; 10.0.1.2; };
->   allow-query { 127.0.0.1; jail-lo; };
->   allow-transfer  { "none"; };
->   forwarders {
->       192.168.1.1;
->   };
-378a385,386
->
-> include "/usr/local/etc/namedb/zones.conf.d/lab.net.conf";
-```
-
-Apply patch
-
-```console
-% patch /usr/local/etc/namedb/named.conf < ~/named.conf.diff
+% doas jexec dns su -
+root@dns:~ # fetch -o /tmp https://github.com/skhal/lab/raw/refs/heads/main/cluster/doc/dns/named.conf.diff
+root@dns:~ # patch /usr/local/etc/namedb/named.conf < /tmp/named.conf.diff
 ```
 
 Configure resolver to use local DNS server:
