@@ -9,10 +9,10 @@ Bootstrap
 Start from Ubuntu template
 
 ```console
-% zfs list -t snapshot zroot/jail/template/Ubuntu-22.04
+% % zfs list -t snapshot zroot/jail/template/Ubuntu-22.04
 NAME                                    USED  AVAIL  REFER  MOUNTPOINT
-zroot/jail/template/Ubuntu-22.04@p5.1     8K      -   920M  -
-% zfs clone zroot/jail/template/Ubuntu-22.04@p5.1 zroot/jail/container/jammy
+zroot/jail/template/Ubuntu-22.04@p0.0     8K      -  1.04G  -
+% zfs clone zroot/jail/template/Ubuntu-22.04@p0.0 zroot/jail/container/jammy
 ```
 
 Use `rc.jail` on the host environment to mana epair(4) for the jail. Propagate mount points, created by `linux` service, from the host to jailed environment under `/compat/<distribution>`:
