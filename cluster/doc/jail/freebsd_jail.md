@@ -1,7 +1,7 @@
 NAME
 ====
 
-**jail-freebsd** - create a FreeBSD jail
+**freebsd-jail** - create a FreeBSD jail
 
 DESCRIPTION
 ===========
@@ -12,14 +12,10 @@ ZFS Bootstrap
 Start from FreeBSD template:
 
 ```console
-% zfs list -t snapshot zroot/jail/template/14.3-RELEASE
+% zfs list -t snapshot zroot/jail/template/15.0-RELEASE
 NAME                                    USED  AVAIL  REFER  MOUNTPOINT
-zroot/jail/template/14.3-RELEASE@p2     144K      -   459M  -
-zroot/jail/template/14.3-RELEASE@p2.1   152K      -   459M  -
-zroot/jail/template/14.3-RELEASE@p2.2   128K      -   459M  -
-zroot/jail/template/14.3-RELEASE@p2.3   120K      -   459M  -
-zroot/jail/template/14.3-RELEASE@p2.4     8K      -   459M  -
-# zfs clone zroot/jail/template/14.3-RELEASE@p2.4 zroot/jail/container/demo
+zroot/jail/template/15.0-RELEASE@p0.0   104K      -   374M  -
+# zfs clone zroot/jail/template/15.0-RELEASE@p0.0 zroot/jail/container/demo
 ```
 
 Configuration
@@ -30,7 +26,7 @@ Use `rc.jail` script on the host environment manage jail epair(4) for every brid
 ```console
 # cat /etc/jail.conf.d/demo.conf
 demo {
-  $id = "90";
+  $id = "123";
 
   $bridge0 = "bridge0";
   $bridge0_ip = "${bridge0}:192.168.1.${id}/24";
@@ -72,7 +68,7 @@ epair8b: flags=1008843<UP,BROADCAST,RUNNING,SIMPLEX,MULTICAST,LOWER_UP> metric 0
   description: jail:demo:bridge0
   options=8<VLAN_MTU>
   ether 02:86:6e:e0:e2:0b
-  inet 192.168.1.91 netmask 0xffffff00 broadcast 192.168.1.255
+  inet 192.168.1.123 netmask 0xffffff00 broadcast 192.168.1.255
   groups: epair
   media: Ethernet 10Gbase-T (10Gbase-T <full-duplex>)
   status: active
@@ -81,7 +77,7 @@ epair9b: flags=1008843<UP,BROADCAST,RUNNING,SIMPLEX,MULTICAST,LOWER_UP> metric 0
   description: jail:demo:bridge1
   options=8<VLAN_MTU>
   ether 02:7e:3f:38:56:0b
-  inet 10.0.1.91 netmask 0xffffff00 broadcast 10.0.1.255
+  inet 10.0.1.123 netmask 0xffffff00 broadcast 10.0.1.255
   groups: epair
   media: Ethernet 10Gbase-T (10Gbase-T <full-duplex>)
   status: active
