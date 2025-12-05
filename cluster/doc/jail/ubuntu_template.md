@@ -1,21 +1,15 @@
 Name
 ====
 
-**template-ubuntu** - create a Ubuntu jail template
+**ubuntu-template** - create a Ubuntu jail template
 
-Background
-==========
-
-The instructions enable Linux Binary Compatibility on the hosting machine, create a ZFS dataset with bootstrapped Ubuntu user land.
-
-FreeBSD provides [Linux Binary Compatibility](https://docs.freebsd.org/en/books/handbook/linuxemu/#linuxemu) to run Linux software in FreeBSD environment, controlled by `linux` service.
-
-debootstrap(8) creates Linux environment at a given prefix with minimal set of Linux shared libraries and binaries for Linux user land, including apt(1).
+Bootstrap
+=========
 
 Host
-====
+----
 
-Enable Linux Binary Compatibility on the FreeBSD host:
+Enable [Linux Binary Compatibility](https://docs.freebsd.org/en/books/handbook/linuxemu/#linuxemu) to run Linux software in FreeBSD environment, controlled by `linux` service.
 
 ```console
 # sysrc -f /etc/rc.conf.d/linux linux_enable=YES
@@ -38,16 +32,16 @@ There is a limited number of Linux applications available in pkg(1) with `linux-
 
 Keep in mind that Linux binaries run along FreeBSD binaries. They show up in the process tree, can be traced, etc.
 
-Bootstrap
-=========
+Jail
+====
 
 Create a Ubuntu template jail from FreeBSD template:
 
 ```console
-# zfs list -t snapshot zroot/jail/template/14.3-RELEASE | tail -1
-zroot/jail/template/14.3-RELEASE@p5.6     0B      -   459M  -
-# zfs clone zroot/jail/template/14.3-RELEASE@p5.6 zroot/jail/template/Ubuntu-22.04
+# zfs clone zroot/jail/template/15.0-RELEASE@p0.0 zroot/jail/template/Ubuntu-22.04
 ```
+
+We'll use a temporary jail to configure the template, with configuration in `/tmp/ubuntu.conf`. It is important to start and stop the jail using jail(8) command with `-f /tmp/ubuntu.conf` flag.
 
 Start a temporary jail with path set to the template location:
 
@@ -87,25 +81,6 @@ ubuntu: created
 Verify work:
 
 ```console
-% doas jexec ubuntu ifconfig -ag epair
-epair6b: flags=1008843<UP,BROADCAST,RUNNING,SIMPLEX,MULTICAST,LOWER_UP> metric 0 mtu 1500
-	description: jail:ubuntu:bridge0
-	options=8<VLAN_MTU>
-	ether 02:55:ef:72:1f:0b
-	inet 192.168.1.12 netmask 0xffffff00 broadcast 192.168.1.255
-	groups: epair
-	media: Ethernet 10Gbase-T (10Gbase-T <full-duplex>)
-	status: active
-	nd6 options=29<PERFORMNUD,IFDISABLED,AUTO_LINKLOCAL>
-epair7b: flags=1008843<UP,BROADCAST,RUNNING,SIMPLEX,MULTICAST,LOWER_UP> metric 0 mtu 1500
-	description: jail:ubuntu:bridge1
-	options=8<VLAN_MTU>
-	ether 02:54:f8:a8:4a:0b
-	inet 10.0.1.12 netmask 0xffffff00 broadcast 10.0.1.255
-	groups: epair
-	media: Ethernet 10Gbase-T (10Gbase-T <full-duplex>)
-	status: active
-	nd6 options=29<PERFORMNUD,IFDISABLED,AUTO_LINKLOCAL>
 % doas jexec ubuntu ping -c 1 192.168.1.1
 PING 192.168.1.1 (192.168.1.1): 56 data bytes
 64 bytes from 192.168.1.1: icmp_seq=0 ttl=64 time=0.585 ms
@@ -118,7 +93,17 @@ Connection to 1.1.1.1 53 port [udp/domain] succeeded!
 ^C
 ```
 
-Install debootstrap(8):
+Use latest packages:
+
+```console
+% cat /jail/template/Ubuntu-22.04/usr/local/etc/pkg/repos/FreeBSD.conf
+FreeBSD-ports: {
+      url: "pkg+https://pkg.FreeBSD.org/${ABI}/latest",
+}
+% doas jexec ubuntu pkg update
+```
+
+Install debootstrap(8) to create Linux environment at a given prefix with minimal set of Linux shared libraries and binaries for Linux user land, including apt(1).
 
 ```console
 % doas jexec ubuntu pkg install debootstrap
@@ -240,7 +225,7 @@ Upgrade user land:
 Install following packages for basic FreeBSD-like tools:
 
 ```console
-% doas jexec ubuntu chroot /compat/jammy apt apt-file install ldnsutils man net-tools tcsh vim
+% doas jexec ubuntu chroot /compat/jammy apt install apt-file ldnsutils man net-tools tcsh vim
 ```
 
 -	`apt-file` to search for packages that install a file, i.e., `apt-file find /usr/bin/shasum`.
@@ -286,10 +271,17 @@ Tue Nov 18 08:49:04 CST 2025
 Snapshot
 ========
 
-Snapshot the template with installed patch number `pN` (i.e., `p5` for `14.3-RELEASE-p5`) and local changes number:
+Stop the jail:
 
 ```console
-# zfs snapshot zroot/jail/template/Ubuntu-22.04@p5.0
+% doas jail -r -f /tmp/ubuntu.conf ubuntu
+ubuntu: removed
+```
+
+Snapshot the template:
+
+```console
+% zfs snapshot zroot/jail/template/Ubuntu-22.04@p0.0
 ```
 
 SEE ALSO
