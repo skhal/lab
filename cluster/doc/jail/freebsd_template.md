@@ -9,14 +9,14 @@ Bootstrap
 Download FreeBSD userland into `/jail/image/`:
 
 ```console
-# fetch -m -o /jail/image/15.0-RELEASE-base.txz https://download.freebsd.org/ftp/releases/amd64/15.0-RELEASE/base.txz
+# fetch -m -o /jail/image/$(freebsd-version)-base.txz https://download.freebsd.org/ftp/releases/$(uname -m)/$(freebsd-version)/base.txz
 ```
 
 Extract the archive into a new ZFS dataset:
 
 ```console
-# zfs create zroot/jail/template/15.0-RELEASE
-# tar -C /jail/template/15.0-RELEASE -x -f /jail/image/15.0-RELEASE-base.txz --unlink
+# zfs create zroot/jail/template/$(freebsd-version)
+# tar -C /jail/template/$(freebsd-version) -x -f /jail/image/$(freebsd-version)-base.txz --unlink
 ```
 
 Patch
