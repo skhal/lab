@@ -1,5 +1,5 @@
---- /etc/nsswitch.conf.sample	2025-09-28 09:01:28.828836000 -0500
-+++ /etc/nsswitch.conf	2025-09-28 09:02:30.649736000 -0500
+--- /etc/nsswitch.conf.sample	2025-12-05 07:03:34.161846000 -0600
++++ /etc/nsswitch.conf	2025-12-04 08:27:47.553363000 -0600
 @@ -1,12 +1,12 @@
  #
  # nsswitch.conf(5) - name service switch configuration file

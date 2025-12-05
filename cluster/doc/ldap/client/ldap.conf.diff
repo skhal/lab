@@ -1,0 +1,15 @@
+--- /usr/local/etc/ldap.conf.sample	2025-11-29 12:42:59.000000000 -0600
++++ /usr/local/etc/ldap.conf	2025-12-03 18:02:05.098510000 -0600
+@@ -12,10 +12,10 @@
+ # space. How long nss_ldap takes to failover depends on
+ # whether your LDAP client library supports configurable
+ # network or connect timeouts (see bind_timelimit).
+-host 127.0.0.1
++host ldap.lab.net
+
+ # The distinguished name of the search base.
+-base dc=padl,dc=com
++base dc=lab,dc=net
+
+ # Another way to specify your LDAP server is to provide an
+ # uri with the server name. This allows to use
