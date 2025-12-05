@@ -11,7 +11,11 @@ INSTALL_TARGETS = ${SOURCES:S,^,${HOME}/.,}
 
 install: ${INSTALL_TARGETS} ${INSTALL_PATHS} .PHONY
 
-vim: vimrc.d
+# install Go package before Go binaries.
+go: pkg
+
+# install vimrc before adding packs
+vim: ${HOME}/.vimrc vimrc.d
 
 # Target is `${HOME}/.foo`, the source is `foo`.
 SOURCE = ${.TARGET:T:S/^.//}
