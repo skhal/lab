@@ -52,7 +52,7 @@ Set default gateway:
 
 ```console
 # chroot /jail/template/15.0-RELEASE/ sysrc -f /etc/rc.conf.d/routing defaultrouter="192.168.1.1"
-cp /etc/resolv.conf /jail/template/15.0-RELEASE/etc/
+# cp /etc/resolv.conf /jail/template/15.0-RELEASE/etc/
 ```
 
 Syslogd
