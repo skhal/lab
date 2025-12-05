@@ -33,7 +33,7 @@ There is a limited number of Linux applications available in pkg(1) with `linux-
 Keep in mind that Linux binaries run along FreeBSD binaries. They show up in the process tree, can be traced, etc.
 
 Jail
-====
+----
 
 Create a Ubuntu template jail from FreeBSD template:
 
