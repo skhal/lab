@@ -68,67 +68,15 @@ Zone lab.net
 Store zones in `zones.conf.d` folder:
 
 ```console
-% doas jexec dns mkdir /usr/local/etc/namedb/zones.conf.d
+# mkdir /usr/local/etc/namedb/zones.conf.d
+# fetch -o /usr/local/etc/namedb/zones.conf.d https://github.com/skhal/lab/raw/refs/heads/main/cluster/doc/dns/server/zones.conf.d/lab.net.conf
 ```
 
-Store forward and reverse mappings in separate files:
+Add forward and reverse mappings:
 
-```
-// file: /usr/local/etc/namedb/zones.conf.d/lab.net.conf
-zone "lab.net" IN {
-  type master;
-  file "/usr/local/etc/namedb/primary/lab.net-forward.db";
-  allow-update { none; };
-};
-zone "1.0.10.in-addr.arpa" IN {
-  type master;
-  file "/usr/local/etc/namedb/primary/lab.net-reverse.db";
-  allow-update { none; };
-};
-```
-
-Forward mapping:
-
-```
-; file: /usr/local/etc/namedb/primary/lab.net-forward.db
-$TTL  1h
-@       IN      SOA     dns.lab.net. root.dns.lab.net. (
-                        ;; [YYYYMMDDnn] (update date + number)
-                        2025100501; Serial
-                        1h;   Refresh
-                        15m;    Retry
-                        1w;   Expiry
-                        1d;   Minimum
-)
-
-; Name server
-      IN  NS  dns.lab.net.
-      IN  A   10.0.1.2
-
-; Servers
-dns   IN  A 10.0.1.2
-```
-
-Reverse mapping:
-
-```
-; file: /usr/local/etc/namedb/primary/lab.net-reverse.db
-$TTL  1h
-@       IN      SOA     lab.net. root.lab.net. (
-                        ;; [YYYYMMDDnn] (update date + number)
-                        2025100501; Serial
-                        1h;   Refresh
-                        15m;    Retry
-                        1w;   Expiry
-                        1d;   Minimum
-)
-
-; Name server
-      IN  NS  dns.lab.net.
-      IN  A   10.0.1.2
-
-; Servers
-2     IN  PTR dns.lab.net.
+```console
+# fetch -o /usr/local/etc/namedb/primary https://github.com/skhal/lab/raw/refs/heads/main/cluster/doc/dns/server/primary/lab.net-forward.db
+# fetch -o /usr/local/etc/namedb/primary https://github.com/skhal/lab/raw/refs/heads/main/cluster/doc/dns/server/primary/lab.net-reverse.db
 ```
 
 Validate
@@ -137,7 +85,7 @@ Validate
 Forward lookups:
 
 ```console
-% doas jexec dns drill dns.lab.net
+# drill dns.lab.net
 ;; ->>HEADER<<- opcode: QUERY, rcode: NOERROR, id: 47488
 ;; flags: qr aa rd ra ; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 0
 ;; QUESTION SECTION:
@@ -154,7 +102,7 @@ dns.lab.net.	3600	IN	A	10.0.1.2
 ;; SERVER: 127.0.0.1
 ;; WHEN: Sat Nov 15 11:05:43 2025
 ;; MSG SIZE  rcvd: 45
-% doas jexec dns drill freebsd.org
+# drill freebsd.org
 ;; ->>HEADER<<- opcode: QUERY, rcode: NOERROR, id: 7773
 ;; flags: qr rd ra ; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 0
 ;; QUESTION SECTION:
@@ -176,7 +124,7 @@ freebsd.org.	3532	IN	A	96.47.72.84
 Reverse lookups:
 
 ```console
-% doas jexec dns drill -x 10.0.1.2
+# drill -x 10.0.1.2
 ;; ->>HEADER<<- opcode: QUERY, rcode: NOERROR, id: 51164
 ;; flags: qr aa rd ra ; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 0
 ;; QUESTION SECTION:
@@ -193,7 +141,7 @@ Reverse lookups:
 ;; SERVER: 127.0.0.1
 ;; WHEN: Sat Nov 15 11:06:28 2025
 ;; MSG SIZE  rcvd: 64
-% doas jexec dns drill -x 1.1.1.1
+# drill -x 1.1.1.1
 ;; ->>HEADER<<- opcode: QUERY, rcode: NOERROR, id: 18731
 ;; flags: qr rd ra ; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 0
 ;; QUESTION SECTION:
