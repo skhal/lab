@@ -290,3 +290,19 @@ dn: olcDatabase={0}config,cn=config
 dn: olcDatabase={1}mdb,cn=config
 dn: olcDatabase={2}monitor,cn=config
 ```
+
+Management
+==========
+
+Any client can update LDAP server contents with instructions in LDIF format using ldapadd(1) and ldapmodify(1) commands that pick up LDAP URI from the configuration (use `-H ldap://ldap.lab.net` flag to explicitly set URI):
+
+```console
+% ldapadd -x -W -D 'cn=op,dc=lab,dc=net' -f /tmp/foo.ldif
+% ldapmodify -x -W -D 'cn=op,dc=lab,dc=net' -f /tmp/foo.ldif
+```
+
+Change user password with ldappasswd(1):
+
+```console
+% ldappasswd -x -W -D 'cn=op,dc=lab,dc=net' -S 'uid=foo,ou=people,dc=lab,dc=net'
+```
