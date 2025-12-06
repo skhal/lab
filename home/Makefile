@@ -5,7 +5,7 @@
 #
 # Flavor: FreeBSD
 
-INSTALL_PATHS = ctags.d go pkg vim vimrc.d
+INSTALL_PATHS = ctags.d go pkg rust vim vimrc.d
 SOURCES = tcshrc vimrc tmux.conf gitconfig
 INSTALL_TARGETS = ${SOURCES:S,^,${HOME}/.,}
 
@@ -13,6 +13,9 @@ install: ${INSTALL_TARGETS} ${INSTALL_PATHS} .PHONY
 
 # install Go package before Go binaries.
 go: pkg
+
+# install Rust to use cargo(1)
+rust: pkg
 
 # install vimrc before adding packs
 vim: ${HOME}/.vimrc vimrc.d

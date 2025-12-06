@@ -1,0 +1,15 @@
+# Copyright 2025 Samvel Khalatyan. All rights reserved.
+#
+# List of Go packages to install.
+
+# Format:
+#   package [flags]
+#
+# Example:
+#   foo
+#   foo --git https://github.com/bar/baz
+#
+# keep-sorted start
+typos-cli
+typos-lsp --git https://github.com/tekumara/typos-lsp
+# keep-sorted end
