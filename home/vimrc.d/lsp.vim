@@ -120,3 +120,58 @@ augroup LspCpp
   autocmd FileType c,cpp nmap <buffer> gpr <plug>(lsp-previous-reference)
   autocmd FileType c,cpp nmap <buffer> gsh <plug>(lsp-signature-help)
 augroup END
+
+augroup LspTypos
+  au!
+  autocmd User lsp_setup call lsp#register_server({
+      \ 'name': 'typos',
+      \ 'cmd': {server_info->['typos-lsp']},
+      \ 'whitelist': ['markdown'],
+      \ })
+  autocmd FileType markdown setlocal omnifunc=lsp#complete
+  autocmd FileType markdown nmap <buffer> gchi <plug>(lsp-call-hierarchy-incoming)
+  autocmd FileType markdown nmap <buffer> gcho <plug>(lsp-call-hierarchy-outgoing)
+  autocmd FileType markdown nmap <buffer> gca <plug>(lsp-code-action)
+  autocmd FileType markdown nmap <buffer> gcaf <plug>(lsp-code-action-float)
+  autocmd FileType markdown nmap <buffer> gcap <plug>(lsp-code-action-preview)
+  autocmd FileType markdown nmap <buffer> gcl <plug>(lsp-code-lens)
+  autocmd FileType markdown nmap <buffer> gd <plug>(lsp-declaration)
+  autocmd FileType markdown nmap <buffer> gpd <plug>(lsp-peek-declaration)
+  autocmd FileType markdown nmap <buffer> gd <plug>(lsp-definition)
+  autocmd FileType markdown nmap <buffer> gpd <plug>(lsp-peek-definition)
+  autocmd FileType markdown nmap <buffer> gds <plug>(lsp-document-symbol)
+  autocmd FileType markdown nmap <buffer> gdss <plug>(lsp-document-symbol-search)
+  autocmd FileType markdown nmap <buffer> gdd <plug>(lsp-document-diagnostics)
+  autocmd FileType markdown nmap <buffer> gh <plug>(lsp-hover)
+  autocmd FileType markdown nmap <buffer> ghf <plug>(lsp-hover-float)
+  autocmd FileType markdown nmap <buffer> ghp <plug>(lsp-hover-preview)
+  autocmd FileType markdown nmap <buffer> gpc <plug>(lsp-preview-close)
+  autocmd FileType markdown nmap <buffer> gpf <plug>(lsp-preview-focus)
+  autocmd FileType markdown nmap <buffer> gne <plug>(lsp-next-error)
+  autocmd FileType markdown nmap <buffer> gnenw <plug>(lsp-next-error-nowrap)
+  autocmd FileType markdown nmap <buffer> gpe <plug>(lsp-previous-error)
+  autocmd FileType markdown nmap <buffer> gpenw <plug>(lsp-previous-error-nowrap)
+  autocmd FileType markdown nmap <buffer> gnw <plug>(lsp-next-warning)
+  autocmd FileType markdown nmap <buffer> gnwnw <plug>(lsp-next-warning-nowrap)
+  autocmd FileType markdown nmap <buffer> gpw <plug>(lsp-previous-warning)
+  autocmd FileType markdown nmap <buffer> gpwnw <plug>(lsp-previous-warning-nowrap)
+  autocmd FileType markdown nmap <buffer> gnd <plug>(lsp-next-diagnostic)
+  autocmd FileType markdown nmap <buffer> gndnw <plug>(lsp-next-diagnostic-nowrap)
+  autocmd FileType markdown nmap <buffer> gpd <plug>(lsp-previous-diagnostic)
+  autocmd FileType markdown nmap <buffer> gpdnw <plug>(lsp-previous-diagnostic-nowrap)
+  autocmd FileType markdown nmap <buffer> gr <plug>(lsp-reference)
+  autocmd FileType markdown nmap <buffer> gr <plug>(lsp-rename)
+  autocmd FileType markdown nmap <buffer> gtd <plug>(lsp-type-definition)
+  autocmd FileType markdown nmap <buffer> gth <plug>(lsp-type-hierarchy)
+  autocmd FileType markdown nmap <buffer> gptd <plug>(lsp-peek-type-definition)
+  autocmd FileType markdown nmap <buffer> gws <plug>(lsp-workspace-symbol)
+  autocmd FileType markdown nmap <buffer> gwss <plug>(lsp-workspace-symbol-search)
+  autocmd FileType markdown nmap <buffer> gdf <plug>(lsp-document-format)
+  autocmd FileType markdown nmap <buffer> gdrf <plug>(lsp-document-range-format)
+  autocmd FileType markdown nmap <buffer> gi <plug>(lsp-implementation)
+  autocmd FileType markdown nmap <buffer> gpi <plug>(lsp-peek-implementation)
+  autocmd FileType markdown nmap <buffer> gs <plug>(lsp-status)
+  autocmd FileType markdown nmap <buffer> gnr <plug>(lsp-next-reference)
+  autocmd FileType markdown nmap <buffer> gpr <plug>(lsp-previous-reference)
+  autocmd FileType markdown nmap <buffer> gsh <plug>(lsp-signature-help)
+augroup END
