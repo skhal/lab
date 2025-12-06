@@ -17,7 +17,7 @@ Important [packages](https://github.com/skhal/lab/blob/63436f8239a1447b062f5d64d
 -	`go125` for Go
 -	`llvm21` for Vim LSP with `clangd`
 -	`tmux` terminal multiplexer
--	`unversal-ctags` for Vim tagbar with C++
+-	`universal-ctags` for Vim tagbar with C++
 
 It also installs statically linked Go [binaries](https://github.com/skhal/lab/blob/63436f8239a1447b062f5d64dbafd0349642bc58/home/go/bin/packages.txt) (static linking makes it work in Linux jails with shared home folder):
 
