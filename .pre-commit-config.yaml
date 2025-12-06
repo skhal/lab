@@ -114,6 +114,11 @@ repos:
     types: [textproto]
     exclude: "testdata"
     args: ["-skip_all_colons"]
+  - id: typos
+    name: typos
+    entry: typos
+    language: system
+    types: [text]
   - id: yaml-format
     name: yaml-format
     entry: yamlfmt
