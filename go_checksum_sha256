@@ -2,3 +2,5 @@ SHA256 (go1.25.3.linux-amd64.tar.gz) = 0335f314b6e7bfe08c3d0cfaa7c19db961b7b99fb
 SHA256 (go1.25.3.freebsd-amd64.tar.gz) = 77a36eef352609f616813ec710274d122738510b62efd0fac1435cb480a07170
 SHA256 (go1.25.4.linux-amd64.tar.gz) = 9fa5ffeda4170de60f67f3aa0f824e426421ba724c21e133c1e35d6159ca1bec
 SHA256 (go1.25.4.freebsd-amd64.tar.gz) = 6256dad7368f8b4d7ddbeb80ed98b3368a553df7b17dad18894f0637840f6d50
+SHA256 (go1.25.5.linux-amd64.tar.gz) = 9e9b755d63b36acf30c12a9a3fc379243714c1c6d3dd72861da637f336ebb35b
+SHA256 (go1.25.5.freebsd-amd64.tar.gz) = a2d2b2aeb218bd646fd8708bacc96c9d4de1b6c9ea48ceb9171e9e784f676650

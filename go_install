@@ -10,7 +10,7 @@ set -e
 # keep-sorted start
 readonly CACHE_PATH=${HOME}/.cache/go_install
 readonly GO_ROOT_PREFIX=/usr/local
-readonly GO_VERSION=${GO_VERSION:-1.25.4}
+readonly GO_VERSION=${GO_VERSION:-1.25.5}
 readonly LOG_PATH=go_install.log # relative to TMPDIR
 # keep-sorted end
 
