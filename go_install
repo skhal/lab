@@ -74,7 +74,7 @@ download() {
 }
 
 extract() {
-  local os=${1:?'exract: missing os'}
+  local os=${1:?'extract: missing os'}
   local url
   url=$(make_url ${os})
   local archive
@@ -88,7 +88,7 @@ extract() {
 }
 
 patch_from() {
-  local os=${1:?'exract: missing os'}
+  local os=${1:?'patch_from: missing os'}
   local url
   url=$(make_url ${os})
   local archive
@@ -115,6 +115,9 @@ install() {
   local goroot
   goroot=$(make_goroot)
   echo ".. install ${goroot} [need sudo]"
+  if test -d ${goroot}; then
+    sudo rm -rf ${goroot}
+  fi
   sudo mv -i ${PWD}/go ${goroot}
 }
 
