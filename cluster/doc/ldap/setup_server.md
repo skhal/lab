@@ -118,17 +118,12 @@ The configuration file is ready, import it into a configuration database:
 
 ```console
 # mkdir /usr/local/etc/openldap/slapd.d
+# mkdir /var/db/openldap-data/lab.net
 # /usr/local/sbin/slapadd -n0 -F /usr/local/etc/openldap/slapd.d/ -l /usr/local/etc/openldap/slapd.ldif
 ```
 
 Bootstrap filesystem
 --------------------
-
-Create a folder to store `dc=lab,dc=net` database:
-
-```console
-# mkdir /var/db/openldap-data/lab.net
-```
 
 slapd(8) will run as `ldap:ldap` user. Fix permissions to the server configuration and databases:
 
