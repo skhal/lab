@@ -54,3 +54,12 @@ Use SSH keys to sign commits. Generate a key with ssh-keygen(1). Upload the publ
 % git config --global gpg.format ssh
 % git config --global user.signingkey $HOME/.ssh/id_github.pub
 ```
+
+Users & Groups
+--------------
+
+Add user `op` to the `:wheel` group (don't make LDAP an authoritative source for this, don't store wheel in LDAP for security reasons. We want local system be authoritative source for root, wheel, and other widely used groups).
+
+```console
+# pw groupmod -n wheel -m op.
+```
