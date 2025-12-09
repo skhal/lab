@@ -28,6 +28,16 @@ It also installs statically linked Go [binaries](https://github.com/skhal/lab/bl
 Applications
 ============
 
+Doas
+----
+
+Give privileges to the members of `:op` group install packages:
+
+```console
+% cat /usr/local/etc/doas.conf
+permit nopass :op cmd pkg
+```
+
 Git
 ---
 
