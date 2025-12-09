@@ -226,14 +226,12 @@ Update access to the configuration database:
 # slapcat -n0 | diff -u - /tmp/slapd.ldif
 --- -   2025-09-26 20:52:07.357710000 -0500
 +++ /tmp/slapd.ldif     2025-09-26 20:50:22.724090000 -0500
-@@ -574,7 +574,10 @@
+@@ -574,7 +574,8 @@
  dn: olcDatabase={0}config,cn=config
  objectClass: olcDatabaseConfig
  olcDatabase: {0}config
 -olcAccess: {0}to *  by * none
-+olcAccess: {0}to *
-+  by dn.exact=gidNumber=0+uidNumber=0,cn=peercred,cn=external,cn=auth manage
-+  by * break
++olcAccess: {0}to * by dn.exact=gidNumber=0+uidNumber=0,cn=peercred,cn=external,cn=auth manage by * break
 +olcAccess: {0}to * by * none
  olcAddContentAcl: TRUE
  olcLastMod: TRUE
