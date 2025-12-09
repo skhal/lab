@@ -1,5 +1,0 @@
-# ldapmodify
-dn: cn=%sudoer,ou=sudoers,dc=lab,dc=net
-changeType: modify
-add: sudoCommand
-sudoCommand: /usr/bin/mv

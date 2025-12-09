@@ -12,3 +12,8 @@ objectClass: sudoRole
 sudoUser: %sudoer
 sudoHost: ALL
 sudoCommand: /usr/bin/apt
+sudoCommand: /usr/bin/apt-file
+sudoCommand: /usr/bin/ln
+sudoCommand: /usr/bin/mv
+sudoCommand: /usr/bin/rm
+sudoCommand: /usr/bin/tee
