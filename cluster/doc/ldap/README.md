@@ -10,3 +10,4 @@ The instructions describe how to setup an LDAP server and configure clients to u
 
 -	[Server setup](./setup_server.md)
 -	[Client setup](./setup_client.md)
+-	[Sudo schema](./sudo.md)
