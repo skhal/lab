@@ -4,6 +4,7 @@ cc_library(
     name = "find",
     srcs = ["find.cc"],
     hdrs = ["find.h"],
+    implementation_deps = ["@abseil-cpp//absl/status"],
     visibility = ["//visibility:public"],
     deps = ["@abseil-cpp//absl/status:statusor"],
 )
@@ -14,6 +15,7 @@ cc_test(
     deps = [
         ":find",
         "@abseil-cpp//absl/status:status_matchers",
+        "@abseil-cpp//absl/status:statusor",
         "@abseil-cpp//absl/strings",
         "@abseil-cpp//absl/strings:str_format",
         "@googletest//:gtest",

@@ -6,8 +6,8 @@ cc_library(
     name = "cache",
     srcs = ["cache.cc"],
     hdrs = ["cache.h"],
+    implementation_deps = ["@abseil-cpp//absl/base:core_headers"],
     visibility = ["//visibility:public"],
-    deps = ["@abseil-cpp//absl/base:core_headers"],
 )
 
 cc_test(
