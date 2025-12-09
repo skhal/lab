@@ -55,6 +55,18 @@ Use SSH keys to sign commits. Generate a key with ssh-keygen(1). Upload the publ
 % git config --global user.signingkey $HOME/.ssh/id_github.pub
 ```
 
+Packages
+--------
+
+Use latest package for development:
+
+```console
+% cat /usr/local/etc/pkg/repos/FreeBSD.conf
+FreeBSD-ports: {
+  url: "pkg+https://pkg.FreeBSD.org/${ABI}/latest",
+}
+```
+
 Users & Groups
 --------------
 
