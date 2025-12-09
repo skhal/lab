@@ -1,6 +1,0 @@
-dn: cn=wheel,ou=groups,dc=lab,dc=net
-cn: wheel
-objectClass: top
-objectClass: posixGroup
-gidNumber: 0
-memberUid: root op
