@@ -17,4 +17,5 @@ root/.login
 root/.profile
 root/.shrc
 usr/local/etc/doas.conf
+usr/local/etc/pkg.conf
 usr/local/etc/pkg/repos

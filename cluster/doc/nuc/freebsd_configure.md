@@ -323,7 +323,7 @@ Given this setup, It is optional to disable compression all together in newsyslo
     31	/etc/rc.d/auditd /etc/rc.d/bsnmpd /etc/rc.d/hastd /etc/rc.d/ntpdate /etc/rc.d/power_profile /etc/rc.d/pwcheck /etc/rc.d/savecore /etc/rc.d/watchdogd
 ```
 
-In result, rc-messages prior to `syslogd(8)` are only availalbe in console. The first ones are from `auditd` service in `/var/log/messages`:
+In result, rc-messages prior to `syslogd(8)` are only available in console. The first ones are from `auditd` service in `/var/log/messages`:
 
 ```
 Aug 29 14:40:08 nuc kernel: em0: link state changed to UP
@@ -369,4 +369,14 @@ permit nopass op cmd shutdown
 permit nopass op cmd sockstat
 permit nopass op cmd sysrc
 permit nopass op cmd top
+```
+
+Packages
+--------
+
+Add pkg(8) alias to list vital packages that are note removed with `pkg delete -a` ([ref](https://github.com/freebsd/pkg/issues/2485)\):
+
+```fetch
+# fetch -o /tmp https://github.com/skhal/lab/raw/refs/heads/main/cluster/doc/nuc/data/pkg.conf.diff
+# patch /usr/local/etc/pkg.conf < /tmp/pkg.conf.diff
 ```
