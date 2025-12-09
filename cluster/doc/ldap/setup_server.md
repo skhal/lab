@@ -107,21 +107,11 @@ First, modify the default configuration settings in `slapd.ldif` configuration f
 	-	Add indices to speed up user account lookups.
 	-	Restrict DB access using Access Control Lists (ACLs)
 
-Patch the configuration file:
+Patch the configuration file ([server/slapd.ldif.diff](server/slapd.ldif.diff)\):
 
 ```console
-# patch -R /usr/local/etc/openldap/slapd.ldif < ~/slapd.ldif.diff
-Hmm...  Looks like a unified diff to me...
-The text leading up to this was:
---------------------------
-|--- /usr/local/etc/openldap/slapd.ldif.sample  2025-08-09 02:08:12.000000000 -0500
-|+++ /usr/local/etc/openldap/slapd.ldif 2025-09-26 17:54:04.466570000 -0500
---------------------------
-Patching file /usr/local/etc/openldap/slapd.ldif using Plan A...
-Hunk #1 succeeded at 39.
-Hunk #2 succeeded at 70.
-Hunk #3 succeeded at 82.
-done
+# fetch -o /tmp https://github.com/skhal/lab/raw/refs/heads/main/cluster/doc/ldap/server/slapd.ldif.diff
+# patch -R /usr/local/etc/openldap/slapd.ldif < /tmp/slapd.ldif.diff
 ```
 
 The configuration file is ready, import it into a configuration database:
