@@ -22,17 +22,8 @@ setenv	PAGER	less
 
 if ($?prompt) then
 	# An interactive shell -- set some stuff up
-
-	# force %c to represent skipped path components with `...`, csh(1)
-	set ellipsis
-
-	# ref: https://en.wikipedia.org/wiki/ANSI_escape_code
-	set esc_cyan_ = "%{\033[;36m%}"
-	set esc_yellow_ = "%{\033[;33m%}"
-	set esc_reset_ = "%{\033[m%}"
-	set prompt = "${esc_yellow_}%N${esc_reset_}@%m:${esc_cyan_}%c03${esc_reset_} %# "
+	set prompt = "%N@%m:%~ %# "
 	set promptchars = "%#"
-	unset esc_cyan_ esc_yellow_ esc_reset_
 
 	set filec
 	set history = 1000

@@ -1,3 +1,4 @@
+ifconfig_igc0_ipv6="inet6 accept_rtadv"
 ifconfig_igc0="DHCP"
 cloned_interfaces="bridge0 bridge1"
 ifconfig_bridge0="addm igc0 up descr jail:ext"

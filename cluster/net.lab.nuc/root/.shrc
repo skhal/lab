@@ -1,5 +1,5 @@
 #
-# .shrc - bourne shell startup file 
+# .shrc - bourne shell startup file
 #
 # This file will be used if the shell is invoked for interactive use and
 # the environment variable ENV is set to this file.
@@ -24,7 +24,7 @@
 # alias ll='ls -laFo'
 # alias l='ls -l'
 # alias g='egrep -i'
- 
+
 # # be paranoid
 # alias cp='cp -ip'
 # alias mv='mv -i'
@@ -34,9 +34,11 @@
 bind ^[[A ed-search-prev-history
 bind ^[[B ed-search-next-history
 
-# # ctrl+arrow allow to jump from words to words
+# # Ctrl+right arrow: go to the next word
+# # Ctrl+left arrow: go to the previous word
 bind "\\e[1;5C" em-next-word
 bind "\\e[1;5D" ed-prev-word
+
 alias history='fc -l'
 
 # Fix home/del for mobaxterm
@@ -47,13 +49,8 @@ bind ^[[6~ ed-move-to-end
 # EISDIR errors from each directory encountered.
 # alias grep='grep -d skip'
 
-# ref: https://en.wikipedia.org/wiki/ANSI_escape_code
-esc_cyan_="\\e[;36m"
-esc_red_="\\e[;31m"
-esc_reset_="\\e[m"
-# set prompt: ``username@hostname:directory $ '' 
-PS1="${esc_red_}\u${esc_reset_}@\h:${esc_cyan_}\w${esc_reset_} \\$ "
-unset esc_cyan_ esc_red_ esc_reset_
+# set prompt: ``username@hostname:directory $ ''
+PS1="\u@\h:\w \\$ "
 
 # search path for cd(1)
 # CDPATH=:$HOME
