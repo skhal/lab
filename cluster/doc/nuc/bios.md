@@ -9,6 +9,7 @@ Configuration
 -	Set date and time in UTC
 -	Disable "Secure Boot" to boot non-Windows OS, [ref](https://www.asus.com/global/support/faq/1044664/).
 -	Disable PCIe ASPM Support, [ref](https://superuser.com/questions/1822809/why-does-disabling-active-power-management-in-bios-double-nvme-speed)
+-	Disable Bluetooth
 
 Update
 ======
