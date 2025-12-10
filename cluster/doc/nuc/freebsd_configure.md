@@ -147,6 +147,7 @@ There are many helpful examples of basic pf(4) configuration available in `/usr/
 
 ```
 ext_if = "igc0"
+int_if = "bridge1"
 
 tcp_services = "{ domain, http, https, ntp, ssh }"
 udp_services = "{ domain, ntp }"
@@ -165,6 +166,7 @@ pass inet proto icmp all icmp-type $icmp_types keep state
 
 # ssh
 pass in inet proto tcp to $ext_if port ssh
+pass in inet proto tcp to $int_if port ssh
 ```
 
 Use pfctl(8) to manage PF:

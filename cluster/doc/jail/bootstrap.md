@@ -1,7 +1,7 @@
 Name
 ====
 
-**boostrap** - bootstrap FreeBSD to host jails
+**bootstrap** - bootstrap FreeBSD to host jails
 
 ZFS
 ===
@@ -93,14 +93,15 @@ Create a second bridge for local, intra-jail traffic:
 ```console
 % doas sysrc -f /etc/rc.conf.d/network cloned_interfaces+=bridge1
 cloned_interfaces: 'bridge0' -> bridge0 bridge1
-% doas sysrc -f /etc/rc.conf.d/network ifconfig_bridge1='up descr jail:int'
+% doas sysrc -f /etc/rc.conf.d/network ifconfig_bridge1='inet 10.0.1.101/24 up descr jail:int'
 ifconfig_bridge1: '' -> up descr jail:int
 ```
 
 The new bridge has the following properties:
 
-1.	there are no connected Ethernet adapters.
-2.	it has `jail:int` marker in the description to indicate that the bridge is for intra-jail traffic.
+1.	it has an IP assigned.
+2.	there are no connected Ethernet adapters.
+3.	it has `jail:int` marker in the description to indicate that the bridge is for intra-jail traffic.
 
 Create an epair(4) for each jail, a virtual back-to-back connected Ethernet interface, with two sides:
 
