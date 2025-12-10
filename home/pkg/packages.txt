@@ -7,6 +7,9 @@
 
 # keep-sorted start
 bash
+catch2
+ccache
+cmake
 doas
 git
 go125
@@ -19,8 +22,8 @@ pam_mkhomedir
 pkg
 py311-cppman
 py311-pre-commit
-rust
 rsync
+rust
 tmux
 tree
 universal-ctags
