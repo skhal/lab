@@ -38,6 +38,22 @@ Give privileges to the members of `:op` group install packages:
 permit nopass :op cmd pkg
 ```
 
+Fonts
+-----
+
+`webfonts` package installs fonts. Re-generate font cache files:
+
+```console
+# fc-cache -f
+```
+
+Validate - should be non-empty list of installed fonts:
+
+```console
+% fc-list | wc -l
+  30
+```
+
 Git
 ---
 

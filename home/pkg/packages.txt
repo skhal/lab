@@ -13,6 +13,7 @@ cmake
 doas
 git
 go125
+graphviz
 groff
 llvm21
 nss_ldap
@@ -29,4 +30,5 @@ tree
 universal-ctags
 unzip
 vim
+webfonts
 # keep-sorted end
