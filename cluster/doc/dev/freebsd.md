@@ -10,6 +10,14 @@ Bootstrap
 % pkg install FreeBSD-ssh FreeBSD-bmake doas
 ```
 
+Configure ssh:
+
+```
+# sysrc -f /etc/rc.conf.d/sshd sshd_enable=yes
+# fetch -o /tmp https://raw.githubusercontent.com/skhal/lab/refs/heads/main/cluster/doc/dev/data/sshd_config.diff
+# patch -i /tmp/sshd_config.diff /etc/ssh/sshd_config
+```
+
 Install
 =======
 
@@ -41,8 +49,8 @@ Doas
 Give privileges to the members of `:op` group install packages:
 
 ```console
-% cat /usr/local/etc/doas.conf
-permit nopass :op cmd pkg
+# fetch -o /tmp https://raw.githubusercontent.com/skhal/lab/refs/heads/main/cluster/doc/dev/data/doas.conf
+# mv /tmp/doas.conf /usr/local/etc/
 ```
 
 Fonts
