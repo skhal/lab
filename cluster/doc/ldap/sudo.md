@@ -15,7 +15,7 @@ Fetch OpenLDAP schema for sudo(8):
 Convert it to LDIF:
 
 ```console
-% echo "include /tmp/sudo.schame" > /tmp/ldap_sudo.conf
+% echo "include /tmp/sudo.schema" > /tmp/ldap_sudo.conf
 % mkdir /tmp/ldap_sudo
 % slaptest -F /tmp/ldap_sudo -f /tmp/ldap_sudo.conf
 % slapcat -n0 -F /tmp/ldap_sudo -l /tmp/ldap_sudo_slapd.ldif
