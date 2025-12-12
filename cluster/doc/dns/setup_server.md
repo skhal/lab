@@ -30,7 +30,8 @@ And then restarting syslogd with: service syslogd restart
 Enable the service:
 
 ```console
-# mkdir /usr/local/etc/rc.conf.d
+# mkdir -v /usr/local/etc/rc.conf.d
+/usr/local/etc/rc.conf.d
 # sysrc -f /usr/local/etc/rc.conf.d/named named_enable=yes
 named_enable:  -> yes
 ```
@@ -50,7 +51,7 @@ Patch the configuration file:
 
 ```console
 # fetch -o /tmp https://github.com/skhal/lab/raw/refs/heads/main/cluster/doc/dns/server/named.conf.diff
-# patch /usr/local/etc/namedb/named.conf < /tmp/named.conf.diff
+# patch -i /tmp/named.conf.diff /usr/local/etc/namedb/named.conf
 ```
 
 Configure resolver to use local DNS server:
@@ -68,7 +69,7 @@ Zone lab.net
 Store zones in `zones.conf.d` folder:
 
 ```console
-# mkdir /usr/local/etc/namedb/zones.conf.d
+# mkdir -v /usr/local/etc/namedb/zones.conf.d
 # fetch -o /usr/local/etc/namedb/zones.conf.d https://github.com/skhal/lab/raw/refs/heads/main/cluster/doc/dns/server/zones.conf.d/lab.net.conf
 ```
 
