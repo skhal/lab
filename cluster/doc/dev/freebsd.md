@@ -75,15 +75,14 @@ Git
 Set user name and email for commit messages:
 
 ```console
-% git config --global user.name 'Samvel Khalatyan'
-% git config --global user.email sn.khalatyan@gmail.com
+% git config --global user.name 'John Doe'
+% git config --global user.email john.doe@example.com
 ```
 
-Use SSH keys to sign commits. Generate a key with ssh-keygen(1). Upload the public key to GitHub. Place the public key into the environment with git(1), say `~/.ssh//id_github.pub`\):
+Use SSH keys to sign commits ([ref](https://docs.github.com/en/authentication/managing-commit-signature-verification/signing-commits)). Generate a key with ssh-keygen(1). Upload the public key to GitHub. Place the public key into the environment with git(1), say `~/.ssh//id_github.pub`\):
 
 ```console
-% git config --global gpg.format ssh
-% git config --global user.signingkey $HOME/.ssh/id_github.pub
+% git config --global user.signingkey ~/.ssh/id_github.pub
 ```
 
 Packages
