@@ -208,11 +208,7 @@ Apt
 Use Universe and Multiverse sources to apt(8)
 
 ```console
-% doas jexec ubuntu chroot /compat/jammy cat /etc/apt/sources.list
-deb http://archive.ubuntu.com/ubuntu jammy main universe restricted multiverse
-deb http://security.ubuntu.com/ubuntu/ jammy-security universe multiverse restricted main
-deb http://archive.ubuntu.com/ubuntu jammy-backports universe multiverse restricted main
-deb http://archive.ubuntu.com/ubuntu jammy-updates universe multiverse restricted main
+% doas jexec ubuntu fetch -o /compat/jammy/etc/apt/ https://raw.githubusercontent.com/skhal/lab/refs/heads/main/cluster/doc/jail/data/sources.list
 ```
 
 Upgrade user land:
