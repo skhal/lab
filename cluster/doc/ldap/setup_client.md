@@ -110,7 +110,7 @@ Keep in mind that PAM LDAP uses `/usr/local/etc/ldap.conf` for configuration, co
 
 ```console
 # fetch -o /tmp https://raw.githubusercontent.com/skhal/lab/refs/heads/main/cluster/doc/ldap/client/ldap.conf.diff
-# patch -i /tmp/ldap.conf.diff /usr/local/etc/openldap/ldap.conf
+# patch -i /tmp/ldap.conf.diff /usr/local/etc/ldap.conf
 ```
 
 PAM policies reside under `/etc/pam.d` in pam.conf(5) format (or `/usr/local/etc/pam.d` for installed packages). Patch SSH policy to use LDAP:
