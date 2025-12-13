@@ -223,12 +223,10 @@ Install:
 Enable nslcd(8) service:
 
 ```console
-% doas jexec jammy head /etc/rc.{,shutdown.}local
-==> /etc/rc.local <==
-chroot /compat/jammy /usr/sbin/service nslcd start
-
-==> /etc/rc.shutdown.local <==
-chroot /compat/jammy /usr/sbin/service nslcd stop
+% doas jexec jammy fetch -o /tmp https://raw.githubusercontent.com/skhal/lab/refs/heads/main/cluster/doc/jail/data/nslcd/rc.local
+% mv -vn /tmp/rc.local /etc/
+% doas jexec jammy fetch -o /tmp https://raw.githubusercontent.com/skhal/lab/refs/heads/main/cluster/doc/jail/data/nslcd/rc.shutdown.local
+% mv -vn /tmp/rc.shutdown.local /etc/
 ```
 
 Restart the jail. Verify:

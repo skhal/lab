@@ -1,0 +1,1 @@
+chroot /compat/jammy /usr/sbin/service nslcd stop
