@@ -5,8 +5,14 @@
 [alias]
   x = log --all --decorate --oneline --graph --max-count=10
 
+[commit]
+	gpgsign = true
+
 [core]
   pager = less -x3,5
 
 [include]
   path = ~/.gitconfig.local
+
+[gpg]
+	format = ssh
