@@ -1,0 +1,3 @@
+# ssh uses LDAP - start LDAP first
+chroot /compat/jammy /usr/sbin/service nslcd start
+chroot /compat/jammy /usr/sbin/service ssh start

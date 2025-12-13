@@ -1,0 +1,3 @@
+# ssh uses LDAP - shut it down first
+chroot /compat/jammy /usr/sbin/service ssh stop
+chroot /compat/jammy /usr/sbin/service nslcd stop

@@ -260,23 +260,16 @@ Secure Shell (SSH)
 Listen on local address, allow only users from `ssh` group:
 
 ```console
-% doas jexec jammy chroot /compat/jammy su -
-root@jail:jammy :~ # cat /etc/ssh/sshd_config.d/lab.net.conf
-ListenAddress=192.168.1.12
-AllowGroups=ssh
+% doas jexec jammy fetch -o /compat/jammy/etc/ssh/sshd_config.d/ https://raw.githubusercontent.com/skhal/lab/refs/heads/main/cluster/doc/jail/data/sshd_config.d/lab.net.conf
 ```
 
 Enable the service:
 
 ```console
-% doas jexec jammy head /etc/rc.{,shutdown.}local
-==> /etc/rc.local <==
-chroot /compat/jammy /usr/sbin/service nslcd start
-chroot /compat/jammy /usr/sbin/service ssh start
-
-==> /etc/rc.shutdown.local <==
-chroot /compat/jammy /usr/sbin/service ssh stop
-chroot /compat/jammy /usr/sbin/service nslcd stop
+% doas jexec jammy fetch -o /tmp https://raw.githubusercontent.com/skhal/lab/refs/heads/main/cluster/doc/jail/data/rc.local
+% mv -v /tmp/rc.local /etc/
+% doas jexec jammy fetch -o /tmp https://raw.githubusercontent.com/skhal/lab/refs/heads/main/cluster/doc/jail/data/rc.shutdown.local
+% mv -v /tmp/rc.shutdown.local /etc/
 ```
 
 **Warning**: make sure to start/stop `ssh` after/before `nslcd`. SSH uses LDAP to authenticate users.
