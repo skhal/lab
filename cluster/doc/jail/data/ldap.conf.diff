@@ -1,0 +1,19 @@
+--- /etc/ldap/ldap.conf.sample	2025-12-13 15:47:46.409010000 -0600
++++ /etc/ldap/ldap.conf	2025-12-13 15:48:55.825488000 -0600
+@@ -5,13 +5,12 @@
+ # See ldap.conf(5) for details
+ # This file should be world readable but not world writable.
+
+-#BASE	dc=example,dc=com
+-#URI	ldap://ldap.example.com ldap://ldap-provider.example.com:666
++BASE	dc=lab,dc=net
++URI	ldap://ldap.lab.net
+
+ #SIZELIMIT	12
+ #TIMELIMIT	15
+ #DEREF		never
+
+ # TLS certificates (needed for GnuTLS)
+-TLS_CACERT	/etc/ssl/certs/ca-certificates.crt
+-
++#TLS_CACERT	/etc/ssl/certs/ca-certificates.crt

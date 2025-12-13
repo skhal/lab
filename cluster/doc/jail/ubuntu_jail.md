@@ -171,23 +171,17 @@ dns.lab.net.	3600	IN	A	10.0.1.2
 Name Service Switch (NSS)
 -------------------------
 
-Verify LDAP server is reachable (use `ldap.lab.net` in URI):
+Ensure LDAP server is reachable (use `ldap.lab.net` in URI). Install LDAP tools:
 
 ```console
 % doas jexec jammy chroot /compat/jammy apt install ldap-utils
-% doas jexec jammy chroot /compat/jammy diff /etc/ldap/ldap.conf{.sample,}
-8,9c8,10
-< #BASE	dc=example,dc=com
-< #URI	ldap://ldap.example.com ldap://ldap-provider.example.com:666
----
-> BASE	dc=lab,dc=net
-> URI	ldap://ldap.lab.net
-> SUDOERS_BASE ou=sudoers,dc=lab,dc=net
-16,17c17
-< TLS_CACERT	/etc/ssl/certs/ca-certificates.crt
-<
----
-> #TLS_CACERT	/etc/ssl/certs/ca-certificates.crt
+% doas jexec jammy fetch -o /compat/jammy/tmp https://raw.githubusercontent.com/skhal/lab/refs/heads/main/cluster/doc/jail/data/ldap.conf.diff
+% doas jexec jammy chroot /compat/jammy patch -i /tmp/ldap.conf.diff /etc/ldap/ldap.conf
+```
+
+Verify:
+
+```console
 % doas jexec jammy chroot /compat/jammy ldapsearch -x -s base
 # extended LDIF
 #
@@ -213,16 +207,18 @@ result: 0 Success
 # numEntries: 1
 ```
 
-Install `libnss-ldapd` with the following configuraiton:
+Add `libnss-ldapd` with the following configuration:
 
 -	Host: `ldap.lab.net`
 -	Base: `dc=lab,dc=net`
 -	Services: `passwd` and `group`
 -	TLS: none
 
-	```console
-	% doas jexec jammy chroot /compat/jammy apt install libnss-ldapd
-	```
+Install:
+
+```console
+% doas jexec jammy chroot /compat/jammy apt install libnss-ldapd
+```
 
 Enable nslcd(8) service:
 
