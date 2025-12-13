@@ -46,35 +46,9 @@ We'll use a temporary jail to configure the template, with configuration in `/tm
 Start a temporary jail with path set to the template location:
 
 ```console
-% cat /tmp/ubuntu.conf
-ubuntu {
-  host.hostname = "${name}.lab.net";
-  path = "/jail/template/Ubuntu-22.04";
-
-  interface = "igc0";
-  ip4.addr = "192.168.1.254";
-
-  allow.mount.devfs;
-  allow.mount.fdescfs;
-  allow.mount.linprocfs;
-  allow.mount.linsysfs;
-  allow.mount.procfs;
-  allow.mount.tmpfs;
-  allow.mount;
-  allow.raw_sockets;
-
-  mount.devfs;
-  devfs_ruleset = 5;
-
-  enforce_statfs = 1;
-
-  exec.clean;
-  exec.consolelog = "/var/log/jail_${name}.log";
-
-  exec.start = "/bin/sh /etc/rc";
-  exec.stop = "/bin/sh /etc/rc.shutdown";
-}
-% doas jail -cm -f /tmp/ubuntu.conf
+% fetch -o /tmp https://raw.githubusercontent.com/skhal/lab/refs/heads/main/cluster/doc/jail/data/jail.conf.d/ubuntu_bootstrap.conf
+% : update the path in /tmp/ubuntu_bootstrap.conf
+% doas jail -cm -f /tmp/ubuntu_bootstrap.conf
 ubuntu: created
 ```
 
@@ -155,7 +129,7 @@ boot  etc lib lib64 media opt root  sbin  sys usr
 Stop the jail:
 
 ```console
-% doas jail -r -f /tmp/ubuntu.conf ubuntu
+% doas jail -r -f /tmp/ubuntu_bootstrap.conf ubuntu
 ubuntu: removed
 ```
 
@@ -165,40 +139,9 @@ Configure
 Some of the configuration steps such as apt(8) need access to mountpoints like `/dev`. Modify the jail's temporary configuration to include mounts:
 
 ```console
-% cat /tmp/ubuntu.conf
-ubuntu {
-  host.hostname = "${name}.lab.net";
-  path = "/jail/template/Ubuntu-22.04";
-
-  interface = "igc0";
-  ip4.addr = "192.168.1.254";
-
-  allow.mount.devfs;
-  allow.mount.fdescfs;
-  allow.mount.linprocfs;
-  allow.mount.linsysfs;
-  allow.mount.procfs;
-  allow.mount.tmpfs;
-  allow.mount;
-  allow.raw_sockets;
-
-  mount += "devfs     $path/compat/jammy/dev     devfs     rw 0 0";
-  mount += "fdescfs   $path/compat/jammy/dev/fd  fdescfs   rw,linrdlnk 0 0";
-  mount += "linprocfs $path/compat/jammy/proc    linprocfs rw 0 0";
-  mount += "linsysfs  $path/compat/jammy/sys     linsysfs  rw 0 0";
-  mount += "tmpfs     $path/compat/jammy/dev/shm tmpfs     rw,size=1g,mode=1777 0 0";
-  mount.devfs;
-  devfs_ruleset = 5;
-
-  enforce_statfs = 1;
-
-  exec.clean;
-  exec.consolelog = "/var/log/jail_${name}.log";
-
-  exec.start = "/bin/sh /etc/rc";
-  exec.stop = "/bin/sh /etc/rc.shutdown";
-}
-% doas jail -cm -f /tmp/ubuntu.conf
+% fetch -o /tmp https://raw.githubusercontent.com/skhal/lab/refs/heads/main/cluster/doc/jail/data/jail.conf.d/ubuntu_config.conf
+% : update the path in /tmp/ubuntu_config.conf
+% doas jail -cm -f /tmp/ubuntu_config.conf
 ubuntu: created
 ```
 
@@ -270,7 +213,7 @@ Snapshot
 Stop the jail:
 
 ```console
-% doas jail -r -f /tmp/ubuntu.conf ubuntu
+% doas jail -r -f /tmp/ubuntu_config.conf ubuntu
 ubuntu: removed
 ```
 
