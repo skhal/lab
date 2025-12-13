@@ -198,6 +198,12 @@ Copy `.cshrc`:
 # cp /root/.cshrc /jail/template/Ubuntu-22.04/compat/jammy/root/
 ```
 
+Set password:
+
+```console
+% doas jexec ubuntu chroot /compat/jammy passwd
+```
+
 Timezone
 --------
 
