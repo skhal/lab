@@ -6,6 +6,8 @@
 # List of FreeBSD packages to install. Keep one package per line.
 
 # keep-sorted start
+FreeBSD-libexecinfo-dev-15.0
+FreeBSD-utilities-dev-15.0
 bash
 catch2
 ccache
