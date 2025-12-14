@@ -1,0 +1,39 @@
+--- /usr/local/etc/nginx/nginx.conf-dist  2025-12-03 20:46:15.000000000 -0600
++++ /usr/local/etc/nginx/nginx.conf 2025-12-14 09:46:24.101067000 -0600
+@@ -38,18 +38,31 @@
+     #gzip  on;
+
+     server {
+-        listen       80;
++        listen       192.168.1.4:80;
+         server_name  localhost;
+
+         #charset koi8-r;
+
+         #access_log  logs/host.access.log  main;
+
+-        location / {
+-            root   /usr/local/www/nginx;
+-            index  index.html index.htm;
+-        }
++        #location / {
++        #    root   /usr/local/www/nginx;
++        #    index  index.html index.htm;
++        #}
+
++        location ~ ^/~([[:lower:]]+)/([[:alnum:]/\.]*)?$ {
++            autoindex on;
++            index off;
++
++            alias /home/$1/www/$2;
++
++            add_header Cache-Control "no-store, no-cache";
++            add_header X-Content-Type-Options "nosniff";
++
++            allow 192.168.1.0/24;
++            deny all;
++ }
++
+         #error_page  404              /404.html;
+
+         # redirect server error pages to the static page /50x.html
