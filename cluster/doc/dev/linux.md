@@ -57,11 +57,17 @@ LLVM Ubuntu [instructions](https://apt.llvm.org) cover two installation methods:
 Use Ubuntu repo for better control of the system:
 
 ```console
-% cat /etc/apt/sources.list.d//llvm.list
+% cat <<EOF | sudo tee /etc/apt/sources.list.d//llvm.list
 # Ref: https://apt.llvm.org
 deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-21 main
 deb-src http://apt.llvm.org/jammy/ llvm-toolchain-jammy-21 main
-# wget -qO- https://apt.llvm.org/llvm-snapshot.gpg.key | sudo tee /etc/apt/trusted.gpg.d/apt.llvm.org.asc
+EOF
+```
+
+Update the keys:
+
+```console
+% wget -qO- https://apt.llvm.org/llvm-snapshot.gpg.key | sudo tee /etc/apt/trusted.gpg.d/apt.llvm.org.asc
 ```
 
 Install Clang and co:
