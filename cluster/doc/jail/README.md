@@ -14,12 +14,12 @@ There are two parts to jails setup:
 
 2.	Create and manage jails. The jails split into a template and a running container using ZFS datasets. Such setup allows quick spawn of jails by cloning templates into new containers.
 
-Start with FreeBSD jail instructions to create an isolated userland:
+Start with FreeBSD jail instructions to create an isolated user lands using freebsd-base(7):
 
 -	[FreeBSD template](./freebsd_template.md)
 -	[FreeBSD jail](./freebsd_jail.md)
 
-A Linux environment departures from the FreeBSD setup. It adds Linux Compatibility layer to the FreeBSD setup, bootstrapped at `/compat/<distribution>` prefix, to provide Linux userland:
+A Linux environment departures from the FreeBSD setup. It adds Linux Compatibility layer to the FreeBSD setup, bootstrapped at `/compat/<distribution>` prefix, to provide Linux user land:
 
 -	[Ubuntu template](./ubuntu_template.md)
 -	[Ubuntu jail](./ubuntu_jail.md)
