@@ -1,21 +1,22 @@
-$TTL 1h
-@ IN  SOA dns.lab.net. root.dns.lab.net. (
-  2025100501  ; Serial, [YYYYMMDDnn] (update date + number)
-  1h  ; Refresh
-  15m ; Retry
-  1w  ; Expiry
-  1d  ; Minimum
+; file: /usr/local/etc/namedb/primary/lab.net-reverse.db
+$TTL  1h
+@       IN      SOA     lab.net. root.lab.net. (
+                        ;; [YYYYMMDDnn] (update date + number)
+                        2025100501; Serial
+                        1h;   Refresh
+                        15m;    Retry
+                        1w;   Expiry
+                        1d;   Minimum
 )
 
 ; Name server
       IN  NS  dns.lab.net.
       IN  A   10.0.1.2
 
-; Infrastructure
-1     IN  PTR nuc.lab.net.
+; Servers
 2     IN  PTR dns.lab.net.
 3     IN  PTR ldap.lab.net.
-
-; Development
+4     IN  PTR www.lab.net.
 11    IN  PTR dev.lab.net.
 12    IN  PTR jammy.lab.net.
+101   IN  PTR nuc.lab.net.

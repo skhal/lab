@@ -7,6 +7,4 @@ etc/rc.conf.d
 home/op/.cshrc
 root/.cshrc
 usr/local/etc/doas.conf
-usr/local/etc/pkg.conf
 usr/local/etc/pkg/repos
-usr/local/etc/rc.conf.d
