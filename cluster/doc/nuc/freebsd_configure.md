@@ -242,7 +242,7 @@ Configure SSH to listen on the host IPs and restrict users access:
 
 ```console
 # fetch -o /tmp https://github.com/skhal/lab/raw/refs/heads/main/cluster/doc/nuc/data/sshd_config.diff
-# patch -i /tmp/sshd_config.diff /etc/ssh/sshd_config
+# patch -b -i /tmp/sshd_config.diff /etc/ssh/sshd_config
 ```
 
 ```console

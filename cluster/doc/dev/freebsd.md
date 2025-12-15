@@ -15,7 +15,7 @@ Configure ssh:
 ```
 # sysrc -f /etc/rc.conf.d/sshd sshd_enable=yes
 # fetch -o /tmp https://raw.githubusercontent.com/skhal/lab/refs/heads/main/cluster/doc/dev/data/sshd_config.diff
-# patch -i /tmp/sshd_config.diff /etc/ssh/sshd_config
+# patch -b -i /tmp/sshd_config.diff /etc/ssh/sshd_config
 ```
 
 Install

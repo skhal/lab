@@ -14,7 +14,7 @@ Pull configuration to serve static user content from ~/www at nginx.example.com/
 
 ```console
 # fetch -o /tmp https://raw.githubusercontent.com/skhal/lab/refs/heads/main/cluster/doc/nginx/data/nginx.conf.diff
-# patch -i /tmp/nginx.conf.diff /usr/local/etc/nginx/nginx.conf
+# patch -b -i /tmp/nginx.conf.diff /usr/local/etc/nginx/nginx.conf
 ```
 
 Enable the server:

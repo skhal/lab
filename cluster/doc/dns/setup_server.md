@@ -51,7 +51,7 @@ Patch the configuration file:
 
 ```console
 # fetch -o /tmp https://github.com/skhal/lab/raw/refs/heads/main/cluster/doc/dns/server/named.conf.diff
-# patch -i /tmp/named.conf.diff /usr/local/etc/namedb/named.conf
+# patch -b -i /tmp/named.conf.diff /usr/local/etc/namedb/named.conf
 ```
 
 Configure resolver to use local DNS server:

@@ -176,7 +176,7 @@ Ensure LDAP server is reachable (use `ldap.lab.net` in URI). Install LDAP tools:
 ```console
 % doas jexec jammy chroot /compat/jammy apt install ldap-utils
 % doas jexec jammy fetch -o /compat/jammy/tmp https://raw.githubusercontent.com/skhal/lab/refs/heads/main/cluster/doc/jail/data/ldap.conf.diff
-% doas jexec jammy chroot /compat/jammy patch -i /tmp/ldap.conf.diff /etc/ldap/ldap.conf
+% doas jexec jammy chroot /compat/jammy patch -b -i /tmp/ldap.conf.diff /etc/ldap/ldap.conf
 ```
 
 Verify:
