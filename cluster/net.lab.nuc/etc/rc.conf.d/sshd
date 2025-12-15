@@ -1,2 +1,1 @@
 sshd_enable="yes"
-sshd_flags="-o ListenAddress=192.168.1.101 -o ListenAddress=10.0.1.101 -o AllowUsers=op"

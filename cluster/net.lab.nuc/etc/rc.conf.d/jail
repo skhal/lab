@@ -1,3 +1,3 @@
 jail_reverse_stop="yes"
 jail_enable="yes"
-jail_list="dns ldap dev jammy"
+jail_list="dns ldap www dev jammy"
