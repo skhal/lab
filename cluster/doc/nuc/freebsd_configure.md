@@ -238,12 +238,16 @@ freebsd.org.    3203INA96.47.72.84
 Secure Shell
 ------------
 
-Force SSH to listen on local port and restrict users that can SSH into the host:
+Configure SSH to listen on the host IPs and restrict users access:
+
+```console
+# fetch -o /tmp https://github.com/skhal/lab/raw/refs/heads/main/cluster/doc/nuc/data/sshd_config.diff
+# patch -i /tmp/sshd_config.diff /etc/ssh/sshd_config
+```
 
 ```console
 % cat /etc/rc.conf.d/sshd
 sshd_enable="yes"
-sshd_flags="-o ListenAddress=192.168.1.102 -o AllowUsers=op"
 ```
 
 Restart the service and verify work:

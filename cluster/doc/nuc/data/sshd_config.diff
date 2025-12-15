@@ -1,0 +1,19 @@
+--- /etc/ssh/sshd_config.orig	2025-12-15 14:59:15.424581000 -0600
++++ /etc/ssh/sshd_config	2025-12-15 14:59:46.406733000 -0600
+@@ -17,6 +17,8 @@
+ #AddressFamily any
+ #ListenAddress 0.0.0.0
+ #ListenAddress ::
++ListenAddress=192.168.1.101
++ListenAddress=10.0.1.101
+
+ #HostKey /etc/ssh/ssh_host_rsa_key
+ #HostKey /etc/ssh/ssh_host_ecdsa_key
+@@ -87,6 +89,7 @@
+ # PAM authentication, then enable this but set PasswordAuthentication
+ # and KbdInteractiveAuthentication to 'no'.
+ #UsePAM yes
++AllowUsers=op
+
+ #AllowAgentForwarding yes
+ #AllowTcpForwarding yes
