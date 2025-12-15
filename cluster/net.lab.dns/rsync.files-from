@@ -1,12 +1,11 @@
-etc/nsswitch.conf
-etc/pam.d/sshd
 etc/rc.conf
 etc/rc.conf.d
 etc/resolv.conf
 etc/ssh/sshd_config
 usr/local/etc/ldap.conf
 usr/local/etc/namedb/named.conf
-usr/local/etc/namedb/primary
+usr/local/etc/namedb/primary/lab.net-forward.db
+usr/local/etc/namedb/primary/lab.net-reverse.db
 usr/local/etc/namedb/zones.conf.d
 usr/local/etc/nss_ldap.conf
 usr/local/etc/openldap/ldap.conf
