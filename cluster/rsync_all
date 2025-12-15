@@ -1,0 +1,60 @@
+#!/bin/sh
+#
+# Copyright 2025 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+# keep-sorted start
+FIND_PATH=./
+NOOP=/usr/bin/false
+# keep-sorted end
+
+usage() {
+  cat <<EOF
+usage: $0 [options] [path]
+
+options:
+  -n    dry-run
+
+arguments:
+  path  path to search for rsync.files-from
+        default: ${FIND_PATH}
+EOF
+}
+
+run() {
+  echo ".. $@"
+  if ${NOOP}; then
+    return
+  fi
+  eval "$@"
+}
+
+while getopts "hn" opt; do
+  case "$opt" in
+    h)
+      usage
+      exit
+      ;;
+    n)
+      NOOP=/usr/bin/true
+      ;;
+    *)
+      usage
+      exit 1
+      ;;
+  esac
+done
+shift $((OPTIND - 1))
+
+find_path=${1:-${FIND_PATH}}
+find ${find_path} -type f -name rsync.files-from -depth 2 | {
+  while read f; do
+    (
+      cd ${f%/*}
+      echo -- $PWD
+      run rsync -arvz --files-from=./${f##*/} op@${PWD##*.}:/ ./
+    )
+  done
+}
