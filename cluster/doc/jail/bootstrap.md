@@ -92,7 +92,7 @@ Create a second bridge for local, intra-jail traffic:
 
 ```console
 % doas sysrc -f /etc/rc.conf.d/network cloned_interfaces+=bridge1
-% doas sysrc -f /etc/rc.conf.d/network ifconfig_bridge1='inet 10.0.1.101/24 up descr jail:int'
+% doas sysrc -f /etc/rc.conf.d/network ifconfig_bridge1='inet 10.0.0.101/24 up descr jail:int'
 ```
 
 The new bridge has the following properties:
