@@ -70,7 +70,7 @@ jail_enable: NO -> yes
 Network
 -------
 
-Jails use vnet(9), virtual network, to isolate networking setup from the host environment. Use if_bridge(4) to connect networks - network interfaces that are UP and connected to the bridge in the UP state can pass packets.
+Jails use vnet(9), virtual network, to isolate networking setup from the host environment ([ref](https://www.freebsdhandbook.com/advanced-networking#network-bridging)). Use if_bridge(4) to connect networks - network interfaces that are UP and connected to the bridge in the UP state can pass packets.
 
 Setup two bridges to separate local and Internet traffic.
 
@@ -78,23 +78,21 @@ Create a bridge for Internet traffic:
 
 ```console
 % doas sysrc -f /etc/rc.conf.d/network cloned_interfaces+=bridge0
-cloned_interfaces: '' -> bridge0
-% doas sysrc -f /etc/rc.conf.d/network ifconfig_bridge0='addm igc0 up descr jail:ext'
-ifconfig_bridge0: '' -> addm igc0 up descr jail:ext
+% doas sysrc -f /etc/rc.conf.d/network ifconfig_bridge0='inet 192.168.1.101/24 addm igc0 up descr jail:ext'
+% doas sysrc -f /etc/rc.conf.d/network ifconfig_igc0=up
 ```
 
 The bridge has following properties:
 
-1.	it has igc(4) Ethernet adapter connected for external connections.
-2.	it has `jail:ext` description to indicate that the bridge is with external connection.
+1.	the IP moves from the member interface igc0 to the bridge
+2.	it has igc(4) Ethernet adapter connected for external connections.
+3.	it has `jail:ext` description to indicate that the bridge is with external connection.
 
 Create a second bridge for local, intra-jail traffic:
 
 ```console
 % doas sysrc -f /etc/rc.conf.d/network cloned_interfaces+=bridge1
-cloned_interfaces: 'bridge0' -> bridge0 bridge1
 % doas sysrc -f /etc/rc.conf.d/network ifconfig_bridge1='inet 10.0.1.101/24 up descr jail:int'
-ifconfig_bridge1: '' -> up descr jail:int
 ```
 
 The new bridge has the following properties:
