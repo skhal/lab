@@ -384,5 +384,5 @@ Add pkg(8) alias to list vital packages that are note removed with `pkg delete -
 
 ```fetch
 # fetch -o /tmp https://github.com/skhal/lab/raw/refs/heads/main/cluster/doc/nuc/data/pkg.conf.diff
-# patch /usr/local/etc/pkg.conf < /tmp/pkg.conf.diff
+# patch -b -i /tmp/pkg.conf.diff /usr/local/etc/pkg.conf
 ```
