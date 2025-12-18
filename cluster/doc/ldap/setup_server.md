@@ -111,7 +111,7 @@ Patch the configuration file ([server/slapd.ldif.diff](server/slapd.ldif.diff)\)
 
 ```console
 # fetch -o /tmp https://github.com/skhal/lab/raw/refs/heads/main/cluster/doc/ldap/server/slapd.ldif.diff
-# patch -R /usr/local/etc/openldap/slapd.ldif < /tmp/slapd.ldif.diff
+# patch -b -i /tmp/slapd.ldif.diff /usr/local/etc/openldap/slapd.ldif < /tmp/slapd.ldif.diff
 ```
 
 The configuration file is ready, import it into a configuration database:
@@ -157,107 +157,17 @@ Start the service
 # service slapd start
 ```
 
-Verify that:
-
--	the service runs under `ldap` user.
--	slapd(8) listens on a single IP address at port `:389`.
--	A server socket and other files under `/var/run/openldap` have `ldap:ldap` ownership.
-
-	```console
-	# sockstat -l4
-	USER     COMMAND    PID   FD  PROTO  LOCAL ADDRESS         FOREIGN ADDRESS
-	ldap     slapd      56701 7   tcp4   10.0.1.3:389          *:*
-	# ls -l /var/run/openldap/
-	total 6
-	srw-rw-rw-  1 ldap ldap   0 Sep 26 18:25 ldapi
-	-rw-r--r--  1 ldap ldap 105 Sep 26 18:25 slapd.args
-	-rw-r--r--  1 ldap ldap   6 Sep 26 18:25 slapd.pid
-	```
-
-Root ACL for `cn=config`
-------------------------
-
-By default, slapd(8) prevents access to `cn=config`, where all the server configurations reside:
-
-```
-olcAccess: to * by * none
-```
-
-We want to grant permissions to the root user when connected to slapd(8) locally via Unix sockets, e.g.:
-
-```console
-# ldapsearch -H ldapi://%2Fvar%2Frun%2Fopenldap%2Fldapi -Y EXTERNAL ...
-```
-
-The root user has the following identity:
-
-```
-gidNumber=0+uidNumber=0,cn=peercred,cn=external,cn=auth
-```
-
-The process consists of the following steps while the service is down:
-
--	Dump the configuration database into a temporary LDIF configuration file.
--	Update the configuration file.
--	Re-create the configuration database.
-
-> [!CAUTION] Do not edit `/usr/local/etc/openldap/slapd.d` files manually. It may break consistency of the configuration directory. Change `.ldif` file and then import it into the directory configuration instead. See [doc](https://openldap.org/doc/admin26/slapdconf2.html).
-
-Stop the service:
-
-```console
-# service slapd stop
-```
-
-Dump the directory service, including the configuration, to a temporary file:
-
-```console
-# slapcat -n0 -l /tmp/slapd.ldif
-```
-
-Update access to the configuration database:
-
-```console
-# slapcat -n0 | diff -u - /tmp/slapd.ldif
---- -   2025-09-26 20:52:07.357710000 -0500
-+++ /tmp/slapd.ldif     2025-09-26 20:50:22.724090000 -0500
-@@ -574,7 +574,8 @@
- dn: olcDatabase={0}config,cn=config
- objectClass: olcDatabaseConfig
- olcDatabase: {0}config
--olcAccess: {0}to *  by * none
-+olcAccess: {0}to * by dn.exact=gidNumber=0+uidNumber=0,cn=peercred,cn=external,cn=auth manage by * break
-+olcAccess: {0}to * by * none
- olcAddContentAcl: TRUE
- olcLastMod: TRUE
- olcLastBind: FALSE
-```
-
-Re-create the configuration database:
-
-```console
-# rm -rf /usr/local/etc/openldap/slapd.d/*
-# /usr/local/sbin/slapadd -n0 -F /usr/local/etc/openldap/slapd.d/ -l /tmp/slapd.ldif
-```
-
-Fix the configuration directory permissions: directory permissions: directory permissions: directory permissions:
-
-```console
-# chmod -R 700 /var/db/openldap-data /usr/local/etc/openldap/slapd.d
-# chown -R ldap:ldap /var/db/openldap-data /usr/local/etc/openldap/slapd.d
-```
-
-Start the service:
-
-```console
-# service slapd start
-```
-
 Verify:
 
-> [!TIP] Use the following tcsh(1) alias to speed up search commands:<br/> `alias ldapisearch /usr/local/bin/ldapsearch -Y EXTERNAL -H ldapi://%2Fvar%2Frun%2Fopenldap%2Fldapi`
-
 ```console
+# sockstat -l4
+USER     COMMAND    PID   FD  PROTO  LOCAL ADDRESS         FOREIGN ADDRESS
+ldap     slapd      56701 7   tcp4   10.0.1.3:389          *:*
+# ls -l /var/run/openldap/
+total 6
+srw-rw-rw-  1 ldap ldap   0 Sep 26 18:25 ldapi
+-rw-r--r--  1 ldap ldap 105 Sep 26 18:25 slapd.args
+-rw-r--r--  1 ldap ldap   6 Sep 26 18:25 slapd.pid
 # ldapisearch -b cn=config dn | grep '^dn:'
 SASL/EXTERNAL authentication started
 SASL username: gidNumber=0+uidNumber=0,cn=peercred,cn=external,cn=auth
@@ -273,6 +183,12 @@ dn: olcDatabase={0}config,cn=config
 dn: olcDatabase={1}mdb,cn=config
 dn: olcDatabase={2}monitor,cn=config
 ```
+
+-	the service runs under `ldap` user.
+-	slapd(8) listens on a single IP address at port `:389`.
+-	A server socket and other files under `/var/run/openldap` have `ldap:ldap` ownership.
+- Root user has access to the configuration database
+
 
 Management
 ==========

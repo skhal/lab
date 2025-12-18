@@ -1,15 +1,28 @@
---- /usr/local/etc/openldap/slapd.ldif.sample	2025-11-25 03:41:30.000000000 -0600
-+++ /usr/local/etc/openldap/slapd.ldif	2025-12-03 16:08:37.211000000 -0600
+--- /usr/local/etc/openldap/slapd.ldif.sample	2025-12-03 23:53:20.000000000 -0600
++++ /usr/local/etc/openldap/slapd.ldif	2025-12-18 07:04:28.917073000 -0600
 @@ -39,6 +39,8 @@
  cn: schema
-
+ 
  include: file:///usr/local/etc/openldap/schema/core.ldif
 +include: file:///usr/local/etc/openldap/schema/cosine.ldif
 +include: file:///usr/local/etc/openldap/schema/nis.ldif
-
+ 
  # Frontend settings
  #
-@@ -79,18 +81,29 @@
+@@ -69,6 +71,12 @@
+ # rootdn can always read and write EVERYTHING!
+ #
+ 
++dn: olcDatabase=config,cn=config
++objectClass: olcDatabaseConfig
++olcDatabase: config
++olcAccess: to *
++  by dn.exact=gidNumber=0+uidNumber=0,cn=peercred,cn=external,cn=auth manage
++  by * none
+ 
+ #######################################################################
+ # LMDB database definitions
+@@ -79,18 +87,29 @@
  objectClass: olcMdbConfig
  olcDatabase: mdb
  olcDbMaxSize: 1073741824
@@ -21,8 +34,8 @@
  # be avoided.  See slappasswd(8) and slapd-config(5) for details.
  # Use of strong authentication encouraged.
 -olcRootPW: secret
-+olcRootPW: {SSHA}-R-E-D-A-C-T-E-D
- # The database directory MUST exist prior to running slapd AND
++olcRootPW: {SSHA}2hrg032G/JVGub0CRVGmIQMGuz+gSOH6
+ # The database directory MUST exist prior to running slapd AND 
  # should only be accessible by the slapd and slap tools.
  # Mode 700 recommended.
 -olcDbDirectory:	/var/db/openldap-data
@@ -40,6 +53,6 @@
 +  by self write
 +  by dn.base="cn=op,dc=lab,dc=net" write
 +  by * read
-
+ 
  dn: olcDatabase=monitor,cn=config
  objectClass: olcDatabaseConfig
