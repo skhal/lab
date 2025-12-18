@@ -1,6 +1,19 @@
 --- /usr/local/etc/openldap/slapd.ldif.sample	2025-12-03 23:53:20.000000000 -0600
-+++ /usr/local/etc/openldap/slapd.ldif	2025-12-18 07:04:28.917073000 -0600
-@@ -39,6 +39,8 @@
++++ /usr/local/etc/openldap/slapd.ldif	2025-12-18 13:37:23.305268000 -0600
+@@ -21,6 +21,12 @@
+ #	Require 112-bit (3DES or better) encryption for updates
+ #	Require 64-bit encryption for simple bind
+ #olcSecurity: ssf=1 update_ssf=112 simple_bind=64
++olcSecurity: ssf=128
++olcTLSCertificateFile: /usr/local/share/ssl/certs/ldap.crt
++olcTLSCertificateKeyFile: /usr/local/share/ssl/private/ldap.key
++olcTLSCACertificateFile: /usr/local/share/certs/ca.crt
++olcTLSProtocolMin: 3.1
++olcTLSVerifyClient: never
+ 
+ 
+ #
+@@ -39,6 +45,8 @@
  cn: schema
  
  include: file:///usr/local/etc/openldap/schema/core.ldif
@@ -9,7 +22,7 @@
  
  # Frontend settings
  #
-@@ -69,6 +71,12 @@
+@@ -69,6 +77,12 @@
  # rootdn can always read and write EVERYTHING!
  #
  
@@ -22,7 +35,7 @@
  
  #######################################################################
  # LMDB database definitions
-@@ -79,18 +87,29 @@
+@@ -79,18 +93,29 @@
  objectClass: olcMdbConfig
  olcDatabase: mdb
  olcDbMaxSize: 1073741824
@@ -34,12 +47,12 @@
  # be avoided.  See slappasswd(8) and slapd-config(5) for details.
  # Use of strong authentication encouraged.
 -olcRootPW: secret
-+olcRootPW: {SSHA}2hrg032G/JVGub0CRVGmIQMGuz+gSOH6
++olcRootPW: {SSHA}***REDACTED***
  # The database directory MUST exist prior to running slapd AND 
  # should only be accessible by the slapd and slap tools.
  # Mode 700 recommended.
 -olcDbDirectory:	/var/db/openldap-data
-+olcDbDirectory:	/var/db/openldap-data/lab.net
++olcDbDirectory:  /var/db/openldap-data/lab.net
  # Indices to maintain
  olcDbIndex: objectClass eq
 +olcDbIndex: uid pres,eq
