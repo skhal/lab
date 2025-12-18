@@ -27,7 +27,13 @@ Convert it to LDIF:
     > /tmp/sudo.ldif
 ```
 
-Import `/tmp/sudo.ldif` using ldapadd(1). Verify:
+Import `/tmp/sudo.ldif` using ldapadd(1).
+
+```console
+# ldapadd -Y EXTERNAL -H ldapi://%2Fvar%2Frun%2Fopenldap%2Fldapi -f /tmp/sudo.ldif
+```
+
+Verify:
 
 ```console
 % ldapisearch -Q -b cn=config -s sub '(cn=*sudo)' dn | grep '^dn:'
