@@ -1,10 +1,11 @@
---- /usr/local/etc/openldap/slapd.ldif.sample	2025-12-03 23:53:20.000000000 -0600
-+++ /usr/local/etc/openldap/slapd.ldif	2025-12-18 13:37:23.305268000 -0600
-@@ -21,6 +21,12 @@
+--- /usr/local/etc/openldap/slapd.ldif.orig	2025-12-03 23:53:20.000000000 -0600
++++ /usr/local/etc/openldap/slapd.ldif	2025-12-18 16:07:05.123552000 -0600
+@@ -21,6 +21,13 @@
  #	Require 112-bit (3DES or better) encryption for updates
  #	Require 64-bit encryption for simple bind
  #olcSecurity: ssf=1 update_ssf=112 simple_bind=64
 +olcSecurity: ssf=128
++olcLocalSSF: 128
 +olcTLSCertificateFile: /usr/local/share/ssl/certs/ldap.crt
 +olcTLSCertificateKeyFile: /usr/local/share/ssl/private/ldap.key
 +olcTLSCACertificateFile: /usr/local/share/certs/ca.crt
@@ -13,7 +14,7 @@
  
  
  #
-@@ -39,6 +45,8 @@
+@@ -39,6 +46,8 @@
  cn: schema
  
  include: file:///usr/local/etc/openldap/schema/core.ldif
@@ -22,7 +23,7 @@
  
  # Frontend settings
  #
-@@ -69,6 +77,12 @@
+@@ -69,6 +78,12 @@
  # rootdn can always read and write EVERYTHING!
  #
  
@@ -35,7 +36,7 @@
  
  #######################################################################
  # LMDB database definitions
-@@ -79,18 +93,29 @@
+@@ -79,18 +94,29 @@
  objectClass: olcMdbConfig
  olcDatabase: mdb
  olcDbMaxSize: 1073741824
