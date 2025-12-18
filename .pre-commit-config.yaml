@@ -119,6 +119,7 @@ repos:
     entry: typos
     language: system
     types: [text]
+    exclude: "^.*\.diff$"
   - id: yaml-format
     name: yaml-format
     entry: yamlfmt
