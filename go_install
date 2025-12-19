@@ -68,7 +68,7 @@ download() {
   echo ".. download ${url}"
   {
     wget --quiet --show-progress ${url}
-    shasum -c ${CHECKSUM_FILE} --ignore-missing
+    sha256sum -c ${CHECKSUM_FILE} --ignore-missing
     mv -nv ${archive} ${archive_in_cache}
   } >>${LOG_PATH}
 }
