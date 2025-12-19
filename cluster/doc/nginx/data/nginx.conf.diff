@@ -1,27 +1,33 @@
---- /usr/local/etc/nginx/nginx.conf-dist  2025-12-03 20:46:15.000000000 -0600
-+++ /usr/local/etc/nginx/nginx.conf 2025-12-14 09:46:24.101067000 -0600
-@@ -38,18 +38,31 @@
+--- /usr/local/etc/nginx/nginx.conf-dist	2025-12-17 20:45:54.000000000 -0600
++++ /usr/local/etc/nginx/nginx.conf	2025-12-19 06:45:12.542165000 -0600
+@@ -28,6 +28,8 @@
+     #                  '"$http_user_agent" "$http_x_forwarded_for"';
+ 
+     #access_log  logs/access.log  main;
++    error_log  syslog:server=unix:/var/run/log,nohostname;
++    access_log syslog:server=unix:/var/run/log,nohostname;
+ 
+     sendfile        on;
+     #tcp_nopush     on;
+@@ -38,16 +40,24 @@
      #gzip  on;
-
+ 
      server {
 -        listen       80;
 +        listen       192.168.1.4:80;
          server_name  localhost;
-
+ 
          #charset koi8-r;
-
+ 
          #access_log  logs/host.access.log  main;
-
+ 
 -        location / {
 -            root   /usr/local/www/nginx;
 -            index  index.html index.htm;
--        }
-+        #location / {
-+        #    root   /usr/local/www/nginx;
-+        #    index  index.html index.htm;
-+        #}
-
 +        location ~ ^/~([[:lower:]]+)/([[:alnum:]/\.]*)?$ {
++            allow 192.168.1.0/24;
++            deny all;
++
 +            autoindex on;
 +            index off;
 +
@@ -29,11 +35,6 @@
 +
 +            add_header Cache-Control "no-store, no-cache";
 +            add_header X-Content-Type-Options "nosniff";
-+
-+            allow 192.168.1.0/24;
-+            deny all;
-+ }
-+
+         }
+ 
          #error_page  404              /404.html;
-
-         # redirect server error pages to the static page /50x.html
