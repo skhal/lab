@@ -242,7 +242,7 @@ Configure SSH to listen on the host IPs and restrict users access:
 
 ```console
 # fetch -o /tmp https://github.com/skhal/lab/raw/refs/heads/main/cluster/doc/nuc/data/sshd_config.diff
-# patch -b -i /tmp/sshd_config.diff /etc/ssh/sshd_config
+# patch -lb -i /tmp/sshd_config.diff /etc/ssh/sshd_config
 ```
 
 ```console
@@ -384,5 +384,5 @@ Add pkg(8) alias to list vital packages that are note removed with `pkg delete -
 
 ```fetch
 # fetch -o /tmp https://github.com/skhal/lab/raw/refs/heads/main/cluster/doc/nuc/data/pkg.conf.diff
-# patch -b -i /tmp/pkg.conf.diff /usr/local/etc/pkg.conf
+# patch -lb -i /tmp/pkg.conf.diff /usr/local/etc/pkg.conf
 ```

@@ -111,7 +111,7 @@ Patch the configuration file ([server/slapd.ldif.diff](server/slapd.ldif.diff)\)
 
 ```console
 # fetch -o /tmp https://github.com/skhal/lab/raw/refs/heads/main/cluster/doc/ldap/server/slapd.ldif.diff
-# patch -b -i /tmp/slapd.ldif.diff /usr/local/etc/openldap/slapd.ldif < /tmp/slapd.ldif.diff
+# patch -lb -i /tmp/slapd.ldif.diff /usr/local/etc/openldap/slapd.ldif < /tmp/slapd.ldif.diff
 ```
 
 The configuration file is ready, import it into a configuration database:
@@ -187,8 +187,7 @@ dn: olcDatabase={2}monitor,cn=config
 -	the service runs under `ldap` user.
 -	slapd(8) listens on a single IP address at port `:389`.
 -	A server socket and other files under `/var/run/openldap` have `ldap:ldap` ownership.
-- Root user has access to the configuration database
-
+-	Root user has access to the configuration database
 
 Management
 ==========

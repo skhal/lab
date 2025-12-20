@@ -31,7 +31,7 @@ Patch LDAP client configuration:
 
 ```console
 # fetch -o /tmp https://raw.githubusercontent.com/skhal/lab/refs/heads/main/cluster/doc/ldap/client/openldap_ldap.conf.diff
-# patch -b -i /tmp/openldap_ldap.conf.diff /usr/local/etc/openldap/ldap.conf
+# patch -lb -i /tmp/openldap_ldap.conf.diff /usr/local/etc/openldap/ldap.conf
 ```
 
 Verify:
@@ -68,14 +68,14 @@ Patch NSS LDAP configuration:
 
 ```console
 # fetch -o /tmp https://raw.githubusercontent.com/skhal/lab/refs/heads/main/cluster/doc/ldap/client/nss_ldap.conf.diff
-# patch -b -i /tmp/nss_ldap.conf.diff /usr/local/etc/nss_ldap.conf
+# patch -lb -i /tmp/nss_ldap.conf.diff /usr/local/etc/nss_ldap.conf
 ```
 
 Change NSS configuration to pull Single Sign On (SSO) groups and passwords from files then LDAP. It is important to give preference to give local users and groups preference to act as the authoritative source and consult LDAP only if local entry is not found, i.e., the order should be `files ldap`:
 
 ```console
 # fetch -o /tmp https://raw.githubusercontent.com/skhal/lab/refs/heads/main/cluster/doc/ldap/client/nsswitch.conf.diff
-# patch -b -i /tmp/nsswitch.conf.diff /etc/nsswitch.conf
+# patch -lb -i /tmp/nsswitch.conf.diff /etc/nsswitch.conf
 ```
 
 Verify:
@@ -110,14 +110,14 @@ Keep in mind that PAM LDAP uses `/usr/local/etc/ldap.conf` for configuration, co
 
 ```console
 # fetch -o /tmp https://raw.githubusercontent.com/skhal/lab/refs/heads/main/cluster/doc/ldap/client/ldap.conf.diff
-# patch -b -i /tmp/ldap.conf.diff /usr/local/etc/ldap.conf
+# patch -lb -i /tmp/ldap.conf.diff /usr/local/etc/ldap.conf
 ```
 
 PAM policies reside under `/etc/pam.d` in pam.conf(5) format (or `/usr/local/etc/pam.d` for installed packages). Patch SSH policy to use LDAP:
 
 ```console
 # fetch -o /tmp https://raw.githubusercontent.com/skhal/lab/refs/heads/main/cluster/doc/ldap/client/sshd.diff
-# patch -b -i /tmp/sshd.diff /etc/pam.d/sshd
+# patch -lb -i /tmp/sshd.diff /etc/pam.d/sshd
 ```
 
 Verify:
