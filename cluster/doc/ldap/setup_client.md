@@ -93,7 +93,7 @@ Secure Shell
 Use Pluggable Authentication Modules (PAM) to configure SSH with LDAP:
 
 ```console
-# pkg install pam_ldap pam_mkhomedir
+# pkg install pam_ldap
 # pkg info -D pam_ldap
 pam_ldap-186_2:
 On install:
@@ -104,7 +104,6 @@ login	auth	sufficient	/usr/local/lib/pam_ldap.so
 ```
 
 -	`pam_ldap` provides LDAP authentication.
--	`pam_mkhomedir` creates user home folder if one does not exist.
 
 Keep in mind that PAM LDAP uses `/usr/local/etc/ldap.conf` for configuration, compared to OpenLDAP client configuration at `/usr/local/etc/openldap/ldap.conf`, i.e., the same filename but different paths. Patch it to point PAM to LDAP server:
 

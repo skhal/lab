@@ -8,11 +8,3 @@
  auth		required	pam_unix.so		no_warn try_first_pass
 
  # account
-@@ -16,6 +17,7 @@
-
- # session
- #session	optional	pam_ssh.so		want_agent
-+session         required        /usr/local/lib/pam_mkhomedir.so
- session		required	pam_permit.so
-
- # password
