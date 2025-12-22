@@ -50,7 +50,7 @@ jammy {
   allow.raw_sockets;
   # keep-sorted end
 
-  mount += "/home     $path/compat/jammy/home    nullfs    rw 0 0";
+  mount += "/home/op  $path/compat/jammy/home/op nullfs    rw 0 0";
   mount += "devfs     $path/compat/jammy/dev     devfs     rw 0 0";
   mount += "fdescfs   $path/compat/jammy/dev/fd  fdescfs   rw,linrdlnk 0 0";
   mount += "linprocfs $path/compat/jammy/proc    linprocfs rw 0 0";

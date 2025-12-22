@@ -6,11 +6,17 @@ Name
 Bootstrap
 =========
 
+Boot menu
+---------
+
 Disable boot menu to speed up restarts:
 
 ```console
 # echo 'autoboot_delay="0"' >> /boot/loader.conf
 ```
+
+Pkg repositories
+----------------
 
 Use default pkg(8) repositories, configured in /etc/pkg/FreeBSD.conf:
 
@@ -33,12 +39,6 @@ FreeBSD-ports: {
     signature_type  : "FINGERPRINTS",
     fingerprints    : "/usr/share/keys/pkg"
   }
-```
-
-Change root-user shell to tcsh(1):
-
-```console
-# chsh -s /bin/tcsh root
 ```
 
 Resource configuration
@@ -101,6 +101,36 @@ Left overs in `/etc/rc.conf`:
 % sysrc -a
 clear_tmp_enable: YES
 dumpdev: AUTO
+```
+
+Root user
+---------
+
+Change root-user shell to tcsh(1):
+
+```console
+# chsh -s /bin/tcsh root
+```
+
+User home
+---------
+
+The goal is to move `/home` outside of the Base system and Boot Environments as such into a dedicated dataset. It is also desirable to separate users for independent resources management. Follow `/var` or `/usr` setup:
+
+-	keep `/home` unmountable, read-only dataset to prevent accidental writes.
+-	child datasets auto-mount under `/home`.
+
+Create datasets:
+
+```console
+# zfs create -p canmount=off,readonly=on zroot/home
+# zfs create -p canmount=on,readonly=off zroot/home/op
+```
+
+Fix user home folder permissions:
+
+```console
+# chown -R op:op /home/op
 ```
 
 Services
