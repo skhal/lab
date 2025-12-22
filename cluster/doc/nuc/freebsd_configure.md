@@ -386,3 +386,39 @@ Add pkg(8) alias to list vital packages that are note removed with `pkg delete -
 # fetch -o /tmp https://github.com/skhal/lab/raw/refs/heads/main/cluster/doc/nuc/data/pkg.conf.diff
 # patch -lb -i /tmp/pkg.conf.diff /usr/local/etc/pkg.conf
 ```
+
+Smart Monitoring tools
+----------------------
+
+```console
+# pkg install sensors smartmontools
+```
+
+-	`sensors` prints summary of the fan, temperature, and other sensors available on the host.
+-	`smartmontools` provides `smartctl` utility to check SMART data from drives. It includes a daemon `smartd` to run checks and a periodic(8) script to collect data.
+
+Configure and start smartd(8) daemon:
+
+```console
+# mkdir -v /usr/local/etc/rc.conf.d
+# sysrc -f /usr/local/etc/rc.conf.d/smartd smartd_enable=yes
+# cp /usr/local/etc/smartd.conf{.sample,}
+# service smartd start
+```
+
+Verify - force daemon to run checks:
+
+```console
+# ps -Ao pid,comm | grep smartd
+12345 smartd
+# kill -s USR1 12345
+# grep smartd /var/log/daemon.log | tail -n 5
+```
+
+Let periodic(8) run daily checks and mail the output to the root user:
+
+```console
+# cat <<EOF >>/usr/local/etc/periodic.conf
+daily_status_smart_enable=yes
+daily_status_smart_devices=auto
+```
