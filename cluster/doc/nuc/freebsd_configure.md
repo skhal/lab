@@ -460,9 +460,15 @@ Periodic
 --------
 
 ```console
-# cat /usr/local/etc/periodic.conf
-daily_scrub_zfs_default_threshold=14
-daily_scrub_zfs_enable=yes
+# tail -n +1 {/usr/local,}/etc/periodic.conf
+==> /usr/local/etc/periodic.conf <==
 daily_status_smart_devices=auto
 daily_status_smart_enable=yes
+
+==> /etc/periodic.conf <==
+daily_output=/var/log/daily.log
+daily_scrub_zfs_default_threshold="14"
+daily_scrub_zfs_enable="YES"
+monthly_output=/var/log/monthly.log
+weekly_output=/var/log/weekly.log
 ```
