@@ -452,3 +452,17 @@ Let periodic(8) run daily checks and mail the output to the root user:
 daily_status_smart_enable=yes
 daily_status_smart_devices=auto
 ```
+
+Other
+=====
+
+Periodic
+--------
+
+```console
+# cat /usr/local/etc/periodic.conf
+daily_scrub_zfs_default_threshold=14
+daily_scrub_zfs_enable=yes
+daily_status_smart_devices=auto
+daily_status_smart_enable=yes
+```
