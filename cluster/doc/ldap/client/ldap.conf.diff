@@ -1,15 +1,32 @@
---- /usr/local/etc/ldap.conf.sample	2025-11-29 12:42:59.000000000 -0600
-+++ /usr/local/etc/ldap.conf	2025-12-03 18:02:05.098510000 -0600
+--- /usr/local/etc/ldap.conf.sample	2025-12-18 04:00:09.000000000 -0600
++++ /usr/local/etc/ldap.conf	2025-12-19 08:33:37.232692000 -0600
 @@ -12,10 +12,10 @@
  # space. How long nss_ldap takes to failover depends on
  # whether your LDAP client library supports configurable
  # network or connect timeouts (see bind_timelimit).
 -host 127.0.0.1
-+host ldap.lab.net
-
++#host 127.0.0.1
+ 
  # The distinguished name of the search base.
 -base dc=padl,dc=com
-+base dc=lab,dc=net
-
++base	dc=lab,dc=net
+ 
  # Another way to specify your LDAP server is to provide an
  # uri with the server name. This allows to use
+@@ -24,6 +24,7 @@
+ #uri ldaps://127.0.0.1/   
+ #uri ldapi://%2fvar%2frun%2fldapi_sock/
+ # Note: %2f encodes the '/' used as directory separator
++uri	ldap://ldap.lab.net
+ 
+ # The LDAP version to use (defaults to 3
+ # if supported by client library)
+@@ -249,7 +250,7 @@
+ 
+ # OpenLDAP SSL mechanism
+ # start_tls mechanism uses the normal LDAP port, LDAPS typically 636
+-#ssl start_tls
++ssl start_tls
+ #ssl on
+ 
+ # OpenLDAP SSL options
