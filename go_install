@@ -14,7 +14,7 @@ readonly GO_VERSION=${GO_VERSION:-1.25.5}
 readonly LOG_PATH=go_install.log # relative to TMPDIR
 # keep-sorted end
 
-CHECKSUM_FILE=$(realpath go_checksum_sha256)
+CHECKSUM_FILE=$(realpath go_checksum_sha256) # relative to script
 readonly CHECKSUM_FILE
 
 err() {
@@ -46,6 +46,17 @@ check_privileges() {
       ;;
   esac
   return 1
+}
+
+is_go_installed() {
+  local go_version=
+  if ! go_version=$(go env GOVERSION 2>/dev/null); then
+    return 1
+  fi
+  if [ "$go_version" != "go${GO_VERSION}" ]; then
+    return 1
+  fi
+  return
 }
 
 make_url() {
@@ -144,6 +155,10 @@ main() {
   if ! check_privileges; then
     err "the effective user does not have sudo privileges"
     return 1
+  fi
+  if is_go_installed; then
+    echo "Go is installed to $(go env GOROOT)"
+    return 0
   fi
   run
 }
