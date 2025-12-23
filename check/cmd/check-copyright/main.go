@@ -1,0 +1,47 @@
+// Copyright 2025 Samvel Khalatyan. All rights reserved.
+//
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
+/*
+Check-copyright verifies that the file includes a copyright statement.
+*/
+package main
+
+import (
+	"bytes"
+	"flag"
+	"fmt"
+	"os"
+
+	"github.com/skhal/lab/check/cmd/check-copyright/internal/copyright"
+)
+
+const argsLen = 1
+
+func init() {
+	flag.Usage = func() {
+		header := func() string {
+			buf := new(bytes.Buffer)
+			fmt.Fprintf(buf, "Usage: %s file\n", flag.CommandLine.Name())
+			return buf.String()
+		}
+		fmt.Fprint(flag.CommandLine.Output(), header())
+		flag.PrintDefaults()
+	}
+}
+
+func main() {
+	flag.Parse()
+	if len(flag.Args()) != argsLen {
+		flag.Usage()
+		os.Exit(1)
+	}
+	cfg := copyright.Config{
+		ReadFile: os.ReadFile,
+	}
+	if err := copyright.Run(&cfg, flag.Args()[0]); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+}
