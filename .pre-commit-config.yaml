@@ -31,6 +31,11 @@ repos:
     language: system
     types_or: [bazel]
     args: ["-mode=diff", "-lint=warn"]
+  - id: check-copyright
+    name: check-copyright
+    entry: check-copyright
+    language: system
+    stages: [pre-commit]
   - id: check-go-test
     name: check-go-test
     entry: check-go-test
