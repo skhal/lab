@@ -6,11 +6,12 @@
 github.com/bazelbuild/bazel-watcher/cmd/ibazel@v0.27.0
 github.com/bazelbuild/buildtools/buildifier@latest
 github.com/bazelbuild/buildtools/buildozer@latest
-github.com/google/keep-sorted@v0.7.1
+github.com/google/keep-ed@v0.7.1
 github.com/google/yamlfmt/cmd/yamlfmt@v0.20.0
 github.com/jstemmer/gotags@latest
 github.com/protocolbuffers/txtpbfmt/cmd/txtpbfmt@latest
 github.com/shurcooL/markdownfmt@latest
+github.com/skhal/lab/check/cmd/check-copyright@latest
 github.com/skhal/lab/check/cmd/check-go-test@latest
 github.com/skhal/lab/check/cmd/check-issue@latest
 github.com/skhal/lab/check/cmd/check-nosubmit@latest
