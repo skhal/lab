@@ -74,7 +74,7 @@ Install Clang and co:
 
 ```console
 % sudo apt update
-% sudo apt install clang-21 clang-tools-21 clang-21-doc libclang-common-21-dev libclang-21-dev libclang1-21 clang-format-21 python3-clang-21 clangd-21 clang-tidy-21
+% sudo apt install clang-21 clang-tools-21 clang-21-doc libclang-common-21-dev libclang-21-dev libclang1-21 clang-format-21 python3-clang-21 clangd-21 clang-tidy-21 lld-21
 ```
 
 Make sure to include the following tools:
