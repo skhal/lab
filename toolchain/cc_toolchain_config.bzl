@@ -1,4 +1,7 @@
 # Copyright 2025 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
 
 """
 A clang-based C++ toolchain for Linux builds.
@@ -14,7 +17,7 @@ load(
 )
 load("@rules_cc//cc/common:cc_common.bzl", "cc_common")
 
-def _impl(ctx):
+def _cc_toolchain_config_impl(ctx):
     tool_paths = [
         tool_path(
             name = "gcc",
@@ -95,7 +98,6 @@ def _impl(ctx):
     )
 
 cc_toolchain_config = rule(
-    implementation = _impl,
-    attrs = {},
+    implementation = _cc_toolchain_config_impl,
     provides = [CcToolchainConfigInfo],
 )
