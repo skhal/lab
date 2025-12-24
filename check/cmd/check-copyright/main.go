@@ -23,7 +23,7 @@ func init() {
 	flag.Usage = func() {
 		header := func() string {
 			buf := new(bytes.Buffer)
-			fmt.Fprintf(buf, "Usage: %s file\n", flag.CommandLine.Name())
+			fmt.Fprintf(buf, "Usage: %s file [file ...]\n", flag.CommandLine.Name())
 			return buf.String()
 		}
 		fmt.Fprint(flag.CommandLine.Output(), header())
@@ -33,14 +33,10 @@ func init() {
 
 func main() {
 	flag.Parse()
-	if len(flag.Args()) != argsLen {
-		flag.Usage()
-		os.Exit(1)
-	}
 	cfg := copyright.Config{
 		ReadFile: os.ReadFile,
 	}
-	if err := copyright.Run(&cfg, flag.Args()[0]); err != nil {
+	if err := copyright.Run(&cfg, flag.Args()); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}

@@ -76,7 +76,7 @@ func TestRun(t *testing.T) {
 				ReadFile: newReadFile(t, []byte(tc.data)),
 			}
 
-			err := copyright.Run(&cfg, "/nonexistent")
+			err := copyright.Run(&cfg, []string{"/nonexistent"})
 
 			if !errors.Is(err, tc.want) {
 				t.Errorf("copyright.Run() unexpected error: %v; want %v", err, tc.want)

@@ -29,12 +29,21 @@ type Config struct {
 }
 
 // Run checks whether the file include a copyright comment.
-func Run(cfg *Config, file string) error {
-	data, err := cfg.ReadFile(file)
-	if err != nil {
-		return err
+func Run(cfg *Config, files []string) error {
+	for _, f := range files {
+		data, err := cfg.ReadFile(f)
+		if err != nil {
+			return err
+		}
+		if err := check(data); err != nil {
+			return err
+		}
 	}
-	match := reCopyright.Find(data)
+	return nil
+}
+
+func check(buf []byte) error {
+	match := reCopyright.Find(buf)
 	if match == nil {
 		return ErrNotFound
 	}
