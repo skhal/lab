@@ -19,38 +19,40 @@ load("@rules_cc//cc/common:cc_common.bzl", "cc_common")
 
 def _cc_toolchain_config_impl(ctx):
     tool_paths = [
-        tool_path(
-            name = "gcc",
-            path = "/usr/bin/clang-21",
-        ),
-        tool_path(
-            name = "ld",
-            path = "/usr/bin/ld",
-        ),
+        # keep-sorted start block=yes
         tool_path(
             name = "ar",
             path = "/usr/bin/ar",
         ),
         tool_path(
             name = "cpp",
-            path = "/bin/false",
+            path = "/usr/bin/clang-cpp-21",
+        ),
+        tool_path(
+            name = "gcc",
+            path = "/usr/bin/clang-21",
         ),
         tool_path(
             name = "gcov",
             path = "/bin/false",
         ),
         tool_path(
+            name = "ld",
+            path = "/usr/bin/lld-21",
+        ),
+        tool_path(
             name = "nm",
-            path = "/bin/false",
+            path = "/usr/bin/nm",
         ),
         tool_path(
             name = "objdump",
-            path = "/bin/false",
+            path = "/usr/bin/objdump",
         ),
         tool_path(
             name = "strip",
-            path = "/bin/false",
+            path = "/usr/bin/strip",
         ),
+        # keep-sorted end
     ]
 
     all_link_actions = [

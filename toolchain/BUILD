@@ -1,4 +1,7 @@
 # Copyright 2025 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
 
 load("@rules_cc//cc/toolchains:cc_toolchain.bzl", "cc_toolchain")
 load(":cc_toolchain_config.bzl", "cc_toolchain_config")
@@ -7,7 +10,9 @@ package(default_visibility = ["//visibility:public"])
 
 filegroup(name = "empty")
 
-cc_toolchain_config(name = "linux_x86_64_toolchain_config")
+cc_toolchain_config(
+    name = "linux_x86_64_toolchain_config",
+)
 
 cc_toolchain(
     name = "linux_x86_64_toolchain",
@@ -17,7 +22,7 @@ cc_toolchain(
     linker_files = ":empty",
     objcopy_files = ":empty",
     strip_files = ":empty",
-    supports_param_files = 0,
+    supports_param_files = False,
     toolchain_config = ":linux_x86_64_toolchain_config",
     toolchain_identifier = "linux_x86_64-toolchain",
 )
