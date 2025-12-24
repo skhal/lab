@@ -36,6 +36,7 @@ repos:
     entry: check-copyright
     language: system
     stages: [pre-commit]
+    exclude_types: [markdown]
   - id: check-go-test
     name: check-go-test
     entry: check-go-test
