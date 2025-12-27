@@ -1,12 +1,15 @@
 # Copyright 2025 Samvel Khalatyan. All rights reserved.
 #
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+#
 # List of Go packages to install.
 
 # keep-sorted start
 github.com/bazelbuild/bazel-watcher/cmd/ibazel@v0.27.0
 github.com/bazelbuild/buildtools/buildifier@latest
 github.com/bazelbuild/buildtools/buildozer@latest
-github.com/google/keep-ed@v0.7.1
+github.com/google/keep-sorted@v0.7.1
 github.com/google/yamlfmt/cmd/yamlfmt@v0.20.0
 github.com/jstemmer/gotags@latest
 github.com/protocolbuffers/txtpbfmt/cmd/txtpbfmt@latest
