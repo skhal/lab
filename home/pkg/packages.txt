@@ -19,6 +19,7 @@ git
 go125
 graphviz
 groff
+jq
 llvm21
 nss_ldap
 openldap26-client
