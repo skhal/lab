@@ -1,8 +1,11 @@
 # Copyright 2025 Samvel Khalatyan. All rights reserved.
 #
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+#
 # Flavor: FreeBSD
 
-GO_INSTALL_OPTS = -ldflags "-linkmode 'external' -extldflags '-static'"
+GO_INSTALL_OPTS = -ldflags "-s -w -linkmode external -extldflags -static"
 
 GO_BIN_PATH = ${HOME}/go/bin
 PACKAGE_LIST = packages.txt
