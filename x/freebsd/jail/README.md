@@ -41,3 +41,5 @@ jls(8) integrates with libxo(3) that can output data in JSON format:
   }
 }
 ```
+
+See [jparams_demo_json](./data/jparams_demo_json).
