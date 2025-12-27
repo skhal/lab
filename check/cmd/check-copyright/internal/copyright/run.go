@@ -7,6 +7,7 @@ package copyright
 
 import (
 	"errors"
+	"fmt"
 	"regexp"
 )
 
@@ -36,7 +37,7 @@ func Run(cfg *Config, files []string) error {
 			return err
 		}
 		if err := check(data); err != nil {
-			return err
+			return fmt.Errorf("%s: %w", f, err)
 		}
 	}
 	return nil
