@@ -37,6 +37,7 @@ repos:
     language: system
     stages: [pre-commit]
     exclude_types: [markdown]
+    exclude: ".*/data/.*"
   - id: check-go-test
     name: check-go-test
     entry: check-go-test
