@@ -3,6 +3,7 @@ module github.com/skhal/lab
 go 1.25.1
 
 require (
+	github.com/gomarkdown/markdown v0.0.0-20250810172220-2e2c11897d1a
 	github.com/google/go-cmp v0.7.0
 	github.com/protocolbuffers/txtpbfmt v0.0.0-20251016062345-16587c79cd91
 	google.golang.org/grpc v1.75.1
