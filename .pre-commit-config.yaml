@@ -37,7 +37,7 @@ repos:
     language: system
     stages: [pre-commit]
     exclude_types: [markdown]
-    exclude: "(go\\.(mod|sum)|.*/(test)?data/.*)"
+    exclude: "(go\\.(mod|sum)|MODULE\\.bazel\\.lock|.*/(test)?data/.*)"
   - id: check-go-test
     name: check-go-test
     entry: check-go-test
