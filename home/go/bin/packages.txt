@@ -5,10 +5,18 @@
 #
 # List of Go packages to install.
 
+# Format:
+#   package [flags]
+#
+# Example:
+#   github.com/foo/bar@latest
+#   github.com/foo/bar@latest -ldflags '-s'
+#
 # keep-sorted start
 github.com/bazelbuild/bazel-watcher/cmd/ibazel@v0.27.0
 github.com/bazelbuild/buildtools/buildifier@latest
 github.com/bazelbuild/buildtools/buildozer@latest
+github.com/go-delve/delve/cmd/dlv@v1.26.0 -ldflags '-extldflags -lkvm'
 github.com/google/keep-sorted@v0.7.1
 github.com/google/yamlfmt/cmd/yamlfmt@v0.20.0
 github.com/jstemmer/gotags@latest
