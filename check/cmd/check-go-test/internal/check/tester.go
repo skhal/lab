@@ -3,7 +3,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package test
+package check
 
 import (
 	"bytes"
@@ -13,6 +13,8 @@ import (
 	"iter"
 	"os/exec"
 	"path/filepath"
+
+	"github.com/skhal/lab/check/cmd/check-go-test/internal/test"
 )
 
 // EventID identifies an Event. It includes the Event's package and test names.
@@ -21,14 +23,14 @@ type EventID string
 // Tester runs `go test` on packages and groups events by event ids. It also
 // keeps track of failed tests for further analysis.
 type Tester struct {
-	events map[EventID][]*TestEvent
+	events map[EventID][]*test.TestEvent
 	fails  []EventID
 }
 
 // NewTester creates a tester, ready for testing packages.
 func NewTester() *Tester {
 	return &Tester{
-		events: make(map[EventID][]*TestEvent),
+		events: make(map[EventID][]*test.TestEvent),
 	}
 }
 
@@ -47,7 +49,7 @@ func (t *Tester) Test(pkg string) error {
 	}
 	defer cmd.Wait()
 	for id, e := range decodeEvents(stdout) {
-		if e.Action == ActionFail {
+		if e.Action == test.ActionFail {
 			t.fails = append(t.fails, id)
 		}
 		ee := t.events[id]
@@ -56,11 +58,11 @@ func (t *Tester) Test(pkg string) error {
 	return nil
 }
 
-func decodeEvents(r io.Reader) iter.Seq2[EventID, *TestEvent] {
-	return func(yield func(EventID, *TestEvent) bool) {
+func decodeEvents(r io.Reader) iter.Seq2[EventID, *test.TestEvent] {
+	return func(yield func(EventID, *test.TestEvent) bool) {
 		dec := json.NewDecoder(r)
 		for {
-			e := new(TestEvent)
+			e := new(test.TestEvent)
 			if err := dec.Decode(e); err == io.EOF {
 				break
 			} else if err != nil {
@@ -82,7 +84,7 @@ func (t *Tester) VisitFails(f func(*FailedTest)) {
 }
 
 // NewEventID constructs an EventID for a given event.
-func NewEventID(e *TestEvent) EventID {
+func NewEventID(e *test.TestEvent) EventID {
 	id := e.Test
 	if e.Package != "" {
 		id = filepath.Join(e.Package, e.Test)
@@ -99,21 +101,21 @@ type FailedTest struct {
 	Output []byte
 }
 
-func newFailedTest(ee []*TestEvent) *FailedTest {
+func newFailedTest(ee []*test.TestEvent) *FailedTest {
 	buf := new(bytes.Buffer)
-	var pkg, test string
+	var pkg, t string
 	for _, e := range ee {
 		switch e.Action {
-		case ActionFail:
+		case test.ActionFail:
 			pkg = e.Package
-			test = e.Test
-		case ActionOutput:
+			t = e.Test
+		case test.ActionOutput:
 			buf.WriteString(e.Output)
 		}
 	}
 	return &FailedTest{
 		Package: pkg,
-		Test:    test,
+		Test:    t,
 		Output:  buf.Bytes(),
 	}
 }

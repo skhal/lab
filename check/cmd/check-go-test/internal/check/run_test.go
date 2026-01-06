@@ -1,11 +1,14 @@
 // Copyright 2025 Samvel Khalatyan. All rights reserved.
+//
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
 
-package test_test
+package check_test
 
 import (
 	"testing"
 
-	"github.com/skhal/lab/check/cmd/check-go-test/internal/test"
+	"github.com/skhal/lab/check/cmd/check-go-test/internal/check"
 )
 
 func TestIsGoFile(t *testing.T) {
@@ -26,7 +29,7 @@ func TestIsGoFile(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			got := test.IsGoFile(tc.file)
+			got := check.IsGoFile(tc.file)
 
 			if tc.want != got {
 				t.Errorf("test.IsGoFile(%q) = %v; want %v", tc.file, got, tc.want)

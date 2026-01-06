@@ -1,6 +1,9 @@
 // Copyright 2025 Samvel Khalatyan. All rights reserved.
+//
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
 
-package test_test
+package check_test
 
 import (
 	"slices"
@@ -8,7 +11,7 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
-	"github.com/skhal/lab/check/cmd/check-go-test/internal/test"
+	"github.com/skhal/lab/check/cmd/check-go-test/internal/check"
 )
 
 func TestFilterFunc(t *testing.T) {
@@ -42,7 +45,7 @@ func TestFilterFunc(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			got := slices.Collect(test.FilterFunc(slices.Values(tc.items), tc.fn))
+			got := slices.Collect(check.FilterFunc(slices.Values(tc.items), tc.fn))
 
 			if diff := cmp.Diff(tc.want, got, cmpopts.EquateEmpty()); diff != "" {
 				t.Errorf("test.FilterFunc() mismatch (-want, +got):\n%s", diff)
@@ -73,7 +76,7 @@ func TestPaths(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			got := slices.Collect(test.Paths(slices.Values(tc.files)))
+			got := slices.Collect(check.Paths(slices.Values(tc.files)))
 
 			if diff := cmp.Diff(tc.want, got, cmpopts.EquateEmpty()); diff != "" {
 				t.Errorf("test.Paths() mismatch (-want, +got):\n%s", diff)
@@ -104,7 +107,7 @@ func TestUnique(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			got := slices.Collect(test.Unique(slices.Values(tc.items)))
+			got := slices.Collect(check.Unique(slices.Values(tc.items)))
 
 			if diff := cmp.Diff(tc.want, got, cmpopts.EquateEmpty()); diff != "" {
 				t.Errorf("test.Unique() mismatch (-want, +got):\n%s", diff)

@@ -3,12 +3,13 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package test_test
+package check_test
 
 import (
 	"fmt"
 	"testing"
 
+	"github.com/skhal/lab/check/cmd/check-go-test/internal/check"
 	"github.com/skhal/lab/check/cmd/check-go-test/internal/test"
 )
 
@@ -16,22 +17,22 @@ func TestNewEventID(t *testing.T) {
 	tests := []struct {
 		name  string
 		event *test.TestEvent
-		want  test.EventID
+		want  check.EventID
 	}{
 		{
 			name:  "no package",
 			event: &test.TestEvent{Test: "test"},
-			want:  test.EventID("test"),
+			want:  check.EventID("test"),
 		},
 		{
 			name:  "with package",
 			event: &test.TestEvent{Package: "package", Test: "test"},
-			want:  test.EventID("package/test"),
+			want:  check.EventID("package/test"),
 		},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			got := test.NewEventID(tc.event)
+			got := check.NewEventID(tc.event)
 
 			if tc.want != got {
 				t.Errorf("test.NewEventID(%s) = %s; want %s", (*printableEvent)(tc.event), got, tc.want)

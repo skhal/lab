@@ -18,13 +18,13 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/skhal/lab/check/cmd/check-go-test/internal/test"
+	"github.com/skhal/lab/check/cmd/check-go-test/internal/check"
 )
 
 func main() {
 	flag.Parse()
-	if err := test.Run(flag.Args()...); err != nil {
-		if !errors.Is(err, test.ErrTest) {
+	if err := check.Run(flag.Args()...); err != nil {
+		if !errors.Is(err, check.ErrTest) {
 			fmt.Fprintln(os.Stderr, err)
 		}
 		os.Exit(1)
