@@ -21,24 +21,24 @@ func Run(files ...string) (err error) {
 	if len(packages) == 0 {
 		return
 	}
-	r := NewTester()
+	tester := NewTester()
 	for _, p := range packages {
 		// Gotest is a pre-commit check. Git reports changed files with respect
-		// to the wortree, without leading "./". `go test` assumes that packages
-		// without "./" prefix are non-local.
+		// to the work tree, without leading "./". `go test` expects local packages
+		// to start with "./".
 		p = filepath.FromSlash("./" + p)
-		if err = r.Test(p); err != nil {
+		if err = tester.Test(p); err != nil {
 			return
 		}
 	}
-	r.VisitFails(func(f *FailedTest) {
+	tester.VisitFails(func(f *FailedTest) {
 		err = ErrTest
 		fmt.Print(string(f.Output))
 	})
 	return
 }
 
-// IsGoFile reports whether a file has .go extension.
+// IsGoFile reports whether a file is a Go source, i.e. has `.go` extension.
 func IsGoFile(f string) bool {
 	const goExtension = ".go"
 	return filepath.Ext(f) == goExtension
