@@ -14,23 +14,29 @@ import (
 	"os/exec"
 	"path/filepath"
 
+	"github.com/skhal/lab/check/cmd/check-go-test/internal/build"
 	"github.com/skhal/lab/check/cmd/check-go-test/internal/test"
 )
 
 // EventID identifies an Event. It includes the Event's package and test names.
 type EventID string
 
+type Event struct {
+	BuildEvent *build.Event
+	TestEvent  *test.TestEvent
+}
+
 // Tester runs `go test` on packages and groups events by event ids. It also
 // keeps track of failed tests for further analysis.
 type Tester struct {
-	events map[EventID][]*test.TestEvent
+	events map[EventID][]*Event
 	fails  []EventID
 }
 
 // NewTester creates a tester, ready for testing packages.
 func NewTester() *Tester {
 	return &Tester{
-		events: make(map[EventID][]*test.TestEvent),
+		events: make(map[EventID][]*Event),
 	}
 }
 
@@ -49,7 +55,7 @@ func (t *Tester) Test(pkg string) error {
 	}
 	defer cmd.Wait()
 	for id, e := range decodeEvents(stdout) {
-		if e.Action == test.ActionFail {
+		if e.TestEvent.Action == test.ActionFail {
 			t.fails = append(t.fails, id)
 		}
 		ee := t.events[id]
@@ -58,8 +64,8 @@ func (t *Tester) Test(pkg string) error {
 	return nil
 }
 
-func decodeEvents(r io.Reader) iter.Seq2[EventID, *test.TestEvent] {
-	return func(yield func(EventID, *test.TestEvent) bool) {
+func decodeEvents(r io.Reader) iter.Seq2[EventID, *Event] {
+	return func(yield func(EventID, *Event) bool) {
 		dec := json.NewDecoder(r)
 		for {
 			e := new(test.TestEvent)
@@ -68,7 +74,7 @@ func decodeEvents(r io.Reader) iter.Seq2[EventID, *test.TestEvent] {
 			} else if err != nil {
 				break
 			}
-			if !yield(NewEventID(e), e) {
+			if !yield(NewEventID(e), &Event{TestEvent: e}) {
 				break
 			}
 		}
@@ -101,16 +107,16 @@ type FailedTest struct {
 	Output []byte
 }
 
-func newFailedTest(ee []*test.TestEvent) *FailedTest {
+func newFailedTest(ee []*Event) *FailedTest {
 	buf := new(bytes.Buffer)
 	var pkg, t string
 	for _, e := range ee {
-		switch e.Action {
+		switch e.TestEvent.Action {
 		case test.ActionFail:
-			pkg = e.Package
-			t = e.Test
+			pkg = e.TestEvent.Package
+			t = e.TestEvent.Test
 		case test.ActionOutput:
-			buf.WriteString(e.Output)
+			buf.WriteString(e.TestEvent.Output)
 		}
 	}
 	return &FailedTest{
