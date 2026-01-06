@@ -20,8 +20,11 @@ func TestToHTML(t *testing.T) {
 	markdown := mustReadFile(t, "testdata/basic.md")
 	golden := tests.GoldenFile("testdata/basic_golden.html")
 
-	got := mdview.ToHTML(markdown)
+	got, err := mdview.ToHTML(t.Context(), markdown)
 
+	if err != nil {
+		t.Fatalf("ToHTML() unexpected error: %s", err)
+	}
 	if *update {
 		golden.Write(t, string(got))
 	}
