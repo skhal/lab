@@ -1,4 +1,7 @@
 // Copyright 2025 Samvel Khalatyan. All rights reserved.
+//
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
 
 package test_test
 
@@ -12,17 +15,17 @@ import (
 func TestNewEventID(t *testing.T) {
 	tests := []struct {
 		name  string
-		event *test.Event
+		event *test.TestEvent
 		want  test.EventID
 	}{
 		{
 			name:  "no package",
-			event: &test.Event{Test: "test"},
+			event: &test.TestEvent{Test: "test"},
 			want:  test.EventID("test"),
 		},
 		{
 			name:  "with package",
-			event: &test.Event{Package: "package", Test: "test"},
+			event: &test.TestEvent{Package: "package", Test: "test"},
 			want:  test.EventID("package/test"),
 		},
 	}
@@ -37,7 +40,7 @@ func TestNewEventID(t *testing.T) {
 	}
 }
 
-type printableEvent test.Event
+type printableEvent test.TestEvent
 
 func (e *printableEvent) String() string {
 	return fmt.Sprintf("{package:%q test:%q}", e.Package, e.Test)

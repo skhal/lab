@@ -1,5 +1,8 @@
 // Copyright 2025 Samvel Khalatyan. All rights reserved.
 //
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+//
 //go:generate stringer -type=Action
 
 package test
@@ -11,7 +14,7 @@ import (
 )
 
 // Event is a TestEvent from test2json (see: go doc test2json).
-type Event struct {
+type TestEvent struct {
 	// Time is the time of the event, omitted for cached test results.
 	Time        time.Time     `json:",omitzero"`  // RFC3339
 	Action      Action        `json:",omitzero"`  // a JSON stream begins with ActionStart
@@ -22,11 +25,11 @@ type Event struct {
 	FailedBuild string        `json:",omitempty"`
 }
 
-func (e *Event) MarshalJSON() ([]byte, error) {
+func (e *TestEvent) MarshalJSON() ([]byte, error) {
 	// Use an alias to the Event to avoid MarshalJSON() infinite loop - json
 	// package recursively traverses the structure and uses MarshalJSON for the
 	// fields of types with such a method.
-	type EventAlias Event
+	type EventAlias TestEvent
 	evt := struct {
 		Elapsed float64 `json:",omitempty"`
 		*EventAlias
@@ -37,11 +40,11 @@ func (e *Event) MarshalJSON() ([]byte, error) {
 	return json.Marshal(evt)
 }
 
-func (e *Event) UnmarshalJSON(b []byte) error {
+func (e *TestEvent) UnmarshalJSON(b []byte) error {
 	// Use an alias to the Event to avoid MarshalJSON() infinite loop - json
 	// package recursively traverses the structure and uses MarshalJSON for the
 	// fields of types with such a method.
-	type EventAlias Event
+	type EventAlias TestEvent
 	evt := &struct {
 		Elapsed float64
 		*EventAlias
@@ -60,13 +63,13 @@ type Action int
 
 const (
 	ActionUnspecified Action = iota
-	ActionStart              // the test bainry is about to be executed
+	ActionStart              // the test binary is about to be executed
 	ActionRun                // the test run started
 	ActionPause              // the test paused
 	ActionContinue           // the test run continued
 	ActionPass               // the test passed
-	ActionBenchmark          // the benchmaks logs and did not fail
-	ActionFail               // the test or benchamrk failed
+	ActionBenchmark          // the benchmarks logs and did not fail
+	ActionFail               // the test or benchmark failed
 	ActionOutput             // test output prints
 	ActionSkip               // the test skipped or no tests in the package
 )

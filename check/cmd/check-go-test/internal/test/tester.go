@@ -1,4 +1,7 @@
 // Copyright 2025 Samvel Khalatyan. All rights reserved.
+//
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
 
 package test
 
@@ -18,18 +21,18 @@ type EventID string
 // Tester runs `go test` on packages and groups events by event ids. It also
 // keeps track of failed tests for further analysis.
 type Tester struct {
-	events map[EventID][]*Event
+	events map[EventID][]*TestEvent
 	fails  []EventID
 }
 
 // NewTester creates a tester, ready for testing packages.
 func NewTester() *Tester {
 	return &Tester{
-		events: make(map[EventID][]*Event),
+		events: make(map[EventID][]*TestEvent),
 	}
 }
 
-// Test runs `go test` on a single package and collects test output, groupped
+// Test runs `go test` on a single package and collects test output, grouped
 // by test id. It keeps track of failed tests.
 func (t *Tester) Test(pkg string) error {
 	ctx, cancel := context.WithCancel(context.Background())
@@ -53,11 +56,11 @@ func (t *Tester) Test(pkg string) error {
 	return nil
 }
 
-func decodeEvents(r io.Reader) iter.Seq2[EventID, *Event] {
-	return func(yield func(EventID, *Event) bool) {
+func decodeEvents(r io.Reader) iter.Seq2[EventID, *TestEvent] {
+	return func(yield func(EventID, *TestEvent) bool) {
 		dec := json.NewDecoder(r)
 		for {
-			e := new(Event)
+			e := new(TestEvent)
 			if err := dec.Decode(e); err == io.EOF {
 				break
 			} else if err != nil {
@@ -79,7 +82,7 @@ func (t *Tester) VisitFails(f func(*FailedTest)) {
 }
 
 // NewEventID constructs an EventID for a given event.
-func NewEventID(e *Event) EventID {
+func NewEventID(e *TestEvent) EventID {
 	id := e.Test
 	if e.Package != "" {
 		id = filepath.Join(e.Package, e.Test)
@@ -87,8 +90,8 @@ func NewEventID(e *Event) EventID {
 	return EventID(id)
 }
 
-// FailedTest holds failed test package, name and output of `go test` for the
-// the given test.
+// FailedTest holds failed test package, name and output of `go test` for a
+// given test.
 type FailedTest struct {
 	Package string
 	Test    string
@@ -96,7 +99,7 @@ type FailedTest struct {
 	Output []byte
 }
 
-func newFailedTest(ee []*Event) *FailedTest {
+func newFailedTest(ee []*TestEvent) *FailedTest {
 	buf := new(bytes.Buffer)
 	var pkg, test string
 	for _, e := range ee {
