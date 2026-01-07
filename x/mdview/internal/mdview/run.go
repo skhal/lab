@@ -9,6 +9,7 @@ package mdview
 import (
 	"context"
 	"errors"
+	"flag"
 	"fmt"
 	"net/http"
 	"os"
@@ -16,16 +17,28 @@ import (
 	"time"
 )
 
-// PageTimeout is the maximum time it may take to generate a page.
-var PageTimeout = 10 * time.Millisecond
-
 var ErrInternalServer = errors.New("Server error") // generic error
 
+// PageTimeout is the maximum time it may take to generate a page.
+const (
+	pageTimeout = 10 * time.Millisecond // time to generate a page
+	defaultAddr = "localhost:8080"      // http server address
+)
+
+// Config provides configuration for Markdown server.
+type Config struct {
+	httpAddr string
+}
+
+func (cfg *Config) RegisterFlags(fs *flag.FlagSet) {
+	fs.StringVar(&cfg.httpAddr, "http", defaultAddr, "http address")
+}
+
 // Run starts an HTTP server to serve the file at localhost:8080/.
-func Run() error {
+func Run(cfg *Config) error {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
-		req, cancel := withTimeout(req, PageTimeout)
+		req, cancel := withTimeout(req, pageTimeout)
 		defer cancel()
 		res := handle(req)
 		select {
@@ -47,9 +60,10 @@ func Run() error {
 		fmt.Fprintf(w, "%s", res.Data())
 	})
 	s := &http.Server{
-		Addr:    ":8080",
+		Addr:    cfg.httpAddr,
 		Handler: mux,
 	}
+	fmt.Println("start server at", cfg.httpAddr)
 	return s.ListenAndServe()
 }
 

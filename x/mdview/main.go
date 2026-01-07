@@ -9,9 +9,9 @@ directory.
 
 Synopsis:
 
-	mdview
+	mdview [-http addr]
 
-The server listens on port :8080. Make a GET HTTP request to render a markdown
+The server listens on localhost:8080. Make a GET HTTP request to render a markdown
 file given by URL path:
 
 	open localhost:8080/path/to/README.md
@@ -24,22 +24,23 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/skhal/lab/x/mdview/internal/mdview"
 )
 
-func init() {
+func main() {
+	var cfg mdview.Config
+	cfg.RegisterFlags(flag.CommandLine)
 	flag.Usage = func() {
 		out := flag.CommandLine.Output()
-		fmt.Fprintf(out, "usage: %s\n", os.Args[0])
+		fmt.Fprintf(out, "usage: %s\n", filepath.Base(os.Args[0]))
+		fmt.Fprintln(out)
+		fmt.Fprintln(out, "flags:")
 		flag.PrintDefaults()
-		os.Exit(2)
 	}
-}
-
-func main() {
 	flag.Parse()
-	if err := mdview.Run(); err != nil {
+	if err := mdview.Run(&cfg); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
