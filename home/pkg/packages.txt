@@ -15,6 +15,7 @@ bash
 catch2
 ccache
 cmake
+delve
 doas
 git
 go125
