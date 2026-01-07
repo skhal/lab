@@ -12,6 +12,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"path/filepath"
 	"time"
 )
 
@@ -21,16 +22,12 @@ var PageTimeout = 10 * time.Millisecond
 var ErrInternalServer = errors.New("Server error") // generic error
 
 // Run starts an HTTP server to serve the file at localhost:8080/.
-func Run(filename string) error {
+func Run() error {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
-		if req.URL.Path != "/" {
-			http.NotFound(w, req)
-			return
-		}
 		req, cancel := withTimeout(req, PageTimeout)
 		defer cancel()
-		res := handle(req, filename)
+		res := handle(req)
 		select {
 		case <-res.Done():
 		case <-req.Context().Done():
@@ -88,7 +85,7 @@ func (res *response) Done() <-chan struct{} {
 	return res.done
 }
 
-func handle(req *http.Request, filename string) *response {
+func handle(req *http.Request) *response {
 	res := &response{
 		data: make(chan []byte, 1),
 		err:  make(chan error, 1),
@@ -98,7 +95,7 @@ func handle(req *http.Request, filename string) *response {
 		defer close(res.data)
 		defer close(res.err)
 		defer close(res.done)
-		data, err := renderMarkdown(req.Context(), filename)
+		data, err := renderMarkdown(req.Context(), req.URL.Path)
 		if err != nil {
 			res.err <- err
 			return
@@ -108,10 +105,27 @@ func handle(req *http.Request, filename string) *response {
 	return res
 }
 
-func renderMarkdown(ctx context.Context, filename string) ([]byte, error) {
-	data, err := os.ReadFile(filename)
+const extMarkdown = ".md"
+
+func renderMarkdown(ctx context.Context, path string) ([]byte, error) {
+	if extMarkdown != filepath.Ext(path) {
+		return nil, fmt.Errorf("%s does not have a markdown extension", path)
+	}
+	pwd, err := os.Getwd()
 	if err != nil {
-		return nil, fmt.Errorf("Failed to open %s", filename)
+		return nil, err
+	}
+	fname := filepath.Join(pwd, path)
+	fi, err := os.Stat(fname)
+	if err != nil {
+		return nil, err
+	}
+	if !fi.Mode().IsRegular() {
+		return nil, fmt.Errorf("%s is not a regular file", path)
+	}
+	data, err := os.ReadFile(fname)
+	if err != nil {
+		return nil, fmt.Errorf("Failed to open %s", path)
 	}
 	if err := ctx.Err(); err != nil {
 		return nil, err
