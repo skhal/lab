@@ -26,7 +26,7 @@ func Run(files ...string) (err error) {
 		// Gotest is a pre-commit check. Git reports changed files with respect
 		// to the work tree, without leading "./". `go test` expects local packages
 		// to start with "./".
-		p = filepath.FromSlash("./" + p)
+		p = filepath.FromSlash("./" + filepath.Clean(p))
 		if err = tester.Test(p); err != nil {
 			return
 		}
