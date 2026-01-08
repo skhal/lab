@@ -6,15 +6,12 @@
 package mdview
 
 import (
-	"errors"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
 	"path/filepath"
 )
-
-var ErrInternalServer = errors.New("Server error") // generic error
 
 func listenAndServe(addr string) error {
 	mux := http.NewServeMux()
