@@ -6,7 +6,10 @@
 package mdview
 
 import (
+	"bytes"
+	_ "embed"
 	"fmt"
+	"html/template"
 	"log"
 	"net/http"
 	"os"
@@ -25,19 +28,19 @@ func listenAndServe(addr string) error {
 }
 
 func serveFile(w http.ResponseWriter, req *http.Request) {
-	preview, err := renderMarkdown(req.URL.Path)
+	html, err := renderMarkdown(req.URL.Path)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		log.Println(err)
 		return
 	}
 	w.WriteHeader(http.StatusOK)
-	fmt.Fprint(w, string(preview.HTML))
+	fmt.Fprint(w, string(html))
 }
 
 type Preview struct {
 	Info *FileInfo
-	HTML []byte
+	HTML template.HTML
 }
 
 type FileInfo struct {
@@ -47,19 +50,20 @@ type FileInfo struct {
 
 const extMarkdown = ".md"
 
-func renderMarkdown(path string) (*Preview, error) {
+func renderMarkdown(path string) ([]byte, error) {
 	info, err := stat(path)
 	if err != nil {
 		return nil, err
 	}
-	html, err := readAndRender(info)
+	data, err := readAndRender(info)
 	if err != nil {
 		return nil, err
 	}
-	return &Preview{
-		Info: info,
-		HTML: html,
-	}, nil
+	html, err := execute(Preview{Info: info, HTML: template.HTML(data)})
+	if err != nil {
+		return nil, err
+	}
+	return html, nil
 }
 
 func stat(path string) (*FileInfo, error) {
@@ -90,4 +94,22 @@ func readAndRender(info *FileInfo) ([]byte, error) {
 		return nil, fmt.Errorf("%s: fail to read", info.Path)
 	}
 	return Render(data), nil
+}
+
+var (
+	//go:embed html/main.html
+	mainTmplSrc string
+	mainTmpl    *template.Template
+)
+
+func init() {
+	mainTmpl = template.Must(template.New("main").Parse(mainTmplSrc))
+}
+
+func execute(p Preview) ([]byte, error) {
+	var buf bytes.Buffer
+	if err := mainTmpl.Execute(&buf, p); err != nil {
+		return nil, err
+	}
+	return buf.Bytes(), nil
 }
