@@ -23,6 +23,7 @@ graphviz
 groff
 jq
 llvm21
+npm
 nss_ldap
 openldap26-client
 pam_ldap

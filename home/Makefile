@@ -1,21 +1,18 @@
-# Copyright (c) 2025 Samvel Khalatyan. All rights reserved.
+# Copyright 2025 Samvel Khalatyan. All rights reserved.
 #
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 #
 # Flavor: FreeBSD
 
-INSTALL_PATHS = ctags.d go pkg rust vim vimrc.d
+INSTALL_PATHS = ctags.d go npm pkg rust vim vimrc.d
 SOURCES = tcshrc vimrc tmux.conf gitconfig
 INSTALL_TARGETS = ${SOURCES:S,^,${HOME}/.,}
 
 install: ${INSTALL_TARGETS} ${INSTALL_PATHS} .PHONY
 
-# install Go package before Go binaries.
-go: pkg
-
-# install Rust to use cargo(1)
-rust: pkg
+# Following paths use one of the binaries installed by pkg(1).
+go npm rust: pkg
 
 # install vimrc before adding packs
 vim: ${HOME}/.vimrc vimrc.d
