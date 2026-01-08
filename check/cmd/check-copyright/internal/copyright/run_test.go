@@ -50,6 +50,16 @@ func TestRun(t *testing.T) {
 			`,
 		},
 		{
+			name: "valid html style",
+			data: `
+<!--
+  Copyright 2025 John Doe. All rights reserved.
+
+  Use of this source code is governed by a BSD-style
+  license that can be found in the LICENSE file.
+-->`,
+		},
+		{
 			name: "missing year",
 			data: `
 // Copyright John Doe. All rights reserved.
@@ -65,6 +75,16 @@ func TestRun(t *testing.T) {
 // Copyright 2025. All rights reserved.
 //
 // Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+			`,
+			want: copyright.ErrNotFound,
+		},
+		{
+			name: "mixed comment prefix",
+			data: `
+// Copyright 2025. All rights reserved.
+#
+" Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 			`,
 			want: copyright.ErrNotFound,
