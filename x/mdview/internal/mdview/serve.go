@@ -7,7 +7,7 @@ package mdview
 
 import (
 	"bytes"
-	_ "embed"
+	"embed"
 	"fmt"
 	"html/template"
 	"log"
@@ -97,18 +97,14 @@ func readAndRender(info *FileInfo) ([]byte, error) {
 }
 
 var (
-	//go:embed html/main.html
-	mainTmplSrc string
-	mainTmpl    *template.Template
+	//go:embed html
+	embfs embed.FS
+	tmpls = template.Must(template.New("templates").ParseFS(embfs, "html/*.html"))
 )
-
-func init() {
-	mainTmpl = template.Must(template.New("main").Parse(mainTmplSrc))
-}
 
 func execute(p Preview) ([]byte, error) {
 	var buf bytes.Buffer
-	if err := mainTmpl.Execute(&buf, p); err != nil {
+	if err := tmpls.ExecuteTemplate(&buf, "main.html", p); err != nil {
 		return nil, err
 	}
 	return buf.Bytes(), nil
