@@ -6,8 +6,6 @@
 package mdview
 
 import (
-	"context"
-
 	"github.com/gomarkdown/markdown"
 	"github.com/gomarkdown/markdown/ast"
 	"github.com/gomarkdown/markdown/html"
@@ -20,11 +18,8 @@ type (
 )
 
 // ToHTML converts Markdown buffer to HTML.
-func ToHTML(ctx context.Context, md Markdown) (HTML, error) {
+func ToHTML(md Markdown) (HTML, error) {
 	ast := parse(md)
-	if err := ctx.Err(); err != nil {
-		return nil, err
-	}
 	return render(ast), nil
 }
 
