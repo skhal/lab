@@ -19,6 +19,17 @@ var ErrInternalServer = errors.New("Server error") // generic error
 
 const pageTimeout = 10 * time.Millisecond // time to generate a page
 
+func listenAndServe(addr string) error {
+	mux := http.NewServeMux()
+	mux.HandleFunc("/", serveFile)
+	s := &http.Server{
+		Addr:    addr,
+		Handler: mux,
+	}
+	fmt.Println("start server at", addr)
+	return s.ListenAndServe()
+}
+
 func serveFile(w http.ResponseWriter, req *http.Request) {
 	req, cancel := withTimeout(req, pageTimeout)
 	defer cancel()

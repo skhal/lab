@@ -8,8 +8,6 @@ package mdview
 
 import (
 	"flag"
-	"fmt"
-	"net/http"
 )
 
 const defaultAddr = "localhost:8080" // http server address
@@ -25,12 +23,5 @@ func (cfg *Config) RegisterFlags(fs *flag.FlagSet) {
 
 // Run starts an HTTP server to serve the file at localhost:8080/.
 func Run(cfg *Config) error {
-	mux := http.NewServeMux()
-	mux.HandleFunc("/", serveFile)
-	s := &http.Server{
-		Addr:    cfg.httpAddr,
-		Handler: mux,
-	}
-	fmt.Println("start server at", cfg.httpAddr)
-	return s.ListenAndServe()
+	return listenAndServe(cfg.httpAddr)
 }
