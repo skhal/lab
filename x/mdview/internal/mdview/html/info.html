@@ -9,4 +9,12 @@
     <td>File:</td>
     <td>{{.Path}}</td>
   </tr>
+  <tr>
+    <td>Access:</td>
+    <td>{{.Atime | FormatRFC822}}</td>
+  </tr>
+  <tr>
+    <td>Modified:</td>
+    <td>{{.Mtime | FormatRFC822}}</td>
+  </tr>
 </table>

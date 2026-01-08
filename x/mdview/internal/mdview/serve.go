@@ -14,6 +14,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"time"
 )
 
 func listenAndServe(addr string) error {
@@ -46,6 +47,9 @@ type Preview struct {
 type FileInfo struct {
 	Path    string
 	AbsPath string
+
+	Atime time.Time
+	Mtime time.Time
 }
 
 const extMarkdown = ".md"
@@ -85,6 +89,8 @@ func stat(path string) (*FileInfo, error) {
 	return &FileInfo{
 		Path:    path,
 		AbsPath: abspath,
+		Atime:   time.Now(),
+		Mtime:   fi.ModTime(),
 	}, nil
 }
 
@@ -98,8 +104,13 @@ func readAndRender(info *FileInfo) ([]byte, error) {
 
 var (
 	//go:embed html
-	embfs embed.FS
-	tmpls = template.Must(template.New("templates").ParseFS(embfs, "html/*.html"))
+	embfs   embed.FS
+	funcMap = template.FuncMap{
+		"FormatRFC822": func(t time.Time) string {
+			return t.Format(time.RFC822)
+		},
+	}
+	tmpls = template.Must(template.New("templates").Funcs(funcMap).ParseFS(embfs, "html/*.html"))
 )
 
 func execute(p Preview) ([]byte, error) {
