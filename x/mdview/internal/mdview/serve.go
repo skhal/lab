@@ -60,5 +60,5 @@ func renderMarkdown(path string) ([]byte, error) {
 	if err != nil {
 		return nil, fmt.Errorf("Failed to open %s", path)
 	}
-	return ToHTML(data)
+	return Render(data), nil
 }
