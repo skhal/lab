@@ -36,8 +36,8 @@ repos:
     entry: check-copyright
     language: system
     stages: [pre-commit]
-    exclude_types: [markdown]
-    exclude: "(go\\.(mod|sum)|MODULE\\.bazel\\.lock|.*/(test)?data/.*|_string.go$)"
+    exclude_types: [markdown, json]
+    exclude: "(MODULE\\.bazel\\.lock|go\\.(mod|sum)|.*/(test)?data/.*|_string.go$)"
   - id: check-go-test
     name: check-go-test
     entry: check-go-test
@@ -74,6 +74,12 @@ repos:
     entry: goimports
     language: system
     types_or: [go]
+    args: ["-w"]
+  - id: html-format
+    name: html-format
+    entry: prettier
+    language: system
+    types_or: [html, json]
     args: ["-w"]
   - id: keep-sorted
     name: keep-sorted
