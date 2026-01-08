@@ -29,7 +29,8 @@ func listenAndServe(addr string) error {
 }
 
 func serveFile(w http.ResponseWriter, req *http.Request) {
-	html, err := renderMarkdown(req.URL.Path)
+	path := filepath.Clean("./" + req.URL.Path) // make local
+	html, err := renderMarkdown(path)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		log.Println(err)
