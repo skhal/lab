@@ -8,6 +8,7 @@ package mdview
 import (
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -22,7 +23,7 @@ func listenAndServe(addr string) error {
 		Addr:    addr,
 		Handler: mux,
 	}
-	fmt.Println("start server at", addr)
+	log.Println("start server at", addr)
 	return s.ListenAndServe()
 }
 
@@ -30,7 +31,7 @@ func serveFile(w http.ResponseWriter, req *http.Request) {
 	data, err := renderMarkdown(req.URL.Path)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		fmt.Fprintln(os.Stderr, err.Error())
+		log.Println(err)
 		return
 	}
 	w.WriteHeader(http.StatusOK)
