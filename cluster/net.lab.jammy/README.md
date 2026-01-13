@@ -1,25 +1,28 @@
-# NAME
+NAME
+====
 
 **jammy.lab.net** - Ubuntu 22.04 development environment
 
-
-# DESCRIPTION
+DESCRIPTION
+===========
 
 `jammy.lab.net` is a Ubuntu 22.04 development environment.
 
-## Configuration
+Configuration
+-------------
 
-* tmux(1)
-* vim(1)
-* Bazel 8.4.2
+-	tmux(1)
+-	vim(1)
+-	Bazel 8.4.2
 
-## Sync
+Sync
+----
 
 ```console
 % rsync -arvz --files-from=./rsync.files-from op@nuc.lab.net:/jail/container/jammy/ ./
 ```
 
+SEE ALSO
+========
 
-# SEE ALSO
-
-* [Setup](./doc/setup.md)
+-	[Setup](./doc/setup.md)

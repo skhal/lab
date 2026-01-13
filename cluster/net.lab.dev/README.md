@@ -1,25 +1,28 @@
-# NAME
+NAME
+====
 
 **dev.lab.net** - FreeBSD development environment
 
-
-# DESCRIPTION
+DESCRIPTION
+===========
 
 `dev.lab.net` is a FreeBSD development environment.
 
-## Configuration
+Configuration
+-------------
 
-* tmux(1)
-* vim(1)
-* Go language
+-	tmux(1)
+-	vim(1)
+-	Go language
 
-## Sync
+Sync
+----
 
 ```console
 % rsync -arvz --files-from=./rsync.files-from op@dev.lab.net:/ ./
 ```
 
+SEE ALSO
+========
 
-# SEE ALSO
-
-* [Setup](./doc/setup.md)
+-	[Setup](./doc/setup.md)

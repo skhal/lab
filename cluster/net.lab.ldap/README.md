@@ -1,19 +1,21 @@
-# NAME
+NAME
+====
 
 **ldap.nuc.lab.net** - OpenLDAP Directory Services server
 
-
-# DESCRIPTION
+DESCRIPTION
+===========
 
 `ldap.lab.net` hosts OpenLDAP server.
 
-## Sync
+Sync
+----
 
 ```console
 % rsync -arvz --files-from=./rsync.files-from op@nuc.lab.net:/jail/container/ldap/ ./
 ```
 
+SEE ALSO
+========
 
-# SEE ALSO
-
-  * [Setup](./doc/setup.md)
+-	[Setup](./doc/setup.md)

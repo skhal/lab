@@ -1,25 +1,26 @@
-# NAME
+NAME
+====
 
 **ssh** -- setup SSH client
 
-
-# DESCRIPTION
+DESCRIPTION
+===========
 
 Outline:
 
-  * Generate SSH key for `lab.net` cluster
-  * Configure SSH client to auto-add keys to SSH agent and forward the agent.
-  * Copy the key to the remote hosts
+-	Generate SSH key for `lab.net` cluster
+-	Configure SSH client to auto-add keys to SSH agent and forward the agent.
+-	Copy the key to the remote hosts
 
-```console
-% ssh-keygen -C "sn.khalatyan@gmail.com" -f ~/.ssh/id_lab -t ed25519
-% cat <<EOF >~/.ssh/config
-Host *.lab.net
-  AddKeysToAgent yes
-  ForwardAgent yes
-  IdentityFile ~/.ssh/id_lab
-EOF
-```
+	```console
+	% ssh-keygen -C "sn.khalatyan@gmail.com" -f ~/.ssh/id_lab -t ed25519
+	% cat <<EOF >~/.ssh/config
+	Host *.lab.net
+	AddKeysToAgent yes
+	ForwardAgent yes
+	IdentityFile ~/.ssh/id_lab
+	EOF
+	```
 
 Distribute the public SSH key to the remote hosts:
 
@@ -40,6 +41,6 @@ Verity it works:
 
 ```console
 % ssh dev.nuc.lab.net hostname
-Enter passphrase for key '/Users/skhalatyan/.ssh/id_lab': 
+Enter passphrase for key '/Users/skhalatyan/.ssh/id_lab':
 dev.nuc.lab.net
 ```
