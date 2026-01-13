@@ -31,6 +31,7 @@ github.com/skhal/lab/iq/cmd/iq@latest
 github.com/skhal/lab/x/mdview@latest
 golang.org/x/pkgsite/cmd/pkgsite@latest
 golang.org/x/tools/cmd/goimports@latest
+golang.org/x/tools/cmd/present@latest
 golang.org/x/tools/cmd/stringer@latest
 golang.org/x/tools/gopls@latest
 google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
