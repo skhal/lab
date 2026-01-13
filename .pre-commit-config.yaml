@@ -37,7 +37,7 @@ repos:
     entry: check-copyright
     language: system
     stages: [pre-commit]
-    exclude_types: [markdown, json]
+    exclude_types: [json]
     exclude: "(MODULE\\.bazel\\.lock|go\\.(mod|sum)|.*/(test)?data/.*|_string.go$|.diff$)"
   - id: check-go-test
     name: check-go-test
