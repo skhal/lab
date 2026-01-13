@@ -21,90 +21,90 @@ repos:
   hooks:
   # keep-sorted start
   - id: buildifier
-    name: buildifier
+    name: "Format Bazel"
     entry: buildifier
     language: system
     types_or: [bazel]
     args: ["-mode=fix", "-lint=fix"]
   - id: buildifier-lint
-    name: buildifier-lint
+    name: "Lint Bazel"
     entry: buildifier
     language: system
     types_or: [bazel]
     args: ["-mode=diff", "-lint=warn"]
   - id: check-copyright
-    name: check-copyright
+    name: "Check copyright"
     entry: check-copyright
     language: system
     stages: [pre-commit]
     exclude_types: [json]
     exclude: "(MODULE\\.bazel\\.lock|go\\.(mod|sum)|.*/(test)?data/.*|_string.go$|.diff$)"
   - id: check-go-test
-    name: check-go-test
+    name: "Run go tests"
     entry: check-go-test
     language: system
     types_or: [go]
     pass_filenames: true
   - id: check-issue
-    name: check-issue
+    name: "Issue is set"
     entry: check-issue
     language: system
     stages: [commit-msg]
   - id: check-nosubmit
-    name: check-nosubmit
+    name: "No-submit is not set"
     entry: check-nosubmit
     language: system
   - id: check-todo
-    name: check-todo
+    name: "Lint TODO format"
     entry: check-todo
     language: system
   - id: clang-format
-    name: clang-format
+    name: "Format C/C++"
     entry: clang-format21 -i
     language: system
     types_or: [c++, c]
     args: ["-style=file"]
   - id: clang-tidy
-    name: clang-tidy
+    name: "Tidy C/C++"
     entry: clang-tidy21
     language: system
     types_or: [c++, c]
     args: ["--fix"]
   - id: goimports
-    name: goimports
+    name: "Fix Go imports"
     entry: goimports
     language: system
     types_or: [go]
     args: ["-w"]
   - id: html-format
-    name: html-format
+    name: "Format HTML"
     entry: prettier
     language: system
     types_or: [html, json]
     args: ["-w"]
   - id: keep-sorted
-    name: keep-sorted
+    name: "Keep lines sorted"
     entry: keep-sorted
     language: system
   - id: make-lint
-    name: make-lint
+    name: "Lint makefiles"
     entry: make
     language: system
     types_or: [makefile]
     args: ["-N", "-f"]
   - id: markdown-format
-    name: markdown-format
+    name: "Format Markdown"
     entry: markdownfmt
     language: system
     types_or: [markdown]
     args: ["-w"]
   - id: no-binary
-    name: no-binary
+    name: "No binaries"
     entry: "Binaries are not allowed"
     language: fail
     types_or: [binary]
   - id: shell-format
-    name: shell-format
+    name: "Format shell"
     entry: shfmt
     language: system
     types_or: [shell]
@@ -116,26 +116,26 @@ repos:
     - "--posix"
     - "--write"
   - id: shell-no-extension
-    name: shell-no-extension
-    entry: "Shell executable scripts should not have an extension"
+    name: "No extension in shell executable"
+    entry: "Shell executable with extension is not allowed"
     language: fail
     types: [shell, executable]
     files: "\\.sh$"
   - id: txtpb-format
-    name: txtpb-format
+    name: "Format text Protobuf"
     entry: txtpbfmt
     language: system
     types: [textproto]
     exclude: "testdata"
     args: ["-skip_all_colons"]
   - id: typos
-    name: typos
+    name: "Check typos"
     entry: typos
     language: system
     types: [text]
     exclude: "^(.*\\.diff|infra/net.lab.*\\.conf)$"
   - id: yaml-format
-    name: yaml-format
+    name: "Format YAML"
     entry: yamlfmt
     language: system
     types_or: [yaml]
