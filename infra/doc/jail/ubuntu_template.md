@@ -46,7 +46,7 @@ We'll use a temporary jail to configure the template, with configuration in `/tm
 Start a temporary jail with path set to the template location:
 
 ```console
-% fetch -o /tmp https://raw.githubusercontent.com/skhal/lab/refs/heads/main/cluster/doc/jail/data/jail.conf.d/ubuntu_bootstrap.conf
+% fetch -o /tmp https://raw.githubusercontent.com/skhal/lab/refs/heads/main/infra/doc/jail/data/jail.conf.d/ubuntu_bootstrap.conf
 % : update the path in /tmp/ubuntu_bootstrap.conf
 % doas jail -cm -f /tmp/ubuntu_bootstrap.conf
 ubuntu: created
@@ -139,7 +139,7 @@ Configure
 Some of the configuration steps such as apt(8) need access to mountpoints like `/dev`. Modify the jail's temporary configuration to include mounts:
 
 ```console
-% fetch -o /tmp https://raw.githubusercontent.com/skhal/lab/refs/heads/main/cluster/doc/jail/data/jail.conf.d/ubuntu_config.conf
+% fetch -o /tmp https://raw.githubusercontent.com/skhal/lab/refs/heads/main/infra/doc/jail/data/jail.conf.d/ubuntu_config.conf
 % : update the path in /tmp/ubuntu_config.conf
 % doas jail -cm -f /tmp/ubuntu_config.conf
 ubuntu: created
@@ -151,7 +151,7 @@ Apt
 Use Universe and Multiverse sources to apt(8)
 
 ```console
-% doas jexec ubuntu fetch -o /compat/jammy/etc/apt/ https://raw.githubusercontent.com/skhal/lab/refs/heads/main/cluster/doc/jail/data/sources.list
+% doas jexec ubuntu fetch -o /compat/jammy/etc/apt/ https://raw.githubusercontent.com/skhal/lab/refs/heads/main/infra/doc/jail/data/sources.list
 ```
 
 Upgrade user land:

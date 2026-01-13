@@ -110,7 +110,7 @@ First, modify the default configuration settings in `slapd.ldif` configuration f
 Patch the configuration file ([server/slapd.ldif.diff](server/slapd.ldif.diff)\):
 
 ```console
-# fetch -o /tmp https://github.com/skhal/lab/raw/refs/heads/main/cluster/doc/ldap/server/slapd.ldif.diff
+# fetch -o /tmp https://github.com/skhal/lab/raw/refs/heads/main/infra/doc/ldap/server/slapd.ldif.diff
 # patch -lb -i /tmp/slapd.ldif.diff /usr/local/etc/openldap/slapd.ldif < /tmp/slapd.ldif.diff
 ```
 

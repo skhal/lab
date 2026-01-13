@@ -38,7 +38,7 @@ repos:
     language: system
     stages: [pre-commit]
     exclude_types: [markdown, json]
-    exclude: "(MODULE\\.bazel\\.lock|go\\.(mod|sum)|.*/(test)?data/.*|_string.go$)"
+    exclude: "(MODULE\\.bazel\\.lock|go\\.(mod|sum)|.*/(test)?data/.*|_string.go$|.diff$)"
   - id: check-go-test
     name: check-go-test
     entry: check-go-test
@@ -133,7 +133,7 @@ repos:
     entry: typos
     language: system
     types: [text]
-    exclude: "^.*\\.diff$"
+    exclude: "^(.*\\.diff|infra/net.lab.*\\.conf)$"
   - id: yaml-format
     name: yaml-format
     entry: yamlfmt

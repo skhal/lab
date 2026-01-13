@@ -50,7 +50,7 @@ Make following changes to DNS server configuration ([named.conf.diff](./named.co
 Patch the configuration file:
 
 ```console
-# fetch -o /tmp https://github.com/skhal/lab/raw/refs/heads/main/cluster/doc/dns/server/named.conf.diff
+# fetch -o /tmp https://github.com/skhal/lab/raw/refs/heads/main/infra/doc/dns/server/named.conf.diff
 # patch -lb -i /tmp/named.conf.diff /usr/local/etc/namedb/named.conf
 ```
 
@@ -70,14 +70,14 @@ Store zones in `zones.conf.d` folder:
 
 ```console
 # mkdir -v /usr/local/etc/namedb/zones.conf.d
-# fetch -o /usr/local/etc/namedb/zones.conf.d https://github.com/skhal/lab/raw/refs/heads/main/cluster/doc/dns/server/zones.conf.d/lab.net.conf
+# fetch -o /usr/local/etc/namedb/zones.conf.d https://github.com/skhal/lab/raw/refs/heads/main/infra/doc/dns/server/zones.conf.d/lab.net.conf
 ```
 
 Add forward and reverse mappings:
 
 ```console
-# fetch -o /usr/local/etc/namedb/primary https://github.com/skhal/lab/raw/refs/heads/main/cluster/doc/dns/server/primary/lab.net-forward.db
-# fetch -o /usr/local/etc/namedb/primary https://github.com/skhal/lab/raw/refs/heads/main/cluster/doc/dns/server/primary/lab.net-reverse.db
+# fetch -o /usr/local/etc/namedb/primary https://github.com/skhal/lab/raw/refs/heads/main/infra/doc/dns/server/primary/lab.net-forward.db
+# fetch -o /usr/local/etc/namedb/primary https://github.com/skhal/lab/raw/refs/heads/main/infra/doc/dns/server/primary/lab.net-reverse.db
 ```
 
 Validate

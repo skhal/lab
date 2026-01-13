@@ -13,7 +13,7 @@ Description
 Pull configuration to serve static user content from ~/www at nginx.example.com/~user/:
 
 ```console
-# fetch -o /tmp https://raw.githubusercontent.com/skhal/lab/refs/heads/main/cluster/doc/nginx/data/nginx.conf.diff
+# fetch -o /tmp https://raw.githubusercontent.com/skhal/lab/refs/heads/main/infra/doc/nginx/data/nginx.conf.diff
 # patch -lb -i /tmp/nginx.conf.diff /usr/local/etc/nginx/nginx.conf
 ```
 
@@ -21,7 +21,7 @@ Nginx configuration uses syslogd(8) for logging. Configure it:
 
 ```console
 # mkdir -v /usr/local/etc/syslog.d
-# fetch -o /tmp https://raw.githubusercontent.com/skhal/lab/refs/heads/main/cluster/doc/nginx/data/syslog_nginx.conf.diff
+# fetch -o /tmp https://raw.githubusercontent.com/skhal/lab/refs/heads/main/infra/doc/nginx/data/syslog_nginx.conf.diff
 # mv /tmp/syslog_nginx.conf /usr/local/etc/syslog.d/nginx.conf
 ```
 
@@ -29,7 +29,7 @@ Rotate the logs with newsyslog(8):
 
 ```console
 # mkdir -v /usr/local/etc/newsyslog.conf.d
-# fetch -o /tmp https://raw.githubusercontent.com/skhal/lab/refs/heads/main/cluster/doc/nginx/data/newsyslog_nginx.conf.diff
+# fetch -o /tmp https://raw.githubusercontent.com/skhal/lab/refs/heads/main/infra/doc/nginx/data/newsyslog_nginx.conf.diff
 # mv /tmp/newsyslog_nginx.conf /usr/local/etc/newsyslog.conf.d/nginx.conf
 ```
 

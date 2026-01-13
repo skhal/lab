@@ -175,7 +175,7 @@ Ensure LDAP server is reachable (use `ldap.lab.net` in URI). Install LDAP tools:
 
 ```console
 % doas jexec jammy chroot /compat/jammy apt install ldap-utils
-% doas jexec jammy fetch -o /compat/jammy/tmp https://raw.githubusercontent.com/skhal/lab/refs/heads/main/cluster/doc/jail/data/ldap.conf.diff
+% doas jexec jammy fetch -o /compat/jammy/tmp https://raw.githubusercontent.com/skhal/lab/refs/heads/main/infra/doc/jail/data/ldap.conf.diff
 % doas jexec jammy chroot /compat/jammy patch -lb -i /tmp/ldap.conf.diff /etc/ldap/ldap.conf
 ```
 
@@ -223,9 +223,9 @@ Install:
 Enable nslcd(8) service:
 
 ```console
-% doas jexec jammy fetch -o /compat/jammy/tmp https://raw.githubusercontent.com/skhal/lab/refs/heads/main/cluster/doc/jail/data/nslcd/rc.local
+% doas jexec jammy fetch -o /compat/jammy/tmp https://raw.githubusercontent.com/skhal/lab/refs/heads/main/infra/doc/jail/data/nslcd/rc.local
 % doas jexec jammy chroot /compat/jammy mv -vn /tmp/rc.local /etc/
-% doas jexec jammy fetch -o /compat/jammy/tmp https://raw.githubusercontent.com/skhal/lab/refs/heads/main/cluster/doc/jail/data/nslcd/rc.shutdown.local
+% doas jexec jammy fetch -o /compat/jammy/tmp https://raw.githubusercontent.com/skhal/lab/refs/heads/main/infra/doc/jail/data/nslcd/rc.shutdown.local
 % doas jexec jammy chroot /compat/jammy mv -vn /tmp/rc.shutdown.local /etc/
 ```
 
@@ -260,15 +260,15 @@ Secure Shell (SSH)
 Listen on local address, allow only users from `ssh` group:
 
 ```console
-% doas jexec jammy fetch -o /compat/jammy/etc/ssh/sshd_config.d/ https://raw.githubusercontent.com/skhal/lab/refs/heads/main/cluster/doc/jail/data/sshd_config.d/lab.net.conf
+% doas jexec jammy fetch -o /compat/jammy/etc/ssh/sshd_config.d/ https://raw.githubusercontent.com/skhal/lab/refs/heads/main/infra/doc/jail/data/sshd_config.d/lab.net.conf
 ```
 
 Enable the service:
 
 ```console
-% doas jexec jammy fetch -o /compat/jammy/tmp https://raw.githubusercontent.com/skhal/lab/refs/heads/main/cluster/doc/jail/data/rc.local
+% doas jexec jammy fetch -o /compat/jammy/tmp https://raw.githubusercontent.com/skhal/lab/refs/heads/main/infra/doc/jail/data/rc.local
 % doas jexec jammy chroot /compat/jammy mv -v /tmp/rc.local /etc/
-% doas jexec jammy fetch -o /compat/jammy/tmp https://raw.githubusercontent.com/skhal/lab/refs/heads/main/cluster/doc/jail/data/rc.shutdown.local
+% doas jexec jammy fetch -o /compat/jammy/tmp https://raw.githubusercontent.com/skhal/lab/refs/heads/main/infra/doc/jail/data/rc.shutdown.local
 % doas jexec jammy chroot /compat/jammy mv -v /tmp/rc.shutdown.local /etc/
 ```
 

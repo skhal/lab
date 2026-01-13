@@ -271,7 +271,7 @@ Secure Shell
 Configure SSH to listen on the host IPs and restrict users access:
 
 ```console
-# fetch -o /tmp https://github.com/skhal/lab/raw/refs/heads/main/cluster/doc/nuc/data/sshd_config.diff
+# fetch -o /tmp https://github.com/skhal/lab/raw/refs/heads/main/infra/doc/nuc/data/sshd_config.diff
 # patch -lb -i /tmp/sshd_config.diff /etc/ssh/sshd_config
 ```
 
@@ -413,7 +413,7 @@ Packages
 Add pkg(8) alias to list vital packages that are note removed with `pkg delete -a` ([ref](https://github.com/freebsd/pkg/issues/2485)\):
 
 ```fetch
-# fetch -o /tmp https://github.com/skhal/lab/raw/refs/heads/main/cluster/doc/nuc/data/pkg.conf.diff
+# fetch -o /tmp https://github.com/skhal/lab/raw/refs/heads/main/infra/doc/nuc/data/pkg.conf.diff
 # patch -lb -i /tmp/pkg.conf.diff /usr/local/etc/pkg.conf
 ```
 

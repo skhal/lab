@@ -14,7 +14,7 @@ Configure ssh:
 
 ```
 # sysrc -f /etc/rc.conf.d/sshd sshd_enable=yes
-# fetch -o /tmp https://raw.githubusercontent.com/skhal/lab/refs/heads/main/cluster/doc/dev/data/sshd_config.diff
+# fetch -o /tmp https://raw.githubusercontent.com/skhal/lab/refs/heads/main/infra/doc/dev/data/sshd_config.diff
 # patch -lb -i /tmp/sshd_config.diff /etc/ssh/sshd_config
 ```
 
@@ -49,7 +49,7 @@ Doas
 Give privileges to the members of `:op` group install packages:
 
 ```console
-# fetch -o /tmp https://raw.githubusercontent.com/skhal/lab/refs/heads/main/cluster/doc/dev/data/doas.conf
+# fetch -o /tmp https://raw.githubusercontent.com/skhal/lab/refs/heads/main/infra/doc/dev/data/doas.conf
 # mv /tmp/doas.conf /usr/local/etc/
 ```
 
