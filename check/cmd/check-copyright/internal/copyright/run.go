@@ -7,6 +7,7 @@ package copyright
 
 import (
 	"bytes"
+	"embed"
 	"errors"
 	"fmt"
 	"regexp"
@@ -16,13 +17,12 @@ import (
 // ErrNotFound indicates missing or invalid copyright.
 var ErrNotFound = errors.New("copyright is not found")
 
+var lineRx = regexp.MustCompile(`^(\s*(/[/\*]|[#"])?) Copyright`)
+
 var (
-	lineRx      = regexp.MustCompile(`^(\s*(/[/\*]|[#"])?) Copyright`)
-	blockRxTmpl = template.Must(template.New("block").Parse(`^{{.Prefix}} Copyright \d{4} \w+( \w+)?. All rights reserved.
-{{.EmptyLinePrefix}}
-{{.Prefix}} Use of this source code is governed by a BSD-style
-{{.Prefix}} license that can be found in the LICENSE file.
-`))
+	//go:embed data
+	embedFS      embed.FS
+	licenseTmpls = template.Must(template.New("licenses").ParseFS(embedFS, "data/license_*.txt"))
 )
 
 // ReadFileFn reads file and returns its content or error.
@@ -93,8 +93,8 @@ func compileBlockRx(prefix []byte) (*regexp.Regexp, error) {
 		data.EmptyLinePrefix = data.Prefix
 	}
 	var b bytes.Buffer
-	if err := blockRxTmpl.Execute(&b, data); err != nil {
+	if err := licenseTmpls.ExecuteTemplate(&b, "license_bsd.txt", data); err != nil {
 		return nil, err
 	}
-	return regexp.Compile(b.String())
+	return regexp.Compile("^" + b.String()) // must match the beginning
 }
