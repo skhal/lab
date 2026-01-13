@@ -8,8 +8,10 @@ package mdview
 import (
 	"bytes"
 	"embed"
+	"errors"
 	"fmt"
 	"html/template"
+	"io/fs"
 	"log"
 	"net/http"
 	"os"
@@ -82,6 +84,9 @@ func stat(path string) (*FileInfo, error) {
 	abspath := filepath.Join(pwd, path)
 	fi, err := os.Stat(abspath)
 	if err != nil {
+		if errors.Is(err, fs.ErrNotExist) {
+			return nil, fmt.Errorf("%s: does not exist", path)
+		}
 		return nil, fmt.Errorf("%s: fail to stat", path)
 	}
 	if !fi.Mode().IsRegular() {
