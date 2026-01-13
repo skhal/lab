@@ -16,6 +16,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 )
 
@@ -30,9 +31,15 @@ func listenAndServe(addr string) error {
 	return s.ListenAndServe()
 }
 
+const readmeName = "README.md"
+
 func serveFile(w http.ResponseWriter, req *http.Request) {
-	path := filepath.Clean("./" + req.URL.Path) // make local
-	html, err := renderMarkdown(path)
+	p := req.URL.Path
+	if strings.HasSuffix(p, "/") {
+		p += readmeName
+	}
+	p = filepath.Clean("./" + p) // make local
+	html, err := renderMarkdown(p)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		log.Println(err)
