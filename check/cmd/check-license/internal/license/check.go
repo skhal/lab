@@ -63,6 +63,14 @@ func match(buf []byte) (ok bool, err error) {
 }
 
 func compileBlockRx(prefix []byte) (*regexp.Regexp, error) {
+	b, err := genLicenseBlock(prefix)
+	if err != nil {
+		return nil, err
+	}
+	return regexp.Compile("^" + string(b)) // must match the beginning
+}
+
+func genLicenseBlock(prefix []byte) ([]byte, error) {
 	data := struct {
 		Prefix          string
 		EmptyLinePrefix string
@@ -77,5 +85,5 @@ func compileBlockRx(prefix []byte) (*regexp.Regexp, error) {
 	if err := licenseTmpls.ExecuteTemplate(&b, "license_bsd.txt", data); err != nil {
 		return nil, err
 	}
-	return regexp.Compile("^" + b.String()) // must match the beginning
+	return b.Bytes(), nil
 }
