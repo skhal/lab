@@ -7,19 +7,11 @@ package license
 
 import (
 	"bytes"
-	"embed"
 	"errors"
 	"regexp"
-	"text/template"
 )
 
 var lineRx = regexp.MustCompile(`^([\t ]*(/[/\*]|[#"])?) Copyright`)
-
-var (
-	//go:embed data
-	embedFS      embed.FS
-	licenseTmpls = template.Must(template.New("licenses").ParseFS(embedFS, "data/license_*.txt"))
-)
 
 const eol = '\n'
 
@@ -74,22 +66,6 @@ func compileBlockRx(prefix []byte) (*regexp.Regexp, error) {
 	b = addPrefix(b, prefix)
 	return regexp.Compile("^" + string(b)) // must match the beginning
 }
-
-// LicenseData is input to the license template.
-type LicenseData struct {
-	Year   string
-	Holder string
-}
-
-func genLicenseBlock(data *LicenseData) ([]byte, error) {
-	var b bytes.Buffer
-	if err := licenseTmpls.ExecuteTemplate(&b, "license_bsd.txt", data); err != nil {
-		return nil, err
-	}
-	return b.Bytes(), nil
-}
-
-var emptyLine = []byte("\n")
 
 func addPrefix(block []byte, prefix []byte) []byte {
 	var b bytes.Buffer
