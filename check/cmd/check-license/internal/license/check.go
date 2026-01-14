@@ -10,7 +10,6 @@ import (
 	"embed"
 	"errors"
 	"regexp"
-	"strings"
 	"text/template"
 )
 
@@ -64,32 +63,22 @@ func match(buf []byte) (ok bool, err error) {
 }
 
 func compileBlockRx(prefix []byte) (*regexp.Regexp, error) {
-	b, err := genLicenseBlock(prefix)
+	b, err := genLicenseBlock()
 	if err != nil {
 		return nil, err
 	}
+	b = addPrefix(b, prefix)
 	return regexp.Compile("^" + string(b)) // must match the beginning
 }
 
 // LicenseData is input to the license template.
 type LicenseData struct {
-	Prefix string
 	Year   string
 	Holder string
 }
 
-// EmptyLinePrefix returns prefix for empty lines in the license. It is empty
-// if the prefix is space-only, e.g. HTML comments.
-func (ld *LicenseData) EmptyLinePrefix() string {
-	if len(strings.TrimSpace(ld.Prefix)) == 0 {
-		return ""
-	}
-	return ld.Prefix
-}
-
-func genLicenseBlock(prefix []byte) ([]byte, error) {
+func genLicenseBlock() ([]byte, error) {
 	data := &LicenseData{
-		Prefix: string(prefix),
 		Year:   `\d{4}`,
 		Holder: `\w+( \w+)?`,
 	}
@@ -98,4 +87,29 @@ func genLicenseBlock(prefix []byte) ([]byte, error) {
 		return nil, err
 	}
 	return b.Bytes(), nil
+}
+
+var emptyLine = []byte("\n")
+
+func addPrefix(block []byte, prefix []byte) []byte {
+	var b bytes.Buffer
+	for line := range bytes.Lines(block) {
+		if isEmptyLine(line) {
+			if len(bytes.TrimSpace(prefix)) != 0 {
+				b.Write(prefix)
+			}
+		} else {
+			b.Write(prefix)
+			b.WriteByte(' ')
+		}
+		b.Write(line)
+	}
+	return b.Bytes()
+}
+
+func isEmptyLine(b []byte) bool {
+	if len(b) > 1 {
+		return false
+	}
+	return len(b) == 0 || (len(b) == 1 && b[0] == eol)
 }

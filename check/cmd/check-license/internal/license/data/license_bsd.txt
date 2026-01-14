@@ -1,4 +1,4 @@
-{{.Prefix}} Copyright {{.Year}} {{.Holder}}. All rights reserved.
-{{.EmptyLinePrefix}}
-{{.Prefix}} Use of this source code is governed by a BSD-style
-{{.Prefix}} license that can be found in the LICENSE file.
+Copyright {{.Year}} {{.Holder}}. All rights reserved.
+
+Use of this source code is governed by a BSD-style
+license that can be found in the LICENSE file.
