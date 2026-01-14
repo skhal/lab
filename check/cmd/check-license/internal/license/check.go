@@ -10,6 +10,7 @@ import (
 	"embed"
 	"errors"
 	"regexp"
+	"strings"
 	"text/template"
 )
 
@@ -70,20 +71,27 @@ func compileBlockRx(prefix []byte) (*regexp.Regexp, error) {
 	return regexp.Compile("^" + string(b)) // must match the beginning
 }
 
+// LicenseData is input to the license template.
+type LicenseData struct {
+	Prefix string
+	Year   string
+	Holder string
+}
+
+// EmptyLinePrefix returns prefix for empty lines in the license. It is empty
+// if the prefix is space-only, e.g. HTML comments.
+func (ld *LicenseData) EmptyLinePrefix() string {
+	if len(strings.TrimSpace(ld.Prefix)) == 0 {
+		return ""
+	}
+	return ld.Prefix
+}
+
 func genLicenseBlock(prefix []byte) ([]byte, error) {
-	data := struct {
-		Prefix          string
-		EmptyLinePrefix string
-		Year            string
-		Holder          string
-	}{
+	data := &LicenseData{
 		Prefix: string(prefix),
 		Year:   `\d{4}`,
 		Holder: `\w+( \w+)?`,
-	}
-	// The separator line is empty in comment blocks, e.g. HTML.
-	if len(bytes.TrimSpace(prefix)) != 0 {
-		data.EmptyLinePrefix = data.Prefix
 	}
 	var b bytes.Buffer
 	if err := licenseTmpls.ExecuteTemplate(&b, "license_bsd.txt", data); err != nil {
