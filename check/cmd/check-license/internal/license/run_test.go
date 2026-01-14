@@ -3,13 +3,13 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package copyright_test
+package license_test
 
 import (
 	"errors"
 	"testing"
 
-	"github.com/skhal/lab/check/cmd/check-copyright/internal/copyright"
+	"github.com/skhal/lab/check/cmd/check-license/internal/license"
 )
 
 func TestRun(t *testing.T) {
@@ -20,7 +20,7 @@ func TestRun(t *testing.T) {
 	}{
 		{
 			name: "empty",
-			want: copyright.ErrNotFound,
+			want: license.ErrNotFound,
 		},
 		{
 			name: "valid c style",
@@ -67,7 +67,7 @@ func TestRun(t *testing.T) {
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 			`,
-			want: copyright.ErrInvalid,
+			want: license.ErrInvalid,
 		},
 		{
 			name: "missing author",
@@ -77,7 +77,7 @@ func TestRun(t *testing.T) {
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 			`,
-			want: copyright.ErrInvalid,
+			want: license.ErrInvalid,
 		},
 		{
 			name: "mixed comment prefix",
@@ -87,26 +87,26 @@ func TestRun(t *testing.T) {
 " Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 			`,
-			want: copyright.ErrInvalid,
+			want: license.ErrInvalid,
 		},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			cfg := copyright.Config{
+			cfg := license.Config{
 				ReadFile: newReadFile(t, []byte(tc.data)),
 			}
 
-			err := copyright.Run(&cfg, []string{"/nonexistent"})
+			err := license.Run(&cfg, []string{"/nonexistent"})
 
 			if !errors.Is(err, tc.want) {
-				t.Errorf("copyright.Run() unexpected error: %v; want %v", err, tc.want)
+				t.Errorf("license.Run() unexpected error: %v; want %v", err, tc.want)
 				t.Logf("data:\n%s", tc.data)
 			}
 		})
 	}
 }
 
-func newReadFile(t *testing.T, data []byte) copyright.ReadFileFn {
+func newReadFile(t *testing.T, data []byte) license.ReadFileFn {
 	t.Helper()
 	return func(string) ([]byte, error) {
 		t.Helper()

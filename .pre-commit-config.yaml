@@ -32,13 +32,6 @@ repos:
     language: system
     types_or: [bazel]
     args: ["-mode=diff", "-lint=warn"]
-  - id: check-copyright
-    name: "Check copyright"
-    entry: check-copyright
-    language: system
-    stages: [pre-commit]
-    exclude_types: [json]
-    exclude: "(MODULE\\.bazel\\.lock|go\\.(mod|sum)|.*/(test)?data/.*|_string.go$|.diff$)"
   - id: check-go-test
     name: "Run go tests"
     entry: check-go-test
@@ -50,6 +43,13 @@ repos:
     entry: check-issue
     language: system
     stages: [commit-msg]
+  - id: check-license
+    name: "Check coplicense"
+    entry: check-license
+    language: system
+    stages: [pre-commit]
+    exclude_types: [json]
+    exclude: "(MODULE\\.bazel\\.lock|go\\.(mod|sum)|.*/(test)?data/.*|_string.go$|.diff$)"
   - id: check-nosubmit
     name: "No-submit is not set"
     entry: check-nosubmit

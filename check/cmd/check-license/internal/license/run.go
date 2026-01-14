@@ -3,7 +3,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package copyright
+package license
 
 import (
 	"bytes"
@@ -15,11 +15,11 @@ import (
 )
 
 var (
-	// ErrNotFound indicates missing copyright.
-	ErrNotFound = errors.New("missing copyright")
+	// ErrNotFound indicates missing license.
+	ErrNotFound = errors.New("missing license")
 
-	// ErrInvalid indicates invalid copyright.
-	ErrInvalid = errors.New("invalid copyright")
+	// ErrInvalid indicates invalid license.
+	ErrInvalid = errors.New("invalid license")
 )
 
 // InvalidError is [ErrInvalid] with line number where copyright was found.

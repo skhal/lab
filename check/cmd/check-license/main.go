@@ -14,7 +14,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/skhal/lab/check/cmd/check-copyright/internal/copyright"
+	"github.com/skhal/lab/check/cmd/check-license/internal/license"
 )
 
 const argsLen = 1
@@ -33,10 +33,10 @@ func init() {
 
 func main() {
 	flag.Parse()
-	cfg := copyright.Config{
+	cfg := license.Config{
 		ReadFile: os.ReadFile,
 	}
-	if err := copyright.Run(&cfg, flag.Args()); err != nil {
+	if err := license.Run(&cfg, flag.Args()); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}

@@ -22,9 +22,9 @@ github.com/google/yamlfmt/cmd/yamlfmt@v0.20.0
 github.com/jstemmer/gotags@latest
 github.com/protocolbuffers/txtpbfmt/cmd/txtpbfmt@latest
 github.com/shurcooL/markdownfmt@latest
-github.com/skhal/lab/check/cmd/check-copyright@latest
 github.com/skhal/lab/check/cmd/check-go-test@latest
 github.com/skhal/lab/check/cmd/check-issue@latest
+github.com/skhal/lab/check/cmd/check-license@latest
 github.com/skhal/lab/check/cmd/check-nosubmit@latest
 github.com/skhal/lab/check/cmd/check-todo@latest
 github.com/skhal/lab/iq/cmd/iq@latest
