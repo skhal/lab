@@ -8,6 +8,7 @@ package license
 import (
 	"errors"
 	"fmt"
+	"os"
 )
 
 var (
@@ -38,18 +39,10 @@ func (e *InvalidError) Is(target error) bool {
 	return target == ErrInvalid
 }
 
-// ReadFileFn reads file and returns its content or error.
-type ReadFileFn = func(string) ([]byte, error)
-
-// Config configures the runner.
-type Config struct {
-	ReadFile ReadFileFn
-}
-
-// Run checks whether the file include a copyright comment.
-func Run(cfg *Config, files []string) error {
+// Run checks that every file in files has a license.
+func Run(files []string) error {
 	for _, f := range files {
-		data, err := cfg.ReadFile(f)
+		data, err := os.ReadFile(f)
 		if err != nil {
 			return err
 		}

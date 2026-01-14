@@ -33,10 +33,7 @@ func init() {
 
 func main() {
 	flag.Parse()
-	cfg := license.Config{
-		ReadFile: os.ReadFile,
-	}
-	if err := license.Run(&cfg, flag.Args()); err != nil {
+	if err := license.Run(flag.Args()); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
