@@ -92,24 +92,12 @@ func TestRun(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			cfg := license.Config{
-				ReadFile: newReadFile(t, []byte(tc.data)),
-			}
-
-			err := license.Run(&cfg, []string{"/nonexistent"})
+			err := license.Check([]byte(tc.data))
 
 			if !errors.Is(err, tc.want) {
 				t.Errorf("license.Run() unexpected error: %v; want %v", err, tc.want)
 				t.Logf("data:\n%s", tc.data)
 			}
 		})
-	}
-}
-
-func newReadFile(t *testing.T, data []byte) license.ReadFileFn {
-	t.Helper()
-	return func(string) ([]byte, error) {
-		t.Helper()
-		return data, nil
 	}
 }

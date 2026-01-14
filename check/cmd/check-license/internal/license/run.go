@@ -53,7 +53,7 @@ func Run(cfg *Config, files []string) error {
 		if err != nil {
 			return err
 		}
-		if err := check(data); err != nil {
+		if err := Check(data); err != nil {
 			return fmt.Errorf("%s: %w", f, err)
 		}
 	}

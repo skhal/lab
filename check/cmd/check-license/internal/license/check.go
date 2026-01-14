@@ -23,7 +23,7 @@ var (
 
 const eol = '\n'
 
-func check(buf []byte) (err error) {
+func Check(buf []byte) (err error) {
 	ln := 1
 	defer func() {
 		if errors.Is(err, ErrInvalid) {
