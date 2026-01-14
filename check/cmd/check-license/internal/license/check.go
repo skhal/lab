@@ -74,8 +74,12 @@ func genLicenseBlock(prefix []byte) ([]byte, error) {
 	data := struct {
 		Prefix          string
 		EmptyLinePrefix string
+		Year            string
+		Holder          string
 	}{
 		Prefix: string(prefix),
+		Year:   `\d{4}`,
+		Holder: `\w+( \w+)?`,
 	}
 	// The separator line is empty in comment blocks, e.g. HTML.
 	if len(bytes.TrimSpace(prefix)) != 0 {

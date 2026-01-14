@@ -1,4 +1,4 @@
-{{.Prefix}} Copyright \d{4} \w+( \w+)?. All rights reserved.
+{{.Prefix}} Copyright {{.Year}} {{.Holder}}. All rights reserved.
 {{.EmptyLinePrefix}}
 {{.Prefix}} Use of this source code is governed by a BSD-style
 {{.Prefix}} license that can be found in the LICENSE file.
