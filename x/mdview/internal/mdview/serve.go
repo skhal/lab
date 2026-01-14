@@ -22,7 +22,7 @@ import (
 
 func listenAndServe(addr string) error {
 	mux := http.NewServeMux()
-	mux.HandleFunc("/", serveFile)
+	mux.Handle("/", handle(serveFile))
 	s := &http.Server{
 		Addr:    addr,
 		Handler: mux,
@@ -33,7 +33,16 @@ func listenAndServe(addr string) error {
 
 const readmeName = "README.md"
 
-func serveFile(w http.ResponseWriter, req *http.Request) {
+type handle func(w http.ResponseWriter, req *http.Request) error
+
+func (h handle) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+	if err := h(w, req); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		log.Println(err)
+	}
+}
+
+func serveFile(w http.ResponseWriter, req *http.Request) error {
 	p := req.URL.Path
 	if strings.HasSuffix(p, "/") {
 		p += readmeName
@@ -41,12 +50,11 @@ func serveFile(w http.ResponseWriter, req *http.Request) {
 	p = filepath.Clean("./" + p) // make local
 	html, err := renderMarkdown(p)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		log.Println(err)
-		return
+		return err
 	}
 	w.WriteHeader(http.StatusOK)
 	fmt.Fprint(w, string(html))
+	return nil
 }
 
 type Preview struct {
