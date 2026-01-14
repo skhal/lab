@@ -63,7 +63,11 @@ func match(buf []byte) (ok bool, err error) {
 }
 
 func compileBlockRx(prefix []byte) (*regexp.Regexp, error) {
-	b, err := genLicenseBlock()
+	data := &LicenseData{
+		Year:   `\d{4}`,
+		Holder: `\w+( \w+)?`,
+	}
+	b, err := genLicenseBlock(data)
 	if err != nil {
 		return nil, err
 	}
@@ -77,11 +81,7 @@ type LicenseData struct {
 	Holder string
 }
 
-func genLicenseBlock() ([]byte, error) {
-	data := &LicenseData{
-		Year:   `\d{4}`,
-		Holder: `\w+( \w+)?`,
-	}
+func genLicenseBlock(data *LicenseData) ([]byte, error) {
 	var b bytes.Buffer
 	if err := licenseTmpls.ExecuteTemplate(&b, "license_bsd.txt", data); err != nil {
 		return nil, err
