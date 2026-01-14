@@ -67,7 +67,7 @@ func TestRun(t *testing.T) {
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 			`,
-			want: copyright.ErrNotFound,
+			want: copyright.ErrInvalid,
 		},
 		{
 			name: "missing author",
@@ -77,7 +77,7 @@ func TestRun(t *testing.T) {
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 			`,
-			want: copyright.ErrNotFound,
+			want: copyright.ErrInvalid,
 		},
 		{
 			name: "mixed comment prefix",
@@ -87,7 +87,7 @@ func TestRun(t *testing.T) {
 " Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 			`,
-			want: copyright.ErrNotFound,
+			want: copyright.ErrInvalid,
 		},
 	}
 	for _, tc := range tests {

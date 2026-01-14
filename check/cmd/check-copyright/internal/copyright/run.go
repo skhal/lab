@@ -14,10 +14,35 @@ import (
 	"text/template"
 )
 
-// ErrNotFound indicates missing or invalid copyright.
-var ErrNotFound = errors.New("copyright is not found")
+var (
+	// ErrNotFound indicates missing copyright.
+	ErrNotFound = errors.New("missing copyright")
 
-var lineRx = regexp.MustCompile(`^(\s*(/[/\*]|[#"])?) Copyright`)
+	// ErrInvalid indicates invalid copyright.
+	ErrInvalid = errors.New("invalid copyright")
+)
+
+// InvalidError is [ErrInvalid] with line number where copyright was found.
+type InvalidError struct {
+	line int
+}
+
+// NewInvalidError returns a new InvalidError for provided line number.
+func NewInvalidError(line int) *InvalidError {
+	return &InvalidError{
+		line: line,
+	}
+}
+
+func (e *InvalidError) Error() string {
+	return fmt.Sprintf("L%d: %s", e.line, ErrInvalid)
+}
+
+func (e *InvalidError) Is(target error) bool {
+	return target == ErrInvalid
+}
+
+var lineRx = regexp.MustCompile(`^([\t ]*(/[/\*]|[#"])?) Copyright`)
 
 var (
 	//go:embed data
@@ -49,7 +74,13 @@ func Run(cfg *Config, files []string) error {
 
 const eol = '\n'
 
-func check(buf []byte) error {
+func check(buf []byte) (err error) {
+	ln := 1
+	defer func() {
+		if errors.Is(err, ErrInvalid) {
+			err = NewInvalidError(ln)
+		}
+	}()
 	for len(buf) > 0 {
 		if ok, err := match(buf); ok {
 			return nil
@@ -62,6 +93,7 @@ func check(buf []byte) error {
 		}
 		idx += 1 // skip eol
 		buf = buf[idx:]
+		ln += 1
 	}
 	return ErrNotFound
 }
@@ -76,7 +108,7 @@ func match(buf []byte) (ok bool, err error) {
 		return
 	}
 	if !blockRx.Match(buf) {
-		return
+		return false, ErrInvalid
 	}
 	return true, nil
 }
