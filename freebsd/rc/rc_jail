@@ -1,7 +1,10 @@
 #!/bin/sh
 #
-# Copyright 2025 Samvel Khalatyan. All rights reserved.
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
 #
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
 # Manage jail(8) VNET via exec hooks.
 #
 # Example
@@ -125,7 +128,6 @@ jail_exec_poststop() {
   done
 }
 
-
 # jail_write_epair writes the epair(4) identifier to the jail runtime file.
 #
 # Arguments:
@@ -145,7 +147,7 @@ jail_write_epair() {
   if ! [ -d ${jail_epair_file_path} ]; then
     ${MKDIR_CMD} ${jail_epair_file_path}
   fi
-  echo ${jail_epair} > ${jail_epair_file}
+  echo ${jail_epair} >${jail_epair_file}
 }
 
 # jail_read_epair reads the epair(4) identifier from the jail runtime file.
@@ -209,8 +211,7 @@ main() {
   shift 1
 
   case ${hook} in
-    prestart|created|poststop)
-      ;;
+    prestart | created | poststop) ;;
     *)
       echo "invalid hook - ${hook}" >&2
       return 1
