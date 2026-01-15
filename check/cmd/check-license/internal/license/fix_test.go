@@ -107,6 +107,7 @@ func TestAdd_non_empty(t *testing.T) {
 #
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
+
 echo test
 `,
 		},
@@ -118,6 +119,7 @@ echo test
 //
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
+
 namespace {}
 `,
 		},
@@ -129,16 +131,20 @@ namespace {}
 //
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
+
 const test = 123
 `,
 		},
 		{
+			data:     "namespace {}\n",
 			filename: "test.h",
 			holder:   "Tester",
 			want: `// Copyright 2026 Tester. All rights reserved.
 //
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
+
+namespace {}
 `,
 		},
 		{
@@ -151,6 +157,7 @@ const test = 123
   Use of this source code is governed by a BSD-style
   license that can be found in the LICENSE file.
 -->
+
 <br/>
 `,
 		},
@@ -162,6 +169,7 @@ const test = 123
 #
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
+
 echo test
 `,
 		},
@@ -200,6 +208,7 @@ echo test
 #
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
+
 echo test
 `,
 		},
@@ -216,6 +225,7 @@ echo test
   Use of this source code is governed by a BSD-style
   license that can be found in the LICENSE file.
 -->
+
 <br/>
 `,
 		},
@@ -232,6 +242,7 @@ echo test
   Use of this source code is governed by a BSD-style
   license that can be found in the LICENSE file.
 -->
+
 <br/>
 `,
 		},
@@ -247,6 +258,7 @@ echo test
 #
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
+
 echo test
 `,
 		},

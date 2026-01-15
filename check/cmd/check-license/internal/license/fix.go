@@ -77,7 +77,10 @@ func (ins *inserter) Insert(b []byte, lic []byte) ([]byte, error) {
 	var buf bytes.Buffer
 	b = ins.writeFirstLine(&buf, b)
 	ins.writeLicense(&buf, lic)
-	buf.Write(b)
+	if len(b) > 0 {
+		buf.WriteByte(eol) // separate license
+		buf.Write(b)
+	}
 	return buf.Bytes(), nil
 }
 
