@@ -6,10 +6,13 @@
 package license
 
 import (
+	"context"
 	"errors"
 	"flag"
 	"fmt"
 	"os"
+	"sync"
+	"time"
 )
 
 var (
@@ -69,13 +72,38 @@ func Run(files []string, opts *RunOptions) error {
 	if err := opts.Validate(); err != nil {
 		return err
 	}
-	for _, f := range files {
-		err := check(f, opts)
-		if err != nil {
-			return err
+	return doRun(files, opts)
+}
+
+var runTimeout = 100 * time.Millisecond
+
+func doRun(files []string, opts *RunOptions) error {
+	errch := make(chan error)
+	go func() {
+		defer close(errch)
+		ctx, cancel := context.WithTimeout(context.Background(), runTimeout)
+		defer cancel()
+		var wg sync.WaitGroup
+		for _, f := range files {
+			wg.Add(1)
+			go func(ctx context.Context, f string) {
+				defer wg.Done()
+				err := check(f, opts)
+				if err != nil {
+					select {
+					case errch <- err:
+					case <-ctx.Done():
+					}
+				}
+			}(ctx, f)
 		}
+		wg.Wait()
+	}()
+	var ee []error
+	for err := range errch {
+		ee = append(ee, err)
 	}
-	return nil
+	return errors.Join(ee...)
 }
 
 func check(file string, opts *RunOptions) error {
