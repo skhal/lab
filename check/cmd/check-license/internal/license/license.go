@@ -23,7 +23,7 @@ type LicenseData struct {
 	Holder string
 }
 
-func genLicenseBlock(data *LicenseData) ([]byte, error) {
+func genLicenseBlock(data LicenseData) ([]byte, error) {
 	var b bytes.Buffer
 	if err := licenseTmpls.ExecuteTemplate(&b, "license_bsd.txt", data); err != nil {
 		return nil, err

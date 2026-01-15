@@ -55,11 +55,10 @@ func match(buf []byte) (ok bool, err error) {
 }
 
 func compileBlockRx(prefix []byte) (*regexp.Regexp, error) {
-	data := &LicenseData{
+	b, err := genLicenseBlock(LicenseData{
 		Year:   `\d{4}`,
 		Holder: `\w+( \w+)?`,
-	}
-	b, err := genLicenseBlock(data)
+	})
 	if err != nil {
 		return nil, err
 	}
