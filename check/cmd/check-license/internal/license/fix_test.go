@@ -195,6 +195,7 @@ echo test
 			filename: "test",
 			holder:   "Tester",
 			want: `#!/bin/sh
+#
 # Copyright 2026 Tester. All rights reserved.
 #
 # Use of this source code is governed by a BSD-style
@@ -241,6 +242,7 @@ echo test
 			filename: "test.sh",
 			holder:   "Tester",
 			want: `#!/bin/sh
+#
 # Copyright 2026 Tester. All rights reserved.
 #
 # Use of this source code is governed by a BSD-style

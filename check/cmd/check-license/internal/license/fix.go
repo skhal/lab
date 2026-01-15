@@ -32,8 +32,8 @@ func Add(b []byte, filename, holder string) ([]byte, error) {
 	return ins.Insert(b, lic)
 }
 
-// splitFirstLineFunc splits a block of data into the first line and the rest.
-type splitFirstLineFunc func([]byte) ([]byte, []byte)
+// splitFirstLineFunc splits a block of data into the first line, the rest, and optional separator line.
+type splitFirstLineFunc func([]byte) splitBlock
 
 // inserter injects a license into a block of text.
 //
@@ -85,12 +85,16 @@ func (ins *inserter) writeFirstLine(buf *bytes.Buffer, b []byte) []byte {
 	if ins.splitFirstLine == nil {
 		return b
 	}
-	first, b := ins.splitFirstLine(b)
-	if first != nil {
-		buf.Write(first)
+	sb := ins.splitFirstLine(b)
+	if sb.first != nil {
+		buf.Write(sb.first)
 		buf.WriteByte(eol)
 	}
-	return b
+	if sb.separator != nil {
+		buf.Write(sb.separator)
+		buf.WriteByte(eol)
+	}
+	return sb.rest
 }
 
 func (ins *inserter) writeLicense(buf *bytes.Buffer, lic []byte) {
@@ -122,21 +126,40 @@ func (ins *inserter) writeLicenseEmptyLine(buf *bytes.Buffer) {
 	buf.WriteByte(eol)
 }
 
-func splitShebang(b []byte) ([]byte, []byte) {
-	if len(b) < 2 {
-		return nil, b
-	}
-	if !bytes.HasPrefix(b, []byte("#!")) {
-		return nil, b
-	}
-	before, after, _ := bytes.Cut(b, []byte("\n"))
-	return before, after
+type splitBlock struct {
+	first     []byte
+	rest      []byte
+	separator []byte // separator to insert b/w first and rest
 }
 
-func splitDoctype(b []byte) ([]byte, []byte) {
+func splitShebang(b []byte) splitBlock {
+	if len(b) < 2 {
+		return splitBlock{
+			rest: b,
+		}
+	}
+	if !bytes.HasPrefix(b, []byte("#!")) {
+		return splitBlock{
+			rest: b,
+		}
+	}
+	before, after, _ := bytes.Cut(b, []byte("\n"))
+	return splitBlock{
+		first:     before,
+		rest:      after,
+		separator: []byte("#"),
+	}
+}
+
+func splitDoctype(b []byte) splitBlock {
 	before, after, _ := bytes.Cut(b, []byte("\n"))
 	if !bytes.HasPrefix(bytes.ToLower(before), []byte("<!doctype")) {
-		return nil, b
+		return splitBlock{
+			rest: b,
+		}
 	}
-	return before, after
+	return splitBlock{
+		first: before,
+		rest:  after,
+	}
 }
