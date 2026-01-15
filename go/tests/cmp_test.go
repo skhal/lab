@@ -1,4 +1,7 @@
-// Copyright 2025 Samvel Khalatyan. All rights reserved.
+// Copyright 2026 Samvel Khalatyan. All rights reserved.
+//
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
 
 package tests_test
 
@@ -139,47 +142,47 @@ func TestEquateFloat64(t *testing.T) {
 		},
 		// two non-zero, zero tolerance
 		{
-			x: 1.0,
-			y: 2.0,
+			x:         1.0,
+			y:         2.0,
 			tolerance: 0.7,
 			wantEqual: true,
 		},
 		{
-			x: 1.0,
-			y: 2.0,
+			x:         1.0,
+			y:         2.0,
 			tolerance: 0.6,
 		},
 		{
-			x: -1.0,
-			y: 2.0,
+			x:         -1.0,
+			y:         2.0,
 			tolerance: 7,
 			wantEqual: true,
 		},
 		{
-			x: -1.0,
-			y: 2.0,
+			x:         -1.0,
+			y:         2.0,
 			tolerance: 5,
 		},
 		{
-			x: 1.0,
-			y: -2.0,
+			x:         1.0,
+			y:         -2.0,
 			tolerance: 7,
 			wantEqual: true,
 		},
 		{
-			x: 1.0,
-			y: -2.0,
+			x:         1.0,
+			y:         -2.0,
 			tolerance: 5,
 		},
 		{
-			x: -1.0,
-			y: -2.0,
+			x:         -1.0,
+			y:         -2.0,
 			tolerance: 0.7,
 			wantEqual: true,
 		},
 		{
-			x: -1.0,
-			y: -2.0,
+			x:         -1.0,
+			y:         -2.0,
 			tolerance: 0.6,
 		},
 	}
