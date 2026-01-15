@@ -1,0 +1,18 @@
+#!/bin/sh
+#
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+#
+# check_license is a pre-commit hook to checks license in the staged files.
+# It and inserts a license (-fix) if not found with holder equal to the
+# user.name from git-config(1).
+#
+# Synopsis:
+#   check_license README.md
+
+set -e
+
+holder=$(git config get user.name)
+exec check-license -fix -holder="${holder}" "$@"

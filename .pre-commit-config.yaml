@@ -44,8 +44,8 @@ repos:
     language: system
     stages: [commit-msg]
   - id: check-license
-    name: "Check coplicense"
-    entry: check-license
+    name: "Check license"
+    entry: ./check/cmd/check-license/check_license
     language: system
     stages: [pre-commit]
     exclude_types: [json]
