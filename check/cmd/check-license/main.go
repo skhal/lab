@@ -32,8 +32,10 @@ func init() {
 }
 
 func main() {
+	opts := new(license.RunOptions)
+	opts.RegisterFlags(flag.CommandLine)
 	flag.Parse()
-	if err := license.Run(flag.Args()); err != nil {
+	if err := license.Run(flag.Args(), opts); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
