@@ -1,4 +1,4 @@
-// Copyright 2025 Samvel Khalatyan. All rights reserved.
+// Copyright 2026 Samvel Khalatyan. All rights reserved.
 //
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
@@ -181,12 +181,12 @@ type popTestCase struct {
 
 var popTestCases = []popTestCase{
 	{
-		name:     "empty",
+		name:      "empty",
 		wantEmpty: true,
 	},
 	{
-		name:     "one item",
-		items:    []int{10},
+		name:      "one item",
+		items:     []int{10},
 		wantEmpty: true,
 	},
 	{

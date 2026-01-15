@@ -1,4 +1,4 @@
-// Copyright 2025 Samvel Khalatyan. All rights reserved.
+// Copyright 2026 Samvel Khalatyan. All rights reserved.
 //
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
@@ -6,7 +6,7 @@
 /*
 Topm finds top N transactions in the standard input.
 
-    % topm -n 5 -k binary-heap < tinyBatch.txt
+	% topm -n 5 -k binary-heap < tinyBatch.txt
 */
 package main
 

@@ -1,4 +1,4 @@
-// Copyright 2025 Samvel Khalatyan. All rights reserved.
+// Copyright 2026 Samvel Khalatyan. All rights reserved.
 //
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
@@ -8,12 +8,12 @@ Multiway merges multiples sorted files.
 
 The files contain sorted arrays of strings:
 
-    % more a.txt
-		a c d
-		% more b.txt
-		a b e
-		% multiway a.txt b.txt
-		a a b c d e
+	    % more a.txt
+			a c d
+			% more b.txt
+			a b e
+			% multiway a.txt b.txt
+			a a b c d e
 */
 package main
 

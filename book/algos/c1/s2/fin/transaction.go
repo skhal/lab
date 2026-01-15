@@ -1,4 +1,4 @@
-// Copyright 2025 Samvel Khalatyan. All rights reserved.
+// Copyright 2026 Samvel Khalatyan. All rights reserved.
 //
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
@@ -27,7 +27,7 @@ type Transaction struct {
 	// Date is when the transaction happens. Only use the date, no time.
 	Date time.Time
 
-	// Amount of the transaction up to hundreths precision.
+	// Amount of the transaction up to hundredths precision.
 	Amount float64
 }
 

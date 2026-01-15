@@ -1,4 +1,4 @@
-// Copyright 2025 Samvel Khalatyan. All rights reserved.
+// Copyright 2026 Samvel Khalatyan. All rights reserved.
 //
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
@@ -6,7 +6,7 @@
 package queue
 
 // emptyHeap has a single, unused element at 0-index to simplify index math in
-// promot() and demote().
+// promote() and demote().
 const emptyHeapSize = 1
 
 type keyValue[K any, V any] struct {
