@@ -14,68 +14,40 @@ import (
 )
 
 func TestAdd_empty(t *testing.T) {
+	wantC := `// Copyright 2026 Tester. All rights reserved.
+//
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+`
+	wantHTML := `<!--
+  Copyright 2026 Tester. All rights reserved.
+
+  Use of this source code is governed by a BSD-style
+  license that can be found in the LICENSE file.
+-->
+`
+	wantShell := `# Copyright 2026 Tester. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+`
 	tests := []struct {
 		filename string
 		holder   string
 		want     string
 		wantErr  error
 	}{
-		{
-			filename: "test",
-			holder:   "Tester",
-			want: `# Copyright 2026 Tester. All rights reserved.
-#
-# Use of this source code is governed by a BSD-style
-# license that can be found in the LICENSE file.
-`,
-		},
-		{
-			filename: "test.cc",
-			holder:   "Tester",
-			want: `// Copyright 2026 Tester. All rights reserved.
-//
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
-`,
-		},
-		{
-			filename: "test.go",
-			holder:   "Tester",
-			want: `// Copyright 2026 Tester. All rights reserved.
-//
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
-`,
-		},
-		{
-			filename: "test.h",
-			holder:   "Tester",
-			want: `// Copyright 2026 Tester. All rights reserved.
-//
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
-`,
-		},
-		{
-			filename: "test.html",
-			holder:   "Tester",
-			want: `<!--
-  Copyright 2026 Tester. All rights reserved.
-
-  Use of this source code is governed by a BSD-style
-  license that can be found in the LICENSE file.
--->
-`,
-		},
-		{
-			filename: "test.sh",
-			holder:   "Tester",
-			want: `# Copyright 2026 Tester. All rights reserved.
-#
-# Use of this source code is governed by a BSD-style
-# license that can be found in the LICENSE file.
-`,
-		},
+		// keep-sorted start
+		{filename: ".bazelrc", holder: "Tester", want: wantShell},
+		{filename: ".clangd", holder: "Tester", want: wantShell},
+		{filename: "test", holder: "Tester", want: wantShell},
+		{filename: "test.cc", holder: "Tester", want: wantC},
+		{filename: "test.go", holder: "Tester", want: wantC},
+		{filename: "test.h", holder: "Tester", want: wantC},
+		{filename: "test.html", holder: "Tester", want: wantHTML},
+		{filename: "test.sh", holder: "Tester", want: wantShell},
+		{filename: "test.yaml", holder: "Tester", want: wantShell},
+		// keep-sorted end
 	}
 	for _, tc := range tests {
 		t.Run(tc.filename, func(t *testing.T) {
@@ -92,6 +64,29 @@ func TestAdd_empty(t *testing.T) {
 }
 
 func TestAdd_non_empty(t *testing.T) {
+	wantC := `// Copyright 2026 Tester. All rights reserved.
+//
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
+test
+`
+	wantHTML := `<!--
+  Copyright 2026 Tester. All rights reserved.
+
+  Use of this source code is governed by a BSD-style
+  license that can be found in the LICENSE file.
+-->
+
+test
+`
+	wantShell := `# Copyright 2026 Tester. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+test
+`
 	tests := []struct {
 		data     string
 		filename string
@@ -99,80 +94,17 @@ func TestAdd_non_empty(t *testing.T) {
 		want     string
 		wantErr  error
 	}{
-		{
-			data:     "echo test\n",
-			filename: "test",
-			holder:   "Tester",
-			want: `# Copyright 2026 Tester. All rights reserved.
-#
-# Use of this source code is governed by a BSD-style
-# license that can be found in the LICENSE file.
-
-echo test
-`,
-		},
-		{
-			data:     "namespace {}\n",
-			filename: "test.cc",
-			holder:   "Tester",
-			want: `// Copyright 2026 Tester. All rights reserved.
-//
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
-
-namespace {}
-`,
-		},
-		{
-			data:     "const test = 123\n",
-			filename: "test.go",
-			holder:   "Tester",
-			want: `// Copyright 2026 Tester. All rights reserved.
-//
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
-
-const test = 123
-`,
-		},
-		{
-			data:     "namespace {}\n",
-			filename: "test.h",
-			holder:   "Tester",
-			want: `// Copyright 2026 Tester. All rights reserved.
-//
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
-
-namespace {}
-`,
-		},
-		{
-			data:     "<br/>\n",
-			filename: "test.html",
-			holder:   "Tester",
-			want: `<!--
-  Copyright 2026 Tester. All rights reserved.
-
-  Use of this source code is governed by a BSD-style
-  license that can be found in the LICENSE file.
--->
-
-<br/>
-`,
-		},
-		{
-			data:     "echo test\n",
-			filename: "test.sh",
-			holder:   "Tester",
-			want: `# Copyright 2026 Tester. All rights reserved.
-#
-# Use of this source code is governed by a BSD-style
-# license that can be found in the LICENSE file.
-
-echo test
-`,
-		},
+		// keep-sorted start
+		{data: "test\n", filename: ".bazelrc", holder: "Tester", want: wantShell},
+		{data: "test\n", filename: ".clangd", holder: "Tester", want: wantShell},
+		{data: "test\n", filename: "test", holder: "Tester", want: wantShell},
+		{data: "test\n", filename: "test.cc", holder: "Tester", want: wantC},
+		{data: "test\n", filename: "test.go", holder: "Tester", want: wantC},
+		{data: "test\n", filename: "test.h", holder: "Tester", want: wantC},
+		{data: "test\n", filename: "test.html", holder: "Tester", want: wantHTML},
+		{data: "test\n", filename: "test.sh", holder: "Tester", want: wantShell},
+		{data: "test\n", filename: "test.yaml", holder: "Tester", want: wantShell},
+		// keep-sorted end
 	}
 	for _, tc := range tests {
 		t.Run(tc.filename, func(t *testing.T) {
@@ -190,6 +122,7 @@ echo test
 
 func TestAdd_header(t *testing.T) {
 	tests := []struct {
+		name     string
 		data     string
 		filename string
 		holder   string
@@ -197,8 +130,9 @@ func TestAdd_header(t *testing.T) {
 		wantErr  error
 	}{
 		{
+			name: "no ext shebang and text",
 			data: `#!/bin/sh
-echo test
+test
 `,
 			filename: "test",
 			holder:   "Tester",
@@ -209,12 +143,27 @@ echo test
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 
-echo test
+test
 `,
 		},
 		{
+			name: "no ext shebang only",
+			data: `#!/bin/sh
+`,
+			filename: "test",
+			holder:   "Tester",
+			want: `#!/bin/sh
+#
+# Copyright 2026 Tester. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+`,
+		},
+		{
+			name: "html doctype and text",
 			data: `<!doctype html>
-<br/>
+test
 `,
 			filename: "test.html",
 			holder:   "Tester",
@@ -226,16 +175,32 @@ echo test
   license that can be found in the LICENSE file.
 -->
 
-<br/>
+test
 `,
 		},
 		{
-			data: `<!DOCTYPE HTML>
-<br/>
+			name: "html doctype only",
+			data: `<!doctype html>
+`,
+			filename: "test.html",
+			holder:   "Tester",
+			want: `<!doctype html>
+<!--
+  Copyright 2026 Tester. All rights reserved.
+
+  Use of this source code is governed by a BSD-style
+  license that can be found in the LICENSE file.
+-->
+`,
+		},
+		{
+			name: "html doctype mixed case",
+			data: `<!DoCTypE HtMl>
+test
 `,
 			filename: "test_ignore_case.html",
 			holder:   "Tester",
-			want: `<!DOCTYPE HTML>
+			want: `<!DoCTypE HtMl>
 <!--
   Copyright 2026 Tester. All rights reserved.
 
@@ -243,12 +208,13 @@ echo test
   license that can be found in the LICENSE file.
 -->
 
-<br/>
+test
 `,
 		},
 		{
+			name: "sh ext shebang and text",
 			data: `#!/bin/sh
-echo test
+test
 `,
 			filename: "test.sh",
 			holder:   "Tester",
@@ -259,7 +225,7 @@ echo test
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 
-echo test
+test
 `,
 		},
 	}

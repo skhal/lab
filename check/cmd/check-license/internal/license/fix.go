@@ -51,24 +51,46 @@ type inserter struct {
 	splitFirstLine splitFirstLineFunc
 }
 
+var (
+	insShell = inserter{
+		prefix:         "#",
+		splitFirstLine: splitShebang,
+	}
+	insShellNoSplit = inserter{
+		prefix: "#",
+	}
+	insC = inserter{
+		prefix: "//",
+	}
+	insHTML = inserter{
+		start:          "<!--",
+		prefix:         " ",
+		end:            "-->",
+		splitFirstLine: splitDoctype,
+	}
+)
+
 func newInserter(filename string) (*inserter, error) {
 	switch filepath.Ext(filename) {
+	// keep-sorted start
 	case "", ".sh": // no extension: default to shell
-		return &inserter{
-			prefix:         "#",
-			splitFirstLine: splitShebang,
-		}, nil
+		return &insShell, nil
 	case ".cc", ".go", ".h":
-		return &inserter{
-			prefix: "//",
-		}, nil
+		return &insC, nil
 	case ".html", ".md":
-		return &inserter{
-			start:          "<!--",
-			prefix:         " ",
-			end:            "-->",
-			splitFirstLine: splitDoctype,
-		}, nil
+		return &insHTML, nil
+	case ".yaml":
+		return &insShellNoSplit, nil
+		// keep-sorted end
+	}
+	base := filepath.Base(filename)
+	switch base {
+	case ".clangd":
+		return &insShellNoSplit, nil
+	}
+	switch {
+	case strings.HasPrefix(base, ".bazel"):
+		return &insShellNoSplit, nil
 	}
 	return nil, fmt.Errorf("%s: unsupported file type", filename)
 }
