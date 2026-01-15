@@ -1,4 +1,4 @@
-// Copyright 2025 Samvel Khalatyan. All rights reserved.
+// Copyright 2026 Samvel Khalatyan. All rights reserved.
 //
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
@@ -25,7 +25,7 @@ func TestRun(t *testing.T) {
 		{
 			name: "valid c style",
 			data: `
-// Copyright 2025 John Doe. All rights reserved.
+// Copyright 2026 John Doe. All rights reserved.
 //
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
@@ -34,7 +34,7 @@ func TestRun(t *testing.T) {
 		{
 			name: "valid sh style",
 			data: `
-# Copyright 2025 John Doe. All rights reserved.
+# Copyright 2026 John Doe. All rights reserved.
 #
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
@@ -43,7 +43,7 @@ func TestRun(t *testing.T) {
 		{
 			name: "valid vim style",
 			data: `
-" Copyright 2025 John Doe. All rights reserved.
+" Copyright 2026 John Doe. All rights reserved.
 "
 " Use of this source code is governed by a BSD-style
 " license that can be found in the LICENSE file.
@@ -53,7 +53,7 @@ func TestRun(t *testing.T) {
 			name: "valid html style",
 			data: `
 <!--
-  Copyright 2025 John Doe. All rights reserved.
+  Copyright 2026 John Doe. All rights reserved.
 
   Use of this source code is governed by a BSD-style
   license that can be found in the LICENSE file.
@@ -72,7 +72,7 @@ func TestRun(t *testing.T) {
 		{
 			name: "missing author",
 			data: `
-// Copyright 2025. All rights reserved.
+// Copyright 2026. All rights reserved.
 //
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
@@ -82,7 +82,7 @@ func TestRun(t *testing.T) {
 		{
 			name: "mixed comment prefix",
 			data: `
-// Copyright 2025. All rights reserved.
+// Copyright 2026. All rights reserved.
 #
 " Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.

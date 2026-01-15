@@ -1,4 +1,4 @@
-// Copyright 2025 Samvel Khalatyan. All rights reserved.
+// Copyright 2026 Samvel Khalatyan. All rights reserved.
 //
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
@@ -57,7 +57,7 @@ var (
 	// Enforce sub-set of possible options:
 	// - keyword: issue, close, fix
 	// - issue: local or remote
-	issueRegexp   = regexp.MustCompile(`^(?i)(?:issue|close|fix) (?:\w+/\w+)?#\d+$`)
+	issueRegexp = regexp.MustCompile(`^(?i)(?:issue|close|fix) (?:\w+/\w+)?#\d+$`)
 )
 
 // Check validates the file with commit message.

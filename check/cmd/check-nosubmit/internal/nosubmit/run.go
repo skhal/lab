@@ -1,12 +1,16 @@
-// Copyright 2025 Samvel Khalatyan. All rights reserved.
+// Copyright 2026 Samvel Khalatyan. All rights reserved.
+//
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
 
 // Package nosubmit checks files against presence of "DO NOT SUBMIT" comment.
 //
 // Place "DO NOT SUBMIT" comment anywhere in the code to prevent it from being
-// committed. Add optional descriptin.
+// committed. Add optional description.
 //
 // Example:
-//   # DO NOT SUBMIT: work in progress
+//
+//	# DO NOT SUBMIT: work in progress
 package nosubmit
 
 import (
@@ -18,7 +22,7 @@ import (
 	"regexp"
 )
 
-// ErrCheck indicates presense of "DO NO SUBMIT" comment.
+// ErrCheck indicates presence of "DO NO SUBMIT" comment.
 var ErrCheck = errors.New("check error")
 
 // ReadFileFunc reads file and returns contents or error.
