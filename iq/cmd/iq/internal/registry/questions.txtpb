@@ -1,4 +1,8 @@
-# Copyright 2025 Samvel Khalatyan. All rights reserved.
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
 #
 # proto-file: iq/pb/question.proto
 # proto-message: QuestionSet
@@ -15,7 +19,7 @@ questions {
 }
 questions {
   id: 3
-  description: "is string with non-alphanumberic chars a palindrome"
+  description: "is string with non-alphanumeric chars a palindrome"
   tags: "two-pointer"
 }
 questions {
@@ -35,7 +39,7 @@ questions {
 }
 questions {
   id: 7
-  description: "pair sum in unosrted array"
+  description: "pair sum in unsorted array"
   tags: "map"
 }
 questions {
@@ -55,7 +59,7 @@ questions {
 }
 questions {
   id: 11
-  description: "geometic sequence in a collection"
+  description: "geometric sequence in a collection"
   tags: "map"
 }
 questions {

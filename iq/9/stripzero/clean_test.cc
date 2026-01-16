@@ -1,4 +1,8 @@
-// Copyright 2025 Samvel Khalatyan. All rights reserved.
+// Copyright 2026 Samvel Khalatyan. All rights reserved.
+//
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
 //
 // clang-format off-next-line: skip file in `go build`
 //go:build ignore
@@ -19,7 +23,7 @@ namespace iq::stripzero {
 
 class RowFormatter {
  public:
-  RowFormatter(std::string_view prefix)
+  explicit RowFormatter(std::string_view prefix)
       : is_first_row_(true), prefix_(prefix) {}
 
   void operator()(std::string* s, const Row& r) {

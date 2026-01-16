@@ -1,9 +1,13 @@
-// Copyright 2025 Samvel Khalatyan. All rights reserved.
+// Copyright 2026 Samvel Khalatyan. All rights reserved.
+//
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
 //
 // The solution works with Unicode code points instead of ASCII characters. This
 // fact leads to increased complexity - we can't use a constant size vector to
 // keep track of ASCII letter frequency as Unicode code points span larger space
-// and we neeed to fall back to the hash map to track frequences.
+// and we need to fall back to the hash map to track frequencies.
 
 package anagram
 

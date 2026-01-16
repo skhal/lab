@@ -1,4 +1,8 @@
-// Copyright 2025 Samvel Khalatyan. All rights reserved.
+// Copyright 2026 Samvel Khalatyan. All rights reserved.
+//
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
 //
 // clang-format off-next-line
 //go:build ignore
@@ -69,9 +73,9 @@ const FindTestParam kFindTestParams[]{
     {.name = "three negatives", .nn = {-1, -2, -3}, .want = {}},
     {.name = "three identical negatives", .nn = {-1, -1, -1}, .want = {}},
     // Positive tests
-    // -- 3 itmes
+    // -- 3 items
     {.name = "three items", .nn = {1, 2, -3}, .want = {{-3, 1, 2}}},
-    // -- 4 itmes
+    // -- 4 items
     {.name = "four items", .nn = {1, 2, -3, 4}, .want = {{-3, 1, 2}}},
     {.name = "four items duplicate low",
      .nn = {1, 2, -3, -3},

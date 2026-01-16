@@ -1,4 +1,7 @@
-// Copyright 2025 Samvel Khalatyan. All rights reserved.
+// Copyright 2026 Samvel Khalatyan. All rights reserved.
+//
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
 
 package registry_test
 
@@ -136,7 +139,7 @@ func TestWrite_afterLoad(t *testing.T) {
 	}
 }
 
-func TestRegistry_With_errorsOnDuplciates(t *testing.T) {
+func TestRegistry_With_errorsOnDuplicates(t *testing.T) {
 	hasQuestion := newQuestion(t, 1, "one")
 	dupQuestion := newQuestion(t, 1, "two")
 	opts := []registry.Option{

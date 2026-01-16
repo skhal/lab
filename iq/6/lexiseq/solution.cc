@@ -1,4 +1,8 @@
-// Copyright 2025 Samvel Khalatyan. All rights reserved.
+// Copyright 2026 Samvel Khalatyan. All rights reserved.
+//
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
 //
 // clang-format off-next-line
 //go:build ignore
@@ -40,7 +44,7 @@ Pivot findPivot(std::string_view s) {
   return kPivotInvalid;
 }
 
-// findPivotNext scans the string s bakwards from the end until it finds the
+// findPivotNext scans the string s backwards from the end until it finds the
 // first character that is larger than the pivot. It returns the position of
 // the character or zero if the search fails.
 int findPivotNext(std::string_view s, char pivot) {

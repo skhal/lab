@@ -1,4 +1,8 @@
-// Copyright 2025 Samvel Khalatyan. All rights reserved.
+// Copyright 2026 Samvel Khalatyan. All rights reserved.
+//
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
 //
 // clang-format off-next-line
 //go:build ignore
@@ -21,7 +25,7 @@
 
 namespace iq::geomseq {
 
-// Must be in the same namesapce with Triplet:
+// Must be in the same namespace with Triplet:
 // https://google.github.io/googletest/advanced.html#teaching-googletest-how-to-print-your-values
 template <typename Sink>
 void AbslStringify(Sink& sink, const Triplet& t) {

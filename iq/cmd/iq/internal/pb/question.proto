@@ -1,4 +1,8 @@
-// Copyright 2025 Samvel Khalatyan. All rights reserved.
+// Copyright 2026 Samvel Khalatyan. All rights reserved.
+//
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
 
 edition = "2023";
 
@@ -23,10 +27,10 @@ message QuestionSet {
 //
 // Next ID: 4
 message Question {
-  // id is the questino identifier.
+  // id is the question identifier.
   int32 id = 1;
 
-  // description is a short desription of the question.
+  // description is a short description of the question.
   string description = 2;
 
   // tags are free-form strings to group questions into sets.

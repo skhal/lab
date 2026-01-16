@@ -1,4 +1,8 @@
-// Copyright 2025 Samvel Khalatyan. All rights reserved.
+// Copyright 2026 Samvel Khalatyan. All rights reserved.
+//
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
 //
 // clang-format off-next-line
 //go:build ignore
@@ -60,7 +64,7 @@ const ShiftTestParam kShiftTestParams[]{
     {.name = "two items first zero", .nn = {0, 1}, .want = {1, 0}},
     {.name = "two items second zero", .nn = {1, 0}, .want = {1, 0}},
     {.name = "two zeros", .nn = {0, 0}, .want = {0, 0}},
-    // 3 itmes
+    // 3 items
     {.name = "three items not zeros", .nn = {1, 2, 3}, .want = {1, 2, 3}},
     {.name = "three items first zero", .nn = {0, 2, 3}, .want = {2, 3, 0}},
     {.name = "three items second zero", .nn = {1, 0, 3}, .want = {1, 3, 0}},

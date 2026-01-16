@@ -1,4 +1,7 @@
-// Copyright 2025 Samvel Khalatyan. All rights reserved.
+// Copyright 2026 Samvel Khalatyan. All rights reserved.
+//
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
 
 package remove
 
@@ -71,7 +74,7 @@ func LastNth(l *List, n int) {
 
 // findLastNth searches for the n-th node from the end starting from node. It
 // returns a reference to the previous to n-th last node and flag whether the
-// n-th last node was found. It returns (nil, true) if the lenght of the chain
+// n-th last node was found. It returns (nil, true) if the length of the chain
 // is equal to n starting from node.
 func findLastNth(start *Node, n int) (prev *Node, ok bool) {
 	size := 0

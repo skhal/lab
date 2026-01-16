@@ -1,4 +1,7 @@
-// Copyright 2025 Samvel Khalatyan. All rights reserved.
+// Copyright 2026 Samvel Khalatyan. All rights reserved.
+//
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
 
 package random
 
@@ -19,7 +22,7 @@ func pick(ww []int, n int) int {
 			left = mid + 1
 		case n == w:
 			return mid + 1
-		case mid > 0 && n < ww[mid - 1]:
+		case mid > 0 && n < ww[mid-1]:
 			right = mid
 		default:
 			return mid

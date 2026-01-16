@@ -1,4 +1,7 @@
-// Copyright 2025 Samvel Khalatyan. All rights reserved.
+// Copyright 2026 Samvel Khalatyan. All rights reserved.
+//
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
 
 package lru_test
 
@@ -68,7 +71,7 @@ func TestCachePut(t *testing.T) {
 			}
 
 			if diff := cmp.Diff(tc.want, tc.cache.Items()); diff != "" {
-				t.Errorf("lru.Cache state mistmatch (-want, +got):\n%s", diff)
+				t.Errorf("lru.Cache state mismatch (-want, +got):\n%s", diff)
 			}
 		})
 	}
@@ -194,7 +197,7 @@ func TestCacheGetRebalance(t *testing.T) {
 			tc.cache.Get(tc.key)
 
 			if diff := cmp.Diff(tc.want, tc.cache.Items()); diff != "" {
-				t.Errorf("lru.Cache state mistmatch (-want, +got):\n%s", diff)
+				t.Errorf("lru.Cache state mismatch (-want, +got):\n%s", diff)
 			}
 		})
 	}

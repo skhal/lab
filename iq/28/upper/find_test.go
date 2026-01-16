@@ -1,4 +1,7 @@
-// Copyright 2025 Samvel Khalatyan. All rights reserved.
+// Copyright 2026 Samvel Khalatyan. All rights reserved.
+//
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
 
 package upper_test
 
@@ -103,14 +106,14 @@ func TestFind(t *testing.T) {
 			wantOk: true,
 		},
 		{
-			name:   "size three match third",
-			nn:     []int{1, 3, 5},
-			x:      5,
+			name: "size three match third",
+			nn:   []int{1, 3, 5},
+			x:    5,
 		},
 		{
-			name:   "size three above",
-			nn:     []int{1, 3, 5},
-			x:      6,
+			name: "size three above",
+			nn:   []int{1, 3, 5},
+			x:    6,
 		},
 	}
 	for _, tc := range tests {

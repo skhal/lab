@@ -1,4 +1,8 @@
-// Copyright 2025 Samvel Khalatyan. All rights reserved.
+// Copyright 2026 Samvel Khalatyan. All rights reserved.
+//
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
 //
 // clang-format off-next-line
 //go:build ignore
@@ -44,7 +48,7 @@ class PrevNumbers {
 
 class NextNumbers {
  public:
-  NextNumbers(const std::vector<int>& nn) {
+  explicit NextNumbers(const std::vector<int>& nn) {
     for (Index i = nn.size(); i-- > 0;) {
       auto it = index_by_num_.find(nn[i]);
       if (it == index_by_num_.end()) {
@@ -85,7 +89,7 @@ class Triplets {
     }
   }
 
-  operator std::vector<Triplet>() { return triplets_; }
+  explicit operator std::vector<Triplet>() { return triplets_; }
 
  private:
   std::vector<Triplet> triplets_;

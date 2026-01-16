@@ -1,4 +1,7 @@
-// Copyright 2025 Samvel Khalatyan. All rights reserved.
+// Copyright 2026 Samvel Khalatyan. All rights reserved.
+//
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
 
 package remove_test
 
@@ -72,7 +75,7 @@ func TestRemoveNth(t *testing.T) {
 			want: remove.NewList(1, 3),
 		},
 		{
-			name: "three items insuficient items",
+			name: "three items insufficient items",
 			list: remove.NewList(1, 2, 3),
 			n:    4,
 			want: remove.NewList(1, 2, 3),

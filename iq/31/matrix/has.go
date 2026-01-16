@@ -1,17 +1,20 @@
-// Copyright 2025 Samvel Khalatyan. All rights reserved.
+// Copyright 2026 Samvel Khalatyan. All rights reserved.
+//
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
 
 package matrix
 
 type M map[int][]int
 
 func Has(m M, n int) bool {
-	if len(m) == 0{
+	if len(m) == 0 {
 		return false
 	}
 	left := 0
 	right := len(m) * len(m[0])
 	for left < right {
-		mid := left + (right - left) / 2
+		mid := left + (right-left)/2
 		x := getValue(m, mid)
 		switch {
 		case n < x:

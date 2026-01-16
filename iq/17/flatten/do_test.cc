@@ -1,4 +1,8 @@
-// Copyright 2025 Samvel Khalatyan. All rights reserved.
+// Copyright 2026 Samvel Khalatyan. All rights reserved.
+//
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
 //
 // clang-format off-next-line
 //go:build ignore
@@ -105,7 +109,7 @@ TEST(DoTest, Level1OneLevel2One) {
   EXPECT_THAT(got, ListEq(std::vector<int>{1, 2}));
 }
 
-TEST(DoTest, Level1TwoLeve2OneOnFirst) {
+TEST(DoTest, Level1TwoLevel2OneOnFirst) {
   auto tree = makeTree({1, 2});
   getNode(tree, 1)->child = makeTree({3});
 
@@ -114,7 +118,7 @@ TEST(DoTest, Level1TwoLeve2OneOnFirst) {
   EXPECT_THAT(got, ListEq(std::vector<int>{1, 2, 3}));
 }
 
-TEST(DoTest, Level1TwoLeve2OneOnSecond) {
+TEST(DoTest, Level1TwoLevel2OneOnSecond) {
   auto tree = makeTree({1, 2});
   getNode(tree, 2)->child = makeTree({3});
 
@@ -123,7 +127,7 @@ TEST(DoTest, Level1TwoLeve2OneOnSecond) {
   EXPECT_THAT(got, ListEq(std::vector<int>{1, 2, 3}));
 }
 
-TEST(DoTest, Level1TwoLeve2TwoOnFirst) {
+TEST(DoTest, Level1TwoLevel2TwoOnFirst) {
   auto tree = makeTree({1, 2});
   getNode(tree, 1)->child = makeTree({3, 4});
 
@@ -132,7 +136,7 @@ TEST(DoTest, Level1TwoLeve2TwoOnFirst) {
   EXPECT_THAT(got, ListEq(std::vector<int>{1, 2, 3, 4}));
 }
 
-TEST(DoTest, Level1TwoLeve2TwoOnSecond) {
+TEST(DoTest, Level1TwoLevel2TwoOnSecond) {
   auto tree = makeTree({1, 2});
   getNode(tree, 2)->child = makeTree({3, 4});
 
@@ -141,7 +145,7 @@ TEST(DoTest, Level1TwoLeve2TwoOnSecond) {
   EXPECT_THAT(got, ListEq(std::vector<int>{1, 2, 3, 4}));
 }
 
-TEST(DoTest, Level1TwoLeve2TwoOnEach) {
+TEST(DoTest, Level1TwoLevel2TwoOnEach) {
   auto tree = makeTree({1, 2});
   getNode(tree, 1)->child = makeTree({3});
   getNode(tree, 2)->child = makeTree({4});

@@ -1,4 +1,7 @@
-// Copyright 2025 Samvel Khalatyan. All rights reserved.
+// Copyright 2026 Samvel Khalatyan. All rights reserved.
+//
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
 
 package chain_test
 
@@ -31,7 +34,7 @@ func TestFind(t *testing.T) {
 	tests := []struct {
 		name string
 		nn   []int
-		want []chain.C // different opions
+		want []chain.C // different options
 	}{
 		{
 			name: "empty",

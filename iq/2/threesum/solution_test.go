@@ -1,4 +1,7 @@
-// Copyright 2025 Samvel Khalatyan. All rights reserved.
+// Copyright 2026 Samvel Khalatyan. All rights reserved.
+//
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
 
 package threesum_test
 
@@ -18,7 +21,7 @@ var tests = []struct {
 	nn   []int
 	want []*Triplet
 }{
-	// nagative tests
+	// negative tests
 	{
 		name: "empty",
 	},
@@ -35,7 +38,7 @@ var tests = []struct {
 		nn:   []int{1, 2, 3},
 	},
 	{
-		name: "three idential items",
+		name: "three identical items",
 		nn:   []int{1, 1, 1},
 	},
 	{
@@ -43,7 +46,7 @@ var tests = []struct {
 		nn:   []int{-1, -2, -3},
 	},
 	{
-		name: "three idential negative items",
+		name: "three identical negative items",
 		nn:   []int{-1, -1, -1},
 	},
 	// positive tests
