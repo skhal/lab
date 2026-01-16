@@ -1,4 +1,8 @@
-" Copyright 2025 Samvel Khalatyan. All rights reserved.
+" Copyright 2026 Samvel Khalatyan. All rights reserved.
+"
+" Use of this source code is governed by a BSD-style
+" license that can be found in the LICENSE file.
+
 
 " go#Doc calls `go doc` for the keyword under cursor. It allows for dots in
 " the keyword name. The result depends on where the cursor is positioned - it
