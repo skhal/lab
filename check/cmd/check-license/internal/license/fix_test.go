@@ -31,6 +31,11 @@ func TestAdd_empty(t *testing.T) {
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 `
+	wantVim := `" Copyright 2026 Tester. All rights reserved.
+"
+" Use of this source code is governed by a BSD-style
+" license that can be found in the LICENSE file.
+`
 	tests := []struct {
 		filename string
 		holder   string
@@ -51,6 +56,7 @@ func TestAdd_empty(t *testing.T) {
 		{filename: "test.proto", holder: "Tester", want: wantC},
 		{filename: "test.sh", holder: "Tester", want: wantShell},
 		{filename: "test.txt", holder: "Tester", want: wantShell},
+		{filename: "test.vim", holder: "Tester", want: wantVim},
 		{filename: "test.yaml", holder: "Tester", want: wantShell},
 		// keep-sorted end
 	}
@@ -92,6 +98,13 @@ test
 
 test
 `
+	wantVim := `" Copyright 2026 Tester. All rights reserved.
+"
+" Use of this source code is governed by a BSD-style
+" license that can be found in the LICENSE file.
+
+test
+`
 	tests := []struct {
 		data     string
 		filename string
@@ -113,6 +126,7 @@ test
 		{data: "test\n", filename: "test.proto", holder: "Tester", want: wantC},
 		{data: "test\n", filename: "test.sh", holder: "Tester", want: wantShell},
 		{data: "test\n", filename: "test.txt", holder: "Tester", want: wantShell},
+		{data: "test\n", filename: "test.vim", holder: "Tester", want: wantVim},
 		{data: "test\n", filename: "test.yaml", holder: "Tester", want: wantShell},
 		// keep-sorted end
 	}

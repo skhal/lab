@@ -52,13 +52,7 @@ type inserter struct {
 }
 
 var (
-	insShell = inserter{
-		prefix:         "#",
-		splitFirstLine: splitShebang,
-	}
-	insShellNoSplit = inserter{
-		prefix: "#",
-	}
+	// keep-sorted start block=yes
 	insC = inserter{
 		prefix: "//",
 	}
@@ -68,6 +62,17 @@ var (
 		end:            "-->",
 		splitFirstLine: splitDoctype,
 	}
+	insShell = inserter{
+		prefix:         "#",
+		splitFirstLine: splitShebang,
+	}
+	insShellNoSplit = inserter{
+		prefix: "#",
+	}
+	insVim = inserter{
+		prefix: "\"",
+	}
+	// keep-sorted end
 )
 
 func newInserter(filename string) (*inserter, error) {
@@ -81,6 +86,8 @@ func newInserter(filename string) (*inserter, error) {
 		return &insC, nil
 	case ".html", ".md":
 		return &insHTML, nil
+	case ".vim":
+		return &insVim, nil
 		// keep-sorted end
 	}
 	base := filepath.Base(filename)
