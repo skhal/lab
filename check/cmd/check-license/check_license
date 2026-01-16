@@ -14,5 +14,8 @@
 
 set -e
 
-holder=$(git config get user.name)
+if ! holder=$(git config get user.name); then
+  echo "git: failed to get user.name from config"
+  exit 1
+fi
 exec check-license -fix -holder="${holder}" "$@"
