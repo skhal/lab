@@ -1,3 +1,10 @@
+<!--
+  Copyright 2026 Samvel Khalatyan. All rights reserved.
+
+  Use of this source code is governed by a BSD-style
+  license that can be found in the LICENSE file.
+-->
+
 Name
 ====
 
@@ -92,7 +99,7 @@ Update the OS
 
 The setup uses "Packages mechanism". It uses pkg(1) to install base system. There is no need to use freebsd-update(8) any more.
 
-Keep an eye on the version of installed Kernel (-k), running Kernel (-r), and installed userland (-u). Reboot if the versions are out of sync after an upgrade of the packages:
+Keep an eye on the version of installed Kernel (-k), running Kernel (-r), and installed user land (-u). Reboot if the versions are out of sync after an upgrade of the packages:
 
 ```console
 % freebsd-version -kru
@@ -101,7 +108,7 @@ Keep an eye on the version of installed Kernel (-k), running Kernel (-r), and in
 15.0-RELEASE
 ```
 
-The list of intalled packages is minimal. It includes the kernel, minimal packages set to run multi-user environment, base userland, and 32-bit compatibility libraries:
+The list of installed packages is minimal. It includes the kernel, minimal packages set to run multi-user environment, base user land, and 32-bit compatibility libraries:
 
 ```console
 % pkg prime-list
