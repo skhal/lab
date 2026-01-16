@@ -1,4 +1,7 @@
-// Copyright 2025 Samvel Khalatyan. All rights reserved.
+// Copyright 2026 Samvel Khalatyan. All rights reserved.
+//
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
 
 package json_test
 
@@ -21,9 +24,9 @@ type Bar struct {
 // Example_streamOfMixedTypes decodes a stream of JSON messages, one per line,
 // of different types.
 //
-// Since JSON decoder skips unmatched fiels, there is no way to tell whether
+// Since JSON decoder skips unmatched fields, there is no way to tell whether
 // Unamrshal of a valid JSON string into a given data structure was successful,
-// unless the decoder is explicitly asked to disallow unknown fiels, but this
+// unless the decoder is explicitly asked to disallow unknown fields, but this
 // behavior is undesired due to backwards incompatibility.
 //
 // Moreover, the decoder operates on the reader, automatically advancing current
@@ -40,7 +43,7 @@ type Bar struct {
 // NOTE: `go test -json ...`. The tool mixes build and test JSON
 // streams in the standard output. See `go help buildjson` and
 // `go doc test2json`. Unfortunately, the two events, BuildEvent and TestEvent,
-// share the same fiels with the same type, Action and Output, rendering this
+// share the same fields with the same type, Action and Output, rendering this
 // technique to detect failed JSON Unmarshal invalid.
 func Example_streamOfMixedTypes() {
 	str := `

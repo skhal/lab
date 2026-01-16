@@ -1,11 +1,14 @@
-// Copyright 2025 Samvel Khalatyan. All rights reserved.
+// Copyright 2026 Samvel Khalatyan. All rights reserved.
+//
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
 
 package flags
 
 // RequiredString is a flag that must be set from the command line.
 // https://cs.opensource.google/go/go/+/master:src/cmd/go/internal/base/flag.go;l=33-38;drc=96d8d3eb3294e85972aed190aec1806ef3c30712
 type RequiredString struct {
-	val    string
+	val string
 	// parsed keeps track whether the flag was set.
 	parsed bool
 }

@@ -1,16 +1,25 @@
-# NAME
+<!--
+  Copyright 2026 Samvel Khalatyan. All rights reserved.
+
+  Use of this source code is governed by a BSD-style
+  license that can be found in the LICENSE file.
+-->
+
+NAME
+====
 
 **grpc-go** - gRPC with Go
 
-
-# SYNOPSIS
+SYNOPSIS
+========
 
 ```console
 % go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
 % go generate ./x/proto/pb/...
 ```
 
-# DESCRIPTION
+DESCRIPTION
+===========
 
 Ref: https://grpc.io/docs/languages/go/basics/
 

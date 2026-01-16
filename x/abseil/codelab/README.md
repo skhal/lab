@@ -1,12 +1,19 @@
-# NAME
+<!--
+  Copyright 2026 Samvel Khalatyan. All rights reserved.
+
+  Use of this source code is governed by a BSD-style
+  license that can be found in the LICENSE file.
+-->
+
+NAME
+====
 
 **abseil-codelab** - tutorial on Abseil integration with Bazel
 
+DESCRIPTION
+===========
 
-# DESCRIPTION
-
-This is pretty much reproduced [tutorial](https://abseil.io/docs/cpp/quickstart)
-from Abseil.
+This is pretty much reproduced [tutorial](https://abseil.io/docs/cpp/quickstart) from Abseil.
 
 ```console
 % bazel run //:hello_world
@@ -21,7 +28,7 @@ INFO: Running command line: bazel-bin/hello_world
 Joined string: foo-bar-baz
 ```
 
+SEE ALSO
+========
 
-# SEE ALSO
-
-* https://abseil.io/docs/cpp/quickstart
+-	https://abseil.io/docs/cpp/quickstart

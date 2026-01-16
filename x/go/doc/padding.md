@@ -1,25 +1,33 @@
-# NAME
+<!--
+  Copyright 2026 Samvel Khalatyan. All rights reserved.
+
+  Use of this source code is governed by a BSD-style
+  license that can be found in the LICENSE file.
+-->
+
+NAME
+====
 
 **padding** - the number of bites to be added to the block size
 
-
-# DESCRIPTION
+DESCRIPTION
+===========
 
 Consider the following code from Go archive/tar:
 
 https://github.com/golang/go/blob/177cd8d7633843c3eabf8f887381cadbeed3514b/src/archive/tar/format.go#L152-L156
 
-## Problem
+Problem
+-------
 
-It states that if the block size is 2^N and offset is any number between zero
-(inclusive) and the block size, then the expression `-offset & (blockSize - 1)`
-gives the number of bytes between the block size and the offset, that is:
+It states that if the block size is 2^N and offset is any number between zero (inclusive) and the block size, then the expression `-offset & (blockSize - 1)` gives the number of bytes between the block size and the offset, that is:
 
 ```
 blockSize - offset = -offset & (blockSize - 1)
 ```
 
-## Proof
+Proof
+-----
 
 The blockSize is:
 
@@ -33,20 +41,15 @@ Then:
 \mathsf{blockSize} - 1 = \sum_{i=0}^{N-1}{2^i}
 ```
 
-the offset is some number that is less than the block size. When represented as
-a polynomial of the powers of 2, it will run only to $`2^{N-1}`$.
+the offset is some number that is less than the block size. When represented as a polynomial of the powers of 2, it will run only to $`2^{N-1}`$.
 
-Let's denote the multiplier of $`2^i`$ as $`\nu_i`$. It can have a value of 0 or
-1:
+Let's denote the multiplier of $`2^i`$ as $`\nu_i`$. It can have a value of 0 or 1:
 
 ```math
 \mathsf{offset} = \sum_{i=0}^{N-1}{\nu_i 2^i}
 ```
 
-There are different ways to represent negative numbers in computers
-([Wikipedia](https://en.wikipedia.org/wiki/Signed_number_representations)), with
-two's complement being dominant these days, where a negative number is given
-by the complement of the positive number plus one:
+There are different ways to represent negative numbers in computers ([Wikipedia](https://en.wikipedia.org/wiki/Signed_number_representations)), with two's complement being dominant these days, where a negative number is given by the complement of the positive number plus one:
 
 ```
 -N => ~N + 1
