@@ -56,6 +56,7 @@ func TestAdd_empty(t *testing.T) {
 		{filename: "test.proto", holder: "Tester", want: wantC},
 		{filename: "test.sh", holder: "Tester", want: wantShell},
 		{filename: "test.txt", holder: "Tester", want: wantShell},
+		{filename: "test.txtpb", holder: "Tester", want: wantShell},
 		{filename: "test.vim", holder: "Tester", want: wantVim},
 		{filename: "test.yaml", holder: "Tester", want: wantShell},
 		// keep-sorted end
@@ -126,6 +127,7 @@ test
 		{data: "test\n", filename: "test.proto", holder: "Tester", want: wantC},
 		{data: "test\n", filename: "test.sh", holder: "Tester", want: wantShell},
 		{data: "test\n", filename: "test.txt", holder: "Tester", want: wantShell},
+		{data: "test\n", filename: "test.txtpb", holder: "Tester", want: wantShell},
 		{data: "test\n", filename: "test.vim", holder: "Tester", want: wantVim},
 		{data: "test\n", filename: "test.yaml", holder: "Tester", want: wantShell},
 		// keep-sorted end
