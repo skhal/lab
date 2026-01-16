@@ -77,10 +77,10 @@ func newInserter(filename string) (*inserter, error) {
 		return &insShell, nil
 	case ".cc", ".go", ".h":
 		return &insC, nil
+	case ".conf", ".ctags", ".txt", ".yaml":
+		return &insShellNoSplit, nil
 	case ".html", ".md":
 		return &insHTML, nil
-	case ".yaml":
-		return &insShellNoSplit, nil
 		// keep-sorted end
 	}
 	base := filepath.Base(filename)

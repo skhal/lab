@@ -42,10 +42,13 @@ func TestAdd_empty(t *testing.T) {
 		{filename: ".clangd", holder: "Tester", want: wantShell},
 		{filename: "test", holder: "Tester", want: wantShell},
 		{filename: "test.cc", holder: "Tester", want: wantC},
+		{filename: "test.conf", holder: "Tester", want: wantShell},
+		{filename: "test.ctags", holder: "Tester", want: wantShell},
 		{filename: "test.go", holder: "Tester", want: wantC},
 		{filename: "test.h", holder: "Tester", want: wantC},
 		{filename: "test.html", holder: "Tester", want: wantHTML},
 		{filename: "test.sh", holder: "Tester", want: wantShell},
+		{filename: "test.txt", holder: "Tester", want: wantShell},
 		{filename: "test.yaml", holder: "Tester", want: wantShell},
 		// keep-sorted end
 	}
@@ -99,10 +102,13 @@ test
 		{data: "test\n", filename: ".clangd", holder: "Tester", want: wantShell},
 		{data: "test\n", filename: "test", holder: "Tester", want: wantShell},
 		{data: "test\n", filename: "test.cc", holder: "Tester", want: wantC},
+		{data: "test\n", filename: "test.conf", holder: "Tester", want: wantShell},
+		{data: "test\n", filename: "test.ctags", holder: "Tester", want: wantShell},
 		{data: "test\n", filename: "test.go", holder: "Tester", want: wantC},
 		{data: "test\n", filename: "test.h", holder: "Tester", want: wantC},
 		{data: "test\n", filename: "test.html", holder: "Tester", want: wantHTML},
 		{data: "test\n", filename: "test.sh", holder: "Tester", want: wantShell},
+		{data: "test\n", filename: "test.txt", holder: "Tester", want: wantShell},
 		{data: "test\n", filename: "test.yaml", holder: "Tester", want: wantShell},
 		// keep-sorted end
 	}
