@@ -49,7 +49,7 @@ repos:
     language: system
     stages: [pre-commit]
     exclude_types: [json]
-    exclude: "(MODULE\\.bazel\\.lock|go\\.(mod|sum)|.*/(test)?data/.*|_string.go$|.diff$)"
+    exclude: "(MODULE\\.bazel\\.lock|go\\.(mod|sum)|.*/(test)?data/.*|_string.go$|.diff$|home/vim/templates/skel.*$)"
   - id: check-nosubmit
     name: "No-submit is not set"
     entry: check-nosubmit
