@@ -28,6 +28,7 @@ openldap26-client
 pam_ldap
 pam_mkhomedir
 pkg
+protobuf
 py311-cppman
 py311-pre-commit
 python
