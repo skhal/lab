@@ -10,7 +10,6 @@ set number"
 " -- COLORS
 set bg=dark
 set colorcolumn=80
-set cursorline
 colorscheme lab
 
 " -- SPACING
