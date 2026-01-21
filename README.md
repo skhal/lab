@@ -20,13 +20,13 @@ Lab is the place to tinker with ideas, learn by doing, and don't be shy of makin
 Projects
 --------
 
-| Package  | Status                                                                                                                                                    | Notes                                       |
-|----------|-----------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------|
-| `book/`  | [![Book CI](https://github.com/skhal/lab/actions/workflows/book_ci.yml/badge.svg)](https://github.com/skhal/lab/actions/workflows/book_ci.yml)            | ideas from books                            |
-| `check/` | [![Check CI](https://github.com/skhal/lab/actions/workflows/check_ci.yml/badge.svg)](https://github.com/skhal/lab/actions/workflows/check_ci.yml)         | [pre-commit](https://pre-commit.com) checks |
-| `go/`    | [![Go CI](https://github.com/skhal/lab/actions/workflows/go_ci.yml/badge.svg)](https://github.com/skhal/lab/actions/workflows/go_ci.yml)                  | Go libraries                                |
-| `iq/`    | [![Interview Questions CI](https://github.com/skhal/lab/actions/workflows/iq_ci.yml/badge.svg)](https://github.com/skhal/lab/actions/workflows/iq_ci.yml) | Interview Questions                         |
-| `x/`     | [![X CI](https://github.com/skhal/lab/actions/workflows/x_ci.yml/badge.svg)](https://github.com/skhal/lab/actions/workflows/x_ci.yml)                     |                                             |
+| Package            | Status                                                                                                                                                    | Notes                                       |
+|--------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------|
+| [`book/`](./book/) | [![Book CI](https://github.com/skhal/lab/actions/workflows/book_ci.yml/badge.svg)](https://github.com/skhal/lab/actions/workflows/book_ci.yml)            | ideas from books                            |
+| `check/`           | [![Check CI](https://github.com/skhal/lab/actions/workflows/check_ci.yml/badge.svg)](https://github.com/skhal/lab/actions/workflows/check_ci.yml)         | [pre-commit](https://pre-commit.com) checks |
+| `go/`              | [![Go CI](https://github.com/skhal/lab/actions/workflows/go_ci.yml/badge.svg)](https://github.com/skhal/lab/actions/workflows/go_ci.yml)                  | Go libraries                                |
+| `iq/`              | [![Interview Questions CI](https://github.com/skhal/lab/actions/workflows/iq_ci.yml/badge.svg)](https://github.com/skhal/lab/actions/workflows/iq_ci.yml) | Interview Questions                         |
+| `x/`               | [![X CI](https://github.com/skhal/lab/actions/workflows/x_ci.yml/badge.svg)](https://github.com/skhal/lab/actions/workflows/x_ci.yml)                     |                                             |
 
 C++ development
 ---------------
