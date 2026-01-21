@@ -5,21 +5,28 @@
   license that can be found in the LICENSE file.
 -->
 
-NAME
+Name
 ====
 
 **lab** - R&D Lab
 
-Status
-======
+Description
+===========
 
-| Package  | Status                                                                                                                                                    |
-|----------|-----------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `book/`  | [![Book CI](https://github.com/skhal/lab/actions/workflows/book_ci.yml/badge.svg)](https://github.com/skhal/lab/actions/workflows/book_ci.yml)            |
-| `check/` | [![Check CI](https://github.com/skhal/lab/actions/workflows/check_ci.yml/badge.svg)](https://github.com/skhal/lab/actions/workflows/check_ci.yml)         |
-| `go/`    | [![Go CI](https://github.com/skhal/lab/actions/workflows/go_ci.yml/badge.svg)](https://github.com/skhal/lab/actions/workflows/go_ci.yml)                  |
-| `iq/`    | [![Interview Questions CI](https://github.com/skhal/lab/actions/workflows/iq_ci.yml/badge.svg)](https://github.com/skhal/lab/actions/workflows/iq_ci.yml) |
-| `x/`     | [![X CI](https://github.com/skhal/lab/actions/workflows/x_ci.yml/badge.svg)](https://github.com/skhal/lab/actions/workflows/x_ci.yml)                     |
+"I hear, and I forget; I see, and I remember; I do, and I understand" -- [source](https://barrypopik.com/blog/tell_me_and_i_forget_teach_me_and_i_may_remember_involve_me_and_i_will_lear)
+
+Lab is the place to tinker with ideas, learn by doing, and don't be shy of making mistakes. This is where we grow.
+
+Projects
+--------
+
+| Package  | Status                                                                                                                                                    | Notes                                       |
+|----------|-----------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------|
+| `book/`  | [![Book CI](https://github.com/skhal/lab/actions/workflows/book_ci.yml/badge.svg)](https://github.com/skhal/lab/actions/workflows/book_ci.yml)            | ideas from books                            |
+| `check/` | [![Check CI](https://github.com/skhal/lab/actions/workflows/check_ci.yml/badge.svg)](https://github.com/skhal/lab/actions/workflows/check_ci.yml)         | [pre-commit](https://pre-commit.com) checks |
+| `go/`    | [![Go CI](https://github.com/skhal/lab/actions/workflows/go_ci.yml/badge.svg)](https://github.com/skhal/lab/actions/workflows/go_ci.yml)                  | Go libraries                                |
+| `iq/`    | [![Interview Questions CI](https://github.com/skhal/lab/actions/workflows/iq_ci.yml/badge.svg)](https://github.com/skhal/lab/actions/workflows/iq_ci.yml) | Interview Questions                         |
+| `x/`     | [![X CI](https://github.com/skhal/lab/actions/workflows/x_ci.yml/badge.svg)](https://github.com/skhal/lab/actions/workflows/x_ci.yml)                     |                                             |
 
 C++ development
 ---------------
