@@ -33,6 +33,15 @@ function! g:skeleton_find_template.go(path)
 endfunction
 
 " C++
+function! g:skeleton_find_template.c(path)
+  let l:filename = 'skel.c'
+  if fnamemodify(a:path, ':t') =~ 'main\.c$'
+    let l:filename = 'skel_main.c'
+  endif
+  echow 'skel: ' . l:filename
+  return l:filename
+endfunction
+
 function! g:skeleton_find_template.cpp(path)
   let l:filename = 'skel.cc'
   if fnamemodify(a:path, ':t') =~ '_test\.cc$'
