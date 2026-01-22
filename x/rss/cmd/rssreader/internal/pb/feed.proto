@@ -1,0 +1,51 @@
+// Copyright 2026 Samvel Khalatyan. All rights reserved.
+//
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
+edition = "2023";
+
+package x.rss.cmd.rssreader.internal;
+
+import "google/protobuf/go_features.proto";
+
+option features.(pb.go).api_level = API_OPAQUE;
+option go_package = "github.com/skhal/lab/x/rss/cmd/rssreader/internal/pb";
+
+// FeedSet contains feed definitions.
+//
+// Next ID: 2
+message FeedSet {
+  repeated Feed feeds = 1;
+}
+
+// Feed describes an rss feed.
+//
+// Next ID: 2
+message Feed {
+  Source source = 1;
+}
+
+// Source definesa local or remote feed.
+//
+// Next ID: 4
+message Source {
+  // Source
+  //
+  // Next ID: 3
+  oneof source {
+    // File defines a local feed, stored in a file.
+    string file = 1;
+    // Url defines a remote feed.
+    string url = 2;
+  }
+  // Kind lists supported feed types.
+  //
+  // Next ID: 2
+  enum Kind {
+    KIND_UNSPECIFIED = 0;
+    KIND_RSS = 1;
+  }
+  // Kind defines the type of the source.
+  Kind kind = 3;
+}
