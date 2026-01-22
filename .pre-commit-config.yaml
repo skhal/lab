@@ -104,6 +104,12 @@ repos:
     entry: "Binaries are not allowed"
     language: fail
     types_or: [binary]
+  - id: proto-format
+    name: "Format Protocol buffers"
+    entry: clang-format21 -i
+    language: system
+    types_or: [proto]
+    args: ["-style=file"]
   - id: shell-format
     name: "Format shell"
     entry: shfmt
