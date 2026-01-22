@@ -93,6 +93,7 @@ repos:
     language: system
     types_or: [makefile]
     args: ["-N", "-f"]
+    exclude: "book/ostep/.*/Makefile$"
   - id: markdown-format
     name: "Format Markdown"
     entry: markdownfmt
