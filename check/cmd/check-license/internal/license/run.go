@@ -6,6 +6,7 @@
 package license
 
 import (
+	"bytes"
 	"context"
 	"errors"
 	"flag"
@@ -24,6 +25,9 @@ var (
 
 	// ErrFlags indicates error with input flags.
 	ErrFlags = errors.New("invalid flags")
+
+	// ErrBinaryFile indicates the file is binary
+	ErrBinaryFile = errors.New("binary file")
 )
 
 // InvalidError is [ErrInvalid] with line number where copyright was found.
@@ -89,7 +93,9 @@ func doRun(files []string, opts *RunOptions) error {
 			go func(ctx context.Context, f string) {
 				defer wg.Done()
 				err := check(f, opts)
-				if err != nil {
+				if errors.Is(err, ErrBinaryFile) {
+					fmt.Fprintln(os.Stderr, err, ": skip")
+				} else if err != nil {
 					select {
 					case errch <- err:
 					case <-ctx.Done():
@@ -111,6 +117,9 @@ func check(file string, opts *RunOptions) error {
 	if err != nil {
 		return err
 	}
+	if isBinary(data) {
+		return fmt.Errorf("check %s: %w", file, ErrBinaryFile)
+	}
 	err = Check(data)
 	if err != nil {
 		if opts.Fix && errors.Is(err, ErrNotFound) {
@@ -119,6 +128,12 @@ func check(file string, opts *RunOptions) error {
 		return fmt.Errorf("%s: %w", file, err)
 	}
 	return nil
+}
+
+const nullByte = 0
+
+func isBinary(b []byte) bool {
+	return bytes.IndexByte(b, nullByte) != -1
 }
 
 func fix(file string, data []byte, opts *RunOptions) error {
