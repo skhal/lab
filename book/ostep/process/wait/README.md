@@ -8,12 +8,16 @@
 Name
 ====
 
-**process** - system process examples
+**wait** - wait for a child process
+
+Synopsis
+========
+
+```console
+./wait
+```
 
 Description
 ===========
 
-Applications:
-
--	[fork](./fork/): create a child process with fork(2).
--	[wait](./wait/): use wait(2) to let fork(2) child finish.
+A call to wait(2) suspends the calling process until status of one of the child processes changes or there is a signal.
