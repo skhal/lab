@@ -5,25 +5,30 @@
 
 edition = "2023";
 
-package x.rss.cmd.rssreader.internal;
+package feed.pb;
 
 import "google/protobuf/go_features.proto";
 
-option features.(pb.go).api_level = API_OPAQUE;
-option go_package = "github.com/skhal/lab/x/rss/cmd/rssreader/internal/pb";
+option features.(.pb.go).api_level = API_OPAQUE;
+option go_package = "github.com/skhal/lab/x/feed/internal/pb";
 
 // FeedSet contains feed definitions.
 //
 // Next ID: 2
 message FeedSet {
+  // Feeds is a list of feeds.
   repeated Feed feeds = 1;
 }
 
-// Feed describes an rss feed.
+// Feed describes an RSS feed.
 //
-// Next ID: 2
+// Next ID: 3
 message Feed {
-  Source source = 1;
+  // Name is a human description of the feed.
+  string name = 1;
+
+  // Source configures where the feed comes from: a file, an URL, etc.
+  Source source = 2;
 }
 
 // Source definesa local or remote feed.

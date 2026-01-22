@@ -121,6 +121,7 @@ func (x *FeedSet) SetFeeds(v []*Feed) {
 type FeedSet_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
+	// Feeds is a list of feeds.
 	Feeds []*Feed
 }
 
@@ -132,14 +133,17 @@ func (b0 FeedSet_builder) Build() *FeedSet {
 	return m0
 }
 
-// Feed describes an rss feed.
+// Feed describes an RSS feed.
 //
-// Next ID: 2
+// Next ID: 3
 type Feed struct {
-	state             protoimpl.MessageState `protogen:"opaque.v1"`
-	xxx_hidden_Source *Source                `protobuf:"bytes,1,opt,name=source"`
-	unknownFields     protoimpl.UnknownFields
-	sizeCache         protoimpl.SizeCache
+	state                  protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Name        *string                `protobuf:"bytes,1,opt,name=name"`
+	xxx_hidden_Source      *Source                `protobuf:"bytes,2,opt,name=source"`
+	XXX_raceDetectHookData protoimpl.RaceDetectHookData
+	XXX_presence           [1]uint32
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
 }
 
 func (x *Feed) Reset() {
@@ -167,6 +171,16 @@ func (x *Feed) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
+func (x *Feed) GetName() string {
+	if x != nil {
+		if x.xxx_hidden_Name != nil {
+			return *x.xxx_hidden_Name
+		}
+		return ""
+	}
+	return ""
+}
+
 func (x *Feed) GetSource() *Source {
 	if x != nil {
 		return x.xxx_hidden_Source
@@ -174,8 +188,20 @@ func (x *Feed) GetSource() *Source {
 	return nil
 }
 
+func (x *Feed) SetName(v string) {
+	x.xxx_hidden_Name = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 2)
+}
+
 func (x *Feed) SetSource(v *Source) {
 	x.xxx_hidden_Source = v
+}
+
+func (x *Feed) HasName() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 0)
 }
 
 func (x *Feed) HasSource() bool {
@@ -185,6 +211,11 @@ func (x *Feed) HasSource() bool {
 	return x.xxx_hidden_Source != nil
 }
 
+func (x *Feed) ClearName() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 0)
+	x.xxx_hidden_Name = nil
+}
+
 func (x *Feed) ClearSource() {
 	x.xxx_hidden_Source = nil
 }
@@ -192,6 +223,9 @@ func (x *Feed) ClearSource() {
 type Feed_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
+	// Name is a human description of the feed.
+	Name *string
+	// Source configures where the feed comes from: a file, an URL, etc.
 	Source *Source
 }
 
@@ -199,6 +233,10 @@ func (b0 Feed_builder) Build() *Feed {
 	m0 := &Feed{}
 	b, x := &b0, m0
 	_, _ = b, x
+	if b.Name != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 2)
+		x.xxx_hidden_Name = b.Name
+	}
 	x.xxx_hidden_Source = b.Source
 	return m0
 }
@@ -209,7 +247,7 @@ func (b0 Feed_builder) Build() *Feed {
 type Source struct {
 	state                  protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Source      isSource_Source        `protobuf_oneof:"source"`
-	xxx_hidden_Kind        Source_Kind            `protobuf:"varint,3,opt,name=kind,enum=x.rss.cmd.rssreader.internal.Source_Kind"`
+	xxx_hidden_Kind        Source_Kind            `protobuf:"varint,3,opt,name=kind,enum=feed.pb.Source_Kind"`
 	XXX_raceDetectHookData protoimpl.RaceDetectHookData
 	XXX_presence           [1]uint32
 	unknownFields          protoimpl.UnknownFields
@@ -417,32 +455,33 @@ var File_feed_proto protoreflect.FileDescriptor
 const file_feed_proto_rawDesc = "" +
 	"\n" +
 	"\n" +
-	"feed.proto\x12\x1cx.rss.cmd.rssreader.internal\x1a!google/protobuf/go_features.proto\"C\n" +
-	"\aFeedSet\x128\n" +
-	"\x05feeds\x18\x01 \x03(\v2\".x.rss.cmd.rssreader.internal.FeedR\x05feeds\"D\n" +
-	"\x04Feed\x12<\n" +
-	"\x06source\x18\x01 \x01(\v2$.x.rss.cmd.rssreader.internal.SourceR\x06source\"\xa7\x01\n" +
+	"feed.proto\x12\afeed.pb\x1a!google/protobuf/go_features.proto\".\n" +
+	"\aFeedSet\x12#\n" +
+	"\x05feeds\x18\x01 \x03(\v2\r.feed.pb.FeedR\x05feeds\"C\n" +
+	"\x04Feed\x12\x12\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x12'\n" +
+	"\x06source\x18\x02 \x01(\v2\x0f.feed.pb.SourceR\x06source\"\x92\x01\n" +
 	"\x06Source\x12\x14\n" +
 	"\x04file\x18\x01 \x01(\tH\x00R\x04file\x12\x12\n" +
-	"\x03url\x18\x02 \x01(\tH\x00R\x03url\x12=\n" +
-	"\x04kind\x18\x03 \x01(\x0e2).x.rss.cmd.rssreader.internal.Source.KindR\x04kind\"*\n" +
+	"\x03url\x18\x02 \x01(\tH\x00R\x03url\x12(\n" +
+	"\x04kind\x18\x03 \x01(\x0e2\x14.feed.pb.Source.KindR\x04kind\"*\n" +
 	"\x04Kind\x12\x14\n" +
 	"\x10KIND_UNSPECIFIED\x10\x00\x12\f\n" +
 	"\bKIND_RSS\x10\x01B\b\n" +
-	"\x06sourceB>Z4github.com/skhal/lab/x/rss/cmd/rssreader/internal/pb\x92\x03\x05\xd2>\x02\x10\x03b\beditionsp\xe8\a"
+	"\x06sourceB1Z'github.com/skhal/lab/x/feed/internal/pb\x92\x03\x05\xd2>\x02\x10\x03b\beditionsp\xe8\a"
 
 var file_feed_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_feed_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
 var file_feed_proto_goTypes = []any{
-	(Source_Kind)(0), // 0: x.rss.cmd.rssreader.internal.Source.Kind
-	(*FeedSet)(nil),  // 1: x.rss.cmd.rssreader.internal.FeedSet
-	(*Feed)(nil),     // 2: x.rss.cmd.rssreader.internal.Feed
-	(*Source)(nil),   // 3: x.rss.cmd.rssreader.internal.Source
+	(Source_Kind)(0), // 0: feed.pb.Source.Kind
+	(*FeedSet)(nil),  // 1: feed.pb.FeedSet
+	(*Feed)(nil),     // 2: feed.pb.Feed
+	(*Source)(nil),   // 3: feed.pb.Source
 }
 var file_feed_proto_depIdxs = []int32{
-	2, // 0: x.rss.cmd.rssreader.internal.FeedSet.feeds:type_name -> x.rss.cmd.rssreader.internal.Feed
-	3, // 1: x.rss.cmd.rssreader.internal.Feed.source:type_name -> x.rss.cmd.rssreader.internal.Source
-	0, // 2: x.rss.cmd.rssreader.internal.Source.kind:type_name -> x.rss.cmd.rssreader.internal.Source.Kind
+	2, // 0: feed.pb.FeedSet.feeds:type_name -> feed.pb.Feed
+	3, // 1: feed.pb.Feed.source:type_name -> feed.pb.Source
+	0, // 2: feed.pb.Source.kind:type_name -> feed.pb.Source.Kind
 	3, // [3:3] is the sub-list for method output_type
 	3, // [3:3] is the sub-list for method input_type
 	3, // [3:3] is the sub-list for extension type_name
