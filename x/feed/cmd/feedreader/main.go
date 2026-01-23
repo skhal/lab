@@ -83,7 +83,7 @@ func read(feeds *pb.FeedSet) error {
 			for item := range stream {
 				// emulate delay
 				time.Sleep(time.Duration(rand.Intn(10)) * time.Millisecond)
-				fmt.Printf(f.GetName(), ": ", (*printableItem)(item))
+				fmt.Printf("%s: %s\n", f.GetName(), (*printableItem)(item))
 			}
 		})
 	}
