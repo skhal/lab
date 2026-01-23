@@ -5,5 +5,11 @@
 
 package feed
 
+import "time"
+
 type Feed <-chan Item
-type Item string
+type Item struct {
+	Title     string
+	Updated   *time.Time
+	Published *time.Time
+}

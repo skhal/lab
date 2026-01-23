@@ -63,7 +63,11 @@ func (ftch *fileFetcher) Fetch() (Feed, error) {
 	go func() {
 		defer close(stream)
 		for _, item := range feed.Items {
-			stream <- Item(item.Title)
+			stream <- Item{
+				Title:     item.Title,
+				Updated:   item.UpdatedParsed,
+				Published: item.PublishedParsed,
+			}
 		}
 	}()
 	return Feed(stream), nil
