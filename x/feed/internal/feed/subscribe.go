@@ -13,11 +13,16 @@ import (
 
 type Feed <-chan *Item
 
-// Subscribe subscribes to a feed. It generates a stream of feed items, or
-// returns an error if generation fails.
-func Subscribe(f *pb.Feed) (Feed, error) {
-	s := newSubscription(f)
-	return s.Subscribe()
+// Subscription is a client API to access streamed feed.
+type Subscription interface {
+	// Feed generates a stream of feed items. It returns an error if it fails to
+	// create a stream.
+	Feed() (Feed, error)
+}
+
+// Subscribe creates a feed subscription.
+func Subscribe(f *pb.Feed) Subscription {
+	return newSubscription(f)
 }
 
 type subscription struct {
@@ -30,8 +35,8 @@ func newSubscription(f *pb.Feed) *subscription {
 	}
 }
 
-// Subscribe starts a stream of feed items or returns an error if it fails.
-func (s *subscription) Subscribe() (Feed, error) {
+// Feed starts a stream of feed items or returns an error if it fails.
+func (s *subscription) Feed() (Feed, error) {
 	if !s.feed.GetSource().HasSource() {
 		return nil, fmt.Errorf("subscribe %s: missing source", s.feed)
 	}

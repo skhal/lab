@@ -75,7 +75,8 @@ func read(feeds *pb.FeedSet) error {
 	var wg sync.WaitGroup
 	defer wg.Wait()
 	for _, f := range feeds.GetFeeds() {
-		stream, err := feed.Subscribe(f)
+		sub := feed.Subscribe(f)
+		stream, err := sub.Feed()
 		if err != nil {
 			return err
 		}
