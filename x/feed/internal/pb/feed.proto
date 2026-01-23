@@ -20,7 +20,7 @@ message FeedSet {
   repeated Feed feeds = 1;
 }
 
-// Feed describes an RSS feed.
+// Feed describes an RSS or Atom feed.
 //
 // Next ID: 3
 message Feed {
@@ -46,10 +46,11 @@ message Source {
   }
   // Kind lists supported feed types.
   //
-  // Next ID: 2
+  // Next ID: 3
   enum Kind {
     KIND_UNSPECIFIED = 0;
     KIND_RSS = 1;
+    KIND_ATOM = 2;
   }
   // Kind defines the type of the source.
   Kind kind = 3;

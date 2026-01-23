@@ -28,12 +28,13 @@ const (
 
 // Kind lists supported feed types.
 //
-// Next ID: 2
+// Next ID: 3
 type Source_Kind int32
 
 const (
 	Source_KIND_UNSPECIFIED Source_Kind = 0
 	Source_KIND_RSS         Source_Kind = 1
+	Source_KIND_ATOM        Source_Kind = 2
 )
 
 // Enum value maps for Source_Kind.
@@ -41,10 +42,12 @@ var (
 	Source_Kind_name = map[int32]string{
 		0: "KIND_UNSPECIFIED",
 		1: "KIND_RSS",
+		2: "KIND_ATOM",
 	}
 	Source_Kind_value = map[string]int32{
 		"KIND_UNSPECIFIED": 0,
 		"KIND_RSS":         1,
+		"KIND_ATOM":        2,
 	}
 )
 
@@ -133,7 +136,7 @@ func (b0 FeedSet_builder) Build() *FeedSet {
 	return m0
 }
 
-// Feed describes an RSS feed.
+// Feed describes an RSS or Atom feed.
 //
 // Next ID: 3
 type Feed struct {
@@ -460,14 +463,15 @@ const file_feed_proto_rawDesc = "" +
 	"\x05feeds\x18\x01 \x03(\v2\r.feed.pb.FeedR\x05feeds\"C\n" +
 	"\x04Feed\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12'\n" +
-	"\x06source\x18\x02 \x01(\v2\x0f.feed.pb.SourceR\x06source\"\x92\x01\n" +
+	"\x06source\x18\x02 \x01(\v2\x0f.feed.pb.SourceR\x06source\"\xa1\x01\n" +
 	"\x06Source\x12\x14\n" +
 	"\x04file\x18\x01 \x01(\tH\x00R\x04file\x12\x12\n" +
 	"\x03url\x18\x02 \x01(\tH\x00R\x03url\x12(\n" +
-	"\x04kind\x18\x03 \x01(\x0e2\x14.feed.pb.Source.KindR\x04kind\"*\n" +
+	"\x04kind\x18\x03 \x01(\x0e2\x14.feed.pb.Source.KindR\x04kind\"9\n" +
 	"\x04Kind\x12\x14\n" +
 	"\x10KIND_UNSPECIFIED\x10\x00\x12\f\n" +
-	"\bKIND_RSS\x10\x01B\b\n" +
+	"\bKIND_RSS\x10\x01\x12\r\n" +
+	"\tKIND_ATOM\x10\x02B\b\n" +
 	"\x06sourceB1Z'github.com/skhal/lab/x/feed/internal/pb\x92\x03\x05\xd2>\x02\x10\x03b\beditionsp\xe8\a"
 
 var file_feed_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
