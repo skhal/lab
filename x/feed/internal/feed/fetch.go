@@ -17,7 +17,7 @@ import (
 
 // Fetch fetches a feed and generates a stream of items. It returns an error if
 // the feed source is not supported or there is an error in accessing the feed.
-func Fetch(s *pb.Source) (Feed, error) {
+func Fetch(s *pb.Source) ([]*Item, error) {
 	f, err := newFetcher(s)
 	if err != nil {
 		return nil, err
@@ -26,7 +26,7 @@ func Fetch(s *pb.Source) (Feed, error) {
 }
 
 type fetcher interface {
-	Fetch() (Feed, error)
+	Fetch() ([]*Item, error)
 }
 
 func newFetcher(s *pb.Source) (fetcher, error) {
@@ -44,7 +44,7 @@ func newFileFetcher(name string) *fileFetcher {
 	return &fileFetcher{file: name}
 }
 
-func (ftch *fileFetcher) Fetch() (Feed, error) {
+func (ftch *fileFetcher) Fetch() ([]*Item, error) {
 	n, err := expand(ftch.file)
 	if err != nil {
 		return nil, err
@@ -59,18 +59,7 @@ func (ftch *fileFetcher) Fetch() (Feed, error) {
 	if err != nil {
 		return nil, err
 	}
-	stream := make(chan Item)
-	go func() {
-		defer close(stream)
-		for _, item := range feed.Items {
-			stream <- Item{
-				Title:     item.Title,
-				Updated:   item.UpdatedParsed,
-				Published: item.PublishedParsed,
-			}
-		}
-	}()
-	return Feed(stream), nil
+	return transform(feed.Items), nil
 }
 
 func expand(name string) (string, error) {
@@ -80,4 +69,16 @@ func expand(name string) (string, error) {
 	}
 	expanded := strings.Replace(name, "~/", home+"/", 1)
 	return filepath.Clean(expanded), nil
+}
+
+func transform(s []*gofeed.Item) []*Item {
+	ii := make([]*Item, 0, len(s))
+	for _, item := range s {
+		ii = append(ii, &Item{
+			Title:     item.Title,
+			Updated:   item.UpdatedParsed,
+			Published: item.PublishedParsed,
+		})
+	}
+	return ii
 }

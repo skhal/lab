@@ -33,7 +33,18 @@ func (s *subscription) Subscribe() (Feed, error) {
 	if !s.feed.GetSource().HasSource() {
 		return nil, fmt.Errorf("subscribe %s: missing source", s.feed)
 	}
-	return Fetch(s.feed.GetSource())
+	items, err := Fetch(s.feed.GetSource())
+	if err != nil {
+		return nil, err
+	}
+	stream := make(chan *Item)
+	go func() {
+		defer close(stream)
+		for _, item := range items {
+			stream <- item
+		}
+	}()
+	return Feed(stream), nil
 }
 
 func (s *subscription) String() string {

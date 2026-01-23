@@ -83,7 +83,7 @@ func read(feeds *pb.FeedSet) error {
 			for item := range stream {
 				// emulate delay
 				time.Sleep(time.Duration(rand.Intn(10)) * time.Millisecond)
-				fmt.Println(f.GetName(), ": ", printableItem(item))
+				fmt.Printf(f.GetName(), ": ", (*printableItem)(item))
 			}
 		})
 	}
@@ -92,7 +92,7 @@ func read(feeds *pb.FeedSet) error {
 
 type printableItem feed.Item
 
-func (i printableItem) String() string {
+func (i *printableItem) String() string {
 	var t *time.Time
 	switch {
 	case i.Published != nil:
