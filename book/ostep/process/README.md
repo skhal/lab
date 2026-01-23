@@ -17,3 +17,4 @@ Applications:
 
 -	[fork](./fork/): create a child process with fork(2).
 -	[wait](./wait/): use wait(2) to let fork(2) child finish.
+-	[exec](./exec/): exec(3) loads a new program into current process and executes it.
