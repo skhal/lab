@@ -29,9 +29,6 @@ set incsearch
 set listchars=eol:¬,extends:›,precedes:‹,space:░,tab:«–»,trail:•
 nmap <leader>l <esc>:set list!<cr>
 
-" -- SPELL CHECKER
-au FileType markdown setlocal spell
-
 filetype plugin on
 
 for f in split(glob($HOME . '/.vimrc.d/*.vim'), '\n')
