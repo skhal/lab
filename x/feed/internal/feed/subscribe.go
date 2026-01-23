@@ -11,6 +11,8 @@ import (
 	"github.com/skhal/lab/x/feed/internal/pb"
 )
 
+type Feed <-chan *Item
+
 // Subscribe subscribes to a feed. It generates a stream of feed items, or
 // returns an error if generation fails.
 func Subscribe(f *pb.Feed) (Feed, error) {
