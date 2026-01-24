@@ -141,7 +141,7 @@ const (
 			err := check.CheckAST(fset, f)
 
 			if !errors.Is(err, tc.want) {
-				t.Errorf("checksCheckAST() unexpected error %v; want %v", err, tc.want)
+				t.Errorf("check.CheckAST() unexpected error %v; want %v", err, tc.want)
 				t.Log(tc.code)
 			}
 		})
@@ -191,7 +191,7 @@ func Test() {}`,
 			err := check.CheckAST(fset, f)
 
 			if !errors.Is(err, tc.want) {
-				t.Errorf("checksCheckAST() unexpected error %v; want %v", err, tc.want)
+				t.Errorf("check.CheckAST() unexpected error %v; want %v", err, tc.want)
 				t.Log(tc.code)
 			}
 		})
@@ -360,7 +360,7 @@ var (
 			err := check.CheckAST(fset, f)
 
 			if !errors.Is(err, tc.want) {
-				t.Errorf("checksCheckAST() unexpected error %v; want %v", err, tc.want)
+				t.Errorf("check.CheckAST() unexpected error %v; want %v", err, tc.want)
 				t.Log(tc.code)
 			}
 		})
@@ -481,8 +481,45 @@ type (
 			err := check.CheckAST(fset, f)
 
 			if !errors.Is(err, tc.want) {
-				t.Errorf("checksCheckAST() unexpected error %v; want %v", err, tc.want)
+				t.Errorf("check.CheckAST() unexpected error %v; want %v", err, tc.want)
 				t.Log(tc.code)
+			}
+		})
+	}
+}
+
+func TestCheckDir(t *testing.T) {
+	tests := []struct {
+		name string
+		path string
+		want error
+	}{
+		{
+			name: "doc",
+			path: "testdata/doc",
+		},
+		{
+			name: "no doc",
+			path: "testdata/nodoc",
+			want: check.ErrNoDoc,
+		},
+		{
+			name: "multiple docs",
+			path: "testdata/multidoc",
+			want: check.ErrMultiDoc,
+		},
+		{
+			name: "multiple packages",
+			path: "testdata/multipackage",
+			want: check.ErrMultiPackage,
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			err := check.CheckDir(tc.path)
+
+			if !errors.Is(err, tc.want) {
+				t.Errorf("check.CheckDir(%q) unexpected error %v; want %v", tc.path, err, tc.want)
 			}
 		})
 	}

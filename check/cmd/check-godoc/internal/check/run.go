@@ -3,21 +3,36 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Check doc
+// Check package ensures that Go exported symbols and the package include
+// documentation.
 package check
 
 import (
+	"path/filepath"
 	"strings"
 )
 
 // Run verifies that every non-generated Go file has documentation attached to
 // the exported declarations. It returns an error on the first failed file.
 func Run(files []string) error {
+	seen := make(map[string]bool)
+	dirs := make([]string, 0, len(files))
 	for _, f := range files {
 		if IsTest(f) {
 			continue
 		}
-		if err := Check(f); err != nil {
+		if err := CheckFile(f); err != nil {
+			return err
+		}
+		d := filepath.Dir(f)
+		if seen[d] {
+			continue
+		}
+		seen[d] = true
+		dirs = append(dirs, d)
+	}
+	for _, d := range dirs {
+		if err := CheckDir(d); err != nil {
 			return err
 		}
 	}

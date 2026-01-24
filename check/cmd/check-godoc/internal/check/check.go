@@ -3,7 +3,6 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Check doc
 package check
 
 import (
@@ -12,14 +11,27 @@ import (
 	"go/ast"
 	"go/parser"
 	"go/token"
+	"io/fs"
+	"maps"
+	"slices"
+	"strings"
 )
 
 // ErrNoDoc represents missing documentation error.
 var ErrNoDoc = errors.New("no documentation")
 
-// Check verifies that non-generated Go file has documentation attached to the
-// exported declarations. It returns an error if the check fails.
-func Check(fname string) error {
+// ErrNotPackage means that Go failed to parse a path.
+var ErrNotPackage = errors.New("not a package")
+
+// ErrMultiPackage means there are multiple packages at a single path.
+var ErrMultiPackage = errors.New("multiple packages")
+
+// ErrMultiDoc means there are multiple package documentations.
+var ErrMultiDoc = errors.New("multiple documentation")
+
+// CheckFile verifies that non-generated Go file has documentation attached to
+// the exported declarations. It returns an error if the check fails.
+func CheckFile(fname string) error {
 	fset := token.NewFileSet()
 	opts := parser.SkipObjectResolution | parser.ParseComments
 	f, err := parser.ParseFile(fset, fname, nil, opts)
@@ -167,4 +179,63 @@ const (
 func newErrNoDoc(fset *token.FileSet, id *ast.Ident, k kind) error {
 	pos := fset.Position(id.Pos())
 	return fmt.Errorf("%s: %s %s: %w", pos, k, id.Name, ErrNoDoc)
+}
+
+// CheckDir parses a Go package at path and ensures it has documentation set.
+func CheckDir(path string) error {
+	fset := token.NewFileSet()
+	opts := parser.PackageClauseOnly | parser.ParseComments
+	pkgs, err := parser.ParseDir(fset, path, noTest, opts)
+	if err != nil {
+		return err
+	}
+	if err := checkPackages(fset, pkgs); err != nil {
+		return fmt.Errorf("%s: %w", path, err)
+	}
+	return nil
+}
+
+func noTest(info fs.FileInfo) bool {
+	return !strings.HasSuffix(info.Name(), "_test.go")
+}
+
+func checkPackages(fset *token.FileSet, pkgs map[string]*ast.Package) error {
+	// Must be one package
+	switch len(pkgs) {
+	case 0:
+		return ErrNotPackage
+	case 1:
+		// ok
+	default:
+		names := strings.Join(slices.Collect(maps.Keys(pkgs)), ",")
+		return fmt.Errorf("%w: %s", ErrMultiPackage, names)
+	}
+	for _, p := range pkgs {
+		// one package
+		return checkPackage(fset, p)
+	}
+	return nil
+}
+
+func checkPackage(fset *token.FileSet, pkg *ast.Package) error {
+	var docs []*ast.CommentGroup
+	for _, f := range pkg.Files {
+		if f.Doc != nil {
+			docs = append(docs, f.Doc)
+		}
+	}
+	switch len(docs) {
+	case 0:
+		return fmt.Errorf("package %s: %w", pkg.Name, ErrNoDoc)
+	case 1:
+		return nil
+	default:
+		locs := make([]string, 0, len(docs))
+		for _, d := range docs {
+			locs = append(locs, fset.Position(d.Pos()).String())
+		}
+		sep := "\n  "
+		loc := strings.Join(locs, sep)
+		return fmt.Errorf("package %s: %w%s%s", pkg.Name, ErrMultiDoc, sep, loc)
+	}
 }

@@ -44,6 +44,7 @@ repos:
     language: system
     types_or: [go]
     pass_filenames: true
+    exclude: "testdata"
   - id: check-issue
     name: "Issue is set"
     entry: check-issue
