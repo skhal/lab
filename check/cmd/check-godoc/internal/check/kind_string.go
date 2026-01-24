@@ -9,12 +9,13 @@ func _() {
 	// Re-run the stringer command to generate them again.
 	var x [1]struct{}
 	_ = x[kindFunc-1]
-	_ = x[kindVar-2]
+	_ = x[kindType-2]
+	_ = x[kindVar-3]
 }
 
-const _kind_name = "funcvar"
+const _kind_name = "functypevar"
 
-var _kind_index = [...]uint8{0, 4, 7}
+var _kind_index = [...]uint8{0, 4, 8, 11}
 
 func (i kind) String() string {
 	idx := int(i) - 1

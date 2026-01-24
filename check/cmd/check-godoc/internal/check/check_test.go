@@ -234,6 +234,127 @@ var (
 	}
 }
 
+func TestCheckAST_struct(t *testing.T) {
+	tests := []struct {
+		name string
+		code string
+		want error
+	}{
+		{
+			name: "exported no comment",
+			code: `package test
+type A struct {}`,
+			want: check.ErrNoDoc,
+		},
+		{
+			name: "exported comment",
+			code: `package test
+// test comment
+type A struct {}`,
+		},
+		{
+			name: "exported line comment",
+			code: `package test
+type A struct {} // test comment`,
+			want: check.ErrNoDoc,
+		},
+		{
+			name: "not exported no comment",
+			code: `package test
+type a struct {}`,
+		},
+		{
+			name: "group one exported no comment",
+			code: `package test
+type (
+	A struct {}
+)`,
+			want: check.ErrNoDoc,
+		},
+		{
+			name: "group one exported comment",
+			code: `package test
+// test comment
+type (
+  A struct {}
+)`,
+		},
+		{
+			name: "group one exported line comment",
+			code: `package test
+type (
+  A struct {} // test comment
+)`,
+			want: check.ErrNoDoc,
+		},
+		{
+			name: "group one not exported no comment",
+			code: `package test
+type (
+  a struct {}
+)`,
+		},
+		{
+			name: "group two exported no comment",
+			code: `package test
+type (
+	A struct {}
+	B struct {}
+)`,
+			want: check.ErrNoDoc,
+		},
+		{
+			name: "group two exported group comment",
+			code: `package test
+// test comment
+type (
+  A struct {}
+	B struct {}
+)`,
+			want: check.ErrNoDoc,
+		},
+		{
+			name: "group two exported line comment",
+			code: `package test
+type (
+  A struct {} // test comment
+  B struct {} // test comment
+)`,
+			want: check.ErrNoDoc,
+		},
+		{
+			name: "group two exported",
+			code: `package test
+type (
+	// A test
+  A struct {}
+	// B test
+  B struct {}
+)`,
+		},
+		{
+			name: "group two not exported no comment",
+			code: `package test
+type (
+  a struct {}
+  b struct {}
+)`,
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			fset, f := mustParse(t, tc.code)
+
+			err := check.CheckAST(fset, f)
+
+			if !errors.Is(err, tc.want) {
+				t.Errorf("checksCheckAST() unexpected error %v; want %v", err, tc.want)
+				t.Log(tc.code)
+			}
+		})
+	}
+}
+
 func mustParse(t *testing.T, s string) (*token.FileSet, *ast.File) {
 	t.Helper()
 	fset := token.NewFileSet()

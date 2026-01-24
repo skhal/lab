@@ -73,6 +73,8 @@ func checkFuncDecl(fset *token.FileSet, decl *ast.FuncDecl) error {
 
 func checkGenDecl(fset *token.FileSet, decl *ast.GenDecl) error {
 	switch decl.Tok {
+	case token.TYPE:
+		return checkGenDeclTypeSpec(fset, decl)
 	case token.VAR:
 		return checkGenDeclValueSpec(fset, decl)
 	}
@@ -102,13 +104,42 @@ func checkGenDeclValueSpec(fset *token.FileSet, decl *ast.GenDecl) error {
 	return errors.Join(ee...)
 }
 
+func checkGenDeclTypeSpec(fset *token.FileSet, decl *ast.GenDecl) error {
+	var ee []error
+	for _, spec := range decl.Specs {
+		s := spec.(*ast.TypeSpec)
+		if !s.Name.IsExported() {
+			continue
+		}
+		// A comment attached to a struct in a type group:
+		//  type (
+		//    // comment
+		//    A struct {}
+		//  }
+		if s.Doc != nil {
+			continue
+		}
+		// A comment attached to the type group, allow only one type inside:
+		//  // comment
+		//  type A struct {}
+		if decl.Doc != nil && len(decl.Specs) == 1 {
+			continue
+		}
+		ee = append(ee, newErrNoDoc(fset, s.Name, kindType))
+	}
+	return errors.Join(ee...)
+}
+
 type kind int
 
 //go:generate stringer -type=kind -linecomment
 const (
-	_        kind = iota
-	kindFunc      // func
-	kindVar       // var
+	_ kind = iota
+	// keep-sorted start
+	kindFunc // func
+	kindType // type
+	kindVar  // var
+	// keep-sorted end
 )
 
 func newErrNoDoc(fset *token.FileSet, id *ast.Ident, k kind) error {
