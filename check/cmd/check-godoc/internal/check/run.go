@@ -15,6 +15,7 @@ import (
 	"strings"
 )
 
+// ErrNoDoc represents missing documentation error.
 var ErrNoDoc = errors.New("no documentation")
 
 // Run verifies that every non-generated Go file has documentation attached to
@@ -75,6 +76,8 @@ func checkDecl(fset *token.FileSet, decl ast.Decl) error {
 	switch d := decl.(type) {
 	case *ast.FuncDecl:
 		return checkFuncDecl(fset, d)
+	case *ast.GenDecl:
+		return checkGenDecl(fset, d)
 	}
 	return nil
 }
@@ -86,6 +89,50 @@ func checkFuncDecl(fset *token.FileSet, decl *ast.FuncDecl) error {
 	if decl.Doc != nil {
 		return nil
 	}
-	pos := fset.Position(decl.Pos())
-	return fmt.Errorf("%s: func %s: %w", pos, decl.Name, ErrNoDoc)
+	return newErrNoDoc(fset, decl.Name, kindFunc)
+}
+
+func checkGenDecl(fset *token.FileSet, decl *ast.GenDecl) error {
+	switch decl.Tok {
+	case token.VAR:
+		return checkGenDeclValueSpec(fset, decl)
+	}
+	return nil
+}
+
+func checkGenDeclValueSpec(fset *token.FileSet, decl *ast.GenDecl) error {
+	// the comment might be in one of the two places:
+	// ast.GenDecl.Doc: a group comment
+	// ast.ValueSpec.Comment: a line comment
+	var ee []error
+	for _, spec := range decl.Specs {
+		s := spec.(*ast.ValueSpec)
+		if s.Comment != nil {
+			continue
+		}
+		if decl.Doc != nil {
+			continue
+		}
+		for _, n := range s.Names {
+			if !n.IsExported() {
+				continue
+			}
+			ee = append(ee, newErrNoDoc(fset, n, kindVar))
+		}
+	}
+	return errors.Join(ee...)
+}
+
+type kind int
+
+//go:generate stringer -type=kind -linecomment
+const (
+	_        kind = iota
+	kindFunc      // func
+	kindVar       // var
+)
+
+func newErrNoDoc(fset *token.FileSet, id *ast.Ident, k kind) error {
+	pos := fset.Position(id.Pos())
+	return fmt.Errorf("%s: %s %s: %w", pos, k, id.Name, ErrNoDoc)
 }
