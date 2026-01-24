@@ -24,7 +24,7 @@ func main() {
 		fmt.Fprintf(os.Stderr, "usage: %s file\n", filepath.Base(os.Args[0]))
 	}
 	fset := token.NewFileSet()
-	f, err := parser.ParseFile(fset, os.Args[1], nil, 0)
+	f, err := parser.ParseFile(fset, os.Args[1], nil, parser.ParseComments)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
