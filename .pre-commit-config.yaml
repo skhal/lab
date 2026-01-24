@@ -38,6 +38,12 @@ repos:
     language: system
     types_or: [go]
     pass_filenames: true
+  - id: check-godoc
+    name: "Go documentation"
+    entry: check-godoc
+    language: system
+    types_or: [go]
+    pass_filenames: true
   - id: check-issue
     name: "Issue is set"
     entry: check-issue
