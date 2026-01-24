@@ -73,15 +73,36 @@ func checkFuncDecl(fset *token.FileSet, decl *ast.FuncDecl) error {
 
 func checkGenDecl(fset *token.FileSet, decl *ast.GenDecl) error {
 	switch decl.Tok {
+	case token.CONST:
+		return checkGenDeclConstValueSpec(fset, decl)
 	case token.TYPE:
 		return checkGenDeclTypeSpec(fset, decl)
 	case token.VAR:
-		return checkGenDeclValueSpec(fset, decl)
+		return checkGenDeclVarValueSpec(fset, decl)
 	}
 	return nil
 }
+func checkGenDeclConstValueSpec(fset *token.FileSet, decl *ast.GenDecl) error {
+	var ee []error
+	for _, spec := range decl.Specs {
+		s := spec.(*ast.ValueSpec)
+		for _, n := range s.Names {
+			if !n.IsExported() {
+				continue
+			}
+			if s.Doc != nil && len(s.Names) == 1 {
+				continue
+			}
+			if decl.Doc != nil && len(decl.Specs) == 1 && len(s.Names) == 1 {
+				continue
+			}
+			ee = append(ee, newErrNoDoc(fset, n, kindConst))
+		}
+	}
+	return errors.Join(ee...)
+}
 
-func checkGenDeclValueSpec(fset *token.FileSet, decl *ast.GenDecl) error {
+func checkGenDeclVarValueSpec(fset *token.FileSet, decl *ast.GenDecl) error {
 	// the comment might be in one of the two places:
 	// ast.GenDecl.Doc: a group comment
 	// ast.ValueSpec.Comment: a line comment
@@ -136,9 +157,10 @@ type kind int
 const (
 	_ kind = iota
 	// keep-sorted start
-	kindFunc // func
-	kindType // type
-	kindVar  // var
+	kindConst // const
+	kindFunc  // func
+	kindType  // type
+	kindVar   // var
 	// keep-sorted end
 )
 

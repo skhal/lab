@@ -8,14 +8,15 @@ func _() {
 	// An "invalid array index" compiler error signifies that the constant values have changed.
 	// Re-run the stringer command to generate them again.
 	var x [1]struct{}
-	_ = x[kindFunc-1]
-	_ = x[kindType-2]
-	_ = x[kindVar-3]
+	_ = x[kindConst-1]
+	_ = x[kindFunc-2]
+	_ = x[kindType-3]
+	_ = x[kindVar-4]
 }
 
-const _kind_name = "functypevar"
+const _kind_name = "constfunctypevar"
 
-var _kind_index = [...]uint8{0, 4, 8, 11}
+var _kind_index = [...]uint8{0, 5, 9, 13, 16}
 
 func (i kind) String() string {
 	idx := int(i) - 1

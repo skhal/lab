@@ -15,6 +15,139 @@ import (
 	"github.com/skhal/lab/check/cmd/check-godoc/internal/check"
 )
 
+func TestCheckAST_const(t *testing.T) {
+	tests := []struct {
+		name string
+		code string
+		want error
+	}{
+		{
+			name: "exported no comment",
+			code: `package test
+const A = 1`,
+			want: check.ErrNoDoc,
+		},
+		{
+			name: "exported with comment",
+			code: `package test
+// comment
+const A = 1`,
+		},
+		{
+			name: "not exported no comment",
+			code: `package test
+const a = 1`,
+		},
+		{
+			name: "not exported with comment",
+			code: `package test
+// comment
+const a = 1`,
+		},
+		{
+			name: "multi export no comment",
+			code: `package test
+const A, B = 1`,
+			want: check.ErrNoDoc,
+		},
+		{
+			name: "multi export one comment",
+			code: `package test
+// comment
+const A, B = 1`,
+			want: check.ErrNoDoc,
+		},
+		{
+			name: "multi export line comment",
+			code: `package test
+const A, B = 1 // comment`,
+			want: check.ErrNoDoc,
+		},
+		{
+			name: "multi export mix comment",
+			code: `package test
+// comment
+const A, b = 1`,
+			want: check.ErrNoDoc,
+		},
+		{
+			name: "group one no comment",
+			code: `package test
+const (
+  A = 1
+)`,
+			want: check.ErrNoDoc,
+		},
+		{
+			name: "group one group comment",
+			code: `package test
+// comment
+const (
+  A = 1
+)`,
+		},
+		{
+			name: "group one comment",
+			code: `package test
+const (
+	// comment
+  A = 1
+)`,
+		},
+		{
+			name: "group no comment",
+			code: `package test
+const (
+	A = 1
+	B = 1
+)`,
+			want: check.ErrNoDoc,
+		},
+		{
+			name: "group with comment",
+			code: `package test
+// comment
+const (
+	A = 1
+	B = 1
+)`,
+			want: check.ErrNoDoc,
+		},
+		{
+			name: "group some comment",
+			code: `package test
+const (
+	// comment
+	A = 1
+	B = 1
+)`,
+			want: check.ErrNoDoc,
+		},
+		{
+			name: "group each comment",
+			code: `package test
+const (
+	// comment
+	A = 1
+	// comment
+	B = 1
+)`,
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			fset, f := mustParse(t, tc.code)
+
+			err := check.CheckAST(fset, f)
+
+			if !errors.Is(err, tc.want) {
+				t.Errorf("checksCheckAST() unexpected error %v; want %v", err, tc.want)
+				t.Log(tc.code)
+			}
+		})
+	}
+}
+
 func TestCheckAST_func(t *testing.T) {
 	tests := []struct {
 		name string
