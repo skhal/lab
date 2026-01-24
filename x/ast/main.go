@@ -15,19 +15,62 @@ import (
 	"go/ast"
 	"go/parser"
 	"go/token"
+	"io/fs"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 func main() {
 	if len(os.Args) != 2 {
 		fmt.Fprintf(os.Stderr, "usage: %s file\n", filepath.Base(os.Args[0]))
 	}
-	fset := token.NewFileSet()
-	f, err := parser.ParseFile(fset, os.Args[1], nil, parser.ParseComments)
-	if err != nil {
+	if err := run(os.Args[1]); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
+}
+
+func run(name string) error {
+	ok, err := isDir(name)
+	switch {
+	case err != nil:
+		return err
+	case ok:
+		return runOnDir(name)
+	default:
+		return runOnFile(name)
+	}
+}
+
+func isDir(name string) (bool, error) {
+	m, err := os.Stat(name)
+	if err != nil {
+		return false, err
+	}
+	return m.IsDir(), nil
+}
+
+func runOnDir(name string) error {
+	fset := token.NewFileSet()
+	opts := parser.ParseComments | parser.PackageClauseOnly
+	noTests := func(m fs.FileInfo) bool {
+		return !strings.HasSuffix(m.Name(), "_test.go")
+	}
+	f, err := parser.ParseDir(fset, name, noTests, opts)
+	if err != nil {
+		return err
+	}
 	ast.Print(fset, f)
+	return nil
+}
+
+func runOnFile(name string) error {
+	fset := token.NewFileSet()
+	f, err := parser.ParseFile(fset, name, nil, parser.ParseComments)
+	if err != nil {
+		return err
+	}
+	ast.Print(fset, f)
+	return nil
 }
