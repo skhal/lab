@@ -141,26 +141,32 @@ func checkGenDeclTypeSpec(fset *token.FileSet, decl *ast.GenDecl) error {
 	var ee []error
 	for _, spec := range decl.Specs {
 		s := spec.(*ast.TypeSpec)
-		if !s.Name.IsExported() {
-			continue
+		if err := checkTypeSpec(fset, decl, s); err != nil {
+			ee = append(ee, err)
 		}
-		// A comment attached to a struct in a type group:
-		//  type (
-		//    // comment
-		//    A struct {}
-		//  }
-		if s.Doc != nil {
-			continue
-		}
-		// A comment attached to the type group, allow only one type inside:
-		//  // comment
-		//  type A struct {}
-		if decl.Doc != nil && len(decl.Specs) == 1 {
-			continue
-		}
-		ee = append(ee, newErrNoDoc(fset, s.Name, kindType))
 	}
 	return errors.Join(ee...)
+}
+
+func checkTypeSpec(fs *token.FileSet, decl *ast.GenDecl, spec *ast.TypeSpec) error {
+	if !spec.Name.IsExported() {
+		return nil
+	}
+	// A comment attached to a struct in a type group:
+	//  type (
+	//    // comment
+	//    A struct {}
+	//  )
+	if spec.Doc != nil {
+		return nil
+	}
+	// A comment attached to the type group, allow only one type inside:
+	//  // comment
+	//  type A struct {}
+	if decl.Doc != nil && len(decl.Specs) == 1 {
+		return nil
+	}
+	return newErrNoDoc(fs, spec.Name, kindType)
 }
 
 type kind int
