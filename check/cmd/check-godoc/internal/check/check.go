@@ -177,11 +177,13 @@ func checkTypeSpecDoc(fs *token.FileSet, decl *ast.GenDecl, spec *ast.TypeSpec) 
 }
 
 func checkTypeSpecFields(fs *token.FileSet, decl *ast.GenDecl, ts *ast.TypeSpec) error {
-	st, ok := ts.Type.(*ast.StructType)
-	if !ok {
-		return nil
+	switch t := ts.Type.(type) {
+	case *ast.StructType:
+		return checkStructType(fs, t)
+	case *ast.InterfaceType:
+		return checkInterfaceType(fs, t)
 	}
-	return checkStructType(fs, st)
+	return nil
 }
 
 func checkStructType(fs *token.FileSet, st *ast.StructType) error {
@@ -206,17 +208,40 @@ func checkStructType(fs *token.FileSet, st *ast.StructType) error {
 	return errors.Join(ee...)
 }
 
+func checkInterfaceType(fs *token.FileSet, it *ast.InterfaceType) error {
+	// Examples:
+	// - doc: https://pkg.go.dev/context#Context
+	// - comment: https://pkg.go.dev/go/types#Object
+	var ee []error
+	for _, f := range it.Methods.List {
+		if f.Doc != nil && len(f.Names) == 1 {
+			continue
+		}
+		if f.Comment != nil && len(f.Names) == 1 {
+			continue
+		}
+		for _, n := range f.Names {
+			if !n.IsExported() {
+				continue
+			}
+			ee = append(ee, newErrNoDoc(fs, n, kindMethod))
+		}
+	}
+	return errors.Join(ee...)
+}
+
 type kind int
 
 //go:generate stringer -type=kind -linecomment
 const (
 	_ kind = iota
 	// keep-sorted start
-	kindConst // const
-	kindField // field
-	kindFunc  // func
-	kindType  // type
-	kindVar   // var
+	kindConst  // const
+	kindField  // field
+	kindFunc   // func
+	kindMethod // method
+	kindType   // type
+	kindVar    // var
 	// keep-sorted end
 )
 

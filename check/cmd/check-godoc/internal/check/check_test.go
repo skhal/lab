@@ -604,6 +604,94 @@ type A struct {
 	}
 }
 
+func TestCheckAST_methods(t *testing.T) {
+	tests := []struct {
+		name string
+		code string
+		want error
+	}{
+		{
+			name: "exported no comment",
+			code: `package test
+// type comment
+type A interface {
+	A()
+}`,
+			want: check.ErrNoDoc,
+		},
+		{
+			name: "exported with comment",
+			code: `package test
+// type comment
+type A interface {
+	// comment
+	A()
+}`,
+		},
+		{
+			name: "exported line comment",
+			code: `package test
+// type comment
+type A interface {
+	A() // comment
+}`,
+		},
+		{
+			name: "two exported no comments",
+			code: `package test
+// type comment
+type A interface {
+	A()
+	B()
+}`,
+			want: check.ErrNoDoc,
+		},
+		{
+			name: "two exported one comment",
+			code: `package test
+// type comment
+type A interface {
+	// comment
+	A()
+	B()
+}`,
+			want: check.ErrNoDoc,
+		},
+		{
+			name: "one exported no comment",
+			code: `package test
+// type comment
+type A interface {
+	A()
+	b()
+}`,
+			want: check.ErrNoDoc,
+		},
+		{
+			name: "one exported with comment",
+			code: `package test
+// type comment
+type A interface {
+	// comment
+	A()
+	b()
+}`,
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			fset, f := mustParse(t, tc.code)
+
+			err := check.CheckAST(fset, f)
+
+			if !errors.Is(err, tc.want) {
+				t.Errorf("check.CheckAST() unexpected error %v; want %v", err, tc.want)
+				t.Log(tc.code)
+			}
+		})
+	}
+}
+
 func TestCheckDir(t *testing.T) {
 	tests := []struct {
 		name string
