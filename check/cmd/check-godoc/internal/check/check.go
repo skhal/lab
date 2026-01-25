@@ -17,18 +17,6 @@ import (
 	"strings"
 )
 
-// ErrNoDoc represents missing documentation error.
-var ErrNoDoc = errors.New("no documentation")
-
-// ErrNotPackage means that Go failed to parse a path.
-var ErrNotPackage = errors.New("not a package")
-
-// ErrMultiPackage means there are multiple packages at a single path.
-var ErrMultiPackage = errors.New("multiple packages")
-
-// ErrMultiDoc means there are multiple package documentations.
-var ErrMultiDoc = errors.New("multiple documentation")
-
 // CheckFile verifies that non-generated Go file has documentation attached to
 // the exported declarations. It returns an error if the check fails.
 func CheckFile(fname string) error {
@@ -228,26 +216,6 @@ func checkInterfaceType(fs *token.FileSet, it *ast.InterfaceType) error {
 		}
 	}
 	return errors.Join(ee...)
-}
-
-type kind int
-
-//go:generate stringer -type=kind -linecomment
-const (
-	_ kind = iota
-	// keep-sorted start
-	kindConst  // const
-	kindField  // field
-	kindFunc   // func
-	kindMethod // method
-	kindType   // type
-	kindVar    // var
-	// keep-sorted end
-)
-
-func newErrNoDoc(fset *token.FileSet, id *ast.Ident, k kind) error {
-	pos := fset.Position(id.Pos())
-	return fmt.Errorf("%s: %s %s: %w", pos, k, id.Name, ErrNoDoc)
 }
 
 // CheckDir parses a Go package at path and ensures it has documentation set.
