@@ -42,9 +42,6 @@ func checkDecls(fs *token.FileSet, f *ast.File) error {
 	var ee []error
 	for _, d := range f.Decls {
 		if err := checkDecl(fs, d); err != nil {
-			if !errors.Is(err, ErrNoDoc) {
-				return err
-			}
 			ee = append(ee, err)
 		}
 	}
