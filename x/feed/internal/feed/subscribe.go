@@ -7,10 +7,12 @@ package feed
 
 import (
 	"fmt"
+	"sync"
 
 	"github.com/skhal/lab/x/feed/internal/pb"
 )
 
+// Feed is a stream of RSS, Atom, etc. feed items.
 type Feed <-chan *Item
 
 // Subscription is a client API to access streamed feed.
@@ -54,6 +56,50 @@ func (s *subscription) Feed() (Feed, error) {
 	return Feed(stream), nil
 }
 
+// String implements fmt.Stringer interface.
 func (s *subscription) String() string {
 	return s.feed.String()
+}
+
+// Merge multiplexes subscriptions into a single subscription.
+func Merge(subs []Subscription) Subscription {
+	return newMultiplexer(subs)
+}
+
+type multiplexer struct {
+	subs []Subscription
+}
+
+func newMultiplexer(subs []Subscription) *multiplexer {
+	return &multiplexer{
+		subs: subs,
+	}
+}
+
+// Feed multiplexes multiple subscription feeds into a single feed.
+func (smux *multiplexer) Feed() (Feed, error) {
+	stream := make(chan *Item)
+	go func() {
+		defer close(stream)
+		var wg sync.WaitGroup
+		defer wg.Wait()
+		for _, sub := range smux.subs {
+			sub := sub
+			feed, err := sub.Feed()
+			if err != nil {
+				// TODO: report error
+				continue
+			}
+			wg.Go(func() {
+				for {
+					item, ok := <-feed
+					if !ok {
+						break
+					}
+					stream <- item
+				}
+			})
+		}
+	}()
+	return Feed(stream), nil
 }

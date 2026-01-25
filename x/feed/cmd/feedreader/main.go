@@ -3,6 +3,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+// Feedreader implements an RSS, Atom, etc. feed reader using streaming feeds.
 package main
 
 import (
@@ -72,27 +73,30 @@ func load(name string) (*pb.FeedSet, error) {
 }
 
 func read(feeds *pb.FeedSet) error {
+	subs := make([]feed.Subscription, 0, len(feeds.GetFeeds()))
+	for _, f := range feeds.GetFeeds() {
+		subs = append(subs, feed.Subscribe(f))
+	}
+	sub := feed.Merge(subs)
+	stream, err := sub.Feed()
+	if err != nil {
+		return err
+	}
 	var wg sync.WaitGroup
 	defer wg.Wait()
-	for _, f := range feeds.GetFeeds() {
-		sub := feed.Subscribe(f)
-		stream, err := sub.Feed()
-		if err != nil {
-			return err
+	wg.Go(func() {
+		for item := range stream {
+			// emulate delay
+			time.Sleep(time.Duration(rand.Intn(10)) * time.Millisecond)
+			fmt.Printf("%s\n", (*printableItem)(item))
 		}
-		wg.Go(func() {
-			for item := range stream {
-				// emulate delay
-				time.Sleep(time.Duration(rand.Intn(10)) * time.Millisecond)
-				fmt.Printf("%s: %s\n", f.GetName(), (*printableItem)(item))
-			}
-		})
-	}
+	})
 	return nil
 }
 
 type printableItem feed.Item
 
+// String implements fmt.Stringer interface
 func (i *printableItem) String() string {
 	var t *time.Time
 	switch {

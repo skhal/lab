@@ -44,6 +44,7 @@ func newFileFetcher(name string) *fileFetcher {
 	return &fileFetcher{file: name}
 }
 
+// Fetch retrieves feed items from the file.
 func (ftch *fileFetcher) Fetch() ([]*Item, error) {
 	n, err := expand(ftch.file)
 	if err != nil {
