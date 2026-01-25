@@ -40,8 +40,8 @@ func CheckAST(fs *token.FileSet, f *ast.File) error {
 
 func checkDecls(fs *token.FileSet, f *ast.File) error {
 	var ee []error
-	for _, decl := range f.Decls {
-		if err := checkDecl(fs, decl); err != nil {
+	for _, d := range f.Decls {
+		if err := checkDecl(fs, d); err != nil {
 			if !errors.Is(err, ErrNoDoc) {
 				return err
 			}
@@ -143,7 +143,7 @@ func checkTypeSpec(fs *token.FileSet, decl *ast.GenDecl, spec *ast.TypeSpec) err
 	if err := checkTypeSpecDoc(fs, decl, spec); err != nil {
 		return err
 	}
-	return checkTypeSpecFields(fs, decl, spec)
+	return checkTypeSpecFields(fs, spec)
 }
 
 func checkTypeSpecDoc(fs *token.FileSet, decl *ast.GenDecl, spec *ast.TypeSpec) error {
@@ -164,7 +164,7 @@ func checkTypeSpecDoc(fs *token.FileSet, decl *ast.GenDecl, spec *ast.TypeSpec) 
 	return newErrNoDoc(fs, spec.Name, kindType)
 }
 
-func checkTypeSpecFields(fs *token.FileSet, decl *ast.GenDecl, ts *ast.TypeSpec) error {
+func checkTypeSpecFields(fs *token.FileSet, ts *ast.TypeSpec) error {
 	switch t := ts.Type.(type) {
 	case *ast.StructType:
 		return checkStructType(fs, t)
