@@ -24,6 +24,9 @@ var ErrMultiPackage = errors.New("multiple packages")
 // ErrMultiDoc means there are multiple package documentations.
 var ErrMultiDoc = errors.New("multiple documentation")
 
+// ErrLongComment means the comment line is beyond line length limit.
+var ErrLongComment = errors.New("long comment")
+
 type kind int
 
 //go:generate stringer -type=kind -linecomment

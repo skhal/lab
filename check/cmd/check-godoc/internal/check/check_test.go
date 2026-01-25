@@ -692,6 +692,48 @@ type A interface {
 	}
 }
 
+func TestCheckAST_comments(t *testing.T) {
+	tests := []struct {
+		name string
+		code string
+		want error
+	}{
+		{
+			name: "short comment",
+			code: `
+// “Doc comments” are comments that appear immediately before top-level...
+package test`,
+		},
+		{
+			name: "long comment",
+			code: `
+// “Doc comments” are comments that appear immediately before top-level package, const, func, type, and var declarations with no intervening newlines. Every exported (capitalized) name should have a doc comment.
+package test`,
+			want: check.ErrLongComment,
+		},
+		{
+			name: "long multiline comment",
+			code: `
+// “Doc comments” are comments that appear immediately before top-level
+// package, const, func, type, and var declarations with no intervening newlines. Every exported (capitalized) name should have a doc comment.
+package test`,
+			want: check.ErrLongComment,
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			fset, f := mustParse(t, tc.code)
+
+			err := check.CheckAST(fset, f)
+
+			if !errors.Is(err, tc.want) {
+				t.Errorf("check.CheckAST() unexpected error %v; want %v", err, tc.want)
+				t.Log(tc.code)
+			}
+		})
+	}
+}
+
 func TestCheckDir(t *testing.T) {
 	tests := []struct {
 		name string

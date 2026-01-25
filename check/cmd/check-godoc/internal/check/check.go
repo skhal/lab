@@ -17,6 +17,8 @@ import (
 	"strings"
 )
 
+const maxLineLength = 80
+
 // CheckFile verifies that non-generated Go file has documentation attached to
 // the exported declarations. It returns an error if the check fails.
 func CheckFile(fname string) error {
@@ -35,7 +37,10 @@ func CheckAST(fs *token.FileSet, f *ast.File) error {
 	if ast.IsGenerated(f) {
 		return nil
 	}
-	return checkDecls(fs, f)
+	if err := checkDecls(fs, f); err != nil {
+		return err
+	}
+	return checkComments(fs, f)
 }
 
 func checkDecls(fs *token.FileSet, f *ast.File) error {
@@ -272,4 +277,32 @@ func checkPackage(fs *token.FileSet, pkg *ast.Package) error {
 		loc := strings.Join(locs, sep)
 		return fmt.Errorf("package %s: %w%s%s", pkg.Name, ErrMultiDoc, sep, loc)
 	}
+}
+
+func checkComments(fs *token.FileSet, f *ast.File) error {
+	var ee []error
+	for _, cg := range ast.NewCommentMap(fs, f, f.Comments).Comments() {
+		if err := checkCommentGroup(fs, cg); err != nil {
+			ee = append(ee, err)
+		}
+	}
+	return errors.Join(ee...)
+}
+
+func checkCommentGroup(fs *token.FileSet, cg *ast.CommentGroup) error {
+	var ee []error
+	for _, c := range cg.List {
+		if err := checkComment(fs, c); err != nil {
+			ee = append(ee, err)
+		}
+	}
+	return errors.Join(ee...)
+}
+
+func checkComment(fs *token.FileSet, c *ast.Comment) error {
+	if len(c.Text) <= maxLineLength {
+		return nil
+	}
+	pos := fs.Position(c.Pos())
+	return fmt.Errorf("%s: %w: beyond %d chars (%d)", pos, ErrLongComment, maxLineLength, len(c.Text))
 }
