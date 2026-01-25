@@ -701,23 +701,43 @@ func TestCheckAST_comments(t *testing.T) {
 		{
 			name: "short comment",
 			code: `
-// “Doc comments” are comments that appear immediately before top-level...
+// "Doc comments" are comments that appear immediately before top-level...
 package test`,
 		},
 		{
 			name: "long comment",
 			code: `
-// “Doc comments” are comments that appear immediately before top-level package, const, func, type, and var declarations with no intervening newlines. Every exported (capitalized) name should have a doc comment.
+// "Doc comments" are comments that appear immediately before top-level package, const, func, type, and var declarations with no intervening newlines. Every exported (capitalized) name should have a doc comment.
 package test`,
 			want: check.ErrLongComment,
 		},
 		{
 			name: "long multiline comment",
 			code: `
-// “Doc comments” are comments that appear immediately before top-level
+// "Doc comments" are comments that appear immediately before top-level
 // package, const, func, type, and var declarations with no intervening newlines. Every exported (capitalized) name should have a doc comment.
 package test`,
 			want: check.ErrLongComment,
+		},
+		{
+			name: "block long comment",
+			code: `
+/*
+  "Doc comments" are comments that appear immediately before top-level package,
+	const, func, type, and var declarations with no intervening newlines. Every exported (capitalized) name should have a doc comment.
+*/
+package test`,
+			want: check.ErrLongComment,
+		},
+		{
+			name: "block short comment",
+			code: `
+/*
+  "Doc comments" are comments that appear immediately before top-level package,
+  const, func, type, and var declarations with no intervening newlines. Every
+  exported (capitalized) name should have a doc comment.
+*/
+package test`,
 		},
 	}
 	for _, tc := range tests {

@@ -300,9 +300,18 @@ func checkCommentGroup(fs *token.FileSet, cg *ast.CommentGroup) error {
 }
 
 func checkComment(fs *token.FileSet, c *ast.Comment) error {
-	if len(c.Text) <= maxLineLength {
-		return nil
+	var (
+		f      = fs.File(c.Pos())
+		offset = 0
+	)
+	var ee []error
+	for line := range strings.Lines(c.Text) {
+		if len(line) > maxLineLength {
+			pos := fs.Position(f.Pos(int(c.Pos()) + offset))
+			err := fmt.Errorf("%s: %w: beyond %d chars (%d)", pos, ErrLongComment, maxLineLength, len(c.Text))
+			ee = append(ee, err)
+		}
+		offset += len(line)
 	}
-	pos := fs.Position(c.Pos())
-	return fmt.Errorf("%s: %w: beyond %d chars (%d)", pos, ErrLongComment, maxLineLength, len(c.Text))
+	return errors.Join(ee...)
 }
