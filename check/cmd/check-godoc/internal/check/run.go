@@ -8,6 +8,7 @@
 package check
 
 import (
+	"errors"
 	"path/filepath"
 	"strings"
 )
@@ -15,6 +16,7 @@ import (
 // Run verifies that every non-generated Go file has documentation attached to
 // the exported declarations. It returns an error on the first failed file.
 func Run(files []string) error {
+	var ee []error
 	seen := make(map[string]bool)
 	dirs := make([]string, 0, len(files))
 	for _, f := range files {
@@ -22,7 +24,7 @@ func Run(files []string) error {
 			continue
 		}
 		if err := CheckFile(f); err != nil {
-			return err
+			ee = append(ee, err)
 		}
 		d := filepath.Dir(f)
 		if seen[d] {
@@ -33,10 +35,10 @@ func Run(files []string) error {
 	}
 	for _, d := range dirs {
 		if err := CheckDir(d); err != nil {
-			return err
+			ee = append(ee, err)
 		}
 	}
-	return nil
+	return errors.Join(ee...)
 }
 
 // IsTest reports whether the file is a test file. A test file has _test.go
