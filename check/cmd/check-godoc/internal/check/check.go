@@ -141,6 +141,9 @@ func checkGenDeclTypeSpec(fset *token.FileSet, decl *ast.GenDecl) error {
 	var ee []error
 	for _, spec := range decl.Specs {
 		s := spec.(*ast.TypeSpec)
+		if !s.Name.IsExported() {
+			continue
+		}
 		if err := checkTypeSpec(fset, decl, s); err != nil {
 			ee = append(ee, err)
 		}
@@ -149,9 +152,13 @@ func checkGenDeclTypeSpec(fset *token.FileSet, decl *ast.GenDecl) error {
 }
 
 func checkTypeSpec(fs *token.FileSet, decl *ast.GenDecl, spec *ast.TypeSpec) error {
-	if !spec.Name.IsExported() {
-		return nil
+	if err := checkTypeSpecDoc(fs, decl, spec); err != nil {
+		return err
 	}
+	return checkTypeSpecFields(fs, decl, spec)
+}
+
+func checkTypeSpecDoc(fs *token.FileSet, decl *ast.GenDecl, spec *ast.TypeSpec) error {
 	// A comment attached to a struct in a type group:
 	//  type (
 	//    // comment
@@ -169,6 +176,36 @@ func checkTypeSpec(fs *token.FileSet, decl *ast.GenDecl, spec *ast.TypeSpec) err
 	return newErrNoDoc(fs, spec.Name, kindType)
 }
 
+func checkTypeSpecFields(fs *token.FileSet, decl *ast.GenDecl, ts *ast.TypeSpec) error {
+	st, ok := ts.Type.(*ast.StructType)
+	if !ok {
+		return nil
+	}
+	return checkStructType(fs, st)
+}
+
+func checkStructType(fs *token.FileSet, st *ast.StructType) error {
+	// Examples:
+	// - field doc: https://pkg.go.dev/runtime/metrics#Float64Histogram
+	// - field comment: https://pkg.go.dev/strconv#NumError
+	var ee []error
+	for _, f := range st.Fields.List {
+		if f.Doc != nil && len(f.Names) == 1 {
+			continue
+		}
+		if f.Comment != nil && len(f.Names) == 1 {
+			continue
+		}
+		for _, n := range f.Names {
+			if !n.IsExported() {
+				continue
+			}
+			ee = append(ee, newErrNoDoc(fs, n, kindField))
+		}
+	}
+	return errors.Join(ee...)
+}
+
 type kind int
 
 //go:generate stringer -type=kind -linecomment
@@ -176,6 +213,7 @@ const (
 	_ kind = iota
 	// keep-sorted start
 	kindConst // const
+	kindField // field
 	kindFunc  // func
 	kindType  // type
 	kindVar   // var

@@ -488,6 +488,122 @@ type (
 	}
 }
 
+func TestCheckAST_fields(t *testing.T) {
+	tests := []struct {
+		name string
+		code string
+		want error
+	}{
+		{
+			name: "exported no comment",
+			code: `package test
+// type comment
+type A struct {
+	A int
+}`,
+			want: check.ErrNoDoc,
+		},
+		{
+			name: "exported with comment",
+			code: `package test
+// type comment
+type A struct {
+	// comment
+	A int
+}`,
+		},
+		{
+			name: "exported line comment",
+			code: `package test
+// type comment
+type A struct {
+	A int // comment
+}`,
+		},
+		{
+			name: "two exported no comments",
+			code: `package test
+// type comment
+type A struct {
+	A int
+	B int
+}`,
+			want: check.ErrNoDoc,
+		},
+		{
+			name: "two exported one comment",
+			code: `package test
+// type comment
+type A struct {
+	// comment
+	A int
+	B int
+}`,
+			want: check.ErrNoDoc,
+		},
+		{
+			name: "one exported no comment",
+			code: `package test
+// type comment
+type A struct {
+	A int
+	b int
+}`,
+			want: check.ErrNoDoc,
+		},
+		{
+			name: "one exported with comment",
+			code: `package test
+// type comment
+type A struct {
+	// comment
+	A int
+	b int
+}`,
+		},
+		{
+			name: "multiple exported names no comment",
+			code: `package test
+// type comment
+type A struct {
+	A, B int
+}`,
+			want: check.ErrNoDoc,
+		},
+		{
+			name: "multiple exported names one comment",
+			code: `package test
+// type comment
+type A struct {
+	// comment
+	A, B int
+}`,
+			want: check.ErrNoDoc,
+		},
+		{
+			name: "multiple exported names one line comment",
+			code: `package test
+// type comment
+type A struct {
+	A, B int // comment
+}`,
+			want: check.ErrNoDoc,
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			fset, f := mustParse(t, tc.code)
+
+			err := check.CheckAST(fset, f)
+
+			if !errors.Is(err, tc.want) {
+				t.Errorf("check.CheckAST() unexpected error %v; want %v", err, tc.want)
+				t.Log(tc.code)
+			}
+		})
+	}
+}
+
 func TestCheckDir(t *testing.T) {
 	tests := []struct {
 		name string
