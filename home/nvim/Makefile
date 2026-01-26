@@ -3,11 +3,10 @@
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 
-#
 # Flavor: FreeBSD
 
 SOURCES = init.lua
-XDG_CONFIG_HOME = ${HOME}/.config
+XDG_CONFIG_HOME ?= ${HOME}/.config
 NVIM_CONFIG_PATH = ${XDG_CONFIG_HOME}/nvim
 INSTALL_TARGETS = ${SOURCES:S,^,${NVIM_CONFIG_PATH}/,}
 
