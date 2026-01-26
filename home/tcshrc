@@ -7,7 +7,7 @@
 #
 # vim: ft=tcsh
 
-setenv EDITOR vim
+setenv EDITOR nvim
 setenv PAGER less
 
 if ( ! $?prompt ) goto end
