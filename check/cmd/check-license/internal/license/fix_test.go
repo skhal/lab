@@ -26,6 +26,11 @@ func TestAdd_empty(t *testing.T) {
   license that can be found in the LICENSE file.
 -->
 `
+	wantLua := `-- Copyright 2026 Tester. All rights reserved.
+--
+-- Use of this source code is governed by a BSD-style
+-- license that can be found in the LICENSE file.
+`
 	wantShell := `# Copyright 2026 Tester. All rights reserved.
 #
 # Use of this source code is governed by a BSD-style
@@ -53,6 +58,7 @@ func TestAdd_empty(t *testing.T) {
 		{filename: "test.go", holder: "Tester", want: wantC},
 		{filename: "test.h", holder: "Tester", want: wantC},
 		{filename: "test.html", holder: "Tester", want: wantHTML},
+		{filename: "test.lua", holder: "Tester", want: wantLua},
 		{filename: "test.proto", holder: "Tester", want: wantC},
 		{filename: "test.sh", holder: "Tester", want: wantShell},
 		{filename: "test.txt", holder: "Tester", want: wantShell},
@@ -80,6 +86,13 @@ func TestAdd_non_empty(t *testing.T) {
 //
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
+
+test
+`
+	wantLua := `-- Copyright 2026 Tester. All rights reserved.
+--
+-- Use of this source code is governed by a BSD-style
+-- license that can be found in the LICENSE file.
 
 test
 `
@@ -124,6 +137,7 @@ test
 		{data: "test\n", filename: "test.go", holder: "Tester", want: wantC},
 		{data: "test\n", filename: "test.h", holder: "Tester", want: wantC},
 		{data: "test\n", filename: "test.html", holder: "Tester", want: wantHTML},
+		{data: "test\n", filename: "test.lua", holder: "Tester", want: wantLua},
 		{data: "test\n", filename: "test.proto", holder: "Tester", want: wantC},
 		{data: "test\n", filename: "test.sh", holder: "Tester", want: wantShell},
 		{data: "test\n", filename: "test.txt", holder: "Tester", want: wantShell},

@@ -32,6 +32,26 @@ func TestRun(t *testing.T) {
 			`,
 		},
 		{
+			name: "valid lua style",
+			data: `
+-- Copyright 2026 John Doe. All rights reserved.
+--
+-- Use of this source code is governed by a BSD-style
+-- license that can be found in the LICENSE file.
+			`,
+		},
+		{
+			name: "valid lua block style",
+			data: `
+--[[
+  Copyright 2026 John Doe. All rights reserved.
+
+  Use of this source code is governed by a BSD-style
+  license that can be found in the LICENSE file.
+--]]
+			`,
+		},
+		{
 			name: "valid sh style",
 			data: `
 # Copyright 2026 John Doe. All rights reserved.

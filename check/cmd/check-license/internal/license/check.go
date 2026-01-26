@@ -11,10 +11,11 @@ import (
 	"regexp"
 )
 
-var lineRx = regexp.MustCompile(`^([\t ]*(/[/\*]|[#"])?) Copyright`)
+var lineRx = regexp.MustCompile(`^([\t ]*(/[/\*]|[#"]|--)?) Copyright`)
 
 const eol = '\n'
 
+// Check verifies that the buffer buf includes a license block.
 func Check(buf []byte) (err error) {
 	ln := 1
 	defer func() {

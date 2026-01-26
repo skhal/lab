@@ -32,7 +32,8 @@ func Add(b []byte, filename, holder string) ([]byte, error) {
 	return ins.Insert(b, lic)
 }
 
-// splitFirstLineFunc splits a block of data into the first line, the rest, and optional separator line.
+// splitFirstLineFunc splits a block of data into the first line, the rest, and
+// optional separator line.
 type splitFirstLineFunc func([]byte) splitBlock
 
 // inserter injects a license into a block of text.
@@ -62,6 +63,9 @@ var (
 		end:            "-->",
 		splitFirstLine: splitDoctype,
 	}
+	insLua = inserter{
+		prefix: "--",
+	}
 	insShell = inserter{
 		prefix:         "#",
 		splitFirstLine: splitShebang,
@@ -86,6 +90,8 @@ func newInserter(filename string) (*inserter, error) {
 		return &insC, nil
 	case ".html", ".md":
 		return &insHTML, nil
+	case ".lua":
+		return &insLua, nil
 	case ".vim":
 		return &insVim, nil
 		// keep-sorted end
@@ -102,6 +108,7 @@ func newInserter(filename string) (*inserter, error) {
 	return nil, fmt.Errorf("%s: unsupported file type", filename)
 }
 
+// Insert injects a licence block lic into a data block b.
 func (ins *inserter) Insert(b []byte, lic []byte) ([]byte, error) {
 	var buf bytes.Buffer
 	b = ins.writeFirstLine(&buf, b)

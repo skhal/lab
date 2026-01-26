@@ -3,6 +3,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+// Package license provides checker and fixer for license pre-commit check.
 package license
 
 import (
@@ -19,8 +20,8 @@ var (
 
 // LicenseData is input to the license template.
 type LicenseData struct {
-	Year   string
-	Holder string
+	Year   string // Year in the license block.
+	Holder string // Holder in the license block.
 }
 
 func genLicenseBlock(data LicenseData) ([]byte, error) {
