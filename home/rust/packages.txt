@@ -14,6 +14,7 @@
 #   foo --git https://github.com/bar/baz
 #
 # keep-sorted start
+stylua
 typos-cli
 typos-lsp --git https://github.com/tekumara/typos-lsp
 # keep-sorted end

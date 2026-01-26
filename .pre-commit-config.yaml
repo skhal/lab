@@ -94,6 +94,11 @@ repos:
     name: "Keep lines sorted"
     entry: keep-sorted
     language: system
+  - id: lua-format
+    name: "Format Lua"
+    entry: stylua
+    language: system
+    types_or: [lua]
   - id: make-lint
     name: "Lint makefiles"
     entry: make
