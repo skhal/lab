@@ -17,8 +17,7 @@ import (
 // the exported declarations. It returns an error on the first failed file.
 func Run(files []string) error {
 	var ee []error
-	seen := make(map[string]bool)
-	dirs := make([]string, 0, len(files))
+	pc := NewPathCollector()
 	for _, f := range files {
 		if IsTest(f) {
 			continue
@@ -26,19 +25,43 @@ func Run(files []string) error {
 		if err := CheckFile(f); err != nil {
 			ee = append(ee, err)
 		}
-		d := filepath.Dir(f)
-		if seen[d] {
-			continue
-		}
-		seen[d] = true
-		dirs = append(dirs, d)
+		pc.CollectFile(f)
 	}
-	for _, d := range dirs {
+	for _, d := range pc.Paths() {
 		if err := CheckDir(d); err != nil {
 			ee = append(ee, err)
 		}
 	}
 	return errors.Join(ee...)
+}
+
+// PathCollector collects unique folders from a set of files.
+type PathCollector struct {
+	seen  map[string]bool
+	paths []string
+}
+
+// NewPathCollector creates a new PathCollector.
+func NewPathCollector() *PathCollector {
+	return &PathCollector{
+		seen: make(map[string]bool),
+	}
+}
+
+// CollectFile collects the path to the file. It skips the path if already in
+// the collector.
+func (pc *PathCollector) CollectFile(name string) {
+	d := filepath.Dir(name)
+	if pc.seen[d] {
+		return
+	}
+	pc.seen[d] = true
+	pc.paths = append(pc.paths, d)
+}
+
+// Paths returns a slice of collected paths.
+func (pc *PathCollector) Paths() []string {
+	return pc.paths
 }
 
 // IsTest reports whether the file is a test file. A test file has _test.go
