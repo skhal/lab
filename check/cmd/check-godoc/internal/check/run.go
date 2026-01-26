@@ -11,28 +11,48 @@ import (
 	"errors"
 	"path/filepath"
 	"strings"
+	"sync"
 )
 
 // Run verifies that every non-generated Go file has documentation attached to
 // the exported declarations. It returns an error on the first failed file.
 func Run(files []string) error {
 	var ee []error
-	pc := NewPathCollector()
-	for _, f := range files {
-		if IsTest(f) {
-			continue
-		}
-		if err := CheckFile(f); err != nil {
-			ee = append(ee, err)
-		}
-		pc.CollectFile(f)
-	}
-	for _, d := range pc.Paths() {
-		if err := CheckDir(d); err != nil {
-			ee = append(ee, err)
-		}
+	for err := range run(files) {
+		ee = append(ee, err)
 	}
 	return errors.Join(ee...)
+}
+
+func run(files []string) <-chan error {
+	ee := make(chan error)
+	go func() {
+		defer close(ee)
+
+		var wg sync.WaitGroup
+		defer wg.Wait()
+
+		pc := NewPathCollector()
+		for _, f := range files {
+			if IsTest(f) {
+				continue
+			}
+			pc.CollectFile(f)
+			wg.Go(func() {
+				if err := CheckFile(f); err != nil {
+					ee <- err
+				}
+			})
+		}
+		for _, d := range pc.Paths() {
+			wg.Go(func() {
+				if err := CheckDir(d); err != nil {
+					ee <- err
+				}
+			})
+		}
+	}()
+	return ee
 }
 
 // PathCollector collects unique folders from a set of files.
