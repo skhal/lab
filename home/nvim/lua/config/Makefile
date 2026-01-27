@@ -7,27 +7,21 @@
 
 XDG_CONFIG_HOME ?= ${HOME}/.config
 NVIM_CONFIG_PATH = ${XDG_CONFIG_HOME}/nvim
+TARGET_PATH = ${NVIM_CONFIG_PATH}/lua/config
 
-INSTALL_PATHS = lua
+SOURCES = ${find . -maxdepth 1 -type f -name \*.lua:L:sh:S,./,,}
+INSTALL_TARGETS = ${SOURCES:S,^,${TARGET_PATH}/,}
 
-SOURCES = init.lua
-INSTALL_TARGETS = ${SOURCES:S,^,${NVIM_CONFIG_PATH}/,}
+install: ${INSTALL_TARGETS} .PHONY
 
-install: ${INSTALL_PATHS} ${INSTALL_TARGETS} .PHONY
-
-${NVIM_CONFIG_PATH}: .NOTMAIN
+${TARGET_PATH}: .NOTMAIN
 	@if ! test -d ${.TARGET}; then \
 		echo ".. create ${.TARGET}"; \
 		mkdir -vp ${.TARGET}; \
 	 fi
 
 .for target in ${INSTALL_TARGETS}
-${target}: ${NVIM_CONFIG_PATH} .PHONY
+${target}: ${TARGET_PATH} .PHONY
 	@echo ".. install ${.TARGET:T} to ${.TARGET}"; \
 		cp -v ${.TARGET:T} ${.TARGET}
-.endfor
-
-.for target in ${INSTALL_PATHS}
-${target}: .PHONY
-	@${MAKE} -C ${.CURDIR}/${.TARGET} install
 .endfor

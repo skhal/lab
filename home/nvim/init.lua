@@ -24,3 +24,6 @@ vim.api.nvim_create_autocmd("Filetype", {
 	pattern = { "go", "make" },
 	command = "set noexpandtab",
 })
+
+-- Plugin manager
+require("config.lazy")
