@@ -51,6 +51,14 @@ function M.load(ev)
 	for key, val in pairs(substitutes) do
 		vim.cmd("silent! %s/" .. key .. "/" .. val)
 	end
+	for line_num, line in ipairs(vim.api.nvim_buf_get_lines(0, 0, -1, false)) do
+		local from, to = line:find("{{ cursor }}")
+		if from ~= nil then
+			vim.cmd("silent! %s/{{ cursor }}//g")
+			vim.api.nvim_win_set_cursor(0, { line_num, from - 1 })
+			break
+		end
+	end
 	vim.api.nvim_echo({
 		{ ("skel: %s\n"):format(skel_path), "WarningMsg" },
 	}, true, {})
