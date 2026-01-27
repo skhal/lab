@@ -88,7 +88,11 @@ end
 function M.gen_substitutes()
 	local subs = {}
 	for k, f in pairs(M.gens) do
-		subs[k] = f()
+		local ok, v = pcall(f)
+		if not ok then
+			error(("failed generate a substitute %s\n%s"):format(k, v))
+		end
+		subs[k] = v
 	end
 	if not next(subs) then
 		error("failed to generate substitutes")
