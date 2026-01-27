@@ -7,12 +7,20 @@ local M = {}
 
 default_opts = {
 	skel_path = vim.fn.stdpath("data") .. "/lab-skeleton/skel",
+	gens = {
+		year = function()
+			return os.date("%Y")
+		end,
+		holder = function()
+			return git_config_username()
+		end,
+	},
 }
 
 function M.setup(opts)
 	M.skel_path = opts.skel_path or default_opts.skel_path
+	M.gens = default_opts.gens
 	M.augroup = vim.api.nvim_create_augroup("LabSkeleton", { clear = true })
-
 	vim.api.nvim_create_autocmd("BufNewFile", {
 		group = M.augroup,
 		desc = "Load template",
@@ -26,7 +34,7 @@ end
 function load_skeleton(file, subs)
 	vim.cmd("0r " .. file)
 	for key, val in pairs(subs) do
-		vim.cmd("silent! %s/" .. key .. "/" .. val)
+		vim.cmd("silent! %s/{{" .. key .. "}}/" .. val)
 	end
 end
 
@@ -69,15 +77,23 @@ function M.pick_skeleton(file)
 	return skel_path
 end
 
-function M.gen_substitutes()
+function git_config_username()
 	local cmd = vim.system({ "git", "config", "--get", "user.name" }, { text = true }):wait()
 	if cmd.code ~= 0 then
 		error("git-config: can't get user.name")
 	end
-	return {
-		["{{year}}"] = os.date("%Y"),
-		["{{holder}}"] = (cmd.stdout):gsub("+%s+", ""),
-	}
+	return (cmd.stdout):gsub("+%s+", "")
+end
+
+function M.gen_substitutes()
+	local subs = {}
+	for k, f in pairs(M.gens) do
+		subs[k] = f()
+	end
+	if not next(subs) then
+		error("failed to generate substitutes")
+	end
+	return subs
 end
 
 return M
