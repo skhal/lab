@@ -39,22 +39,23 @@ function M.load(ev)
 		}, true, {})
 		return
 	end
+	local year = os.date("%Y")
 	local holder = (obj.stdout):gsub("+%s+", "")
 	vim.api.nvim_echo({
 		{ ("Holder: %s"):format(holder), "Normal" },
 	}, true, {})
 	local substitutes = {
-		["{{ *\\.Year *}}"] = os.date("%Y"),
-		["{{ *\\.Holder *}}"] = holder,
+		["{{year}}"] = year,
+		["{{holder}}"] = holder,
 	}
 	vim.cmd("0r " .. skel_path)
 	for key, val in pairs(substitutes) do
 		vim.cmd("silent! %s/" .. key .. "/" .. val)
 	end
 	for line_num, line in ipairs(vim.api.nvim_buf_get_lines(0, 0, -1, false)) do
-		local from, to = line:find("{{ cursor }}")
+		local from, to = line:find("{{cursor}}")
 		if from ~= nil then
-			vim.cmd("silent! %s/{{ cursor }}//g")
+			vim.cmd("silent! %s/{{cursor}}//g")
 			vim.api.nvim_win_set_cursor(0, { line_num, from - 1 })
 			break
 		end
