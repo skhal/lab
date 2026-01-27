@@ -10,8 +10,9 @@ CARGO_BIN_PATH = ${HOME}/.cargo/bin
 PACKAGE_LIST = packages.txt
 PACKAGES = ${grep -v '^\#' ${PACKAGE_LIST} | tr ' ' ',':L:sh:M*}
 
-M_target = C|,.*$$||:S,^,${CARGO_BIN_PATH}/,
-M_unpack = C|,| |g
+M_target = C|,.*$$||:C|@.*$$||:S,^,${CARGO_BIN_PATH}/,
+M_no_target = C|^.*@||
+M_unpack = ${M_no_target}:C|,| |g
 INSTALL_TARGETS = ${PACKAGES:${M_target}}
 
 install: ${INSTALL_TARGETS} .PHONY
@@ -26,7 +27,7 @@ ${CARGO_BIN_PATH}: .NOTMAIN
 target=${package:${M_target}}
 ${target}: ${CARGO_BIN_PATH} ${PACKAGE_LIST}
 	@if ! test -e ${.TARGET}; then \
-		echo ".. install ${.TARGET:T}"; \
+		echo ".. install ${.TARGET:T} to ${.TARGET}"; \
 		cargo install --locked ${package:${M_unpack}}; \
 	 fi
 .endfor

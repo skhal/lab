@@ -3,18 +3,18 @@
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 
-#
 # List of Go packages to install.
 
 # Format:
-#   package [flags]
+#   [application@]crate [flags]
 #
 # Example:
-#   foo
-#   foo --git https://github.com/bar/baz
+#   crate
+#   app@crate
+#   crate --git https://github.com/bar/baz
 #
 # keep-sorted start
 stylua
-typos-cli
 typos-lsp --git https://github.com/tekumara/typos-lsp
+typos@typos-cli
 # keep-sorted end
