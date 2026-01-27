@@ -14,4 +14,4 @@ if not (vim.uv or vim.loop).fs_stat(lab_skeleton_path) then
 end
 
 vim.opt.rtp:append(lab_skeleton_path)
-require("lab-skeleton")
+require("lab-skeleton").setup({})
