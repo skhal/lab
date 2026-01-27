@@ -5,7 +5,7 @@
 
 # Flavor: FreeBSD
 
-INSTALL_PATHS = config plugins
+INSTALL_PATHS = config
 
 install: ${INSTALL_PATHS} .PHONY
 
