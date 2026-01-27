@@ -4,12 +4,9 @@
 -- license that can be found in the LICENSE file.
 
 -- keep-sorted start
-vim.o.autoindent = true
 vim.o.colorcolumn = "80"
 vim.o.cursorline = true
 vim.o.expandtab = true
-vim.o.hlsearch = true
-vim.o.incsearch = true
 vim.o.listchars = "eol:¬,extends:›,precedes:‹,space:░,tab:«–»,trail:•"
 vim.o.number = true
 vim.o.shiftwidth = 2
