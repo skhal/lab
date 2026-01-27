@@ -41,9 +41,6 @@ function M.load(ev)
 	end
 	local year = os.date("%Y")
 	local holder = (obj.stdout):gsub("+%s+", "")
-	vim.api.nvim_echo({
-		{ ("Holder: %s"):format(holder), "Normal" },
-	}, true, {})
 	local substitutes = {
 		["{{year}}"] = year,
 		["{{holder}}"] = holder,
@@ -61,7 +58,7 @@ function M.load(ev)
 		end
 	end
 	vim.api.nvim_echo({
-		{ ("skel: %s\n"):format(skel_path), "WarningMsg" },
+		{ ("skel: %s\nyear: %d\nholder: %s"):format(skel_path, year, holder), "Normal" },
 	}, true, {})
 end
 
