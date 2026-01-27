@@ -7,19 +7,21 @@ local M = {}
 
 default_opts = {
 	skel_path = vim.fn.stdpath("data") .. "/lab-skeleton/skel",
-	gens = {
-		year = function()
-			return os.date("%Y")
-		end,
-		holder = function()
-			return git_config_username()
-		end,
+	ftgens = {
+		[""] = {
+			year = function()
+				return os.date("%Y")
+			end,
+			holder = function()
+				return git_config_username()
+			end,
+		},
 	},
 }
 
 function M.setup(opts)
 	M.skel_path = opts.skel_path or default_opts.skel_path
-	M.gens = default_opts.gens
+	M.ftgens = default_opts.ftgens
 	M.augroup = vim.api.nvim_create_augroup("LabSkeleton", { clear = true })
 	vim.api.nvim_create_autocmd("BufNewFile", {
 		group = M.augroup,
@@ -50,17 +52,17 @@ function position_cursor()
 end
 
 function M.load(ev)
-	local ok, skel_path = pcall(M.pick_skeleton, ev.file)
+	local ok, skel = pcall(M.pick_skeleton, ev.file)
 	if not ok then
-		vim.api.nvim_echo({ { skel_path, "ErrorMsg" } }, true, {})
+		vim.api.nvim_echo({ { skel.path, "ErrorMsg" } }, true, {})
 		return
 	end
-	local ok, subs = pcall(M.gen_substitutes)
+	local ok, subs = pcall(M.gen_substitutes, skel.filetype)
 	if not ok then
 		vim.api.nvim_echo({ { subs, "ErrorMsg" } }, true, {})
 		return
 	end
-	local ok, err = pcall(load_skeleton, skel_path, subs)
+	local ok, err = pcall(load_skeleton, skel.path, subs)
 	if not ok then
 		vim.api.nvim_echo({ { err, "ErrorMsg" } }, true, {})
 		return
@@ -69,12 +71,15 @@ function M.load(ev)
 end
 
 function M.pick_skeleton(file)
-	local ext = vim.fn.fnamemodify(file, ":e")
-	local skel_path = M.skel_path .. "/new." .. ext
+	local ft = vim.filetype.match({ filename = file })
+	local skel_path = M.skel_path .. "/new." .. ft
 	if not (vim.uv or vim.loop).fs_stat(skel_path) then
 		error(("skeleton %s: does not exist."):format(skel_path))
 	end
-	return skel_path
+	return {
+		path = skel_path,
+		filetype = ft,
+	}
 end
 
 function git_config_username()
@@ -85,14 +90,16 @@ function git_config_username()
 	return (cmd.stdout):gsub("+%s+", "")
 end
 
-function M.gen_substitutes()
+function M.gen_substitutes(filetype)
 	local subs = {}
-	for k, f in pairs(M.gens) do
-		local ok, v = pcall(f)
-		if not ok then
-			error(("failed generate a substitute %s\n%s"):format(k, v))
+	for ft, gens in pairs(M.ftgens) do
+		for k, f in pairs(gens) do
+			local ok, v = pcall(f)
+			if not ok then
+				error(("filetype %s: failed generate a substitute %s\n%s"):format(ft, k, v))
+			end
+			subs[k] = v
 		end
-		subs[k] = v
 	end
 	if not next(subs) then
 		error("failed to generate substitutes")
