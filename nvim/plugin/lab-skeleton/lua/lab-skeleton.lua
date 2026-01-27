@@ -90,16 +90,29 @@ function git_config_username()
 	return (cmd.stdout):gsub("+%s+", "")
 end
 
-function M.gen_substitutes(filetype)
+function gen_substitutes(gens)
 	local subs = {}
-	for ft, gens in pairs(M.ftgens) do
-		for k, f in pairs(gens) do
-			local ok, v = pcall(f)
-			if not ok then
-				error(("filetype %s: failed generate a substitute %s\n%s"):format(ft, k, v))
-			end
-			subs[k] = v
+	for k, f in pairs(gens) do
+		local ok, v = pcall(f)
+		if not ok then
+			error(("failed generate %s\n%s"):format(ft, k, v))
 		end
+		subs[k] = v
+	end
+	return subs
+end
+
+function M.gen_substitutes(filetype)
+	local ok, subs = pcall(gen_substitutes, M.ftgens[""] or {})
+	if not ok then
+		error(("common substitutes: %s"):format(subs))
+	end
+	local ok, ft_subs = pcall(gen_substitutes, M.ftgens[filetype] or {})
+	if not ok then
+		error(("filetype %s substitutes: %s"):format(filetype, ft_subs))
+	end
+	if next(ft_subs) then
+		table.merge(subs, ft_subs)
 	end
 	if not next(subs) then
 		error("failed to generate substitutes")
