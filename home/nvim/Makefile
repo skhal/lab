@@ -22,7 +22,7 @@ ${NVIM_CONFIG_PATH}: .NOTMAIN
 	 fi
 
 .for target in ${INSTALL_TARGETS}
-${target}: ${NVIM_CONFIG_PATH} .PHONY
+${target}: ${NVIM_CONFIG_PATH} ${.TARGET:T}
 	@echo ".. install ${.TARGET:T} to ${.TARGET}"; \
 		cp -v ${.TARGET:T} ${.TARGET}
 .endfor

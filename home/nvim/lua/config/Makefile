@@ -21,7 +21,7 @@ ${TARGET_PATH}: .NOTMAIN
 	 fi
 
 .for target in ${INSTALL_TARGETS}
-${target}: ${TARGET_PATH} .PHONY
+${target}: ${TARGET_PATH} ${TARGET:T}
 	@echo ".. install ${.TARGET:T} to ${.TARGET}"; \
 		cp -v ${.TARGET:T} ${.TARGET}
 .endfor
