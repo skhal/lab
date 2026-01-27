@@ -17,11 +17,11 @@ install: ${INSTALL_TARGETS} .PHONY
 ${TARGET_PATH}: .NOTMAIN
 	@if ! test -d ${.TARGET}; then \
 		echo ".. create ${.TARGET}"; \
-		mkdir -vp ${.TARGET}; \
+		mkdir -p ${.TARGET}; \
 	 fi
 
 .for target in ${INSTALL_TARGETS}
 ${target}: ${TARGET_PATH} ${.TARGET:T}
 	@echo ".. install ${.TARGET:T} to ${.TARGET}"; \
-		cp -v ${.TARGET:T} ${.TARGET}
+		cp ${.TARGET:T} ${.TARGET}
 .endfor

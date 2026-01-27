@@ -5,7 +5,7 @@
 #
 # Flavor: FreeBSD
 
-INSTALL_TARGETS = home vim
+INSTALL_TARGETS = home nvim vim
 
 install: ${INSTALL_TARGETS} .PHONY
 
