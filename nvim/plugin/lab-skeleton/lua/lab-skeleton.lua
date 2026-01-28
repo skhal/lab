@@ -119,7 +119,7 @@ function M.gen_substitutes(opts)
 	end
 	local ok, ft_subs = pcall(gen_substitutes, M.ftgens[opts.filetype] or {}, opts)
 	if not ok then
-		error(("filetype %s substitutes: %s"):format(filetype, ft_subs))
+		error(("filetype %s: %s"):format(opts.filetype, ft_subs))
 	end
 	if next(ft_subs) then
 		table_merge(subs, ft_subs)
