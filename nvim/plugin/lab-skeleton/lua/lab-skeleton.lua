@@ -9,10 +9,10 @@ default_opts = {
 	skel_path = vim.fn.stdpath("data") .. "/lab-skeleton/skel",
 	ftgens = {
 		[""] = {
-			year = function()
+			year = function(_)
 				return os.date("%Y")
 			end,
-			holder = function()
+			holder = function(_)
 				return git_config_username()
 			end,
 		},
@@ -57,7 +57,8 @@ function M.load(ev)
 		vim.api.nvim_echo({ { skel.path, "ErrorMsg" } }, true, {})
 		return
 	end
-	local ok, subs = pcall(M.gen_substitutes, skel.filetype)
+	local opts = { file = ev.file, filetype = skel.filetype }
+	local ok, subs = pcall(M.gen_substitutes, opts)
 	if not ok then
 		vim.api.nvim_echo({ { subs, "ErrorMsg" } }, true, {})
 		return
@@ -90,10 +91,10 @@ function git_config_username()
 	return (cmd.stdout):gsub("+%s+", "")
 end
 
-function gen_substitutes(gens)
+function gen_substitutes(gens, opts)
 	local subs = {}
 	for k, f in pairs(gens) do
-		local ok, v = pcall(f)
+		local ok, v = pcall(f, opts)
 		if not ok then
 			error(("failed generate %s\n%s"):format(ft, k, v))
 		end
@@ -102,12 +103,12 @@ function gen_substitutes(gens)
 	return subs
 end
 
-function M.gen_substitutes(filetype)
-	local ok, subs = pcall(gen_substitutes, M.ftgens[""] or {})
+function M.gen_substitutes(opts)
+	local ok, subs = pcall(gen_substitutes, M.ftgens[""] or {}, opts)
 	if not ok then
 		error(("common substitutes: %s"):format(subs))
 	end
-	local ok, ft_subs = pcall(gen_substitutes, M.ftgens[filetype] or {})
+	local ok, ft_subs = pcall(gen_substitutes, M.ftgens[opts.filetype] or {}, opts)
 	if not ok then
 		error(("filetype %s substitutes: %s"):format(filetype, ft_subs))
 	end
