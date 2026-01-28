@@ -72,6 +72,9 @@ local function c_header(opts)
 end
 
 local function cpp_guard(opts)
+	if not opts.file:find("%.h$") then
+		return
+	end
 	local relpath = git_relpath(opts.file)
 	local guard = relpath:gsub("^/", "") -- if outside of a git worktree
 	guard = guard:gsub("[/%.]", "_") .. "_"
@@ -220,7 +223,9 @@ local function gen_substitutes(gens, opts)
 		if not ok then
 			error(("generate %s\n%s"):format(k, v))
 		end
-		subs[k] = v
+		if v ~= nil then
+			subs[k] = v
+		end
 	end
 	return subs
 end
