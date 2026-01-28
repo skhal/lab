@@ -107,8 +107,8 @@ local default_opts = {
 	find = {
 		c = find_c_skeleton,
 		cpp = find_cpp_skeleton,
+		default = find_skeleton,
 		go = find_go_skeleton,
-		[""] = find_skeleton,
 	},
 	ftgens = {
 		c = {
@@ -122,7 +122,7 @@ local default_opts = {
 		go = {
 			package = go_package,
 		},
-		[""] = {
+		default = {
 			year = function(_)
 				return os.date("%Y")
 			end,
@@ -204,7 +204,7 @@ end
 
 function M.find_skeleton(file)
 	local ft = vim.filetype.match({ filename = file })
-	local find = M.find[ft] or M.find[""]
+	local find = M.find[ft] or M.find.default
 	local name = find(file, ft)
 	local path = M.skel_path .. "/" .. name
 	if not (vim.uv or vim.loop).fs_stat(path) then
@@ -237,7 +237,7 @@ local function table_merge(dst, src)
 end
 
 function M.gen_substitutes(opts)
-	local ok, subs = pcall(gen_substitutes, M.ftgens[""] or {}, opts)
+	local ok, subs = pcall(gen_substitutes, M.ftgens.default or {}, opts)
 	if not ok then
 		error(("common substitutes: %s"):format(subs))
 	end
