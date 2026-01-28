@@ -44,6 +44,15 @@ local function git_config_username()
 	return (obj.stdout):gsub("%s+$", "")
 end
 
+local function go_module()
+	local cmd = { "go", "list", "-m" }
+	local obj = vim.system(cmd, { text = true }):wait()
+	if obj.code ~= 0 then
+		error("go: can't get module name")
+	end
+	return (obj.stdout):gsub("%s+$", "")
+end
+
 local function git_worktree_path()
 	local cmd = { "git", "rev-parse", "--show-toplevel" }
 	local obj = vim.system(cmd, { text = true }):wait()
@@ -102,6 +111,26 @@ local function go_package(opts)
 	return pkg
 end
 
+local function proto_edition(_)
+	return 2024
+end
+
+local function proto_go_package(opts)
+	local gomod = go_module()
+	local relpath = git_relpath(opts.file)
+	local dirname = vim.fs.dirname(relpath)
+	local pkg = vim.fs.joinpath(gomod, dirname)
+	return vim.fn.escape(pkg, "/")
+end
+
+local function proto_package(opts)
+	local relpath = git_relpath(opts.file)
+	local pkg = vim.fs.dirname(relpath)
+	pkg = pkg:gsub("/", ".")
+	-- remove .pb suffix if any
+	return pkg:gsub("%.pb$", "")
+end
+
 local default_opts = {
 	skel_path = vim.fn.stdpath("data") .. "/lab-skeleton/skel",
 	find = {
@@ -119,9 +148,6 @@ local default_opts = {
 			header = cpp_header,
 			namespace = cpp_namespace,
 		},
-		go = {
-			package = go_package,
-		},
 		default = {
 			year = function(_)
 				return os.date("%Y")
@@ -129,6 +155,14 @@ local default_opts = {
 			holder = function(_)
 				return git_config_username()
 			end,
+		},
+		go = {
+			package = go_package,
+		},
+		proto = {
+			edition = proto_edition,
+			go_package = proto_go_package,
+			package = proto_package,
 		},
 	},
 }
@@ -141,7 +175,7 @@ function M.setup(opts)
 	vim.api.nvim_create_autocmd("BufNewFile", {
 		group = M.augroup,
 		desc = "Load template",
-		pattern = { "*.c", "*.cc", "*.go", "*.h", "*.lua" },
+		pattern = { "*.c", "*.cc", "*.go", "*.h", "*.lua", "*.proto" },
 		callback = function(ev)
 			M.load(ev)
 		end,

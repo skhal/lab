@@ -1,0 +1,13 @@
+// Copyright {{year}} {{holder}}. All rights reserved.
+//
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
+edition = "{{edition}}";
+
+package {{package}};
+
+import "google/protobuf/go_features.proto";
+
+option features.(.pb.go).api_level = API_OPAQUE;
+option go_package = "{{go_package}}";
