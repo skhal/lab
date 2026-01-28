@@ -23,6 +23,7 @@ groff
 jq
 llvm21
 lua54-luacheck
+neovim
 npm
 nss_ldap
 openldap26-client
@@ -40,6 +41,5 @@ tmux
 tree
 universal-ctags
 unzip
-vim
 webfonts
 # keep-sorted end
