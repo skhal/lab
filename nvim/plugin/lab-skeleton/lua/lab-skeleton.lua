@@ -121,7 +121,7 @@ function M.find_skeleton(file)
 		error(("skeleton %s: does not exist."):format(name))
 	end
 	return {
-		filepath = ft,
+		filetype = ft,
 		path = path,
 	}
 end
