@@ -17,12 +17,41 @@ local function find_go_skeleton(file, _)
 	return skel
 end
 
+local function find_c_skeleton(file, _)
+	local skel = "new.c"
+	if file:find("main%.c$") ~= nil then
+		skel = "new_main.c"
+	end
+	return skel
+end
+
 local function git_config_username()
 	local cmd = vim.system({ "git", "config", "--get", "user.name" }, { text = true }):wait()
 	if cmd.code ~= 0 then
-		error("git-config: can't get user.name")
+		error("git: can't get user.name")
 	end
-	return (cmd.stdout):gsub("+%s+", "")
+	return (cmd.stdout):gsub("%s+$", "")
+end
+
+local function git_worktree_path()
+	local cmd = vim.system({ "git", "rev-parse", "--show-toplevel" }, { text = true }):wait()
+	if cmd.code ~= 0 then
+		error("git: can't get worktree path")
+	end
+	return (cmd.stdout):gsub("%s+$", "")
+end
+
+local function c_header(opts)
+	local worktree = git_worktree_path()
+	local abspath = vim.fs.abspath(opts.file)
+	local relpath = vim.fs.relpath(worktree, abspath)
+	if not relpath then
+		-- open file outside the worktree
+		relpath = opts.file
+	end
+	relpath = relpath:gsub("_test%.c$", ".c")
+	relpath = relpath:gsub("%.c$", ".h")
+	return vim.fn.escape(relpath, "/")
 end
 
 local function go_package(opts)
@@ -35,11 +64,15 @@ end
 local default_opts = {
 	skel_path = vim.fn.stdpath("data") .. "/lab-skeleton/skel",
 	find = {
-		["go"] = find_go_skeleton,
+		c = find_c_skeleton,
+		go = find_go_skeleton,
 		[""] = find_skeleton,
 	},
 	ftgens = {
-		["go"] = {
+		c = {
+			header = c_header,
+		},
+		go = {
 			package = go_package,
 		},
 		[""] = {
@@ -61,7 +94,7 @@ function M.setup(opts)
 	vim.api.nvim_create_autocmd("BufNewFile", {
 		group = M.augroup,
 		desc = "Load template",
-		pattern = { "*.lua", "*.go" },
+		pattern = { "*.c", "*.lua", "*.go" },
 		callback = function(ev)
 			M.load(ev)
 		end,
