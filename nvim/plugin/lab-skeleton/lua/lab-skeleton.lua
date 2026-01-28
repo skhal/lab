@@ -5,6 +5,10 @@
 
 local M = {}
 
+local function find_skeleton(_, ft)
+	return "new." .. ft
+end
+
 local function git_config_username()
 	local cmd = vim.system({ "git", "config", "--get", "user.name" }, { text = true }):wait()
 	if cmd.code ~= 0 then
@@ -22,6 +26,9 @@ end
 
 local default_opts = {
 	skel_path = vim.fn.stdpath("data") .. "/lab-skeleton/skel",
+	find = {
+		[""] = find_skeleton,
+	},
 	ftgens = {
 		["go"] = {
 			package = go_package,
@@ -39,6 +46,7 @@ local default_opts = {
 
 function M.setup(opts)
 	M.skel_path = opts.skel_path or default_opts.skel_path
+	M.find = default_opts.find
 	M.ftgens = default_opts.ftgens
 	M.augroup = vim.api.nvim_create_augroup("LabSkeleton", { clear = true })
 	vim.api.nvim_create_autocmd("BufNewFile", {
@@ -70,7 +78,7 @@ local function position_cursor()
 end
 
 function M.load(ev)
-	local ok, skel = pcall(M.pick_skeleton, ev.file)
+	local ok, skel = pcall(M.find_skeleton, ev.file)
 	if not ok then
 		vim.api.nvim_echo({ { skel.path, "ErrorMsg" } }, true, {})
 		return
@@ -95,15 +103,17 @@ function M.load(ev)
 	end
 end
 
-function M.pick_skeleton(file)
+function M.find_skeleton(file)
 	local ft = vim.filetype.match({ filename = file })
-	local skel_path = M.skel_path .. "/new." .. ft
-	if not (vim.uv or vim.loop).fs_stat(skel_path) then
-		error(("skeleton %s: does not exist."):format(skel_path))
+	local find = M.find[ft] or M.find[""]
+	local name = find(file, ft)
+	local path = M.skel_path .. "/" .. name
+	if not (vim.uv or vim.loop).fs_stat(path) then
+		error(("skeleton %s: does not exist."):format(name))
 	end
 	return {
-		path = skel_path,
-		filetype = ft,
+		filepath = ft,
+		path = path,
 	}
 end
 
