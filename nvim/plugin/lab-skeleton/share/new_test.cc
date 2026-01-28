@@ -3,12 +3,14 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-#include "gtest/gtest.h"
 #include "{{header}}"
 
+#include "gtest/gtest.h"
+
+namespace {{namespace}} {
 namespace {
-{namespace}
+
+{{cursor}}
+
 }  // namespace
-{
-  namespace {}  // namespace
 }  // namespace {{namespace}}

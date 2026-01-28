@@ -25,6 +25,16 @@ local function find_c_skeleton(file, _)
 	return skel
 end
 
+local function find_cpp_skeleton(file, _)
+	local skel = "new.cc"
+	if file:find("_test%.cc$") ~= nil then
+		skel = "new_test.cc"
+	elseif file:find("%.h$") ~= nil then
+		skel = "new.h"
+	end
+	return skel
+end
+
 local function git_config_username()
 	local cmd = { "git", "config", "--get", "user.name" }
 	local obj = vim.system(cmd, { text = true }):wait()
@@ -43,17 +53,43 @@ local function git_worktree_path()
 	return (obj.stdout):gsub("%s+$", "")
 end
 
-local function c_header(opts)
+local function git_relpath(file)
 	local worktree = git_worktree_path()
-	local abspath = vim.fs.abspath(opts.file)
+	local abspath = vim.fs.abspath(file)
 	local relpath = vim.fs.relpath(worktree, abspath)
 	if not relpath then
-		-- open file outside the worktree
-		relpath = opts.file
+		-- file is outside the worktree
+		relpath = file
 	end
+	return relpath
+end
+
+local function c_header(opts)
+	local relpath = git_relpath(opts.file)
 	relpath = relpath:gsub("_test%.c$", ".c")
 	relpath = relpath:gsub("%.c$", ".h")
 	return vim.fn.escape(relpath, "/")
+end
+
+local function cpp_guard(opts)
+	local relpath = git_relpath(opts.file)
+	local guard = relpath:gsub("^/", "") -- if outside of a git worktree
+	guard = guard:gsub("[/%.]", "_") .. "_"
+	return guard:upper()
+end
+
+local function cpp_header(opts)
+	local relpath = git_relpath(opts.file)
+	relpath = relpath:gsub("_test%.cc$", ".cc")
+	relpath = relpath:gsub("%.cc$", ".h")
+	return vim.fn.escape(relpath, "/")
+end
+
+local function cpp_namespace(opts)
+	local relpath = git_relpath(opts.file)
+	local ns = vim.fs.dirname(relpath)
+	ns = ns:gsub("^/", "") -- if outside of a git worktree
+	return ns:gsub("/", "::")
 end
 
 local function go_package(opts)
@@ -67,12 +103,18 @@ local default_opts = {
 	skel_path = vim.fn.stdpath("data") .. "/lab-skeleton/skel",
 	find = {
 		c = find_c_skeleton,
+		cpp = find_cpp_skeleton,
 		go = find_go_skeleton,
 		[""] = find_skeleton,
 	},
 	ftgens = {
 		c = {
 			header = c_header,
+		},
+		cpp = {
+			guard = cpp_guard,
+			header = cpp_header,
+			namespace = cpp_namespace,
 		},
 		go = {
 			package = go_package,
@@ -96,7 +138,7 @@ function M.setup(opts)
 	vim.api.nvim_create_autocmd("BufNewFile", {
 		group = M.augroup,
 		desc = "Load template",
-		pattern = { "*.c", "*.lua", "*.go" },
+		pattern = { "*.c", "*.cc", "*.go", "*.h", "*.lua" },
 		callback = function(ev)
 			M.load(ev)
 		end,

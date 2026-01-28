@@ -3,13 +3,13 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-#ifndef{{guard } }
-#define{{guard } }
+#ifndef {{guard}}
+#define {{guard}}
 
-namespace {
-{namespace}
-}  // namespace
-{
+namespace {{namespace}} {
+
+{{cursor}}
+
 }  // namespace {{namespace}}
 
 #endif  // {{guard}}

@@ -5,8 +5,8 @@
 
 #include "{{header}}"
 
-namespace {
-{namespace}
-}  // namespace
-{
+namespace {{namespace}} {
+
+{{cursor}}
+
 }  // namespace {{namespace}}
