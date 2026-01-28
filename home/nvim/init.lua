@@ -19,10 +19,5 @@ vim.o.smartindent = true
 vim.o.softtabstop = 2
 vim.o.tabstop = 2
 -- keep-sorted end
-vim.api.nvim_create_autocmd("Filetype", {
-	group = vim.api.nvim_create_augroup("Indents", { clear = true }),
-	pattern = { "go", "lua", "make" },
-	command = "set noexpandtab",
-})
 
 require("config.lab-skeleton")

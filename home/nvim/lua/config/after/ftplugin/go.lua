@@ -3,4 +3,7 @@
 -- Use of this source code is governed by a BSD-style
 -- license that can be found in the LICENSE file.
 
+-- keep-sorted start
 vim.bo.equalprg = "goimports"
+vim.bo.expandtab = false
+-- keep-sorted end
