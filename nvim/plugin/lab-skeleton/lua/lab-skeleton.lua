@@ -174,7 +174,7 @@ local function gen_substitutes(gens, opts)
 	for k, f in pairs(gens) do
 		local ok, v = pcall(f, opts)
 		if not ok then
-			error(("failed generate %s\n%s"):format(opts.ft, k, v))
+			error(("generate %s\n%s"):format(k, v))
 		end
 		subs[k] = v
 	end
@@ -198,7 +198,7 @@ function M.gen_substitutes(opts)
 	local ft_subs
 	ok, ft_subs = pcall(gen_substitutes, M.ftgens[opts.filetype] or {}, opts)
 	if not ok then
-		error(("filetype %s: %s"):format(opts.filetype, ft_subs))
+		error(("filetype %s\n%s"):format(opts.filetype, ft_subs))
 	end
 	if next(ft_subs) then
 		table_merge(subs, ft_subs)
