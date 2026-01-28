@@ -110,6 +110,16 @@ function M.load(ev)
 		vim.api.nvim_echo({ { err, "ErrorMsg" } }, true, {})
 		return
 	end
+	local msgs = {
+		{ ("skel: %s\n"):format(skel.path), "Normal" },
+		{ ("ft: %s\n"):format(skel.filetype), "Normal" },
+	}
+	if next(subs) then
+		for k, v in pairs(subs) do
+			table.insert(msgs, { (". %s: %s\n"):format(k, v), "Normal" })
+		end
+	end
+	vim.api.nvim_echo(msgs, true, {})
 end
 
 function M.find_skeleton(file)
