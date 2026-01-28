@@ -20,4 +20,5 @@ vim.o.softtabstop = 2
 vim.o.tabstop = 2
 -- keep-sorted end
 
+require("config.lab-git")
 require("config.lab-skeleton")
