@@ -5,9 +5,19 @@
 
 local M = {}
 
+function go_package(opts)
+	local abspath = vim.fs.abspath(opts.file)
+	local dirname = vim.fs.dirname(abspath)
+	local pkg = vim.fs.basename(dirname)
+	return pkg
+end
+
 default_opts = {
 	skel_path = vim.fn.stdpath("data") .. "/lab-skeleton/skel",
 	ftgens = {
+		["go"] = {
+			package = go_package,
+		},
 		[""] = {
 			year = function(_)
 				return os.date("%Y")
@@ -26,7 +36,7 @@ function M.setup(opts)
 	vim.api.nvim_create_autocmd("BufNewFile", {
 		group = M.augroup,
 		desc = "Load template",
-		pattern = { "*.lua" },
+		pattern = { "*.lua", "*.go" },
 		callback = function(ev)
 			M.load(ev)
 		end,
