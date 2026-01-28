@@ -98,7 +98,7 @@ func newInserter(filename string) (*inserter, error) {
 	}
 	base := filepath.Base(filename)
 	switch base {
-	case ".clangd":
+	case ".clangd", ".gitignore":
 		return &insShellNoSplit, nil
 	}
 	switch {
