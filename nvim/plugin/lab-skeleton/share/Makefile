@@ -9,7 +9,7 @@ XDG_DATA_HOME ?= ${HOME}/.local/share
 NVIM_DATA_PATH = ${XDG_DATA_HOME}/nvim
 TARGET_PATH = ${NVIM_DATA_PATH}/lab-skeleton/skel
 
-SOURCES = ${find . -maxdepth 1 -type f -name new.\*:L:sh:S,./,,}
+SOURCES = ${find . -maxdepth 1 -type f -name new\*:L:sh:S,./,,}
 INSTALL_TARGETS = ${SOURCES:S,^,${TARGET_PATH}/,}
 
 install: ${INSTALL_TARGETS} .PHONY
