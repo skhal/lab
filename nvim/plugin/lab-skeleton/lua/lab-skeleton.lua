@@ -5,14 +5,22 @@
 
 local M = {}
 
-function go_package(opts)
+local function git_config_username()
+	local cmd = vim.system({ "git", "config", "--get", "user.name" }, { text = true }):wait()
+	if cmd.code ~= 0 then
+		error("git-config: can't get user.name")
+	end
+	return (cmd.stdout):gsub("+%s+", "")
+end
+
+local function go_package(opts)
 	local abspath = vim.fs.abspath(opts.file)
 	local dirname = vim.fs.dirname(abspath)
 	local pkg = vim.fs.basename(dirname)
 	return pkg
 end
 
-default_opts = {
+local default_opts = {
 	skel_path = vim.fn.stdpath("data") .. "/lab-skeleton/skel",
 	ftgens = {
 		["go"] = {
@@ -43,16 +51,16 @@ function M.setup(opts)
 	})
 end
 
-function load_skeleton(file, subs)
+local function load_skeleton(file, subs)
 	vim.cmd("0r " .. file)
 	for key, val in pairs(subs) do
 		vim.cmd("silent! %s/{{" .. key .. "}}/" .. val)
 	end
 end
 
-function position_cursor()
+local function position_cursor()
 	for line_num, line in ipairs(vim.api.nvim_buf_get_lines(0, 0, -1, false)) do
-		local from, to = line:find("{{cursor}}")
+		local from, _ = line:find("{{cursor}}")
 		if from ~= nil then
 			vim.cmd("silent! %s/{{cursor}}//g")
 			vim.api.nvim_win_set_cursor(0, { line_num, from - 1 })
@@ -68,17 +76,23 @@ function M.load(ev)
 		return
 	end
 	local opts = { file = ev.file, filetype = skel.filetype }
-	local ok, subs = pcall(M.gen_substitutes, opts)
+	local subs
+	ok, subs = pcall(M.gen_substitutes, opts)
 	if not ok then
 		vim.api.nvim_echo({ { subs, "ErrorMsg" } }, true, {})
 		return
 	end
-	local ok, err = pcall(load_skeleton, skel.path, subs)
+	local err
+	ok, err = pcall(load_skeleton, skel.path, subs)
 	if not ok then
 		vim.api.nvim_echo({ { err, "ErrorMsg" } }, true, {})
 		return
 	end
-	local ok, err = pcall(position_cursor)
+	ok, err = pcall(position_cursor)
+	if not ok then
+		vim.api.nvim_echo({ { err, "ErrorMsg" } }, true, {})
+		return
+	end
 end
 
 function M.pick_skeleton(file)
@@ -93,27 +107,19 @@ function M.pick_skeleton(file)
 	}
 end
 
-function git_config_username()
-	local cmd = vim.system({ "git", "config", "--get", "user.name" }, { text = true }):wait()
-	if cmd.code ~= 0 then
-		error("git-config: can't get user.name")
-	end
-	return (cmd.stdout):gsub("+%s+", "")
-end
-
-function gen_substitutes(gens, opts)
+local function gen_substitutes(gens, opts)
 	local subs = {}
 	for k, f in pairs(gens) do
 		local ok, v = pcall(f, opts)
 		if not ok then
-			error(("failed generate %s\n%s"):format(ft, k, v))
+			error(("failed generate %s\n%s"):format(opts.ft, k, v))
 		end
 		subs[k] = v
 	end
 	return subs
 end
 
-function table_merge(dst, src)
+local function table_merge(dst, src)
 	for k, v in pairs(src) do
 		dst[k] = v
 	end
@@ -127,7 +133,8 @@ function M.gen_substitutes(opts)
 	if not next(subs) then
 		subs = {}
 	end
-	local ok, ft_subs = pcall(gen_substitutes, M.ftgens[opts.filetype] or {}, opts)
+	local ft_subs
+	ok, ft_subs = pcall(gen_substitutes, M.ftgens[opts.filetype] or {}, opts)
 	if not ok then
 		error(("filetype %s: %s"):format(opts.filetype, ft_subs))
 	end
