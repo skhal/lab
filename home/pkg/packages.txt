@@ -22,6 +22,7 @@ graphviz
 groff
 jq
 llvm21
+lua54-luacheck
 npm
 nss_ldap
 openldap26-client

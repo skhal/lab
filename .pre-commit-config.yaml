@@ -99,6 +99,11 @@ repos:
     entry: stylua
     language: system
     types_or: [lua]
+  - id: lua-lint
+    name: "Lint Lua"
+    entry: luacheck
+    language: system
+    types_or: [lua]
   - id: make-lint
     name: "Lint makefiles"
     entry: make
