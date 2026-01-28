@@ -103,17 +103,26 @@ function gen_substitutes(gens, opts)
 	return subs
 end
 
+function table_merge(dst, src)
+	for k, v in pairs(src) do
+		dst[k] = v
+	end
+end
+
 function M.gen_substitutes(opts)
 	local ok, subs = pcall(gen_substitutes, M.ftgens[""] or {}, opts)
 	if not ok then
 		error(("common substitutes: %s"):format(subs))
+	end
+	if not next(subs) then
+		subs = {}
 	end
 	local ok, ft_subs = pcall(gen_substitutes, M.ftgens[opts.filetype] or {}, opts)
 	if not ok then
 		error(("filetype %s substitutes: %s"):format(filetype, ft_subs))
 	end
 	if next(ft_subs) then
-		table.merge(subs, ft_subs)
+		table_merge(subs, ft_subs)
 	end
 	if not next(subs) then
 		error("failed to generate substitutes")
