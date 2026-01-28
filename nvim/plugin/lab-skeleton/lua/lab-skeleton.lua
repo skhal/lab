@@ -5,6 +5,12 @@
 
 local M = {}
 
+local function table_merge(dst, src)
+	for k, v in pairs(src) do
+		dst[k] = v
+	end
+end
+
 local function find_skeleton(_, ft)
 	return "new." .. ft
 end
@@ -134,20 +140,9 @@ end
 local default_opts = {
 	skel_path = vim.fn.stdpath("data") .. "/lab-skeleton/skel",
 	find = {
-		c = find_c_skeleton,
-		cpp = find_cpp_skeleton,
 		default = find_skeleton,
-		go = find_go_skeleton,
 	},
 	ftgens = {
-		c = {
-			header = c_header,
-		},
-		cpp = {
-			guard = cpp_guard,
-			header = cpp_header,
-			namespace = cpp_namespace,
-		},
 		default = {
 			year = function(_)
 				return os.date("%Y")
@@ -155,14 +150,6 @@ local default_opts = {
 			holder = function(_)
 				return git_config_username()
 			end,
-		},
-		go = {
-			package = go_package,
-		},
-		proto = {
-			edition = proto_edition,
-			go_package = proto_go_package,
-			package = proto_package,
 		},
 	},
 }
@@ -172,13 +159,72 @@ function M.setup(opts)
 	M.find = default_opts.find
 	M.ftgens = default_opts.ftgens
 	M.augroup = vim.api.nvim_create_augroup("LabSkeleton", { clear = true })
+	for _, o in ipairs({
+		{
+			ft = "c",
+			pattern = "*.c",
+			find = find_c_skeleton,
+			ftgens = {
+				header = c_header,
+			},
+		},
+		{
+			ft = "cpp",
+			pattern = { "*.cc", "*.h" },
+			find = find_cpp_skeleton,
+			ftgens = {
+				guard = cpp_guard,
+				header = cpp_header,
+				namespace = cpp_namespace,
+			},
+		},
+		{
+			ft = "go",
+			pattern = "*.go",
+			find = find_go_skeleton,
+			ftgens = {
+				package = go_package,
+			},
+		},
+		{
+			ft = "lua",
+			pattern = "*.lua",
+			ftgens = {
+				edition = proto_edition,
+				go_package = proto_go_package,
+				package = proto_package,
+			},
+		},
+		{
+			ft = "proto",
+			pattern = "*.proto",
+			ftgens = {
+				edition = proto_edition,
+				go_package = proto_go_package,
+				package = proto_package,
+			},
+		},
+	}) do
+		M.register(o.ft, o.pattern, o.find, o.ftgens)
+	end
+end
+
+function M.register(ft, pattern, find, ftgens)
+	if find ~= nil then
+		M.find[ft] = find
+	end
+	if ftgens ~= nil then
+		if not M.ftgens[ft] then
+			M.ftgens[ft] = ftgens
+		else
+			table_merge(M.ftgens[ft], ftgens)
+		end
+	end
 	vim.api.nvim_create_autocmd("BufNewFile", {
 		group = M.augroup,
-		desc = "Load template",
-		pattern = { "*.c", "*.cc", "*.go", "*.h", "*.lua", "*.proto" },
-		callback = function(ev)
-			M.load(ev)
-		end,
+		desc = ("Load template %s"):format(ft),
+		pattern = pattern,
+		callback = M.load,
 	})
 end
 
@@ -262,12 +308,6 @@ local function gen_substitutes(gens, opts)
 		end
 	end
 	return subs
-end
-
-local function table_merge(dst, src)
-	for k, v in pairs(src) do
-		dst[k] = v
-	end
 end
 
 function M.gen_substitutes(opts)
