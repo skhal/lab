@@ -5,7 +5,7 @@
 
 # Flavor: FreeBSD
 
-INSTALL_PATHS = lab-git lab-skeleton
+INSTALL_PATHS = lua
 
 install: ${INSTALL_PATHS} .PHONY
 
