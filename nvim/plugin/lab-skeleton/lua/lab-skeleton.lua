@@ -11,7 +11,7 @@ end
 
 local function find_go_skeleton(file, _)
 	local skel = "new.go"
-	if file:find("_test.go$") ~= nil then
+	if file:find("_test%.go$") ~= nil then
 		skel = "new_test.go"
 	end
 	return skel
