@@ -26,19 +26,21 @@ local function find_c_skeleton(file, _)
 end
 
 local function git_config_username()
-	local cmd = vim.system({ "git", "config", "--get", "user.name" }, { text = true }):wait()
-	if cmd.code ~= 0 then
+	local cmd = { "git", "config", "--get", "user.name" }
+	local obj = vim.system(cmd, { text = true }):wait()
+	if obj.code ~= 0 then
 		error("git: can't get user.name")
 	end
-	return (cmd.stdout):gsub("%s+$", "")
+	return (obj.stdout):gsub("%s+$", "")
 end
 
 local function git_worktree_path()
-	local cmd = vim.system({ "git", "rev-parse", "--show-toplevel" }, { text = true }):wait()
-	if cmd.code ~= 0 then
+	local cmd = { "git", "rev-parse", "--show-toplevel" }
+	local obj = vim.system(cmd, { text = true }):wait()
+	if obj.code ~= 0 then
 		error("git: can't get worktree path")
 	end
-	return (cmd.stdout):gsub("%s+$", "")
+	return (obj.stdout):gsub("%s+$", "")
 end
 
 local function c_header(opts)
