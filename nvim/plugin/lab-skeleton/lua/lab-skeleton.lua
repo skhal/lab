@@ -9,6 +9,14 @@ local function find_skeleton(_, ft)
 	return "new." .. ft
 end
 
+local function find_go_skeleton(file, _)
+	local skel = "new.go"
+	if file:find("_test.go$") ~= nil then
+		skel = "new_test.go"
+	end
+	return skel
+end
+
 local function git_config_username()
 	local cmd = vim.system({ "git", "config", "--get", "user.name" }, { text = true }):wait()
 	if cmd.code ~= 0 then
@@ -27,6 +35,7 @@ end
 local default_opts = {
 	skel_path = vim.fn.stdpath("data") .. "/lab-skeleton/skel",
 	find = {
+		["go"] = find_go_skeleton,
 		[""] = find_skeleton,
 	},
 	ftgens = {
