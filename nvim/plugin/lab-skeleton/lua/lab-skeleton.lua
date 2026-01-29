@@ -109,7 +109,7 @@ function M.find_skeleton(file)
 	local find = M.find[ft] or M.find.default
 	local name = find(file, ft)
 	local path = vim.fs.joinpath(M.path, name)
-	if not (vim.uv or vim.loop).fs_stat(path) then
+	if not vim.uv.fs_stat(path) then
 		error(("skeleton %s: does not exist."):format(name))
 	end
 	return {
