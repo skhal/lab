@@ -118,21 +118,20 @@ function M.find_skeleton(file)
 	}
 end
 
-local function gen_substitutes(gens, opts)
-	local subs = {}
-	for k, f in pairs(gens) do
-		local ok, v = pcall(f, opts)
-		if not ok then
-			error(("generate %s\n%s"):format(k, v))
-		end
-		if v ~= nil then
-			subs[k] = v
-		end
-	end
-	return subs
-end
-
 function M.gen_substitutes(opts)
+	local gen_substitutes = function(gens, o)
+		local subs = {}
+		for k, f in pairs(gens) do
+			local ok, v = pcall(f, o)
+			if not ok then
+				error(("generate %s\n%s"):format(k, v))
+			end
+			if v ~= nil then
+				subs[k] = v
+			end
+		end
+		return subs
+	end
 	local ok, subs = pcall(gen_substitutes, M.subs.default or {}, opts)
 	if not ok then
 		error(("common substitutes\n%s"):format(subs))
