@@ -41,6 +41,11 @@ function M.setup(opts)
 end
 
 function M.register(ft, find, subs)
+	if ft == "default" then
+		vim.api.nvim_echo({
+			{ "Use setup() to change defaults.", "ErrorMsg" },
+		}, true, {})
+	end
 	if find ~= nil then
 		M.find[ft] = find
 	end
