@@ -89,15 +89,15 @@ function M.load(ev)
 			end
 		end
 	end
-	local load = function()
-		local skel = M.find_skeleton(ev.file)
-		local subs = M.gen_substitutes({ file = ev.file, filetype = skel.filetype })
+	local load = function(e)
+		local skel = M.find_skeleton(e.file)
+		local subs = M.gen_substitutes({ file = e.file, filetype = skel.filetype })
 		load_skeleton(skel.path)
 		run_substitutes(subs)
 		position_cursor()
 		report(skel, subs)
 	end
-	local ok, err = pcall(load)
+	local ok, err = pcall(load, ev)
 	if not ok then
 		vim.api.nvim_echo({ { err, "ErrorMsg" } }, true, {})
 		return
