@@ -32,9 +32,15 @@ function M.setup(opts)
 	if opts.subs ~= nil then
 		table_merge(M.ftsubs.default, opts.subs)
 	end
+	vim.api.nvim_create_autocmd("BufNewFile", {
+		group = M.augroup,
+		desc = "Load template",
+		pattern = "*",
+		callback = M.load,
+	})
 end
 
-function M.register(ft, pattern, find, subs)
+function M.register(ft, find, subs)
 	if find ~= nil then
 		M.find[ft] = find
 	end
@@ -45,12 +51,6 @@ function M.register(ft, pattern, find, subs)
 			table_merge(M.ftsubs[ft], subs)
 		end
 	end
-	vim.api.nvim_create_autocmd("BufNewFile", {
-		group = M.augroup,
-		desc = ("Load template %s"):format(ft),
-		pattern = pattern,
-		callback = M.load,
-	})
 end
 
 local function load_skeleton(file, subs)

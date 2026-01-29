@@ -30,7 +30,6 @@ skel.setup({
 
 local c = {
 	ft = "c",
-	pattern = "*.c",
 
 	find = function(file, _)
 		local f = "new.c"
@@ -52,7 +51,6 @@ local c = {
 
 local cc = {
 	ft = "cpp",
-	pattern = { "*.cc", "*.h" },
 
 	find = function(file, _)
 		local f = "new.cc"
@@ -93,7 +91,6 @@ local cc = {
 
 local go = {
 	ft = "go",
-	pattern = "*.go",
 
 	find = function(file, _)
 		local f = "new.go"
@@ -115,12 +112,10 @@ local go = {
 
 local lua = {
 	ft = "lua",
-	pattern = "*.lua",
 }
 
 local proto = {
 	ft = "proto",
-	pattern = "*.proto",
 
 	subs = {
 		edition = function(_)
@@ -154,5 +149,5 @@ local proto = {
 }
 
 for _, o in pairs({ c, cc, go, lua, proto }) do
-	skel.register(o.ft, o.pattern, o.find, o.subs)
+	skel.register(o.ft, o.find, o.subs)
 end
