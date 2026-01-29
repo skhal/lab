@@ -7,7 +7,7 @@ local M = {
 	path = vim.fs.joinpath(vim.fn.stdpath("data"), "lab-skeleton", "skel"),
 	find = {
 		default = function(_, ft)
-			return "new." .. ft
+			return "new." .. (ft or "default")
 		end,
 	},
 	subs = {
