@@ -15,32 +15,6 @@ local function find_skeleton(_, ft)
 	return "new." .. ft
 end
 
-local function find_go_skeleton(file, _)
-	local skel = "new.go"
-	if file:find("_test%.go$") ~= nil then
-		skel = "new_test.go"
-	end
-	return skel
-end
-
-local function find_c_skeleton(file, _)
-	local skel = "new.c"
-	if file:find("main%.c$") ~= nil then
-		skel = "new_main.c"
-	end
-	return skel
-end
-
-local function find_cpp_skeleton(file, _)
-	local skel = "new.cc"
-	if file:find("_test%.cc$") ~= nil then
-		skel = "new_test.cc"
-	elseif file:find("%.h$") ~= nil then
-		skel = "new.h"
-	end
-	return skel
-end
-
 local function git_config_username()
 	local cmd = { "git", "config", "--get", "user.name" }
 	local obj = vim.system(cmd, { text = true }):wait()
@@ -48,93 +22,6 @@ local function git_config_username()
 		error("git: can't get user.name")
 	end
 	return (obj.stdout):gsub("%s+$", "")
-end
-
-local function go_module()
-	local cmd = { "go", "list", "-m" }
-	local obj = vim.system(cmd, { text = true }):wait()
-	if obj.code ~= 0 then
-		error("go: can't get module name")
-	end
-	return (obj.stdout):gsub("%s+$", "")
-end
-
-local function git_worktree_path()
-	local cmd = { "git", "rev-parse", "--show-toplevel" }
-	local obj = vim.system(cmd, { text = true }):wait()
-	if obj.code ~= 0 then
-		error("git: can't get worktree path")
-	end
-	return (obj.stdout):gsub("%s+$", "")
-end
-
-local function git_relpath(file)
-	local worktree = git_worktree_path()
-	local abspath = vim.fs.abspath(file)
-	local relpath = vim.fs.relpath(worktree, abspath)
-	if not relpath then
-		-- file is outside the worktree
-		relpath = file
-	end
-	return relpath
-end
-
-local function c_header(opts)
-	local relpath = git_relpath(opts.file)
-	relpath = relpath:gsub("_test%.c$", ".c")
-	relpath = relpath:gsub("%.c$", ".h")
-	return vim.fn.escape(relpath, "/")
-end
-
-local function cpp_guard(opts)
-	if not opts.file:find("%.h$") then
-		return
-	end
-	local relpath = git_relpath(opts.file)
-	local guard = relpath:gsub("^/", "") -- if outside of a git worktree
-	guard = guard:gsub("[/%.]", "_") .. "_"
-	return guard:upper()
-end
-
-local function cpp_header(opts)
-	local relpath = git_relpath(opts.file)
-	relpath = relpath:gsub("_test%.cc$", ".cc")
-	relpath = relpath:gsub("%.cc$", ".h")
-	return vim.fn.escape(relpath, "/")
-end
-
-local function cpp_namespace(opts)
-	local relpath = git_relpath(opts.file)
-	local ns = vim.fs.dirname(relpath)
-	ns = ns:gsub("^/", "") -- if outside of a git worktree
-	return ns:gsub("/", "::")
-end
-
-local function go_package(opts)
-	local abspath = vim.fs.abspath(opts.file)
-	local dirname = vim.fs.dirname(abspath)
-	local pkg = vim.fs.basename(dirname)
-	return pkg
-end
-
-local function proto_edition(_)
-	return 2024
-end
-
-local function proto_go_package(opts)
-	local gomod = go_module()
-	local relpath = git_relpath(opts.file)
-	local dirname = vim.fs.dirname(relpath)
-	local pkg = vim.fs.joinpath(gomod, dirname)
-	return vim.fn.escape(pkg, "/")
-end
-
-local function proto_package(opts)
-	local relpath = git_relpath(opts.file)
-	local pkg = vim.fs.dirname(relpath)
-	pkg = pkg:gsub("/", ".")
-	-- remove .pb suffix if any
-	return pkg:gsub("%.pb$", "")
 end
 
 local default_opts = {
@@ -159,54 +46,6 @@ function M.setup(opts)
 	M.find = default_opts.find
 	M.ftgens = default_opts.ftgens
 	M.augroup = vim.api.nvim_create_augroup("LabSkeleton", { clear = true })
-	for _, o in ipairs({
-		{
-			ft = "c",
-			pattern = "*.c",
-			find = find_c_skeleton,
-			ftgens = {
-				header = c_header,
-			},
-		},
-		{
-			ft = "cpp",
-			pattern = { "*.cc", "*.h" },
-			find = find_cpp_skeleton,
-			ftgens = {
-				guard = cpp_guard,
-				header = cpp_header,
-				namespace = cpp_namespace,
-			},
-		},
-		{
-			ft = "go",
-			pattern = "*.go",
-			find = find_go_skeleton,
-			ftgens = {
-				package = go_package,
-			},
-		},
-		{
-			ft = "lua",
-			pattern = "*.lua",
-			ftgens = {
-				edition = proto_edition,
-				go_package = proto_go_package,
-				package = proto_package,
-			},
-		},
-		{
-			ft = "proto",
-			pattern = "*.proto",
-			ftgens = {
-				edition = proto_edition,
-				go_package = proto_go_package,
-				package = proto_package,
-			},
-		},
-	}) do
-		M.register(o.ft, o.pattern, o.find, o.ftgens)
-	end
 end
 
 function M.register(ft, pattern, find, ftgens)
