@@ -7,7 +7,7 @@
 
 XDG_CONFIG_HOME ?= ${HOME}/.config
 NVIM_CONFIG_PATH = ${XDG_CONFIG_HOME}/nvim
-TARGET_PATH = ${NVIM_CONFIG_PATH}/lua/config/after/ftplugin
+TARGET_PATH = ${NVIM_CONFIG_PATH}/after/ftplugin
 
 SOURCES = ${find . -maxdepth 1 -type f -name \*.lua:L:sh:S,./,,}
 INSTALL_TARGETS = ${SOURCES:S,^,${TARGET_PATH}/,}
