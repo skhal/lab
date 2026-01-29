@@ -10,7 +10,7 @@ local M = {
 			return "new." .. ft
 		end,
 	},
-	ftsubs = {
+	subs = {
 		default = {},
 	},
 	augroup = vim.api.nvim_create_augroup("LabSkeleton", { clear = true }),
@@ -30,7 +30,7 @@ function M.setup(opts)
 		M.find.default = opts.find
 	end
 	if opts.subs ~= nil then
-		table_merge(M.ftsubs.default, opts.subs)
+		table_merge(M.subs.default, opts.subs)
 	end
 	vim.api.nvim_create_autocmd("BufNewFile", {
 		group = M.augroup,
@@ -50,10 +50,10 @@ function M.register(ft, find, subs)
 		M.find[ft] = find
 	end
 	if subs ~= nil then
-		if not M.ftsubs[ft] then
-			M.ftsubs[ft] = subs
+		if not M.subs[ft] then
+			M.subs[ft] = subs
 		else
-			table_merge(M.ftsubs[ft], subs)
+			table_merge(M.subs[ft], subs)
 		end
 	end
 end
@@ -141,20 +141,20 @@ local function gen_substitutes(gens, opts)
 end
 
 function M.gen_substitutes(opts)
-	local ok, subs = pcall(gen_substitutes, M.ftsubs.default or {}, opts)
+	local ok, subs = pcall(gen_substitutes, M.subs.default or {}, opts)
 	if not ok then
 		error(("common substitutes\n%s"):format(subs))
 	end
 	if not next(subs) then
 		subs = {}
 	end
-	local ft_subs
-	ok, ft_subs = pcall(gen_substitutes, M.ftsubs[opts.filetype] or {}, opts)
+	local ftsubs
+	ok, ftsubs = pcall(gen_substitutes, M.subs[opts.filetype] or {}, opts)
 	if not ok then
-		error(("filetype %s\n%s"):format(opts.filetype, ft_subs))
+		error(("filetype %s\n%s"):format(opts.filetype, ftsubs))
 	end
-	if next(ft_subs) then
-		table_merge(subs, ft_subs)
+	if next(ftsubs) then
+		table_merge(subs, ftsubs)
 	end
 	if not next(subs) then
 		error("failed to generate substitutes")
