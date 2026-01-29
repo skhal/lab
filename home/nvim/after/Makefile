@@ -5,7 +5,7 @@
 
 # Flavor: FreeBSD
 
-INSTALL_PATHS = ftplugin
+INSTALL_PATHS = ftplugin lsp
 
 install: ${INSTALL_PATHS} .PHONY
 

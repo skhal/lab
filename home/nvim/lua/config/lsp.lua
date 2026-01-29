@@ -4,6 +4,7 @@
 -- license that can be found in the LICENSE file.
 
 -- keep-sorted start
+vim.lsp.enable("clangd")
 vim.lsp.enable("gopls")
 vim.lsp.enable("lua_ls")
 vim.lsp.enable("typos-lsp")
