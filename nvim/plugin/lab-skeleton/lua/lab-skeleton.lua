@@ -10,7 +10,7 @@ local M = {
 			return "new." .. ft
 		end,
 	},
-	ftgens = {
+	ftsubs = {
 		default = {
 			year = function(_)
 				return os.date("%Y")
@@ -41,20 +41,20 @@ function M.setup(opts)
 	if opts.find ~= nil then
 		M.find.default = opts.find
 	end
-	if opts.ftgens ~= nil then
-		table_merge(M.ftgens.default, opts.ftgens)
+	if opts.subs ~= nil then
+		table_merge(M.ftsubs.default, opts.subs)
 	end
 end
 
-function M.register(ft, pattern, find, ftgens)
+function M.register(ft, pattern, find, subs)
 	if find ~= nil then
 		M.find[ft] = find
 	end
-	if ftgens ~= nil then
-		if not M.ftgens[ft] then
-			M.ftgens[ft] = ftgens
+	if subs ~= nil then
+		if not M.ftsubs[ft] then
+			M.ftsubs[ft] = subs
 		else
-			table_merge(M.ftgens[ft], ftgens)
+			table_merge(M.ftsubs[ft], subs)
 		end
 	end
 	vim.api.nvim_create_autocmd("BufNewFile", {
@@ -148,7 +148,7 @@ local function gen_substitutes(gens, opts)
 end
 
 function M.gen_substitutes(opts)
-	local ok, subs = pcall(gen_substitutes, M.ftgens.default or {}, opts)
+	local ok, subs = pcall(gen_substitutes, M.ftsubs.default or {}, opts)
 	if not ok then
 		error(("common substitutes\n%s"):format(subs))
 	end
@@ -156,7 +156,7 @@ function M.gen_substitutes(opts)
 		subs = {}
 	end
 	local ft_subs
-	ok, ft_subs = pcall(gen_substitutes, M.ftgens[opts.filetype] or {}, opts)
+	ok, ft_subs = pcall(gen_substitutes, M.ftsubs[opts.filetype] or {}, opts)
 	if not ok then
 		error(("filetype %s\n%s"):format(opts.filetype, ft_subs))
 	end
