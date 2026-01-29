@@ -74,7 +74,7 @@ end
 function M.load(ev)
 	local ok, skel = pcall(M.find_skeleton, ev.file)
 	if not ok then
-		vim.api.nvim_echo({ { skel.path, "ErrorMsg" } }, true, {})
+		vim.api.nvim_echo({ { skel, "ErrorMsg" } }, true, {})
 		return
 	end
 	local opts = { file = ev.file, filetype = skel.filetype }
