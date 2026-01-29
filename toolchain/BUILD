@@ -37,6 +37,6 @@ toolchain(
         "@platforms//cpu:x86_64",
         "@platforms//os:linux",
     ],
-    toolchain = "linux_x86_64_toolchain",
+    toolchain = ":linux_x86_64_toolchain",
     toolchain_type = "@bazel_tools//tools/cpp:toolchain_type",
 )
