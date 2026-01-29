@@ -22,3 +22,4 @@ vim.o.tabstop = 2
 
 require("config.lab-git")
 require("config.lab-skeleton")
+require("config.lsp")
