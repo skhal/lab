@@ -58,27 +58,6 @@ function M.register(ft, find, subs)
 	end
 end
 
-local function load_skeleton(file)
-	vim.cmd("0r " .. file)
-end
-
-local function run_substitutes(subs)
-	for key, val in pairs(subs) do
-		vim.cmd("silent! %s/{{" .. key .. "}}/" .. val)
-	end
-end
-
-local function position_cursor()
-	for line_num, line in ipairs(vim.api.nvim_buf_get_lines(0, 0, -1, false)) do
-		local from, _ = line:find("{{cursor}}")
-		if from ~= nil then
-			vim.cmd("silent! %s/{{cursor}}//g")
-			vim.api.nvim_win_set_cursor(0, { line_num, from - 1 })
-			break
-		end
-	end
-end
-
 function M.load(ev)
 	local report = function(skel, subs)
 		local msgs = {
@@ -91,6 +70,24 @@ function M.load(ev)
 			end
 		end
 		vim.api.nvim_echo(msgs, true, {})
+	end
+	local load_skeleton = function(file)
+		vim.cmd("0r " .. file)
+	end
+	local run_substitutes = function(subs)
+		for key, val in pairs(subs) do
+			vim.cmd("silent! %s/{{" .. key .. "}}/" .. val)
+		end
+	end
+	local position_cursor = function()
+		for line_num, line in ipairs(vim.api.nvim_buf_get_lines(0, 0, -1, false)) do
+			local from, _ = line:find("{{cursor}}")
+			if from ~= nil then
+				vim.cmd("silent! %s/{{cursor}}//g")
+				vim.api.nvim_win_set_cursor(0, { line_num, from - 1 })
+				break
+			end
+		end
 	end
 	local load = function()
 		local skel = M.find_skeleton(ev.file)
