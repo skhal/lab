@@ -33,7 +33,6 @@ pam_mkhomedir
 pkg
 protobuf
 protobuf-go
-py311-cppman
 py311-pre-commit
 python
 rsync
