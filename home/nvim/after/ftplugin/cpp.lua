@@ -4,3 +4,5 @@
 -- license that can be found in the LICENSE file.
 
 vim.bo.equalprg = "clang-format21 -assume-filename=%"
+
+vim.api.nvim_buf_set_keymap(0, "n", "<localleader>rs", "<cmd>LspClangdSwitchSourceHeader<cr>", {})
