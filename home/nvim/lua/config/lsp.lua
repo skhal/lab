@@ -6,6 +6,7 @@
 -- keep-sorted start
 vim.lsp.enable("gopls")
 vim.lsp.enable("lua_ls")
+vim.lsp.enable("typos-lsp")
 -- keep-sorted end
 
 vim.keymap.set("n", "gK", function()
