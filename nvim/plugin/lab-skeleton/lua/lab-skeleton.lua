@@ -157,10 +157,7 @@ function M.gen_substitutes(opts)
 			subs = ftsubs
 		end
 	end
-	if not next(subs) then
-		error("failed to generate substitutes")
-	end
-	return subs
+	return subs or {}
 end
 
 return M
