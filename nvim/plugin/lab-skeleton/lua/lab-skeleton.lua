@@ -80,40 +80,31 @@ local function position_cursor()
 end
 
 function M.load(ev)
-	local ok, skel = pcall(M.find_skeleton, ev.file)
-	if not ok then
-		vim.api.nvim_echo({ { skel, "ErrorMsg" } }, true, {})
-		return
-	end
-	local opts = { file = ev.file, filetype = skel.filetype }
-	local subs
-	ok, subs = pcall(M.gen_substitutes, opts)
-	if not ok then
-		vim.api.nvim_echo({ { subs, "ErrorMsg" } }, true, {})
-		return
-	end
-	local err
-	ok, err = pcall(load_skeleton, skel.path)
-	if not ok then
-		vim.api.nvim_echo({ { err, "ErrorMsg" } }, true, {})
-		return
-	end
-	run_substitutes(subs)
-	ok, err = pcall(position_cursor)
-	if not ok then
-		vim.api.nvim_echo({ { err, "ErrorMsg" } }, true, {})
-		return
-	end
-	local msgs = {
-		{ ("skel: %s\n"):format(skel.path), "Normal" },
-		{ ("ft: %s\n"):format(skel.filetype), "Normal" },
-	}
-	if next(subs) then
-		for k, v in pairs(subs) do
-			table.insert(msgs, { (". %s: %s\n"):format(k, v), "Normal" })
+	local report = function(skel, subs)
+		local msgs = {
+			{ ("skel: %s\n"):format(skel.path), "Normal" },
+			{ ("ft: %s\n"):format(skel.filetype), "Normal" },
+		}
+		if next(subs) then
+			for k, v in pairs(subs) do
+				table.insert(msgs, { (". %s: %s\n"):format(k, v), "Normal" })
+			end
 		end
+		vim.api.nvim_echo(msgs, true, {})
 	end
-	vim.api.nvim_echo(msgs, true, {})
+	local load = function()
+		local skel = M.find_skeleton(ev.file)
+		local subs = M.gen_substitutes({ file = ev.file, filetype = skel.filetype })
+		load_skeleton(skel.path)
+		run_substitutes(subs)
+		position_cursor()
+		report(skel, subs)
+	end
+	local ok, err = pcall(load)
+	if not ok then
+		vim.api.nvim_echo({ { err, "ErrorMsg" } }, true, {})
+		return
+	end
 end
 
 function M.find_skeleton(file)
