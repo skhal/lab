@@ -32,7 +32,7 @@ function M.worktree_path()
 end
 
 function M.relpath(file)
-	local worktree = M.wortree_path()
+	local worktree = M.worktree_path()
 	local abspath = vim.fs.abspath(file)
 	local relpath = vim.fs.relpath(worktree, abspath)
 	return relpath or file -- file if it is outside of the worktree
