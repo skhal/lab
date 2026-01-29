@@ -11,19 +11,7 @@ local M = {
 		end,
 	},
 	ftsubs = {
-		default = {
-			year = function(_)
-				return os.date("%Y")
-			end,
-			holder = function(_)
-				local cmd = { "git", "config", "--get", "user.name" }
-				local obj = vim.system(cmd, { text = true }):wait()
-				if obj.code ~= 0 then
-					error("git: can't get user.name")
-				end
-				return (obj.stdout):gsub("%s+$", "")
-			end,
-		},
+		default = {},
 	},
 	augroup = vim.api.nvim_create_augroup("LabSkeleton", { clear = true }),
 }

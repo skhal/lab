@@ -16,7 +16,17 @@ vim.opt.rtp:append(lab_skeleton_path)
 local git = require("lab-git")
 local skel = require("lab-skeleton")
 
-skel.setup({})
+skel.setup({
+	subs = {
+		year = function(_)
+			return os.date("%Y")
+		end,
+
+		holder = function(_)
+			return git.config_get("user.name")
+		end,
+	},
+})
 
 local c = {
 	ft = "c",
