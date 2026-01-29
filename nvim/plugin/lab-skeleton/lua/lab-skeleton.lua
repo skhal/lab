@@ -58,8 +58,11 @@ function M.register(ft, find, subs)
 	end
 end
 
-local function load_skeleton(file, subs)
+local function load_skeleton(file)
 	vim.cmd("0r " .. file)
+end
+
+local function run_substitutes(subs)
 	for key, val in pairs(subs) do
 		vim.cmd("silent! %s/{{" .. key .. "}}/" .. val)
 	end
@@ -90,11 +93,12 @@ function M.load(ev)
 		return
 	end
 	local err
-	ok, err = pcall(load_skeleton, skel.path, subs)
+	ok, err = pcall(load_skeleton, skel.path)
 	if not ok then
 		vim.api.nvim_echo({ { err, "ErrorMsg" } }, true, {})
 		return
 	end
+	run_substitutes(subs)
 	ok, err = pcall(position_cursor)
 	if not ok then
 		vim.api.nvim_echo({ { err, "ErrorMsg" } }, true, {})
