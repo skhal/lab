@@ -3,31 +3,12 @@
 -- Use of this source code is governed by a BSD-style
 -- license that can be found in the LICENSE file.
 
-local M = {}
-
-local function table_merge(dst, src)
-	for k, v in pairs(src) do
-		dst[k] = v
-	end
-end
-
-local function find_skeleton(_, ft)
-	return "new." .. ft
-end
-
-local function git_config_username()
-	local cmd = { "git", "config", "--get", "user.name" }
-	local obj = vim.system(cmd, { text = true }):wait()
-	if obj.code ~= 0 then
-		error("git: can't get user.name")
-	end
-	return (obj.stdout):gsub("%s+$", "")
-end
-
-local default_opts = {
-	skel_path = vim.fn.stdpath("data") .. "/lab-skeleton/skel",
+local M = {
+	path = vim.fs.joinpath(vim.fn.stdpath("data"), "lab-skeleton", "skel"),
 	find = {
-		default = find_skeleton,
+		default = function(_, ft)
+			return "new." .. ft
+		end,
 	},
 	ftgens = {
 		default = {
@@ -35,17 +16,34 @@ local default_opts = {
 				return os.date("%Y")
 			end,
 			holder = function(_)
-				return git_config_username()
+				local cmd = { "git", "config", "--get", "user.name" }
+				local obj = vim.system(cmd, { text = true }):wait()
+				if obj.code ~= 0 then
+					error("git: can't get user.name")
+				end
+				return (obj.stdout):gsub("%s+$", "")
 			end,
 		},
 	},
+	augroup = vim.api.nvim_create_augroup("LabSkeleton", { clear = true }),
 }
 
+local function table_merge(dst, src)
+	for k, v in pairs(src) do
+		dst[k] = v
+	end
+end
+
 function M.setup(opts)
-	M.skel_path = opts.skel_path or default_opts.skel_path
-	M.find = default_opts.find
-	M.ftgens = default_opts.ftgens
-	M.augroup = vim.api.nvim_create_augroup("LabSkeleton", { clear = true })
+	if opts.path ~= nil then
+		M.path = opts.path
+	end
+	if opts.find ~= nil then
+		M.find.default = opts.find
+	end
+	if opts.ftgens ~= nil then
+		table_merge(M.ftgens.default, opts.ftgens)
+	end
 end
 
 function M.register(ft, pattern, find, ftgens)
@@ -125,7 +123,7 @@ function M.find_skeleton(file)
 	local ft = vim.filetype.match({ filename = file })
 	local find = M.find[ft] or M.find.default
 	local name = find(file, ft)
-	local path = M.skel_path .. "/" .. name
+	local path = vim.fs.joinpath(M.path, name)
 	if not (vim.uv or vim.loop).fs_stat(path) then
 		error(("skeleton %s: does not exist."):format(name))
 	end
@@ -152,7 +150,7 @@ end
 function M.gen_substitutes(opts)
 	local ok, subs = pcall(gen_substitutes, M.ftgens.default or {}, opts)
 	if not ok then
-		error(("common substitutes: %s"):format(subs))
+		error(("common substitutes\n%s"):format(subs))
 	end
 	if not next(subs) then
 		subs = {}
