@@ -28,126 +28,109 @@ skel.setup({
 	},
 })
 
-local c = {
-	ft = "c",
-
-	find = function(file, _)
-		local f = "new.c"
-		if file:find("main%.c$") ~= nil then
-			f = "new_main.c"
-		end
-		return f
-	end,
-
-	subs = {
-		header = function(opts)
-			local relpath = git.relpath(opts.file)
-			relpath = relpath:gsub("_test%.c$", ".c")
-			relpath = relpath:gsub("%.c$", ".h")
-			return vim.fn.escape(relpath, "/")
-		end,
-	},
-}
-
-local cc = {
-	ft = "cpp",
-
-	find = function(file, _)
-		local f = "new.cc"
-		if file:find("_test%.cc$") ~= nil then
-			f = "new_test.cc"
-		elseif file:find("%.h$") ~= nil then
-			f = "new.h"
-		end
-		return f
-	end,
-
-	subs = {
-		guard = function(opts)
-			if not opts.file:find("%.h$") then
-				return
+local registrations = {
+	{
+		ft = "c",
+		find = function(file, _)
+			local f = "new.c"
+			if file:find("main%.c$") ~= nil then
+				f = "new_main.c"
 			end
-			local relpath = git.relpath(opts.file)
-			local guard = relpath:gsub("^/", "") -- if outside of a git worktree
-			guard = guard:gsub("[/%.]", "_") .. "_"
-			return guard:upper()
+			return f
 		end,
-
-		header = function(opts)
-			local relpath = git.relpath(opts.file)
-			relpath = relpath:gsub("_test%.cc$", ".cc")
-			relpath = relpath:gsub("%.cc$", ".h")
-			return vim.fn.escape(relpath, "/")
-		end,
-
-		namespace = function(opts)
-			local relpath = git.relpath(opts.file)
-			local ns = vim.fs.dirname(relpath)
-			ns = ns:gsub("^/", "") -- if outside of a git worktree
-			return ns:gsub("/", "::")
-		end,
+		subs = {
+			header = function(opts)
+				local relpath = git.relpath(opts.file)
+				relpath = relpath:gsub("_test%.c$", ".c")
+				relpath = relpath:gsub("%.c$", ".h")
+				return vim.fn.escape(relpath, "/")
+			end,
+		},
 	},
-}
-
-local go = {
-	ft = "go",
-
-	find = function(file, _)
-		local f = "new.go"
-		if file:find("_test%.go$") ~= nil then
-			f = "new_test.go"
-		end
-		return f
-	end,
-
-	subs = {
-		package = function(opts)
-			local abspath = vim.fs.abspath(opts.file)
-			local dirname = vim.fs.dirname(abspath)
-			local pkg = vim.fs.basename(dirname)
-			return pkg
+	{
+		ft = "cpp",
+		find = function(file, _)
+			local f = "new.cc"
+			if file:find("_test%.cc$") ~= nil then
+				f = "new_test.cc"
+			elseif file:find("%.h$") ~= nil then
+				f = "new.h"
+			end
+			return f
 		end,
-	},
-}
-
-local lua = {
-	ft = "lua",
-}
-
-local proto = {
-	ft = "proto",
-
-	subs = {
-		edition = function(_)
-			return 2024
-		end,
-
-		go_package = function(opts)
-			local go_module = function()
-				local cmd = { "go", "list", "-m" }
-				local obj = vim.system(cmd, { text = true }):wait()
-				if obj.code ~= 0 then
-					error("go: can't get module name")
+		subs = {
+			guard = function(opts)
+				if not opts.file:find("%.h$") then
+					return
 				end
-				return (obj.stdout):gsub("%s+$", "")
+				local relpath = git.relpath(opts.file)
+				local guard = relpath:gsub("^/", "") -- if outside of a git worktree
+				guard = guard:gsub("[/%.]", "_") .. "_"
+				return guard:upper()
+			end,
+			header = function(opts)
+				local relpath = git.relpath(opts.file)
+				relpath = relpath:gsub("_test%.cc$", ".cc")
+				relpath = relpath:gsub("%.cc$", ".h")
+				return vim.fn.escape(relpath, "/")
+			end,
+			namespace = function(opts)
+				local relpath = git.relpath(opts.file)
+				local ns = vim.fs.dirname(relpath)
+				ns = ns:gsub("^/", "") -- if outside of a git worktree
+				return ns:gsub("/", "::")
+			end,
+		},
+	},
+	{
+		ft = "go",
+		find = function(file, _)
+			local f = "new.go"
+			if file:find("_test%.go$") ~= nil then
+				f = "new_test.go"
 			end
-			local gomod = go_module()
-			local relpath = git.relpath(opts.file)
-			local dirname = vim.fs.dirname(relpath)
-			local pkg = vim.fs.joinpath(gomod, dirname)
-			return vim.fn.escape(pkg, "/")
+			return f
 		end,
-
-		package = function(opts)
-			local relpath = git.relpath(opts.file)
-			local pkg = vim.fs.dirname(relpath)
-			pkg = pkg:gsub("/", ".")
-			-- remove .pb suffix if any
-			return pkg:gsub("%.pb$", "")
-		end,
+		subs = {
+			package = function(opts)
+				local abspath = vim.fs.abspath(opts.file)
+				local dirname = vim.fs.dirname(abspath)
+				local pkg = vim.fs.basename(dirname)
+				return pkg
+			end,
+		},
+	},
+	{
+		ft = "proto",
+		subs = {
+			edition = function(_)
+				return 2024
+			end,
+			go_package = function(opts)
+				local go_module = function()
+					local cmd = { "go", "list", "-m" }
+					local obj = vim.system(cmd, { text = true }):wait()
+					if obj.code ~= 0 then
+						error("go: can't get module name")
+					end
+					return (obj.stdout):gsub("%s+$", "")
+				end
+				local gomod = go_module()
+				local relpath = git.relpath(opts.file)
+				local dirname = vim.fs.dirname(relpath)
+				local pkg = vim.fs.joinpath(gomod, dirname)
+				return vim.fn.escape(pkg, "/")
+			end,
+			package = function(opts)
+				local relpath = git.relpath(opts.file)
+				local pkg = vim.fs.dirname(relpath)
+				pkg = pkg:gsub("/", ".")
+				return pkg:gsub("%.pb$", "") -- remove .pb suffix if any
+			end,
+		},
 	},
 }
 
-for _, o in pairs({ c, cc, go, lua, proto }) do
+for _, o in pairs(registrations) do
 	skel.register(o.ft, o.find, o.subs)
 end
