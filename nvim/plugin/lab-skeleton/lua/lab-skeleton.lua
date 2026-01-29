@@ -145,16 +145,17 @@ function M.gen_substitutes(opts)
 	if not ok then
 		error(("common substitutes\n%s"):format(subs))
 	end
-	if not next(subs) then
-		subs = {}
-	end
 	local ftsubs
 	ok, ftsubs = pcall(gen_substitutes, M.subs[opts.filetype] or {}, opts)
 	if not ok then
 		error(("filetype %s\n%s"):format(opts.filetype, ftsubs))
 	end
 	if next(ftsubs) then
-		table_merge(subs, ftsubs)
+		if next(subs) then
+			table_merge(subs, ftsubs)
+		else
+			subs = ftsubs
+		end
 	end
 	if not next(subs) then
 		error("failed to generate substitutes")
