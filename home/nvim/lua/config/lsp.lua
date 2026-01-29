@@ -7,6 +7,7 @@
 vim.lsp.enable("clangd")
 vim.lsp.enable("gopls")
 vim.lsp.enable("lua_ls")
+vim.lsp.enable("protols")
 vim.lsp.enable("typos_lsp")
 -- keep-sorted end
 

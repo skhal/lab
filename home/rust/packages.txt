@@ -14,6 +14,7 @@
 #   crate --git https://github.com/bar/baz
 #
 # keep-sorted start
+protols
 stylua
 typos-lsp --git https://github.com/tekumara/typos-lsp
 typos@typos-cli
