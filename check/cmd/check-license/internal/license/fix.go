@@ -84,7 +84,7 @@ func newInserter(filename string) (*inserter, error) {
 	// keep-sorted start
 	case "", ".sh": // no extension: default to shell
 		return &insShell, nil
-	case ".bazel", ".conf", ".ctags", ".txt", ".txtpb", ".yaml":
+	case ".bazel", ".conf", ".ctags", ".toml", ".txt", ".txtpb", ".yaml":
 		return &insShellNoSplit, nil
 	case ".cc", ".go", ".h", ".proto":
 		return &insC, nil
