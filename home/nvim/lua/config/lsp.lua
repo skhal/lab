@@ -13,16 +13,17 @@ vim.lsp.enable("typos_lsp")
 
 vim.cmd([[set completeopt+=menuone,noselect,popup]])
 
-vim.keymap.set("n", "gK", function()
-	local new_config = not vim.diagnostic.config().virtual_lines
-	vim.diagnostic.config({ virtual_lines = new_config })
-end, { desc = "Toggle diagnostic virtual_lines" })
-
 vim.api.nvim_create_autocmd("LspAttach", {
 	callback = function(args)
 		local client = vim.lsp.get_client_by_id(args.data.client_id)
 		if client:supports_method("textDocument/completion") then
 			vim.lsp.completion.enable(true, client.id, args.buf, { autotrigger = true })
+		end
+		if client:supports_method("textDocument/publishDiagnostics") then
+			vim.keymap.set("n", "gK", function()
+				local new_config = not vim.diagnostic.config().virtual_lines
+				vim.diagnostic.config({ virtual_lines = new_config })
+			end, { desc = "Toggle diagnostic virtual_lines" })
 		end
 		if client:supports_method("callHierarchy/incomingCalls") then
 			vim.keymap.set("n", "<localleader>csi", vim.lsp.buf.incoming_calls, { desc = "Incoming calls" })
