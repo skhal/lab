@@ -4,7 +4,7 @@
 // license that can be found in the LICENSE file.
 
 //
-// clang-format off-next-line: skip file in `go build`
+// NOLINTNEXTLINE
 //go:build ignore
 
 #include "iq/9/stripzero/clean.h"

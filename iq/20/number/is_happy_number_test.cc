@@ -4,7 +4,7 @@
 // license that can be found in the LICENSE file.
 
 //
-// clang-format off-next-line
+// NOLINTNEXTLINE
 //go:build ignore
 
 #include "iq/20/number/is_happy_number.h"

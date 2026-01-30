@@ -4,7 +4,7 @@
 // license that can be found in the LICENSE file.
 
 //
-// clang-format off-next-line
+// NOLINTNEXTLINE
 //go:build ignore
 
 #include "iq/3/palindrome/solution.h"

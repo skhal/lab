@@ -1,2 +1,10 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+# keep-sorted start
 BasedOnStyle: Google
-OneLineFormatOffRegex: "^(// clang-format off-next-line(: .*)?)$"
+CommentPragmas: (// NOLINT)$
+OneLineFormatOffRegex: ^(// NOLINTNEXTLINE)$
+# keep-sorted end
