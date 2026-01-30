@@ -24,5 +24,11 @@ vim.api.nvim_create_autocmd("LspAttach", {
 		if client:supports_method("textDocument/completion") then
 			vim.lsp.completion.enable(true, client.id, args.buf, { autotrigger = true })
 		end
+		if client:supports_method("callHierarchy/incomingCalls") then
+			vim.keymap.set("n", "<localleader>csi", vim.lsp.buf.incoming_calls, { desc = "Incoming calls" })
+		end
+		if client:supports_method("callHierarchy/outgoingCalls") then
+			vim.keymap.set("n", "<localleader>cso", vim.lsp.buf.outgoing_calls, { desc = "Outgoing calls" })
+		end
 	end,
 })
