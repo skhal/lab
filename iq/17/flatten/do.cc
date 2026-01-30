@@ -43,12 +43,12 @@ std::shared_ptr<Node> Do([[maybe_unused]] std::shared_ptr<TreeNode> tree) {
   std::shared_ptr<Node> head;
   std::shared_ptr<Node> tail;
   std::queue<std::shared_ptr<TreeNode>> queue;
-  auto enque = [&queue](std::shared_ptr<TreeNode> tree_node) {
+  auto enqueue = [&queue](std::shared_ptr<TreeNode> tree_node) {
     queue.emplace(std::move(tree_node));
   };
-  for (enque(std::move(tree)); !queue.empty(); queue.pop()) {
+  for (enqueue(std::move(tree)); !queue.empty(); queue.pop()) {
     std::shared_ptr<TreeNode> tree_node = queue.front();
-    auto [h, t] = toList(tree_node, enque);
+    auto [h, t] = toList(tree_node, enqueue);
     if (!head) {
       head = std::move(h);
     } else {
