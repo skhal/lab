@@ -4,6 +4,6 @@
 -- license that can be found in the LICENSE file.
 
 -- keep-sorted start
-vim.bo.equalprg = "stylua %"
+vim.bo.equalprg = "stylua --stdin-filepath=% -"
 vim.bo.expandtab = false
 -- keep-sorted end
