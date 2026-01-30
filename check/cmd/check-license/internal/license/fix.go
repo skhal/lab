@@ -98,11 +98,11 @@ func newInserter(filename string) (*inserter, error) {
 	}
 	base := filepath.Base(filename)
 	switch base {
-	case ".clangd", ".gitignore":
+	case ".gitignore":
 		return &insShellNoSplit, nil
 	}
 	switch {
-	case strings.HasPrefix(base, ".bazel"):
+	case strings.HasPrefix(base, ".bazel"), strings.HasPrefix(base, ".clang"):
 		return &insShellNoSplit, nil
 	}
 	return nil, fmt.Errorf("%s: unsupported file type", filename)
