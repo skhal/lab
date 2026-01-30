@@ -115,7 +115,7 @@ std::vector<Triplet> Find(const std::vector<int>& nn, int ratio) {
     }
     nums_prev.Add(n, i);
   }
-  return triplets;
+  return static_cast<std::vector<Triplet>>(triplets);
 }
 
 }  // namespace iq::geomseq

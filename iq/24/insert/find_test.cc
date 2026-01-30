@@ -42,7 +42,7 @@ class FindInsertIndexTest : public TestWithParam<FindInsertIndexTestParam> {};
 TEST(FindInsertIndexTest, Example) {
   const std::size_t got = FindInsertIndex({1, 2, 3}, 2);
 
-  EXPECT_EQ(got, 1);
+  EXPECT_EQ(got, static_cast<std::size_t>(1));
 }
 
 TEST_P(FindInsertIndexTest, Test) {
