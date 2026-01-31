@@ -12,8 +12,12 @@ conform.setup({
 			command = "clang-format21",
 		},
 		["txtpbfmt"] = {
+			meta = {
+				url = "https://github.com/protocolbuffers/txtpbfmt",
+				description = "txtpbfmt parses, edits and formats text proto files in a way that preserves comments.",
+			},
 			command = "txtpbfmt",
-			args = "-skip_all_colons",
+			args = { "-skip_all_colons", "-stdin_display_path", "$FILENAME" },
 		},
 		-- keep-sorted end
 	},
