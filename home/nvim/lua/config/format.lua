@@ -7,9 +7,15 @@ local conform = require("conform")
 
 conform.setup({
 	formatters = {
+		-- keep-sorted start block=yes
 		["clang-format"] = {
 			command = "clang-format21",
 		},
+		["txtpbfmt"] = {
+			command = "txtpbfmt",
+			args = "-skip_all_colons",
+		},
+		-- keep-sorted end
 	},
 	formatters_by_ft = {
 		-- keep-sorted start
@@ -21,6 +27,7 @@ conform.setup({
 		json = { "prettier" },
 		lua = { "stylua" },
 		markdown = { "markdownfmt" },
+		pbtxt = { "txtpbfmt" },
 		proto = { "clang-format" },
 		sh = { "shfmt" },
 		yaml = { "yamlfmt" },
