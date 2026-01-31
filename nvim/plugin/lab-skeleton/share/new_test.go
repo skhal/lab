@@ -8,3 +8,5 @@ package {{package}}_test
 import (
 	"testing"
 )
+
+{{cursor}}

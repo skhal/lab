@@ -5,3 +5,5 @@
 #
 # proto-file: some/proto/my_file.proto
 # proto-message: MyMessage
+
+{{cursor}}
