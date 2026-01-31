@@ -7,4 +7,5 @@
 
 # keep-sorted start
 https://github.com/neovim/nvim-lspconfig
+https://github.com/stevearc/conform.nvim
 # keep-sorted end
