@@ -17,9 +17,6 @@ vim.api.nvim_create_autocmd("LspAttach", {
 	callback = function(args)
 		local client = vim.lsp.get_client_by_id(args.data.client_id)
 		vim.lsp.completion.enable(true, client.id, args.buf, { autotrigger = true })
-		vim.keymap.set("n", "<localleader>gfc", function()
-			vim.lsp.buf.format({ async = false, id = client })
-		end, { desc = "Format code" })
 		vim.keymap.set("n", "gK", function()
 			local new_config = not vim.diagnostic.config().virtual_lines
 			vim.diagnostic.config({ virtual_lines = new_config })
