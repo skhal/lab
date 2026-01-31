@@ -91,6 +91,9 @@ local registrations = {
 		end,
 		subs = {
 			package = function(opts)
+				if opts.file:find("main.go$") ~= nil then
+					return "main"
+				end
 				local abspath = vim.fs.abspath(opts.file)
 				local dirname = vim.fs.dirname(abspath)
 				local pkg = vim.fs.basename(dirname)
