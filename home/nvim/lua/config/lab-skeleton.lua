@@ -29,8 +29,8 @@ skel.setup({
 })
 
 local registrations = {
-	{
-		ft = "c",
+	-- keep-sorted start block=yes
+	c = {
 		find = function(file, _)
 			local f = "new.c"
 			if file:find("main%.c$") ~= nil then
@@ -47,8 +47,7 @@ local registrations = {
 			end,
 		},
 	},
-	{
-		ft = "cpp",
+	cpp = {
 		find = function(file, _)
 			local f = "new.cc"
 			if file:find("_test%.cc$") ~= nil then
@@ -82,8 +81,7 @@ local registrations = {
 			end,
 		},
 	},
-	{
-		ft = "go",
+	go = {
 		find = function(file, _)
 			local f = "new.go"
 			if file:find("_test%.go$") ~= nil then
@@ -100,8 +98,7 @@ local registrations = {
 			end,
 		},
 	},
-	{
-		ft = "proto",
+	proto = {
 		subs = {
 			edition = function(_)
 				return 2024
@@ -129,8 +126,9 @@ local registrations = {
 			end,
 		},
 	},
+	-- keep-sorted end
 }
 
-for _, o in pairs(registrations) do
-	skel.register(o.ft, o.find, o.subs)
+for ft, o in pairs(registrations) do
+	skel.register(ft, o.find, o.subs)
 end
