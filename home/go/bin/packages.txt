@@ -13,12 +13,12 @@
 #   github.com/foo/bar@latest -ldflags '-s'
 #
 # keep-sorted start
-github.com/bazelbuild/bazel-watcher/cmd/ibazel@v0.27.0
+github.com/bazelbuild/bazel-watcher/cmd/ibazel@v0.28.0
 github.com/bazelbuild/buildtools/buildifier@latest
 github.com/bazelbuild/buildtools/buildozer@latest
 github.com/go-delve/delve/cmd/dlv@v1.26.0 -ldflags '-extldflags -lkvm'
 github.com/google/keep-sorted@v0.7.1
-github.com/google/yamlfmt/cmd/yamlfmt@v0.20.0
+github.com/google/yamlfmt/cmd/yamlfmt@v0.21.0
 github.com/jstemmer/gotags@latest
 github.com/protocolbuffers/txtpbfmt/cmd/txtpbfmt@latest
 github.com/shurcooL/markdownfmt@latest
@@ -36,6 +36,6 @@ golang.org/x/tools/cmd/present@latest
 golang.org/x/tools/cmd/stringer@latest
 golang.org/x/tools/gopls@latest
 google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
-google.golang.org/protobuf/cmd/protoc-gen-go@v1.36.10
+google.golang.org/protobuf/cmd/protoc-gen-go@v1.36.11
 mvdan.cc/sh/v3/cmd/shfmt@v3.12.0
 # keep-sorted end
