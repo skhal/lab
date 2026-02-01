@@ -5,6 +5,56 @@
 
 vim.cmd([[set completeopt+=menuone,noselect,popup]])
 
+vim.lsp.config("*", {
+	-- ref: https://github.com/hrsh7th/cmp-nvim-lsp/blob/cbc7b02bb99fae35cb42f514762b89b5126651ef/lua/cmp_nvim_lsp/init.lua
+	capabilities = {
+		textDocument = {
+			completion = {
+				dynamicRegistration = false,
+				completionItem = {
+					snippetSupport = true,
+					commitCharactersSupport = true,
+					deprecatedSupport = true,
+					preselectSupport = true,
+					tagSupport = {
+						valueSet = {
+							1, -- Deprecated
+						},
+					},
+					insertReplaceSupport = true,
+					resolveSupport = {
+						properties = {
+							"documentation",
+							"additionalTextEdits",
+							"insertTextFormat",
+							"insertTextMode",
+							"command",
+						},
+					},
+					insertTextModeSupport = {
+						valueSet = {
+							1, -- asIs
+							2, -- adjustIndentation
+						},
+					},
+					labelDetailsSupport = true,
+				},
+				contextSupport = true,
+				insertTextMode = 1,
+				completionList = {
+					itemDefaults = {
+						"commitCharacters",
+						"editRange",
+						"insertTextFormat",
+						"insertTextMode",
+						"data",
+					},
+				},
+			},
+		},
+	},
+})
+
 vim.api.nvim_create_autocmd("LspAttach", {
 	callback = function(args)
 		local client = vim.lsp.get_client_by_id(args.data.client_id)

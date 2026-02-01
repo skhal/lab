@@ -20,8 +20,10 @@ vim.o.softtabstop = 2
 vim.o.tabstop = 2
 -- keep-sorted end
 
+-- keep-sorted start
 require("config.complete")
 require("config.format")
 require("config.lab-git")
 require("config.lab-skeleton")
 require("config.lsp")
+-- keep-sorted end
