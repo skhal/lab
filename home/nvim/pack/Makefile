@@ -25,11 +25,14 @@ ${NVIM_PACK_PATH}: .NOTMAIN
 
 .for plugin in ${PLUGINS}
 target=${plugin:${M_target}}
+
+.if !target(${target:H})
 ${target:H}: ${NVIM_PACK_PATH}
 	@if ! test -d ${.TARGET}; then \
 		echo ".. create ${.TARGET}"; \
 		mkdir -p ${.TARGET}; \
 	fi
+.endif
 
 ${target}: ${.TARGET:H} ${PLUGINS_FILE}
 	@if ! test -e ${.TARGET}; then \
