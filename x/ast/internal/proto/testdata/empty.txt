@@ -1,0 +1,4 @@
+*ast.FileNode {
+. EOF: *ast.RuneNode {
+. }
+}

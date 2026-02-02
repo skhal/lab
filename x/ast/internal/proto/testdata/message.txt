@@ -1,0 +1,66 @@
+*ast.FileNode {
+. Edition: *ast.EditionNode {
+. . Keyword: *ast.KeywordNode {
+. . . Val: "edition"
+. . }
+. . Equals: *ast.RuneNode {
+. . . Rune: 61
+. . }
+. . Edition: *ast.StringLiteralNode {
+. . . Val: "2024"
+. . }
+. . Semicolon: *ast.RuneNode {
+. . . Rune: 59
+. . }
+. }
+. Decls: []ast.FileElement {
+. . 0: *ast.PackageNode {
+. . . Keyword: *ast.KeywordNode {
+. . . . Val: "package"
+. . . }
+. . . Name: *ast.IdentNode {
+. . . . Val: "test"
+. . . }
+. . . Semicolon: *ast.RuneNode {
+. . . . Rune: 59
+. . . }
+. . }
+. . 1: *ast.MessageNode {
+. . . Keyword: *ast.KeywordNode {
+. . . . Val: "message"
+. . . }
+. . . Name: *ast.IdentNode {
+. . . . Val: "Test"
+. . . }
+. . . MessageBody: ast.MessageBody {
+. . . . OpenBrace: *ast.RuneNode {
+. . . . . Rune: 123
+. . . . }
+. . . . Decls: []ast.MessageElement {
+. . . . . 0: *ast.FieldNode {
+. . . . . . FldType: *ast.IdentNode {
+. . . . . . . Val: "string"
+. . . . . . }
+. . . . . . Name: *ast.IdentNode {
+. . . . . . . Val: "one"
+. . . . . . }
+. . . . . . Equals: *ast.RuneNode {
+. . . . . . . Rune: 61
+. . . . . . }
+. . . . . . Tag: *ast.UintLiteralNode {
+. . . . . . . Val: 1
+. . . . . . }
+. . . . . . Semicolon: *ast.RuneNode {
+. . . . . . . Rune: 59
+. . . . . . }
+. . . . . }
+. . . . }
+. . . . CloseBrace: *ast.RuneNode {
+. . . . . Rune: 125
+. . . . }
+. . . }
+. . }
+. }
+. EOF: *ast.RuneNode {
+. }
+}

@@ -14,7 +14,7 @@ repos:
   - id: check-shebang-scripts-are-executable
   - id: check-yaml
   - id: end-of-file-fixer
-    exclude: "(\\.diff|\\.patch)$"
+    exclude: "(.*/testdata/.*|\\.diff|\\.patch)$"
   - id: trailing-whitespace
     exclude: "(\\.diff|\\.patch)$"
     # keep-sorted end

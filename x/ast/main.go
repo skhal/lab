@@ -19,6 +19,10 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	pbparser "github.com/bufbuild/protocompile/parser"
+	pbreporter "github.com/bufbuild/protocompile/reporter"
+	"github.com/skhal/lab/x/ast/internal/proto"
 )
 
 func main() {
@@ -66,11 +70,36 @@ func runOnDir(name string) error {
 }
 
 func runOnFile(name string) error {
+	switch filepath.Ext(name) {
+	case ".go":
+		return runOnGoFile(name)
+	case ".proto":
+		return runOnProtoFile(name)
+	default:
+		return fmt.Errorf("unsupported file %s", name)
+	}
+}
+
+func runOnGoFile(name string) error {
 	fset := token.NewFileSet()
 	f, err := parser.ParseFile(fset, name, nil, parser.ParseComments)
 	if err != nil {
 		return err
 	}
 	ast.Print(fset, f)
+	return nil
+}
+
+func runOnProtoFile(name string) error {
+	f, err := os.Open(name)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	file, err := pbparser.Parse(name, f, pbreporter.NewHandler(nil))
+	if err != nil {
+		return err
+	}
+	proto.Print(file)
 	return nil
 }

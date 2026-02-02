@@ -1,0 +1,31 @@
+*ast.FileNode {
+. Edition: *ast.EditionNode {
+. . Keyword: *ast.KeywordNode {
+. . . Val: "edition"
+. . }
+. . Equals: *ast.RuneNode {
+. . . Rune: 61
+. . }
+. . Edition: *ast.StringLiteralNode {
+. . . Val: "2024"
+. . }
+. . Semicolon: *ast.RuneNode {
+. . . Rune: 59
+. . }
+. }
+. Decls: []ast.FileElement {
+. . 0: *ast.PackageNode {
+. . . Keyword: *ast.KeywordNode {
+. . . . Val: "package"
+. . . }
+. . . Name: *ast.IdentNode {
+. . . . Val: "test"
+. . . }
+. . . Semicolon: *ast.RuneNode {
+. . . . Rune: 59
+. . . }
+. . }
+. }
+. EOF: *ast.RuneNode {
+. }
+}
