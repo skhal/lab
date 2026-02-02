@@ -130,6 +130,11 @@ repos:
     language: system
     types_or: [proto]
     args: ["-style=file"]
+  - id: proto-nextid
+    name: "Validate protobuf next id"
+    entry: check-nextid
+    language: system
+    types_or: [proto]
   - id: shell-format
     name: "Format shell"
     entry: shfmt
