@@ -71,30 +71,52 @@ function M.load(ev)
 		end
 		vim.api.nvim_echo(msgs, true, {})
 	end
-	local load_skeleton = function(file)
-		vim.cmd("0r " .. file)
-	end
-	local run_substitutes = function(subs)
-		for key, val in pairs(subs) do
-			vim.cmd("silent! %s/{{" .. key .. "}}/" .. val)
+	local load_skeleton = function(skel, subs)
+		local read_file = function(path, f)
+			vim.uv.fs_open(path, "r", tonumber("444", 8), function(err, fd)
+				assert(not err, err)
+				---@diagnostic disable-next-line:redefined-local
+				vim.uv.fs_fstat(fd, function(err, stat) -- luacheck: ignore err
+					assert(not err, err)
+					---@diagnostic disable-next-line:redefined-local
+					vim.uv.fs_read(fd, stat.size, 0, function(err, data) -- luacheck: ignore err
+						assert(not err, err)
+						---@diagnostic disable-next-line:redefined-local
+						vim.uv.fs_close(fd, function(err) -- luacheck: ignore err
+							assert(not err, err)
+							return f(data)
+						end)
+					end)
+				end)
+			end)
 		end
-	end
-	local position_cursor = function()
-		for line_num, line in ipairs(vim.api.nvim_buf_get_lines(0, 0, -1, false)) do
-			local from, _ = line:find("{{cursor}}")
-			if from ~= nil then
-				vim.cmd("silent! %s/{{cursor}}//g")
-				vim.api.nvim_win_set_cursor(0, { line_num, from - 1 })
-				break
-			end
-		end
+		read_file(
+			skel.path,
+			vim.schedule_wrap(function(data)
+				for key, val in pairs(subs) do
+					data = data:gsub(("{{%s}}"):format(key), val)
+				end
+				local lines = {}
+				local pos = {}
+				for row, line in pairs(vim.split(data, "\n")) do
+					local col, _ = line:find("{{cursor}}")
+					if col ~= nil then
+						pos = { row, col - 1 }
+						line = line:gsub("{{cursor}}", "")
+					end
+					table.insert(lines, line)
+				end
+				vim.api.nvim_buf_set_lines(0, 0, -1, false, lines)
+				if next(pos) then
+					vim.api.nvim_win_set_cursor(0, pos)
+				end
+			end)
+		)
 	end
 	local load = function(e)
 		local skel = M.find_skeleton(e.file)
 		local subs = M.gen_substitutes({ file = e.file, filetype = skel.filetype })
-		load_skeleton(skel.path)
-		run_substitutes(subs)
-		position_cursor()
+		load_skeleton(skel, subs)
 		report(skel, subs)
 	end
 	local ok, err = pcall(load, ev)
@@ -109,12 +131,14 @@ function M.find_skeleton(file)
 	local find = M.find[ft] or M.find.default
 	local name = find(file, ft)
 	local path = vim.fs.joinpath(M.path, name)
-	if not vim.uv.fs_stat(path) then
+	local stat = vim.uv.fs_stat(path)
+	if not stat then
 		error(("skeleton %s: does not exist."):format(name))
 	end
 	return {
 		filetype = ft,
 		path = path,
+		stat = stat,
 	}
 end
 
