@@ -52,6 +52,11 @@ vim.lsp.config("*", {
 				},
 			},
 		},
+		workspace = {
+			didChangeWatchedFiles = {
+				dynamicRegistration = true,
+			},
+		},
 	},
 })
 
