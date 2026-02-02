@@ -55,6 +55,10 @@ func CheckFileNode(file *ast.FileNode) error {
 
 func checkFileElement(file *ast.FileNode, elem ast.FileElement) error {
 	switch n := elem.(type) {
+	case *ast.EnumNode:
+		if err := checkEnumNode(file, n); err != nil {
+			return err
+		}
 	case *ast.MessageNode:
 		if err := checkMessageNode(file, n); err != nil {
 			return err
@@ -63,17 +67,67 @@ func checkFileElement(file *ast.FileNode, elem ast.FileElement) error {
 	return nil
 }
 
-func checkMessageNode(file *ast.FileNode, msg *ast.MessageNode) error {
-	return checkLeadingComments(msg, file.NodeInfo(msg).LeadingComments())
+type enumNode struct {
+	node *ast.EnumNode
 }
 
-func checkLeadingComments(msg *ast.MessageNode, comms ast.Comments) error {
+// Node returns wrapped node.
+func (n *enumNode) Node() ast.CompositeNode {
+	return n.node
+}
+
+// Name returns wrapped node's name.
+func (n *enumNode) Name() string {
+	return n.node.Name.Val
+}
+
+// Kind returns "enum" for kind.
+func (n *enumNode) Kind() string {
+	return "enum"
+}
+
+type messageNode struct {
+	node *ast.MessageNode
+}
+
+// Node returns wrapped node.
+func (n *messageNode) Node() ast.CompositeNode {
+	return n.node
+}
+
+// Name returns wrapped node's name.
+func (n *messageNode) Name() string {
+	return n.node.Name.Val
+}
+
+// Kind returns "message" for kind.
+func (n *messageNode) Kind() string {
+	return "message"
+}
+
+type compositeNode interface {
+	Node() ast.CompositeNode
+	Name() string
+	Kind() string
+}
+
+func checkEnumNode(file *ast.FileNode, enum *ast.EnumNode) error {
+	n := enumNode{enum}
+	return checkLeadingComments(&n, file.NodeInfo(enum).LeadingComments())
+}
+
+func checkMessageNode(file *ast.FileNode, msg *ast.MessageNode) error {
+	n := messageNode{msg}
+	return checkLeadingComments(&n, file.NodeInfo(msg).LeadingComments())
+}
+
+func checkLeadingComments(cn compositeNode, comms ast.Comments) error {
 	// Scan for the next-id comment from the end, where it is likely to be found.
 	for i := comms.Len() - 1; i >= 0; i-- {
 		comm := comms.Index(i)
-		switch ok, err := checkComment(msg, comm); {
+		switch ok, err := checkComment(cn, comm); {
 		case err != nil:
-			return fmt.Errorf("%s message %s: %w", comm.Start(), msg.Name.Val, err)
+			return fmt.Errorf("%s %s %s: %w", comm.Start(), cn.Kind(), cn.Name(), err)
 		case !ok:
 			continue
 		}
@@ -82,7 +136,7 @@ func checkLeadingComments(msg *ast.MessageNode, comms ast.Comments) error {
 	return nil
 }
 
-func checkComment(msg *ast.MessageNode, comm ast.Comment) (ok bool, err error) {
+func checkComment(cn compositeNode, comm ast.Comment) (ok bool, err error) {
 	nextid, ok, err := ParseNextID(comm.RawText())
 	if err != nil {
 		return true, err
@@ -90,7 +144,7 @@ func checkComment(msg *ast.MessageNode, comm ast.Comment) (ok bool, err error) {
 	if !ok {
 		return false, nil
 	}
-	lastid, err := getLastID(msg)
+	lastid, err := getLastID(cn.Node())
 	if err != nil {
 		return true, fmt.Errorf("failed to extract last id: %w", err)
 	}
@@ -124,6 +178,14 @@ func getLastID(node ast.CompositeNode) (uint64, error) {
 	var lastid uint64
 	for _, child := range node.Children() {
 		switch n := child.(type) {
+		case *ast.EnumValueNode:
+			id, ok := n.Number.AsUint64()
+			if !ok {
+				return 0, fmt.Errorf("enumerator %s: invalid number %v", n.Name.Val, n.Number)
+			}
+			if id > lastid {
+				lastid = id
+			}
 		case *ast.FieldNode:
 			if id := n.Tag.Val; id > lastid {
 				lastid = id

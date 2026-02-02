@@ -151,6 +151,141 @@ message Test {
 	}
 }
 
+func TestCheckFileNode_enum(t *testing.T) {
+	tests := []struct {
+		name string
+		code string
+		want error
+	}{
+		{
+			name: "empty enum no next-id",
+			code: `
+edition = "2024";
+package test;
+enum Test {}
+`,
+		},
+		{
+			name: "empty enum valid next-id",
+			code: `
+edition = "2024";
+package test;
+// Next ID: 1
+enum Test {}
+`,
+		},
+		{
+			name: "empty enum invalid next-id",
+			code: `
+edition = "2024";
+package test;
+// Next ID: 2
+enum Test {}
+`,
+			want: nextid.ErrNextID,
+		},
+		{
+			name: "not empty enum no next-id",
+			code: `
+edition = "2024";
+package test;
+enum Test {
+	TEST_FOO = 1;
+}
+`,
+		},
+		{
+			name: "not empty enum valid next-id",
+			code: `
+edition = "2024";
+package test;
+// Next ID: 2
+enum Test {
+	TEST_FOO = 1;
+}
+`,
+		},
+		{
+			name: "not empty enum invalid next-id",
+			code: `
+edition = "2024";
+package test;
+// Next ID: 3
+enum Test {
+	TEST_FOO = 1;
+}
+`,
+			want: nextid.ErrNextID,
+		},
+		{
+			name: "enum with one reserved",
+			code: `
+edition = "2024";
+package test;
+// Next ID: 2
+enum Test {
+	reserved 1;
+}
+`,
+		},
+		{
+			name: "enum with few reserved",
+			code: `
+edition = "2024";
+package test;
+// Next ID: 4
+enum Test {
+	reserved 1,3;
+}
+`,
+		},
+		{
+			name: "enum with range reserved",
+			code: `
+edition = "2024";
+package test;
+// Next ID: 4
+enum Test {
+	reserved 1 to 3;
+}
+`,
+		},
+		{
+			name: "enum with range mix",
+			code: `
+edition = "2024";
+package test;
+// Next ID: 6
+enum Test {
+	reserved 1, 2 to 3, 5;
+}
+`,
+		},
+		{
+			name: "enum with field and range",
+			code: `
+edition = "2024";
+package test;
+// Next ID: 4
+enum Test {
+	TEST_FOO = 1;
+	reserved 1, 3;
+}
+`,
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			err := nextid.CheckFileNode(mustParse(t, tc.code))
+
+			if !errors.Is(err, tc.want) {
+				t.Errorf("nextid.CheckFileNode() unexpected error %v; want %v", err, tc.want)
+				t.Log(tc.code)
+			}
+		})
+	}
+}
+
 func mustParse(t *testing.T, s string) *ast.FileNode {
 	t.Helper()
 	fn, err := parser.Parse("string", strings.NewReader(s), reporter.NewHandler(nil))
