@@ -3,6 +3,7 @@ module github.com/skhal/lab
 go 1.25.1
 
 require (
+	github.com/bufbuild/protocompile v0.14.1
 	github.com/gomarkdown/markdown v0.0.0-20250810172220-2e2c11897d1a
 	github.com/google/go-cmp v0.7.0
 	github.com/mmcdole/gofeed v1.3.0
