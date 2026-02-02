@@ -4,8 +4,6 @@
 -- license that can be found in the LICENSE file.
 
 -- keep-sorted start
-vim.o.colorcolumn = "80"
-vim.o.cursorline = true
 vim.o.number = true
 -- keep-sorted end
 
@@ -21,6 +19,7 @@ vim.o.tabstop = 2
 -- keep-sorted end
 
 -- keep-sorted start
+require("config.color")
 require("config.complete")
 require("config.format")
 require("config.lab-git")
