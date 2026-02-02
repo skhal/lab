@@ -17,6 +17,7 @@ catch2
 ccache
 cmake
 doas
+fzf
 git
 go125
 graphviz
