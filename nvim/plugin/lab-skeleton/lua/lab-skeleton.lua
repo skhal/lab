@@ -96,6 +96,7 @@ function M.load(ev)
 				for key, val in pairs(subs) do
 					data = data:gsub(("{{%s}}"):format(key), val)
 				end
+				data = data:gsub("\n$", "") -- remove trailing EOL
 				local lines = {}
 				local pos = {}
 				for row, line in pairs(vim.split(data, "\n")) do
