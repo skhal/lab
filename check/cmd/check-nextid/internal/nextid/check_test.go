@@ -286,6 +286,163 @@ enum Test {
 	}
 }
 
+func TestCheckFileNode_submessage(t *testing.T) {
+	tests := []struct {
+		name string
+		code string
+		want error
+	}{
+		{
+			name: "empty message no next-id",
+			code: `
+edition = "2024";
+package test;
+message Test {
+	message Child {}
+}
+`,
+		},
+		{
+			name: "empty message valid next-id",
+			code: `
+edition = "2024";
+package test;
+message Test {
+	// Next ID: 1
+	message Child {}
+}
+`,
+		},
+		{
+			name: "empty message invalid next-id",
+			code: `
+edition = "2024";
+package test;
+message Test {
+	// Next ID: 2
+	message Child {}
+}
+`,
+			want: nextid.ErrNextID,
+		},
+		{
+			name: "not empty message no next-id",
+			code: `
+edition = "2024";
+package test;
+message Test {
+	message Child {
+		int foo = 1;
+	}
+}
+`,
+		},
+		{
+			name: "not empty message valid next-id",
+			code: `
+edition = "2024";
+package test;
+message Test {
+	// Next ID: 2
+	message Child {
+		int foo = 1;
+	}
+}
+`,
+		},
+		{
+			name: "not empty message invalid next-id",
+			code: `
+edition = "2024";
+package test;
+message Test {
+	// Next ID: 3
+	message Child {
+		int foo = 1;
+	}
+}
+`,
+			want: nextid.ErrNextID,
+		},
+		{
+			name: "message with one reserved",
+			code: `
+edition = "2024";
+package test;
+message Test {
+	// Next ID: 2
+	message Child {
+		reserved 1;
+	}
+}
+`,
+		},
+		{
+			name: "message with few reserved",
+			code: `
+edition = "2024";
+package test;
+message Test {
+	// Next ID: 4
+	message Child {
+		reserved 1,3;
+	}
+}
+`,
+		},
+		{
+			name: "message with range reserved",
+			code: `
+edition = "2024";
+package test;
+message Test {
+	// Next ID: 4
+	message Child {
+		reserved 1 to 3;
+	}
+}
+`,
+		},
+		{
+			name: "message with range mix",
+			code: `
+edition = "2024";
+package test;
+message Test {
+	// Next ID: 6
+	message Child {
+		reserved 1, 2 to 3, 5;
+	}
+}
+`,
+		},
+		{
+			name: "message with field and range",
+			code: `
+edition = "2024";
+package test;
+message Test {
+	// Next ID: 4
+	message Child {
+		int foo = 2;
+		reserved 1, 3;
+	}
+}
+`,
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			err := nextid.CheckFileNode(mustParse(t, tc.code))
+
+			if !errors.Is(err, tc.want) {
+				t.Errorf("nextid.CheckFileNode() unexpected error %v; want %v", err, tc.want)
+				t.Log(tc.code)
+			}
+		})
+	}
+}
+
 func mustParse(t *testing.T, s string) *ast.FileNode {
 	t.Helper()
 	fn, err := parser.Parse("string", strings.NewReader(s), reporter.NewHandler(nil))

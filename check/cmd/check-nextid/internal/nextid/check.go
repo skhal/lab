@@ -118,7 +118,20 @@ func checkEnumNode(file *ast.FileNode, enum *ast.EnumNode) error {
 
 func checkMessageNode(file *ast.FileNode, msg *ast.MessageNode) error {
 	n := messageNode{msg}
-	return checkLeadingComments(&n, file.NodeInfo(msg).LeadingComments())
+	err := checkLeadingComments(&n, file.NodeInfo(msg).LeadingComments())
+	if err != nil {
+		return err
+	}
+	for _, child := range msg.Children() {
+		switch n := child.(type) {
+		case *ast.MessageNode:
+			err := checkMessageNode(file, n)
+			if err != nil {
+				return err
+			}
+		}
+	}
+	return nil
 }
 
 func checkLeadingComments(cn compositeNode, comms ast.Comments) error {
