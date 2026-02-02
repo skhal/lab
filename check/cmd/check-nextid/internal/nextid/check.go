@@ -124,6 +124,11 @@ func checkMessageNode(file *ast.FileNode, msg *ast.MessageNode) error {
 	}
 	for _, child := range msg.Children() {
 		switch n := child.(type) {
+		case *ast.EnumNode:
+			err := checkEnumNode(file, n)
+			if err != nil {
+				return err
+			}
 		case *ast.MessageNode:
 			err := checkMessageNode(file, n)
 			if err != nil {
