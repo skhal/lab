@@ -35,7 +35,7 @@ func Subscribe(f *pb.Feed) Subscription {
 
 type subscription struct {
 	cfg  *pb.Feed
-	feed Feed
+	feed chan *Item
 	stop chan chan error
 	once sync.Once
 }
@@ -65,57 +65,56 @@ func (s *subscription) run() error {
 	if err != nil {
 		return err
 	}
-	s.feed = s.streamFeed(fetcher)
+	s.feed = make(chan *Item)
+	go func() {
+		defer close(s.feed)
+		s.stream(fetcher)
+	}()
 	return nil
 }
 
-func (s *subscription) streamFeed(f Fetcher) Feed {
-	stream := make(chan *Item)
-	go func() {
-		defer close(stream)
+func (s *subscription) stream(f Fetcher) {
+	var (
+		pending []*Item
+		err     error
+	)
+	var nextFetch time.Time
+	for {
 		var (
-			pending []*Item
-			err     error
+			send chan<- *Item
+			item *Item
 		)
-		var nextFetch time.Time
-		for {
-			var (
-				send chan<- *Item
-				item *Item
-			)
-			if len(pending) > 0 {
-				send = stream
-				item = pending[0]
-			}
-			var (
-				fetchTime  <-chan time.Time
-				fetchDelay time.Duration
-			)
-			if nextFetch.After(time.Now()) {
-				fetchDelay = time.Until(nextFetch)
-			}
-			if len(pending) < maxPendingSize {
-				fetchTime = time.After(fetchDelay)
-			}
-			select {
-			case errc := <-s.stop:
-				errc <- err
-				close(errc)
-				return
-			case <-fetchTime:
-				var items []*Item
-				items, err = f.Fetch()
-				if err != nil {
-					nextFetch = time.Now().Add(fetchBackoffDelay)
-					break
-				}
-				pending = append(pending, items...)
-			case send <- item:
-				pending = pending[1:]
-			}
+		if len(pending) > 0 {
+			send = s.feed
+			item = pending[0]
 		}
-	}()
-	return stream
+		var (
+			fetchTime  <-chan time.Time
+			fetchDelay time.Duration
+		)
+		if nextFetch.After(time.Now()) {
+			fetchDelay = time.Until(nextFetch)
+		}
+		if len(pending) < maxPendingSize {
+			fetchTime = time.After(fetchDelay)
+		}
+		select {
+		case errc := <-s.stop:
+			errc <- err
+			close(errc)
+			return
+		case <-fetchTime:
+			var items []*Item
+			items, err = f.Fetch()
+			if err != nil {
+				nextFetch = time.Now().Add(fetchBackoffDelay)
+				break
+			}
+			pending = append(pending, items...)
+		case send <- item:
+			pending = pending[1:]
+		}
+	}
 }
 
 // Close stops the subscription and closes the feed.
