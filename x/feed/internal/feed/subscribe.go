@@ -76,7 +76,7 @@ func (s *subscription) streamFeed(f Fetcher) Feed {
 			pending []*Item
 			err     error
 		)
-		fetch := time.After(0)
+		var next time.Time
 		for {
 			var (
 				send chan *Item
@@ -86,6 +86,14 @@ func (s *subscription) streamFeed(f Fetcher) Feed {
 				send = stream
 				item = pending[0]
 			}
+			var (
+				fetch <-chan time.Time
+				delay time.Duration
+			)
+			if next.After(time.Now()) {
+				delay = time.Until(next)
+			}
+			fetch = time.After(delay)
 			select {
 			case errc := <-s.stop:
 				errc <- err
@@ -94,8 +102,8 @@ func (s *subscription) streamFeed(f Fetcher) Feed {
 			case <-fetch:
 				var items []*Item
 				items, err = f.Fetch()
-				fetch = time.After(fetchDelay)
 				if err != nil {
+					next = time.Now().Add(fetchDelay)
 					break
 				}
 				pending = append(pending, items...)
