@@ -4,6 +4,9 @@
 -- license that can be found in the LICENSE file.
 
 vim.o.winborder = "rounded"
+if vim.fn.exists("+pumborder") == 1 then
+	vim.o.pumborder = "rounded"
+end
 
 vim.cmd([[set completeopt+=menuone,noselect,popup]])
 
