@@ -7,13 +7,17 @@ package feed
 
 import (
 	"fmt"
+	"iter"
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 
 	"github.com/mmcdole/gofeed"
 	"github.com/skhal/lab/x/feed/internal/pb"
 )
+
+const blockSize = 5 // bock size to fetch items from files.
 
 // Fetch fetches a feed and generates a stream of items. It returns an error if
 // the feed source is not supported or there is an error in accessing the feed.
@@ -31,7 +35,8 @@ type fetcher interface {
 
 func newFetcher(s *pb.Source) (fetcher, error) {
 	if s.HasFile() {
-		return newFileFetcher(s.GetFile()), nil
+		f := newFileFetcher(s.GetFile())
+		return newBlockFileFetcher(f, blockSize), nil
 	}
 	return nil, fmt.Errorf("subscribe %s: non-file sources are not supported", s)
 }
@@ -45,8 +50,8 @@ func newFileFetcher(name string) *fileFetcher {
 }
 
 // Fetch retrieves feed items from the file.
-func (fetcher *fileFetcher) Fetch() ([]*Item, error) {
-	name, err := expand(fetcher.file)
+func (f *fileFetcher) Fetch() ([]*Item, error) {
+	name, err := expand(f.file)
 	if err != nil {
 		return nil, err
 	}
@@ -55,10 +60,14 @@ func (fetcher *fileFetcher) Fetch() ([]*Item, error) {
 		return nil, err
 	}
 	defer file.Close()
+	return f.parse(file)
+}
+
+func (f *fileFetcher) parse(file *os.File) ([]*Item, error) {
 	parser := gofeed.NewParser()
 	feed, err := parser.Parse(file)
 	if err != nil {
-		return nil, fmt.Errorf("fetch %s: %w", fetcher.file, err)
+		return nil, fmt.Errorf("fetch %s: %w", f.file, err)
 	}
 	return transform(feed.Items), nil
 }
@@ -82,4 +91,43 @@ func transform(items []*gofeed.Item) []*Item {
 		})
 	}
 	return ii
+}
+
+type blockFileFetcher struct {
+	fetcher fetcher
+
+	once  sync.Once
+	items []*Item
+	err   error
+
+	size      int
+	nextBlock func() (Block, bool)
+}
+
+func newBlockFileFetcher(f fetcher, blockSize int) *blockFileFetcher {
+	return &blockFileFetcher{
+		fetcher: f,
+		size:    blockSize,
+	}
+}
+
+// Fetch generates a block of items from the list of items retrieved from the
+// wrapped fetcher.
+func (f *blockFileFetcher) Fetch() ([]*Item, error) {
+	f.once.Do(func() {
+		f.items, f.err = f.fetcher.Fetch()
+		f.nextBlock, _ = iter.Pull(EqualSizeBlocks(f.size, len(f.items)))
+	})
+	if f.err != nil {
+		return nil, f.err
+	}
+	return f.fetchItems()
+}
+
+func (f *blockFileFetcher) fetchItems() ([]*Item, error) {
+	c, ok := f.nextBlock()
+	if !ok {
+		return nil, nil
+	}
+	return f.items[c.Low:c.High], nil
 }
