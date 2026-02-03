@@ -19,5 +19,8 @@ vim.api.nvim_create_autocmd("LspAttach", {
 		end, { desc = "Toggle diagnostic virtual_lines" })
 		vim.keymap.set("n", "<localleader>csi", vim.lsp.buf.incoming_calls, { desc = "Incoming calls" })
 		vim.keymap.set("n", "<localleader>cso", vim.lsp.buf.outgoing_calls, { desc = "Outgoing calls" })
+		vim.keymap.set("n", "K", function()
+			vim.lsp.buf.hover({ border = "rounded" })
+		end, { desc = "Hover documentation" })
 	end,
 })
