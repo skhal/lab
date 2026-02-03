@@ -7,7 +7,9 @@ package feed
 
 import (
 	"fmt"
+	"math/rand"
 	"sync"
+	"time"
 
 	"github.com/skhal/lab/x/feed/internal/pb"
 )
@@ -88,6 +90,8 @@ func (s *subscription) streamFeed(f Fetcher) Feed {
 					return
 				}
 			}
+			// Wait between polls
+			time.Sleep(time.Duration(rand.Intn(10)) * time.Millisecond)
 		}
 	}()
 	return stream
