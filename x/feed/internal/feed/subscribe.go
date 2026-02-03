@@ -34,21 +34,15 @@ func Subscribe(f *pb.Feed) Subscription {
 type subscription struct {
 	cfg  *pb.Feed
 	feed Feed
-	done chan struct{}
+	stop chan chan error
 	once sync.Once
-	err  error
 }
 
 func newSubscription(f *pb.Feed) *subscription {
 	return &subscription{
 		cfg:  f,
-		done: make(chan struct{}),
+		stop: make(chan chan error),
 	}
-}
-
-// Err returns last fetch error if any.
-func (s *subscription) Err() error {
-	return s.err
 }
 
 // Feed starts a stream of feed items or returns an error if it fails.
@@ -77,21 +71,29 @@ func (s *subscription) streamFeed(f Fetcher) Feed {
 	stream := make(chan *Item)
 	go func() {
 		defer close(stream)
+		var (
+			items []*Item
+			err   error
+		)
+		sleep := func() {
+			time.Sleep(time.Duration(rand.Intn(10)) * time.Millisecond)
+		}
 		for {
-			items, err := f.Fetch()
+			items, err = f.Fetch()
 			if err != nil {
-				s.err = err
-				break
+				sleep()
+				continue
 			}
 			for _, item := range items {
 				select {
 				case stream <- item:
-				case <-s.done:
+				case errc := <-s.stop:
+					errc <- err
+					close(errc)
 					return
 				}
 			}
-			// Wait between polls
-			time.Sleep(time.Duration(rand.Intn(10)) * time.Millisecond)
+			sleep()
 		}
 	}()
 	return stream
@@ -99,8 +101,9 @@ func (s *subscription) streamFeed(f Fetcher) Feed {
 
 // Close stops the subscription and closes the feed.
 func (s *subscription) Close() error {
-	close(s.done)
-	return nil
+	err := make(chan error)
+	s.stop <- err
+	return <-err
 }
 
 // String implements fmt.Stringer interface.
