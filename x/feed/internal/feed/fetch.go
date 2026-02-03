@@ -21,19 +21,21 @@ const blockSize = 5 // bock size to fetch items from files.
 
 // Fetch fetches a feed and generates a stream of items. It returns an error if
 // the feed source is not supported or there is an error in accessing the feed.
-func Fetch(s *pb.Source) ([]*Item, error) {
+func Fetch(s *pb.Source) (Fetcher, error) {
 	f, err := newFetcher(s)
 	if err != nil {
 		return nil, err
 	}
-	return f.Fetch()
+	return f, nil
 }
 
-type fetcher interface {
+// Fetcher is responsible for getting items from the feed.
+type Fetcher interface {
+	// Fetch retrieves items from the feed.
 	Fetch() ([]*Item, error)
 }
 
-func newFetcher(s *pb.Source) (fetcher, error) {
+func newFetcher(s *pb.Source) (Fetcher, error) {
 	if s.HasFile() {
 		f := newFileFetcher(s.GetFile())
 		return newBlockFileFetcher(f, blockSize), nil
@@ -94,7 +96,7 @@ func transform(items []*gofeed.Item) []*Item {
 }
 
 type blockFileFetcher struct {
-	fetcher fetcher
+	fetcher Fetcher
 
 	once  sync.Once
 	items []*Item
@@ -104,7 +106,7 @@ type blockFileFetcher struct {
 	nextBlock func() (Block, bool)
 }
 
-func newBlockFileFetcher(f fetcher, blockSize int) *blockFileFetcher {
+func newBlockFileFetcher(f Fetcher, blockSize int) *blockFileFetcher {
 	return &blockFileFetcher{
 		fetcher: f,
 		size:    blockSize,

@@ -57,7 +57,11 @@ func (s *subscription) run() error {
 	if !s.cfg.GetSource().HasSource() {
 		return fmt.Errorf("subscribe %s: missing source", s.cfg)
 	}
-	items, err := Fetch(s.cfg.GetSource())
+	fetcher, err := Fetch(s.cfg.GetSource())
+	if err != nil {
+		return err
+	}
+	items, err := fetcher.Fetch()
 	if err != nil {
 		return err
 	}
