@@ -73,6 +73,11 @@ func (s *subscription) run() error {
 	return nil
 }
 
+type fetchResult struct {
+	items []*Item
+	err   error
+}
+
 func (s *subscription) stream(f Fetcher) {
 	var (
 		pending []*Item
@@ -84,12 +89,18 @@ func (s *subscription) stream(f Fetcher) {
 		}
 		return s.feed, pending[0]
 	}
-	var nextFetch time.Time
+	var (
+		fetchDone chan fetchResult
+		nextFetch time.Time
+	)
 	fetchTime := func() <-chan time.Time {
 		var (
 			t     <-chan time.Time
 			delay time.Duration
 		)
+		if fetchDone != nil {
+			return t
+		}
 		if nextFetch.After(time.Now()) {
 			delay = time.Until(nextFetch)
 		}
@@ -106,13 +117,19 @@ func (s *subscription) stream(f Fetcher) {
 			close(errc)
 			return
 		case <-fetchTime():
-			var items []*Item
-			items, err = f.Fetch()
-			if err != nil {
+			fetchDone = make(chan fetchResult)
+			go func() {
+				defer close(fetchDone)
+				items, err := f.Fetch()
+				fetchDone <- fetchResult{items, err}
+			}()
+		case res := <-fetchDone:
+			if res.err != nil {
 				nextFetch = time.Now().Add(fetchBackoffDelay)
 				break
 			}
-			pending = append(pending, items...)
+			pending = append(pending, res.items...)
+			fetchDone = nil
 		case send <- item:
 			pending = pending[1:]
 		}
