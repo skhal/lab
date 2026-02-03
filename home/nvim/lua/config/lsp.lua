@@ -26,5 +26,8 @@ vim.api.nvim_create_autocmd("LspAttach", {
 		vim.keymap.set("n", "K", function()
 			vim.lsp.buf.hover({ border = "rounded" })
 		end, { desc = "Hover documentation" })
+		vim.keymap.set("i", "<c-s>", function()
+			vim.lsp.buf.signature_help({ border = "rounded" })
+		end, { desc = "Signature help" })
 	end,
 })
