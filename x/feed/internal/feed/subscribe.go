@@ -7,7 +7,6 @@ package feed
 
 import (
 	"fmt"
-	"math/rand"
 	"sync"
 	"time"
 
@@ -67,33 +66,42 @@ func (s *subscription) run() error {
 	return nil
 }
 
+const fetchDelay = 5 * time.Millisecond
+
 func (s *subscription) streamFeed(f Fetcher) Feed {
 	stream := make(chan *Item)
 	go func() {
 		defer close(stream)
 		var (
-			items []*Item
-			err   error
+			pending []*Item
+			err     error
 		)
-		sleep := func() {
-			time.Sleep(time.Duration(rand.Intn(10)) * time.Millisecond)
-		}
+		fetch := time.After(0)
 		for {
-			items, err = f.Fetch()
-			if err != nil {
-				sleep()
-				continue
+			var (
+				send chan *Item
+				item *Item
+			)
+			if len(pending) > 0 {
+				send = stream
+				item = pending[0]
 			}
-			for _, item := range items {
-				select {
-				case stream <- item:
-				case errc := <-s.stop:
-					errc <- err
-					close(errc)
-					return
+			select {
+			case errc := <-s.stop:
+				errc <- err
+				close(errc)
+				return
+			case <-fetch:
+				var items []*Item
+				items, err = f.Fetch()
+				fetch = time.After(fetchDelay)
+				if err != nil {
+					break
 				}
+				pending = append(pending, items...)
+			case send <- item:
+				pending = pending[1:]
 			}
-			sleep()
 		}
 	}()
 	return stream
