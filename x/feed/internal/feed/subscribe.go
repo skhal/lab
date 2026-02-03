@@ -78,32 +78,34 @@ func (s *subscription) stream(f Fetcher) {
 		pending []*Item
 		err     error
 	)
-	var nextFetch time.Time
-	for {
-		var (
-			send chan<- *Item
-			item *Item
-		)
-		if len(pending) > 0 {
-			send = s.feed
-			item = pending[0]
+	next := func() (chan<- *Item, *Item) {
+		if len(pending) == 0 {
+			return nil, nil
 		}
+		return s.feed, pending[0]
+	}
+	var nextFetch time.Time
+	fetchTime := func() <-chan time.Time {
 		var (
-			fetchTime  <-chan time.Time
-			fetchDelay time.Duration
+			t     <-chan time.Time
+			delay time.Duration
 		)
 		if nextFetch.After(time.Now()) {
-			fetchDelay = time.Until(nextFetch)
+			delay = time.Until(nextFetch)
 		}
 		if len(pending) < maxPendingSize {
-			fetchTime = time.After(fetchDelay)
+			t = time.After(delay)
 		}
+		return t
+	}
+	for {
+		send, item := next()
 		select {
 		case errc := <-s.stop:
 			errc <- err
 			close(errc)
 			return
-		case <-fetchTime:
+		case <-fetchTime():
 			var items []*Item
 			items, err = f.Fetch()
 			if err != nil {
