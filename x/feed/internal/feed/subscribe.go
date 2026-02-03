@@ -13,6 +13,9 @@ import (
 	"github.com/skhal/lab/x/feed/internal/pb"
 )
 
+const fetchDelay = 5 * time.Millisecond
+const maxPendingSize = 10
+
 // Feed is a stream of RSS, Atom, etc. feed items.
 type Feed <-chan *Item
 
@@ -66,8 +69,6 @@ func (s *subscription) run() error {
 	return nil
 }
 
-const fetchDelay = 5 * time.Millisecond
-
 func (s *subscription) streamFeed(f Fetcher) Feed {
 	stream := make(chan *Item)
 	go func() {
@@ -93,7 +94,9 @@ func (s *subscription) streamFeed(f Fetcher) Feed {
 			if next.After(time.Now()) {
 				delay = time.Until(next)
 			}
-			fetch = time.After(delay)
+			if len(pending) < maxPendingSize {
+				fetch = time.After(delay)
+			}
 			select {
 			case errc := <-s.stop:
 				errc <- err
