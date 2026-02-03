@@ -17,6 +17,8 @@ func Merge(subs []Subscription) Subscription {
 
 type multiplexer struct {
 	subs []Subscription
+	feed Feed
+	once sync.Once
 }
 
 func newMultiplexer(subs []Subscription) *multiplexer {
@@ -27,6 +29,11 @@ func newMultiplexer(subs []Subscription) *multiplexer {
 
 // Feed multiplexes multiple subscription feeds into a single feed.
 func (mux *multiplexer) Feed() (Feed, error) {
+	mux.once.Do(func() { mux.merge() })
+	return mux.feed, nil
+}
+
+func (mux *multiplexer) merge() {
 	stream := make(chan *Item)
 	go func() {
 		defer close(stream)
@@ -48,7 +55,7 @@ func (mux *multiplexer) Feed() (Feed, error) {
 			})
 		}
 	}()
-	return Feed(stream), nil
+	mux.feed = Feed(stream)
 }
 
 // Close stops multiplexed subscriptions. It returns a joined error from failed
