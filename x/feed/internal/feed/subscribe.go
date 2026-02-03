@@ -7,6 +7,7 @@ package feed
 
 import (
 	"fmt"
+	"sync"
 
 	"github.com/skhal/lab/x/feed/internal/pb"
 )
@@ -29,27 +30,39 @@ func Subscribe(f *pb.Feed) Subscription {
 }
 
 type subscription struct {
-	feed *pb.Feed
+	cfg  *pb.Feed
+	feed Feed
 	done chan struct{}
+	once sync.Once
 }
 
 func newSubscription(f *pb.Feed) *subscription {
 	return &subscription{
-		feed: f,
+		cfg:  f,
 		done: make(chan struct{}),
 	}
 }
 
 // Feed starts a stream of feed items or returns an error if it fails.
 func (s *subscription) Feed() (Feed, error) {
-	if !s.feed.GetSource().HasSource() {
-		return nil, fmt.Errorf("subscribe %s: missing source", s.feed)
+	var err error
+	s.once.Do(func() { err = s.run() })
+	return s.feed, err
+}
+
+func (s *subscription) run() error {
+	if s.feed != nil {
+		return fmt.Errorf("already running")
 	}
-	items, err := Fetch(s.feed.GetSource())
+	if !s.cfg.GetSource().HasSource() {
+		return fmt.Errorf("subscribe %s: missing source", s.cfg)
+	}
+	items, err := Fetch(s.cfg.GetSource())
 	if err != nil {
-		return nil, err
+		return err
 	}
-	return s.streamItems(items), nil
+	s.feed = s.streamItems(items)
+	return nil
 }
 
 // Close stops the subscription and closes the feed.
@@ -75,5 +88,5 @@ func (s *subscription) streamItems(items []*Item) Feed {
 
 // String implements fmt.Stringer interface.
 func (s *subscription) String() string {
-	return s.feed.String()
+	return s.cfg.String()
 }
