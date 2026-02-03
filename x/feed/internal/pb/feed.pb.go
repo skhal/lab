@@ -394,10 +394,6 @@ func (x *Source) WhichSource() case_Source_Source {
 type Source_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
-	// Source
-	//
-	// Next ID: 3
-
 	// Fields of oneof xxx_hidden_Source:
 	// File defines a local feed, stored in a file.
 	File *string

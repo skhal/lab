@@ -46,6 +46,10 @@ func (s *subscription) Feed() (Feed, error) {
 	if err != nil {
 		return nil, err
 	}
+	return s.streamItems(items), nil
+}
+
+func (s *subscription) streamItems(items []*Item) Feed {
 	stream := make(chan *Item)
 	go func() {
 		defer close(stream)
@@ -53,7 +57,7 @@ func (s *subscription) Feed() (Feed, error) {
 			stream <- item
 		}
 	}()
-	return Feed(stream), nil
+	return Feed(stream)
 }
 
 // String implements fmt.Stringer interface.
@@ -84,10 +88,8 @@ func (smux *multiplexer) Feed() (Feed, error) {
 		var wg sync.WaitGroup
 		defer wg.Wait()
 		for _, sub := range smux.subs {
-			sub := sub
 			feed, err := sub.Feed()
 			if err != nil {
-				// TODO: report error
 				continue
 			}
 			wg.Go(func() {

@@ -35,9 +35,6 @@ message Feed {
 //
 // Next ID: 4
 message Source {
-  // Source
-  //
-  // Next ID: 3
   oneof source {
     // File defines a local feed, stored in a file.
     string file = 1;

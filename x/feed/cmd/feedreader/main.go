@@ -53,14 +53,14 @@ func mustParseFlags() string {
 }
 
 func run(name string) error {
-	feeds, err := load(name)
+	feeds, err := readConfig(name)
 	if err != nil {
 		return err
 	}
-	return read(feeds)
+	return readFeeds(feeds)
 }
 
-func load(name string) (*pb.FeedSet, error) {
+func readConfig(name string) (*pb.FeedSet, error) {
 	b, err := os.ReadFile(name)
 	if err != nil {
 		return nil, err
@@ -72,26 +72,33 @@ func load(name string) (*pb.FeedSet, error) {
 	return fset, nil
 }
 
-func read(feeds *pb.FeedSet) error {
-	subs := make([]feed.Subscription, 0, len(feeds.GetFeeds()))
-	for _, f := range feeds.GetFeeds() {
-		subs = append(subs, feed.Subscribe(f))
-	}
-	sub := feed.Merge(subs)
-	stream, err := sub.Feed()
+func readFeeds(feeds *pb.FeedSet) error {
+	f, err := subscribe(feeds).Feed()
 	if err != nil {
 		return err
 	}
+	readFeed(f)
+	return nil
+}
+
+func readFeed(f feed.Feed) {
 	var wg sync.WaitGroup
 	defer wg.Wait()
 	wg.Go(func() {
-		for item := range stream {
+		for item := range f {
 			// emulate delay
 			time.Sleep(time.Duration(rand.Intn(10)) * time.Millisecond)
 			fmt.Printf("%s\n", (*printableItem)(item))
 		}
 	})
-	return nil
+}
+
+func subscribe(feeds *pb.FeedSet) feed.Subscription {
+	subs := make([]feed.Subscription, 0, len(feeds.GetFeeds()))
+	for _, f := range feeds.GetFeeds() {
+		subs = append(subs, feed.Subscribe(f))
+	}
+	return feed.Merge(subs)
 }
 
 type printableItem feed.Item

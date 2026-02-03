@@ -45,20 +45,20 @@ func newFileFetcher(name string) *fileFetcher {
 }
 
 // Fetch retrieves feed items from the file.
-func (ftch *fileFetcher) Fetch() ([]*Item, error) {
-	n, err := expand(ftch.file)
+func (fetcher *fileFetcher) Fetch() ([]*Item, error) {
+	name, err := expand(fetcher.file)
 	if err != nil {
 		return nil, err
 	}
-	file, err := os.Open(n)
+	file, err := os.Open(name)
 	if err != nil {
 		return nil, err
 	}
 	defer file.Close()
-	p := gofeed.NewParser()
-	feed, err := p.Parse(file)
+	parser := gofeed.NewParser()
+	feed, err := parser.Parse(file)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("fetch %s: %w", fetcher.file, err)
 	}
 	return transform(feed.Items), nil
 }
@@ -72,9 +72,9 @@ func expand(name string) (string, error) {
 	return filepath.Clean(expanded), nil
 }
 
-func transform(s []*gofeed.Item) []*Item {
-	ii := make([]*Item, 0, len(s))
-	for _, item := range s {
+func transform(items []*gofeed.Item) []*Item {
+	ii := make([]*Item, 0, len(items))
+	for _, item := range items {
 		ii = append(ii, &Item{
 			Title:     item.Title,
 			Updated:   item.UpdatedParsed,
