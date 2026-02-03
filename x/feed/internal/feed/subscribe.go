@@ -13,7 +13,7 @@ import (
 	"github.com/skhal/lab/x/feed/internal/pb"
 )
 
-const fetchDelay = 5 * time.Millisecond
+const fetchBackoffDelay = 5 * time.Millisecond
 const maxPendingSize = 10
 
 // Feed is a stream of RSS, Atom, etc. feed items.
@@ -77,10 +77,10 @@ func (s *subscription) streamFeed(f Fetcher) Feed {
 			pending []*Item
 			err     error
 		)
-		var next time.Time
+		var nextFetch time.Time
 		for {
 			var (
-				send chan *Item
+				send chan<- *Item
 				item *Item
 			)
 			if len(pending) > 0 {
@@ -88,25 +88,25 @@ func (s *subscription) streamFeed(f Fetcher) Feed {
 				item = pending[0]
 			}
 			var (
-				fetch <-chan time.Time
-				delay time.Duration
+				fetchTime  <-chan time.Time
+				fetchDelay time.Duration
 			)
-			if next.After(time.Now()) {
-				delay = time.Until(next)
+			if nextFetch.After(time.Now()) {
+				fetchDelay = time.Until(nextFetch)
 			}
 			if len(pending) < maxPendingSize {
-				fetch = time.After(delay)
+				fetchTime = time.After(fetchDelay)
 			}
 			select {
 			case errc := <-s.stop:
 				errc <- err
 				close(errc)
 				return
-			case <-fetch:
+			case <-fetchTime:
 				var items []*Item
 				items, err = f.Fetch()
 				if err != nil {
-					next = time.Now().Add(fetchDelay)
+					nextFetch = time.Now().Add(fetchBackoffDelay)
 					break
 				}
 				pending = append(pending, items...)
