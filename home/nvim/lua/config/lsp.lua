@@ -11,6 +11,10 @@ vim.lsp.enable("protols") -- NOLINT
 vim.lsp.enable("typos_lsp")
 -- keep-sorted end
 
+vim.diagnostic.config({
+	float = { border = "rounded" },
+})
+
 vim.api.nvim_create_autocmd("LspAttach", {
 	callback = function(_)
 		vim.keymap.set("n", "gK", function()
