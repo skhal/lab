@@ -34,6 +34,7 @@ type subscription struct {
 	feed Feed
 	done chan struct{}
 	once sync.Once
+	err  error
 }
 
 func newSubscription(f *pb.Feed) *subscription {
@@ -41,6 +42,11 @@ func newSubscription(f *pb.Feed) *subscription {
 		cfg:  f,
 		done: make(chan struct{}),
 	}
+}
+
+// Err returns last fetch error if any.
+func (s *subscription) Err() error {
+	return s.err
 }
 
 // Feed starts a stream of feed items or returns an error if it fails.
@@ -61,33 +67,36 @@ func (s *subscription) run() error {
 	if err != nil {
 		return err
 	}
-	items, err := fetcher.Fetch()
-	if err != nil {
-		return err
-	}
-	s.feed = s.streamItems(items)
+	s.feed = s.streamFeed(fetcher)
 	return nil
+}
+
+func (s *subscription) streamFeed(f Fetcher) Feed {
+	stream := make(chan *Item)
+	go func() {
+		defer close(stream)
+		for {
+			items, err := f.Fetch()
+			if err != nil {
+				s.err = err
+				break
+			}
+			for _, item := range items {
+				select {
+				case stream <- item:
+				case <-s.done:
+					return
+				}
+			}
+		}
+	}()
+	return stream
 }
 
 // Close stops the subscription and closes the feed.
 func (s *subscription) Close() error {
 	close(s.done)
 	return nil
-}
-
-func (s *subscription) streamItems(items []*Item) Feed {
-	stream := make(chan *Item)
-	go func() {
-		defer close(stream)
-		for _, item := range items {
-			select {
-			case stream <- item:
-			case <-s.done:
-				return
-			}
-		}
-	}()
-	return Feed(stream)
 }
 
 // String implements fmt.Stringer interface.
