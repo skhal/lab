@@ -29,12 +29,14 @@ gazelle(
 # gazelle:exclude home
 # gazelle:exclude toolchain
 # gazelle:exclude vim
-# gazelle:exclude x
 # gazelle:resolve cc gtest/gtest.h @googletest//:gtest_main
 # keep-sorted end
 
 # https://github.com/hedronvision/bazel-compile-commands-extractor?tab=readme-ov-file
 refresh_compile_commands(
     name = "refresh_compile_commands",
-    targets = ["//iq/..."],
+    targets = [
+        "//iq/...",
+        "//x/abseil/...",
+    ],
 )
