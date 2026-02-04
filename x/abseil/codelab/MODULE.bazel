@@ -1,9 +1,0 @@
-# Copyright 2026 Samvel Khalatyan. All rights reserved.
-#
-# Use of this source code is governed by a BSD-style
-# license that can be found in the LICENSE file.
-
-bazel_dep(name = "rules_cc", version = "0.2.9")
-
-# Reference: https://abseil.io/docs/cpp/quickstart
-bazel_dep(name = "abseil-cpp", version = "20250814.1")
