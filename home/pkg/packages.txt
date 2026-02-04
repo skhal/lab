@@ -37,6 +37,7 @@ protobuf
 protobuf-go
 py311-pre-commit
 python
+ripgrep
 rsync
 rust
 tmux
