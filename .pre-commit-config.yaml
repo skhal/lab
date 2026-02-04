@@ -57,7 +57,7 @@ repos:
     language: system
     stages: [pre-commit]
     exclude_types: [json]
-    exclude: "(MODULE\\.bazel\\.lock|go\\.(mod|sum)|.*/(test)?data/.*|_string.go$|.pb.go$|\\.diff$|\\.patch$|home/vim/templates/skel.*$)"
+    exclude: "(MODULE\\.bazel\\.lock|go\\.(mod|sum)|.*/(test)?data/.*|_string.go$|.pb.go$|\\.diff$|\\.patch$|home/vim/templates/skel.*$|nvim/plugin/lab-skeleton/share/new.*$)"
   - id: check-nosubmit
     name: "No-submit is not set"
     entry: check-nosubmit
@@ -73,12 +73,14 @@ repos:
     language: system
     types_or: [c++, c]
     args: ["-style=file"]
+    exclude: "^nvim/plugin/lab-skeleton/share/"
   - id: clang-tidy
     name: "Tidy C/C++"
     entry: clang-tidy21
     language: system
     types_or: [c++, c]
     args: ["--fix"]
+    exclude: "^nvim/plugin/lab-skeleton/share/"
   - id: goimports
     name: "Fix Go imports"
     entry: goimports
