@@ -24,6 +24,7 @@ gazelle(
 # keep-sorted start
 # gazelle:cc_group unit
 # gazelle:exclude cluster
+# gazelle:exclude nvim
 # gazelle:exclude freebsd
 # gazelle:exclude home
 # gazelle:exclude toolchain
