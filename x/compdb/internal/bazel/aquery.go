@@ -8,8 +8,10 @@
 package bazel
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
+	"os"
 	"os/exec"
 )
 
@@ -17,7 +19,7 @@ const bazelCommand = "bazel"
 
 // ActionSet is the actions graph.
 //
-// Ref: https://github.com/bazelbuild/bazel/blob/e2cf1361d07a4e6ecdf241addbe2891111cf08b4/src/main/protobuf/analysis_v2.proto#L25
+// Ref: https://github.com/bazelbuild/bazel/blob/e2cf1361d07a4e6ecdf241addbe2891111cf08b4/src/main/protobuf/analysis_v2.proto#L25 -- NOLINT
 type ActionSet struct {
 	Actions []*Action // All actions in the graph.
 }
@@ -30,12 +32,14 @@ type Action struct {
 // Aquery runs an actions query (aquery) for a given target.
 func Aquery(target string) (*ActionSet, error) {
 	cmd := exec.Command(bazelCommand, newArgs(target)...)
-	b, err := cmd.CombinedOutput()
-	if err != nil {
+	cmd.Stderr = os.Stderr
+	b := new(bytes.Buffer)
+	cmd.Stdout = b
+	if err := cmd.Run(); err != nil {
 		return nil, err
 	}
 	aset := new(ActionSet)
-	if err := json.Unmarshal(b, aset); err != nil {
+	if err := json.Unmarshal(b.Bytes(), aset); err != nil {
 		return nil, err
 	}
 	return aset, nil
@@ -64,7 +68,7 @@ var standardArgs = []string{
 }
 
 func newArgs(target string) []string {
-	// Ref: https://github.com/redpanda-data/redpanda/blob/70d49ac8d266e832acf805d718b5df634b58ae94/bazel/compilation_database_generator/main.go#L158
+	// Ref: https://github.com/redpanda-data/redpanda/blob/70d49ac8d266e832acf805d718b5df634b58ae94/bazel/compilation_database_generator/main.go#L158 -- NOLINT
 	return append([]string{
 		"aquery",
 		fmt.Sprintf(`mnemonic('CppCompile',deps(%s))`, target),
