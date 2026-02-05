@@ -712,6 +712,12 @@ package test`,
 			want: check.ErrLongComment,
 		},
 		{
+			name: "long comment nolint",
+			code: `
+// "Doc comments" are comments that appear immediately before top-level package, const, func, type, and var declarations with no intervening newlines. Every exported (capitalized) name should have a doc comment. -- NOLINT
+package test`,
+		},
+		{
 			name: "long multiline comment",
 			code: `
 // "Doc comments" are comments that appear immediately before top-level

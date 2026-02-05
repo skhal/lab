@@ -17,7 +17,12 @@ import (
 	"strings"
 )
 
-const maxLineLength = 80
+const (
+	// keep-sorted start
+	maxLineLength = 80
+	nolint        = "NOLINT"
+	// keep-sorted end
+)
 
 // CheckFile verifies that non-generated Go file has documentation attached to
 // the exported declarations. It returns an error if the check fails.
@@ -306,7 +311,7 @@ func checkComment(fs *token.FileSet, c *ast.Comment) error {
 	)
 	var ee []error
 	for line := range strings.Lines(c.Text) {
-		if len(line) > maxLineLength {
+		if len(line) > maxLineLength && !hasNolint(line) {
 			pos := fs.Position(f.Pos(int(c.Pos()) + offset))
 			err := fmt.Errorf("%s: %w: beyond %d chars (%d)", pos, ErrLongComment, maxLineLength, len(c.Text))
 			ee = append(ee, err)
@@ -314,4 +319,8 @@ func checkComment(fs *token.FileSet, c *ast.Comment) error {
 		offset += len(line)
 	}
 	return errors.Join(ee...)
+}
+
+func hasNolint(line string) bool {
+	return strings.HasSuffix(line, nolint)
 }
