@@ -86,7 +86,9 @@ local registrations = {
 	go = {
 		find = function(file, _)
 			local f = "new.go"
-			if file:find("_test%.go$") ~= nil then
+			if file:find("main%.go$") ~= nil then
+				f = "new_main.go"
+			elseif file:find("_test%.go$") ~= nil then
 				f = "new_test.go"
 			end
 			return f

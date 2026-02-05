@@ -39,13 +39,14 @@ repos:
     language: system
     types_or: [go]
     pass_filenames: true
+    exclude: "nvim/plugin/lab-skeleton/share/new.*$"
   - id: check-godoc
     name: "Go documentation"
     entry: check-godoc
     language: system
     types_or: [go]
     pass_filenames: true
-    exclude: "testdata"
+    exclude: "(testdata|nvim/plugin/lab-skeleton/share/new.*$)"
   - id: check-issue
     name: "Issue is set"
     entry: check-issue
@@ -86,7 +87,7 @@ repos:
     entry: goimports
     language: system
     types_or: [go]
-    exclude: ".pb.go$"
+    exclude: "(.pb.go$|nvim/plugin/lab-skeleton/share/new.*$)"
     args: ["-w"]
   - id: html-format
     name: "Format HTML"
