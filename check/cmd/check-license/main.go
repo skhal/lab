@@ -17,8 +17,6 @@ import (
 	"github.com/skhal/lab/check/cmd/check-license/internal/license"
 )
 
-const argsLen = 1
-
 func init() {
 	flag.Usage = func() {
 		header := func() string {
