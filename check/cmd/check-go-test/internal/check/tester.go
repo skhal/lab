@@ -14,6 +14,7 @@ import (
 	"fmt"
 	"io"
 	"iter"
+	"os"
 	"os/exec"
 	"path/filepath"
 
@@ -24,11 +25,14 @@ import (
 // EventID identifies an Event. It includes the Event's package and test names.
 type EventID string
 
+// Even is a single item output by Go test command. It is either a build or
+// test event.
 type Event struct {
-	BuildEvent *build.Event
-	TestEvent  *test.TestEvent
+	BuildEvent *build.Event    // building output (go help buildjson)
+	TestEvent  *test.TestEvent // testing output (go doc test2json)
 }
 
+// Fail returns true if the event represents ActionFail.
 func (e *Event) Fail() bool {
 	if e.BuildEvent != nil && e.BuildEvent.Action == build.ActionFail {
 		return true
@@ -59,6 +63,7 @@ func (t *Tester) Test(pkg string) error {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	cmd := exec.CommandContext(ctx, "go", "test", "-json", "-vet=all", pkg)
+	cmd.Stderr = os.Stderr
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
 		return err
@@ -98,8 +103,10 @@ var (
 	buildEventMarker = []byte(`"Action":"build-`)
 )
 
+// ErrNotJSON means the output line was not a JSON object.
 var ErrNotJSON = errors.New("not JSON")
 
+// JSONUnmarshal decodes b into a build or test event.
 func JSONUnmarshal(b []byte) (*Event, error) {
 	// Build output may include non-JSON lines `go help buildjson`
 	if !bytes.HasPrefix(b, jsonPrefix) {
@@ -170,10 +177,10 @@ func newEventIDFromTestEvent(e *test.TestEvent) EventID {
 // FailedTest holds failed test package, name and output of `go test` for a
 // given test.
 type FailedTest struct {
-	Package string
-	Test    string
+	Package string // package name of the test source.
+	Test    string // test name
 
-	Output []byte
+	Output []byte // test output
 }
 
 func newFailedTest(ee []*Event) *FailedTest {
