@@ -11,6 +11,9 @@ conform.setup({
 		["clang-format"] = {
 			command = "clang-format21",
 		},
+		["shfmt"] = {
+			append_args = { "-bn", "-ci", "-p" },
+		},
 		["txtpbfmt"] = {
 			meta = {
 				url = "https://github.com/protocolbuffers/txtpbfmt",
