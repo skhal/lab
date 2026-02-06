@@ -29,19 +29,15 @@ type Command struct {
 
 // Run generates a compilation database for a list of targets.
 func Run(targets []string) error {
-	var commands []*Command
-	for _, t := range targets {
-		cc, err := genCommands(t)
-		if err != nil {
-			return err
-		}
-		commands = append(commands, cc...)
+	commands, err := genCommands(targets)
+	if err != nil {
+		return err
 	}
 	return Print(commands)
 }
 
-func genCommands(target string) ([]*Command, error) {
-	aset, err := bazel.Aquery(target)
+func genCommands(targets []string) ([]*Command, error) {
+	aset, err := bazel.Aquery(targets)
 	if err != nil {
 		return nil, err
 	}

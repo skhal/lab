@@ -13,6 +13,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"strings"
 )
 
 const bazelCommand = "bazel"
@@ -29,9 +30,9 @@ type Action struct {
 	Arguments []string // A command associated with the action.
 }
 
-// Aquery runs an actions query (aquery) for a given target.
-func Aquery(target string) (*ActionSet, error) {
-	cmd := exec.Command(bazelCommand, newArgs(target)...)
+// Aquery runs an actions query (aquery) for targets.
+func Aquery(targets []string) (*ActionSet, error) {
+	cmd := exec.Command(bazelCommand, newArgs(targets)...)
 	cmd.Stderr = os.Stderr
 	b := new(bytes.Buffer)
 	cmd.Stdout = b
@@ -67,10 +68,19 @@ var standardArgs = []string{
 	"--host_features=-layering_check",
 }
 
-func newArgs(target string) []string {
+func newArgs(targets []string) []string {
 	// Ref: https://github.com/redpanda-data/redpanda/blob/70d49ac8d266e832acf805d718b5df634b58ae94/bazel/compilation_database_generator/main.go#L158 -- NOLINT
 	return append([]string{
 		"aquery",
-		fmt.Sprintf(`mnemonic('CppCompile',deps(%s))`, target),
+		fmt.Sprintf(`mnemonic('CppCompile',%s)`, unionDeps(targets)),
 	}, standardArgs...)
+}
+
+func unionDeps(targets []string) string {
+	tt := make([]string, 0, len(targets))
+	for _, t := range targets {
+		tt = append(tt, fmt.Sprintf("deps(%s)", t))
+	}
+	// Use "+" instead of "union" to shorten args
+	return strings.Join(tt, " + ")
 }
