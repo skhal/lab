@@ -6,11 +6,11 @@
 # license that can be found in the LICENSE file.
 
 bazel run :gazelle
-bazel run :refresh_compile_commands
 
-sed \
-  -i'' \
-  -e 's,"/usr/bin/clang-21","/usr/local/bin/clang21",' \
-  -e 's,"/usr/lib/llvm-21","/usr/local/llvm21",' \
-  -e "s,\"external/abseil-cpp+\",\"$(readlink ./external/abseil-cpp+)\"," \
-  compile_commands.json
+{
+  compdb //iq/... //x/abseil/... \
+    | sed \
+      -e 's,"/usr/bin/clang-21","/usr/local/bin/clang21",' \
+      -e 's,"/usr/lib/llvm-21","/usr/local/llvm21",' \
+      -e "s,\"external/abseil-cpp+\",\"$(readlink ./external/abseil-cpp+)\","
+} >compile_commands.json

@@ -4,10 +4,6 @@
 # license that can be found in the LICENSE file.
 
 load("@gazelle//:def.bzl", "gazelle", "gazelle_binary")
-load(
-    "@hedron_compile_commands//:refresh_compile_commands.bzl",
-    "refresh_compile_commands",
-)
 
 gazelle_binary(
     name = "gazelle_cc",
@@ -31,12 +27,3 @@ gazelle(
 # gazelle:exclude vim
 # gazelle:resolve cc gtest/gtest.h @googletest//:gtest_main
 # keep-sorted end
-
-# https://github.com/hedronvision/bazel-compile-commands-extractor?tab=readme-ov-file
-refresh_compile_commands(
-    name = "refresh_compile_commands",
-    targets = [
-        "//iq/...",
-        "//x/abseil/...",
-    ],
-)
