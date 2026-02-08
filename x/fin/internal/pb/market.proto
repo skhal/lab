@@ -1,0 +1,37 @@
+// Copyright 2026 Samvel Khalatyan. All rights reserved.
+//
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
+edition = "2023";
+
+package x.fin.internal;
+
+import "google/protobuf/go_features.proto";
+
+option features.(.pb.go).api_level = API_OPAQUE;
+option go_package = "github.com/skhal/lab/x/fin/internal/pb";
+
+message Market {
+  repeated Record records = 1;
+}
+
+message Record {
+  Date date = 1;
+  Quote quote = 2;
+}
+
+message Date {
+  int32 year = 1;
+  int32 month = 2;
+}
+
+message Quote {
+  Cents sp_composite = 1;
+  Cents dividend = 2;
+  Cents earnings = 3;
+}
+
+message Cents {
+  int32 cents = 1;
+}
