@@ -127,6 +127,11 @@ repos:
     entry: "Binaries are not allowed"
     language: fail
     types_or: [binary]
+  - id: proto-doc
+    name: "Validate Protobuf documentation"
+    entry: check-pbcomment
+    language: system
+    types_or: [proto]
   - id: proto-format
     name: "Format Protocol buffers"
     entry: clang-format21 -i
