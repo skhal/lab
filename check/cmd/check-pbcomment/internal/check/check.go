@@ -40,19 +40,44 @@ func checkFileNode(f *ast.FileNode) error {
 }
 
 func checkFileElement(f *ast.FileNode, fe ast.FileElement) error {
-	checkLeadingComments := func(n ast.Node, prefix func() string) error {
-		if ni := f.NodeInfo(n); ni.LeadingComments().Len() == 0 {
-			return fmt.Errorf("%s %s: missing comment", ni.Start(), prefix())
-		}
-		return nil
-	}
 	switch n := fe.(type) {
 	case *ast.EnumNode:
-		prefix := func() string { return fmt.Sprintf("enum %s", n.Name.Val) }
-		return checkLeadingComments(n, prefix)
+		return checkEnumNode(f, n)
 	case *ast.MessageNode:
-		prefix := func() string { return fmt.Sprintf("message %s", n.Name.Val) }
-		return checkLeadingComments(n, prefix)
+		return checkMessageNode(f, n)
+	}
+	return nil
+}
+
+func checkEnumNode(f *ast.FileNode, e *ast.EnumNode) error {
+	prefix := func() string { return fmt.Sprintf("enum %s", e.Name.Val) }
+	return checkLeadingComments(f, e, prefix)
+}
+
+func checkMessageNode(f *ast.FileNode, m *ast.MessageNode) error {
+	var ee []error
+	prefix := func() string { return fmt.Sprintf("message %s", m.Name.Val) }
+	if err := checkLeadingComments(f, m, prefix); err != nil {
+		ee = append(ee, err)
+	}
+	for _, c := range m.Children() {
+		switch n := c.(type) {
+		case *ast.EnumNode:
+			if err := checkEnumNode(f, n); err != nil {
+				ee = append(ee, err)
+			}
+		case *ast.MessageNode:
+			if err := checkMessageNode(f, n); err != nil {
+				ee = append(ee, err)
+			}
+		}
+	}
+	return errors.Join(ee...)
+}
+
+func checkLeadingComments(f *ast.FileNode, n ast.Node, prefix func() string) error {
+	if ni := f.NodeInfo(n); ni.LeadingComments().Len() == 0 {
+		return fmt.Errorf("%s %s: missing comment", ni.Start(), prefix())
 	}
 	return nil
 }

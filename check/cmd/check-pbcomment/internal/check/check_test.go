@@ -57,6 +57,54 @@ enum Test {}
 `,
 			wantErr: true,
 		},
+		{
+			name: "nested message with comment",
+			s: `
+edition = "2024";
+package test;
+// foo comment
+message Foo {
+	// test comment
+	message Test {}
+}
+`,
+		},
+		{
+			name: "nested message no comment",
+			s: `
+edition = "2024";
+package test;
+// foo comment
+message Foo {
+	message Test {}
+}
+`,
+			wantErr: true,
+		},
+		{
+			name: "nested enum with comment",
+			s: `
+edition = "2024";
+package test;
+// foo comment
+message Foo {
+	// test comment
+	enum Test {}
+}
+`,
+		},
+		{
+			name: "nested enum no comment",
+			s: `
+edition = "2024";
+package test;
+// foo comment
+message Foo {
+	enum Test {}
+}
+`,
+			wantErr: true,
+		},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
