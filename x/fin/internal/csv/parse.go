@@ -53,6 +53,9 @@ const (
 func ParseDate(s string) (d *pb.Date, err error) {
 	defer func() {
 		if err != nil {
+			if s == "" {
+				s = "<empty>"
+			}
 			err = fmt.Errorf("parse %s: invalid date, %s", s, err)
 		}
 	}()
@@ -123,6 +126,9 @@ func (p centsParser) Parse(row []string, cell cell) error {
 	s := row[cell.col]
 	c, err := ParseCents(s)
 	if err != nil {
+		if s == "" {
+			s = "<empty>"
+		}
 		err = fmt.Errorf("parse %s: invalid %s, %s", cell.name, s, err)
 		return err
 	}
