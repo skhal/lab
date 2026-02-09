@@ -79,7 +79,11 @@ func parseFile(file string) (*pb.Market, error) {
 			fmt.Fprintln(os.Stderr, err)
 		}
 	}()
-	return csv.Read(f)
+	m, err := csv.Read(f)
+	if err != nil {
+		return nil, fmt.Errorf("%s:%s", file, err)
+	}
+	return m, nil
 }
 
 func writeFile(m *pb.Market, name string) error {
