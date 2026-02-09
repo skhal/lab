@@ -70,15 +70,23 @@ func parseFlags() (ifile, ofile string, err error) {
 }
 
 func parseFile(file string) (*pb.Market, error) {
-	f, err := os.Open(file)
-	if err != nil {
-		return nil, err
-	}
-	defer func() {
-		if err := f.Close(); err != nil {
-			fmt.Fprintln(os.Stderr, err)
+	const stdin = "-"
+	var f *os.File
+	if file == stdin {
+		file = "/dev/stdin"
+		f = os.Stdin
+	} else {
+		var err error
+		f, err = os.Open(file)
+		if err != nil {
+			return nil, err
 		}
-	}()
+		defer func() {
+			if err := f.Close(); err != nil {
+				fmt.Fprintln(os.Stderr, err)
+			}
+		}()
+	}
 	m, err := csv.Read(f)
 	if err != nil {
 		return nil, fmt.Errorf("%s:%s", file, err)
