@@ -50,8 +50,25 @@ func checkFileElement(f *ast.FileNode, fe ast.FileElement) error {
 }
 
 func checkEnumNode(f *ast.FileNode, e *ast.EnumNode) error {
+	var ee []error
 	prefix := func() string { return fmt.Sprintf("enum %s", e.Name.Val) }
-	return checkLeadingComments(f, e, prefix)
+	if err := checkLeadingComments(f, e, prefix); err != nil {
+		ee = append(ee, err)
+	}
+	for _, c := range e.Children() {
+		switch n := c.(type) {
+		case *ast.EnumValueNode:
+			if err := checkEnumValueNode(f, n); err != nil {
+				ee = append(ee, err)
+			}
+		}
+	}
+	return errors.Join(ee...)
+}
+
+func checkEnumValueNode(f *ast.FileNode, n *ast.EnumValueNode) error {
+	prefix := func() string { return fmt.Sprintf("enumerator %s", n.Name.Val) }
+	return checkLeadingComments(f, n, prefix)
 }
 
 func checkMessageNode(f *ast.FileNode, m *ast.MessageNode) error {

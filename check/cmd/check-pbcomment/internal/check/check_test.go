@@ -82,6 +82,30 @@ enum Test {}
 			wantErr: true,
 		},
 		{
+			name: "enumerator with comment",
+			s: `
+edition = "2024";
+package test;
+// foo comment
+enum Foo {
+	// test comment
+	FOO_TEST = 1;
+}
+`,
+		},
+		{
+			name: "enumerator no comment",
+			s: `
+edition = "2024";
+package test;
+// foo comment
+enum Foo {
+	FOO_TEST = 1;
+}
+`,
+			wantErr: true,
+		},
+		{
 			name: "nested message with comment",
 			s: `
 edition = "2024";
@@ -155,6 +179,36 @@ package test;
 // foo comment
 message Foo {
 	enum Test {}
+}
+`,
+			wantErr: true,
+		},
+		{
+			name: "nested enum enumerator with comment",
+			s: `
+edition = "2024";
+package test;
+// foo comment
+message Foo {
+	// bar comment
+	enum Bar {
+		// test comment
+		BAR_TEST = 1;
+	}
+}
+`,
+		},
+		{
+			name: "nested enum enumerator no comment",
+			s: `
+edition = "2024";
+package test;
+// foo comment
+message Foo {
+	// bar comment
+	enum Bar {
+		BAR_TEST = 1;
+	}
 }
 `,
 			wantErr: true,
