@@ -66,6 +66,10 @@ func checkMessageNode(f *ast.FileNode, m *ast.MessageNode) error {
 			if err := checkEnumNode(f, n); err != nil {
 				ee = append(ee, err)
 			}
+		case *ast.FieldNode:
+			if err := checkFieldNode(f, n); err != nil {
+				ee = append(ee, err)
+			}
 		case *ast.MessageNode:
 			if err := checkMessageNode(f, n); err != nil {
 				ee = append(ee, err)
@@ -73,6 +77,11 @@ func checkMessageNode(f *ast.FileNode, m *ast.MessageNode) error {
 		}
 	}
 	return errors.Join(ee...)
+}
+
+func checkFieldNode(f *ast.FileNode, n *ast.FieldNode) error {
+	prefix := func() string { return fmt.Sprintf("field %s", n.Name.Val) }
+	return checkLeadingComments(f, n, prefix)
 }
 
 func checkLeadingComments(f *ast.FileNode, n ast.Node, prefix func() string) error {

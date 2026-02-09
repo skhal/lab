@@ -40,6 +40,30 @@ message Test {}
 			wantErr: true,
 		},
 		{
+			name: "message field with comment",
+			s: `
+edition = "2024";
+package test;
+// foo comment
+message Foo {
+	// test comment
+	string test = 1;
+}
+`,
+		},
+		{
+			name: "message field no comment",
+			s: `
+edition = "2024";
+package test;
+// foo comment
+message Foo {
+	string test = 1;
+}
+`,
+			wantErr: true,
+		},
+		{
 			name: "enum with comment",
 			s: `
 edition = "2024";
@@ -77,6 +101,36 @@ package test;
 // foo comment
 message Foo {
 	message Test {}
+}
+`,
+			wantErr: true,
+		},
+		{
+			name: "nested message field with comment",
+			s: `
+edition = "2024";
+package test;
+// foo comment
+message Foo {
+	// bar comment
+	message Bar {
+		// test comment
+		string test = 1;
+	}
+}
+`,
+		},
+		{
+			name: "nested message field no comment",
+			s: `
+edition = "2024";
+package test;
+// foo comment
+message Foo {
+	// bar comment
+	message Bar {
+		string test = 1;
+	}
 }
 `,
 			wantErr: true,
