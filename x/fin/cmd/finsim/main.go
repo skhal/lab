@@ -20,6 +20,7 @@ import (
 
 	"github.com/skhal/lab/x/fin/internal/fin"
 	"github.com/skhal/lab/x/fin/internal/pb"
+	"github.com/skhal/lab/x/fin/internal/report"
 	"github.com/skhal/lab/x/fin/internal/sim"
 	"github.com/skhal/lab/x/fin/internal/strategy"
 	"google.golang.org/protobuf/proto"
@@ -45,9 +46,8 @@ func run() error {
 		n = max(len(recs)-n, 0)
 		return recs[n:]
 	}
-	s, e := runHoldStrategy(fetchLastN(m.GetRecords(), nmonth))
-	report(s, e)
-	return nil
+	info := runHoldStrategy(fetchLastN(m.GetRecords(), nmonth))
+	return report.Strategy(os.Stdout, info)
 }
 
 func parseFlags() (file string, months int, err error) {
@@ -80,13 +80,12 @@ func readFile(name string) (*pb.Market, error) {
 	return m, nil
 }
 
-func runHoldStrategy(recs []*pb.Record) (start, end sim.Quote) {
-	s := strategy.NewHold(strategy.HoldOptReinvestDiv())
-	return sim.Run(fin.Cents(100), recs, s)
-}
-
-func report(s, e sim.Quote) {
-	fmt.Printf("%s\n", s)
-	fmt.Printf("%s\n", e)
-	fmt.Printf("return: %.2f\n", float64(e.Balance)/float64(s.Balance))
+func runHoldStrategy(recs []*pb.Record) report.StrategyInfo {
+	info := report.StrategyInfo{
+		Name:        "HoldReinvestDiv",
+		Description: "Hold and reinvest dividends",
+	}
+	st := strategy.NewHold(strategy.HoldOptReinvestDiv())
+	info.Start, info.End = sim.Run(fin.Cents(100), recs, st)
+	return info
 }
