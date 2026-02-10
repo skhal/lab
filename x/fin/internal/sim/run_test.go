@@ -17,8 +17,8 @@ import (
 
 func TestRun(t *testing.T) {
 	type want struct {
-		start sim.Quote
-		end   sim.Quote
+		start fin.Quote
+		end   fin.Quote
 	}
 	tests := []struct {
 		name     string
@@ -38,8 +38,8 @@ func TestRun(t *testing.T) {
 			},
 			strategy: new(flipStrategy),
 			want: want{
-				start: sim.Quote{Date: newTime(t, 2006, time.January), Balance: 123},
-				end:   sim.Quote{Date: newTime(t, 2006, time.February), Balance: -123},
+				start: fin.Quote{Date: newTime(t, 2006, time.January), Balance: 123},
+				end:   fin.Quote{Date: newTime(t, 2006, time.February), Balance: -123},
 			},
 		},
 		{
@@ -51,8 +51,8 @@ func TestRun(t *testing.T) {
 			},
 			strategy: new(flipStrategy),
 			want: want{
-				start: sim.Quote{Date: newTime(t, 2006, time.January), Balance: 123},
-				end:   sim.Quote{Date: newTime(t, 2006, time.March), Balance: 123},
+				start: fin.Quote{Date: newTime(t, 2006, time.January), Balance: 123},
+				end:   fin.Quote{Date: newTime(t, 2006, time.March), Balance: 123},
 			},
 		},
 	}

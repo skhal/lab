@@ -8,7 +8,7 @@ package report
 import (
 	"io"
 
-	"github.com/skhal/lab/x/fin/internal/sim"
+	"github.com/skhal/lab/x/fin/internal/fin"
 )
 
 // StrategyInfo summarizes the results of a strategy. It includes strategy name,
@@ -16,8 +16,8 @@ import (
 type StrategyInfo struct {
 	Name        string    // strategy name
 	Description string    // strategy description
-	Start       sim.Quote // strategy starting quote
-	End         sim.Quote // strategy result
+	Start       fin.Quote // strategy starting quote
+	End         fin.Quote // strategy result
 }
 
 // Strategy generates a report for a single strategy.
