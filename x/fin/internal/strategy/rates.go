@@ -10,14 +10,19 @@ import "github.com/skhal/lab/x/fin/internal/pb"
 // Rate represents generic rate of something, e.g. rate of return.
 type Rate float64
 
+const rateNoChange Rate = 1.
+
 // SPRateOfReturn calculates S&P's rate of return:
 //
 //	SPComposite / SPComposite_prev_month
 func SPRateOfReturn(prev, curr *pb.Record) Rate {
 	psp := float64(prev.GetQuote().GetSpComposite().GetCents())
 	csp := float64(curr.GetQuote().GetSpComposite().GetCents())
-	if psp == 0 {
-		return 0
+	if psp == 0 || csp == 0 {
+		// Since S&P is never equal to 0, a zero value for either previous or
+		// current record indicates a missing record. We can't calculate RoR in
+		// this case and keep the investment intact.
+		return rateNoChange
 	}
 	return Rate(csp / psp)
 }

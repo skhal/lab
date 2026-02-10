@@ -24,29 +24,31 @@ func TestRateOfReturn(t *testing.T) {
 	}{
 		{
 			name: "no change",
-			prev: newRecord(t, time.January, 100, 0),
-			curr: newRecord(t, time.February, 100, 0),
+			prev: newRecord(t, 2006, time.January, 100, 0),
+			curr: newRecord(t, 2006, time.February, 100, 0),
 			want: 1.,
 		},
 		{
 			name: "gain",
-			prev: newRecord(t, time.January, 100, 0),
-			curr: newRecord(t, time.February, 105, 0),
+			prev: newRecord(t, 2006, time.January, 100, 0),
+			curr: newRecord(t, 2006, time.February, 105, 0),
 			want: 1.05,
 		},
 		{
 			name: "loss",
-			prev: newRecord(t, time.January, 100, 0),
-			curr: newRecord(t, time.February, 95, 0),
+			prev: newRecord(t, 2006, time.January, 100, 0),
+			curr: newRecord(t, 2006, time.February, 95, 0),
 			want: 0.95,
 		},
 		{
 			name: "no prev zero return",
-			curr: newRecord(t, time.January, 95, 0),
+			curr: newRecord(t, 2006, time.January, 95, 0),
+			want: 1.,
 		},
 		{
 			name: "no curr zero return",
-			prev: newRecord(t, time.January, 95, 0),
+			prev: newRecord(t, 2006, time.January, 95, 0),
+			want: 1.,
 		},
 	}
 	for _, tc := range tests {
@@ -70,16 +72,16 @@ func TestRateOfDividend(t *testing.T) {
 	}{
 		{
 			name: "no dividend",
-			rec:  newRecord(t, time.January, 100, 0),
+			rec:  newRecord(t, 2006, time.January, 100, 0),
 		},
 		{
 			name: "dividend",
-			rec:  newRecord(t, time.January, 100, 5),
+			rec:  newRecord(t, 2006, time.January, 100, 5),
 			want: 0.05,
 		},
 		{
 			name: "no sp composite zero return",
-			rec:  newRecord(t, time.January, 0, 5),
+			rec:  newRecord(t, 2006, time.January, 0, 5),
 		},
 	}
 	for _, tc := range tests {
@@ -94,13 +96,12 @@ func TestRateOfDividend(t *testing.T) {
 	}
 }
 
-func newRecord(t *testing.T, m time.Month, sp, div int32) *pb.Record {
+func newRecord(t *testing.T, y int32, m time.Month, sp, div int32) *pb.Record {
 	t.Helper()
-	year := int32(2006)
 	month := int32(m)
 	return pb.Record_builder{
 		Date: pb.Date_builder{
-			Year:  &year,
+			Year:  &y,
 			Month: &month,
 		}.Build(),
 		Quote: pb.Quote_builder{
