@@ -81,7 +81,8 @@ func readFile(name string) (*pb.Market, error) {
 }
 
 func runHoldStrategy(recs []*pb.Record) (start, end sim.Quote) {
-	return sim.Run(fin.Cents(100), recs, new(strategy.HoldReinvestDiv))
+	s := strategy.NewHold(strategy.HoldOptReinvestDiv())
+	return sim.Run(fin.Cents(100), recs, s)
 }
 
 func report(s, e sim.Quote) {
