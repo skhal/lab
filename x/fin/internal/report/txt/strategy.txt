@@ -5,7 +5,6 @@
   license that can be found in the LICENSE file.
 */ -}}
 
-Strategy: {{.Description}}
-
-Start: {{template "quote.txt" .Start -}}
-End:   {{template "quote.txt" .End -}}
+{{.Name}} - {{.Description}}
+{{template "quote.txt" .Start -}}
+{{template "quote.txt" .End -}}
