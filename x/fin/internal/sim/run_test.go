@@ -1,0 +1,108 @@
+// Copyright 2026 Samvel Khalatyan. All rights reserved.
+//
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
+package sim_test
+
+import (
+	"testing"
+	"time"
+
+	"github.com/google/go-cmp/cmp"
+	"github.com/skhal/lab/x/fin/internal/fin"
+	"github.com/skhal/lab/x/fin/internal/pb"
+	"github.com/skhal/lab/x/fin/internal/sim"
+)
+
+func TestRun(t *testing.T) {
+	type want struct {
+		start sim.Quote
+		end   sim.Quote
+	}
+	tests := []struct {
+		name     string
+		bal      fin.Cents
+		market   []*pb.Record
+		strategy sim.Strategy
+		want     want
+	}{
+		{
+			name: "empty do nothing",
+		},
+		{
+			name: "one record call strategy",
+			bal:  123,
+			market: []*pb.Record{
+				newRecord(t, newDate(t, 2006, time.January), 2, 3),
+			},
+			strategy: new(flipStrategy),
+			want: want{
+				start: sim.Quote{Date: newTime(t, 2006, time.January), Balance: 123},
+				end:   sim.Quote{Date: newTime(t, 2006, time.February), Balance: -123},
+			},
+		},
+		{
+			name: "two records call strategy",
+			bal:  123,
+			market: []*pb.Record{
+				newRecord(t, newDate(t, 2006, time.January), 2, 3),
+				newRecord(t, newDate(t, 2006, time.February), 2, 3),
+			},
+			strategy: new(flipStrategy),
+			want: want{
+				start: sim.Quote{Date: newTime(t, 2006, time.January), Balance: 123},
+				end:   sim.Quote{Date: newTime(t, 2006, time.March), Balance: 123},
+			},
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			start, end := sim.Run(tc.bal, tc.market, tc.strategy)
+
+			if diff := cmp.Diff(tc.want.start, start); diff != "" {
+				t.Errorf("sim.Run() = start, _; mismatch (-want, +got):\n%s", diff)
+			}
+			if diff := cmp.Diff(tc.want.end, end); diff != "" {
+				t.Errorf("sim.Run() = _, end; mismatch (-want, +got):\n%s", diff)
+			}
+		})
+	}
+}
+
+type flipStrategy struct{}
+
+func (s *flipStrategy) Run(c fin.Cents, market []*pb.Record) fin.Cents {
+	if len(market)%2 == 0 {
+		return c
+	} else {
+		return -c
+	}
+}
+
+func newRecord(t *testing.T, d *pb.Date, sp, div int32) *pb.Record {
+	t.Helper()
+	return pb.Record_builder{
+		Date: d,
+		Quote: pb.Quote_builder{
+			SpComposite: pb.Cents_builder{Cents: &sp}.Build(),
+			Dividend:    pb.Cents_builder{Cents: &div}.Build(),
+		}.Build(),
+	}.Build()
+}
+
+func newDate(t *testing.T, year int32, month time.Month) *pb.Date {
+	t.Helper()
+	m := int32(month)
+	return pb.Date_builder{
+		Year:  &year,
+		Month: &m,
+	}.Build()
+}
+
+func newTime(t *testing.T, year int, month time.Month) time.Time {
+	t.Helper()
+	d := 1
+	var hh, mm, ss, ns int
+	return time.Date(year, month, d, hh, mm, ss, ns, time.Local)
+}
