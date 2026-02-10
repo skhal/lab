@@ -5,7 +5,4 @@
   license that can be found in the LICENSE file.
 */ -}}
 
-Strategy: {{.Description}}
-
-Start: {{template "quote.txt" .Start -}}
-End:   {{template "quote.txt" .End -}}
+${{.Balance}} on {{.Date.Format "2006 Jan"}}
