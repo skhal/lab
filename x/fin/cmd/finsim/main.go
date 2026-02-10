@@ -17,6 +17,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/skhal/lab/x/fin/internal/fin"
 	"github.com/skhal/lab/x/fin/internal/pb"
@@ -34,7 +35,7 @@ func main() {
 }
 
 func run() error {
-	ifile, nmonth, err := parseFlags()
+	ifile, nmonth, runners, err := parseFlags()
 	if err != nil {
 		return err
 	}
@@ -46,10 +47,10 @@ func run() error {
 		n = max(len(recs)-n, 0)
 		return recs[n:]
 	}
-	return runStrategies(fetchLastN(m.GetRecords(), nmonth))
+	return runStrategies(runners, fetchLastN(m.GetRecords(), nmonth))
 }
 
-func parseFlags() (file string, months int, err error) {
+func parseFlags() (file string, months int, runners []*strategyRunner, err error) {
 	flag.Usage = func() {
 		w := flag.CommandLine.Output()
 		fmt.Fprintf(w, "usage: %s [flags] file\n", filepath.Base(os.Args[0]))
@@ -57,13 +58,23 @@ func parseFlags() (file string, months int, err error) {
 		fmt.Fprintln(w, "flags:")
 		flag.PrintDefaults()
 	}
+	sflag := newStrategyListFlag(defaultStrategies...)
 	flag.IntVar(&months, "n", 12, "number of latest months to process")
+	sflagOpts := func() string {
+		nn := make([]string, 0, len(strategies))
+		for name, _ := range strategies {
+			nn = append(nn, name)
+		}
+		return strings.Join(nn, ",")
+	}
+	flag.Var(sflag, "s", fmt.Sprintf("comma separated list of strategies to run, options:\n%s\n", sflagOpts()))
 	flag.Parse()
 	if flag.NArg() != 1 {
 		err = errors.New("missing input file")
 		return
 	}
 	file = flag.Arg(0)
+	runners = sflag.Runners()
 	return
 }
 
@@ -79,17 +90,21 @@ func readFile(name string) (*pb.Market, error) {
 	return m, nil
 }
 
-func runStrategies(market []*pb.Record) error {
+func runStrategies(strategies []*strategyRunner, market []*pb.Record) error {
 	infos := make([]*report.StrategyInfo, 0, len(strategies))
-	for name, r := range strategies {
-		fmt.Println("run: ", name)
+	for _, r := range strategies {
 		infos = append(infos, r.Run(market))
 	}
-	fmt.Println()
 	return report.Strategies(os.Stdout, infos)
 }
 
-var strategies = make(map[string]*strategyRunner)
+var (
+	strategies        = make(map[string]*strategyRunner)
+	defaultStrategies = []string{
+		"hold-collect-div",
+		"hold-reinvest-div",
+	}
+)
 
 func init() {
 	register := func(name, desc string, s sim.Strategy) {
@@ -131,4 +146,62 @@ func (r *strategyRunner) Run(market []*pb.Record) *report.StrategyInfo {
 	}
 	info.Start, info.End = sim.Run(fin.Cents(100), market, r.strategy)
 	return &info
+}
+
+type strategyListFlag struct {
+	runners []*strategyRunner
+
+	seen map[string]bool
+	set  bool
+}
+
+func newStrategyListFlag(names ...string) *strategyListFlag {
+	runners := make([]*strategyRunner, 0, len(names))
+	for _, name := range names {
+		r, ok := strategies[name]
+		if !ok {
+			panic(fmt.Errorf("unsupported strategy %s", name))
+		}
+		runners = append(runners, r)
+	}
+	return &strategyListFlag{
+		runners: runners,
+		seen:    make(map[string]bool),
+	}
+}
+
+// Runners returns a list of registered runners.
+func (f *strategyListFlag) Runners() []*strategyRunner {
+	return f.runners
+}
+
+// Set implements flag.Value interface.
+func (f *strategyListFlag) Set(s string) error {
+	var runners []*strategyRunner
+	for name := range strings.SplitSeq(s, ",") {
+		r, ok := strategies[name]
+		if !ok {
+			return fmt.Errorf("unsupported strategy %s", name)
+		}
+		if f.seen[name] {
+			return fmt.Errorf("duplicate strategy %s", name)
+		}
+		f.seen[name] = true
+		runners = append(runners, r)
+	}
+	if !f.set {
+		f.set = true
+		f.runners = f.runners[:0]
+	}
+	f.runners = append(f.runners, runners...)
+	return nil
+}
+
+// String implements flag.Valaue interface.
+func (f *strategyListFlag) String() string {
+	names := make([]string, 0, len(f.runners))
+	for _, r := range f.runners {
+		names = append(names, r.Name())
+	}
+	return strings.Join(names, ",")
 }
