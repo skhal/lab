@@ -80,34 +80,55 @@ func readFile(name string) (*pb.Market, error) {
 }
 
 func runStrategies(market []*pb.Record) error {
-	strategies := []func([]*pb.Record) report.StrategyInfo{
-		runHoldReinvestDivStrategy,
-		runHoldCollectDivStrategy,
+	infos := make([]*report.StrategyInfo, 0, len(strategies))
+	for name, r := range strategies {
+		fmt.Println("run: ", name)
+		infos = append(infos, r.Run(market))
 	}
-	var infos []*report.StrategyInfo
-	for _, strategy := range strategies {
-		info := strategy(market)
-		infos = append(infos, &info)
-	}
+	fmt.Println()
 	return report.Strategies(os.Stdout, infos)
 }
 
-func runHoldReinvestDivStrategy(recs []*pb.Record) report.StrategyInfo {
-	info := report.StrategyInfo{
-		Name:        "HoldReinvestDiv",
-		Description: "Hold and reinvest dividends",
+var strategies = make(map[string]*strategyRunner)
+
+func init() {
+	register := func(name, desc string, s sim.Strategy) {
+		if r, ok := strategies[name]; ok {
+			err := fmt.Errorf("strategy with name %s already exists: %s", name, r.Description())
+			panic(err)
+		}
+		strategies[name] = newStrategyRunner(name, desc, s)
 	}
-	st := strategy.NewHold(strategy.HoldOptReinvestDiv())
-	info.Start, info.End = sim.Run(fin.Cents(100), recs, st)
-	return info
+	register("hold-collect-div", "hold s&p, collect dividends", strategy.NewHold())
+	register("hold-reinvest-div", "hold s&p, reinvest dividends", strategy.NewHold(strategy.HoldOptReinvestDiv()))
 }
 
-func runHoldCollectDivStrategy(recs []*pb.Record) report.StrategyInfo {
-	info := report.StrategyInfo{
-		Name:        "HoldCollectDiv",
-		Description: "Hold and collect dividends",
+type strategyRunner struct {
+	name     string
+	desc     string
+	strategy sim.Strategy
+}
+
+func newStrategyRunner(name, desc string, s sim.Strategy) *strategyRunner {
+	return &strategyRunner{
+		name:     name,
+		desc:     desc,
+		strategy: s,
 	}
-	st := strategy.NewHold()
-	info.Start, info.End = sim.Run(fin.Cents(100), recs, st)
-	return info
+}
+
+// Name returns the strategy name.
+func (r *strategyRunner) Name() string { return r.name }
+
+// Description gices a strategy description.
+func (r *strategyRunner) Description() string { return r.desc }
+
+// Run executes strategy.
+func (r *strategyRunner) Run(market []*pb.Record) *report.StrategyInfo {
+	info := report.StrategyInfo{
+		Name:        r.Name(),
+		Description: r.Description(),
+	}
+	info.Start, info.End = sim.Run(fin.Cents(100), market, r.strategy)
+	return &info
 }
