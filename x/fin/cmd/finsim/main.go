@@ -46,8 +46,7 @@ func run() error {
 		n = max(len(recs)-n, 0)
 		return recs[n:]
 	}
-	info := runHoldStrategy(fetchLastN(m.GetRecords(), nmonth))
-	return report.Strategy(os.Stdout, info)
+	return runStrategies(fetchLastN(m.GetRecords(), nmonth))
 }
 
 func parseFlags() (file string, months int, err error) {
@@ -80,12 +79,35 @@ func readFile(name string) (*pb.Market, error) {
 	return m, nil
 }
 
-func runHoldStrategy(recs []*pb.Record) report.StrategyInfo {
+func runStrategies(market []*pb.Record) error {
+	strategies := []func([]*pb.Record) report.StrategyInfo{
+		runHoldReinvestDivStrategy,
+		runHoldCollectDivStrategy,
+	}
+	var infos []*report.StrategyInfo
+	for _, strategy := range strategies {
+		info := strategy(market)
+		infos = append(infos, &info)
+	}
+	return report.Strategies(os.Stdout, infos)
+}
+
+func runHoldReinvestDivStrategy(recs []*pb.Record) report.StrategyInfo {
 	info := report.StrategyInfo{
 		Name:        "HoldReinvestDiv",
 		Description: "Hold and reinvest dividends",
 	}
 	st := strategy.NewHold(strategy.HoldOptReinvestDiv())
+	info.Start, info.End = sim.Run(fin.Cents(100), recs, st)
+	return info
+}
+
+func runHoldCollectDivStrategy(recs []*pb.Record) report.StrategyInfo {
+	info := report.StrategyInfo{
+		Name:        "HoldCollectDiv",
+		Description: "Hold and collect dividends",
+	}
+	st := strategy.NewHold()
 	info.Start, info.End = sim.Run(fin.Cents(100), recs, st)
 	return info
 }

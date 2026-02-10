@@ -24,3 +24,8 @@ type StrategyInfo struct {
 func Strategy(w io.Writer, info StrategyInfo) error {
 	return tmpls.ExecuteTemplate(w, "strategy.txt", info)
 }
+
+// Strategies lists per-strategy reports.
+func Strategies(w io.Writer, infos []*StrategyInfo) error {
+	return tmpls.ExecuteTemplate(w, "strategies.txt", infos)
+}
