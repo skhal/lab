@@ -6,6 +6,8 @@
 package report
 
 import (
+	"bytes"
+	"fmt"
 	"io"
 
 	"github.com/skhal/lab/x/fin/internal/fin"
@@ -27,5 +29,55 @@ func Strategy(w io.Writer, info StrategyInfo) error {
 
 // Strategies lists per-strategy reports.
 func Strategies(w io.Writer, infos []*StrategyInfo) error {
-	return tmpls.ExecuteTemplate(w, "strategies.txt", infos)
+	if err := tmpls.ExecuteTemplate(w, "strategies.txt", infos); err != nil {
+		return err
+	}
+	return strategiesPerformance(w, infos)
+}
+
+func strategiesPerformance(w io.Writer, infos []*StrategyInfo) error {
+	header := func() {
+		var b bytes.Buffer
+		fmt.Fprint(&b, "    ")
+		for i := range infos {
+			if i > 0 {
+				fmt.Fprint(&b, " | ")
+			}
+			fmt.Fprintf(&b, " [%d]", i)
+		}
+		fmt.Fprintln(&b)
+		io.Copy(w, &b)
+	}
+	row := func(r int, rinfo *StrategyInfo) {
+		var b bytes.Buffer
+		fmt.Fprintf(&b, "[%d] ", r)
+		for c, cinfo := range infos {
+			if c > 0 {
+				fmt.Fprint(&b, " | ")
+			}
+			rate := 1.0
+			if c != r {
+				rate = float64(cinfo.End.Balance) / float64(rinfo.End.Balance)
+			}
+			fmt.Fprintf(&b, "%.2f", rate)
+		}
+		fmt.Fprintln(&b)
+		io.Copy(w, &b)
+	}
+	list := func() {
+		for i, info := range infos {
+			fmt.Fprintf(w, "[%d] %s\n", i, info.Name)
+		}
+	}
+	fmt.Fprintln(w)
+	fmt.Fprintln(w, "Performance:")
+	for r, rinfo := range infos {
+		if r == 0 {
+			header()
+		}
+		row(r, rinfo)
+	}
+	fmt.Fprintln(w)
+	list()
+	return nil
 }
