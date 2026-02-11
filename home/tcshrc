@@ -79,6 +79,10 @@ if ( ! $?TMUX && -d ${cargo_base_} ) then
 endif
 unset cargo_base_
 
+if ( -x "$HOME"/go/bin/go ) then
+  alias go '"$HOME"/go/bin/go \!*'
+endif
+
 # -- DEVELOPMENT
 # `dev' starts a tmux session with shell history scoped to the session.
 alias dev '\\
