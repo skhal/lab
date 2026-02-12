@@ -9,9 +9,6 @@
 
 if ( ! $?prompt ) goto end
 
-# -- PAINT LS(1).
-setenv CLICOLOR 1
-
 # -- DEVELOPMENT
 # `dev' starts a tmux session with shell history scoped to the session.
 alias dev '\\

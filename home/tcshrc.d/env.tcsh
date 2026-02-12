@@ -3,5 +3,8 @@
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 
+# keep-sorted start
+setenv CLICOLOR 1
 setenv EDITOR nvim
 setenv PAGER less
+# keep-sorted end
