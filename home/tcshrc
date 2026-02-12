@@ -19,14 +19,6 @@ if ( ! $?TMUX && -d ${llvm_base_} ) then
 endif
 unset llvm_base_
 
-# -- Rust SETUP
-# Pick up user binaries from CARGO_HOME
-set cargo_base_ = "$HOME"/.cargo
-if ( ! $?TMUX && -d ${cargo_base_} ) then
-  set path = (${path} ${cargo_base_}/bin)
-endif
-unset cargo_base_
-
 if ( -x "$HOME"/go/bin/go ) then
   alias go '"$HOME"/go/bin/go \!*'
 endif
