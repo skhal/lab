@@ -45,8 +45,6 @@
 #
 # `rc.jail` keeps track of the running jail's epair(4) in /var/run/jail/ folder,
 # in ${jail_name}.${bridge} file.
-#
-# vim: ft=sh
 
 # keep-sorted start
 readonly CAT_CMD=/bin/cat
