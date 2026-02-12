@@ -13,6 +13,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/skhal/lab/x/fin/internal/pb"
 	"github.com/skhal/lab/x/fin/internal/strategy"
+	"github.com/skhal/lab/x/fin/internal/tests"
 )
 
 func TestRateOfReturn(t *testing.T) {
@@ -24,30 +25,30 @@ func TestRateOfReturn(t *testing.T) {
 	}{
 		{
 			name: "no change",
-			prev: newRecord(t, 2006, time.January, 100, 0),
-			curr: newRecord(t, 2006, time.February, 100, 0),
+			prev: tests.NewRecord(t, 2006, time.January, 100, 0),
+			curr: tests.NewRecord(t, 2006, time.February, 100, 0),
 			want: 1.,
 		},
 		{
 			name: "gain",
-			prev: newRecord(t, 2006, time.January, 100, 0),
-			curr: newRecord(t, 2006, time.February, 105, 0),
+			prev: tests.NewRecord(t, 2006, time.January, 100, 0),
+			curr: tests.NewRecord(t, 2006, time.February, 105, 0),
 			want: 1.05,
 		},
 		{
 			name: "loss",
-			prev: newRecord(t, 2006, time.January, 100, 0),
-			curr: newRecord(t, 2006, time.February, 95, 0),
+			prev: tests.NewRecord(t, 2006, time.January, 100, 0),
+			curr: tests.NewRecord(t, 2006, time.February, 95, 0),
 			want: 0.95,
 		},
 		{
 			name: "no prev zero return",
-			curr: newRecord(t, 2006, time.January, 95, 0),
+			curr: tests.NewRecord(t, 2006, time.January, 95, 0),
 			want: 1.,
 		},
 		{
 			name: "no curr zero return",
-			prev: newRecord(t, 2006, time.January, 95, 0),
+			prev: tests.NewRecord(t, 2006, time.January, 95, 0),
 			want: 1.,
 		},
 	}
@@ -72,16 +73,16 @@ func TestRateOfDividend(t *testing.T) {
 	}{
 		{
 			name: "no dividend",
-			rec:  newRecord(t, 2006, time.January, 100, 0),
+			rec:  tests.NewRecord(t, 2006, time.January, 100, 0),
 		},
 		{
 			name: "dividend",
-			rec:  newRecord(t, 2006, time.January, 100, 5),
+			rec:  tests.NewRecord(t, 2006, time.January, 100, 5),
 			want: 0.05,
 		},
 		{
 			name: "no sp composite zero return",
-			rec:  newRecord(t, 2006, time.January, 0, 5),
+			rec:  tests.NewRecord(t, 2005, time.January, 0, 5),
 		},
 	}
 	for _, tc := range tests {
@@ -94,21 +95,6 @@ func TestRateOfDividend(t *testing.T) {
 			}
 		})
 	}
-}
-
-func newRecord(t *testing.T, y int32, m time.Month, sp, div int32) *pb.Record {
-	t.Helper()
-	month := int32(m)
-	return pb.Record_builder{
-		Date: pb.Date_builder{
-			Year:  &y,
-			Month: &month,
-		}.Build(),
-		Quote: pb.Quote_builder{
-			SpComposite: pb.Cents_builder{Cents: &sp}.Build(),
-			Dividend:    pb.Cents_builder{Cents: &div}.Build(),
-		}.Build(),
-	}.Build()
 }
 
 const cutoff = 0.01

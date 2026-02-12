@@ -13,6 +13,7 @@ import (
 	"github.com/skhal/lab/x/fin/internal/fin"
 	"github.com/skhal/lab/x/fin/internal/pb"
 	"github.com/skhal/lab/x/fin/internal/strategy"
+	"github.com/skhal/lab/x/fin/internal/tests"
 )
 
 func TestHold_Run(t *testing.T) {
@@ -37,7 +38,7 @@ func TestHold_Run(t *testing.T) {
 			name:  "one cycle div zero",
 			start: fin.Cents(123),
 			market: []*pb.Record{
-				newRecord(t, 2006, time.January, 100, 0),
+				tests.NewRecord(t, 2006, time.January, 100, 0),
 			},
 			want: fin.Cents(123),
 		},
@@ -45,7 +46,7 @@ func TestHold_Run(t *testing.T) {
 			name:  "one cycle div non-zero",
 			start: fin.Cents(123),
 			market: []*pb.Record{
-				newRecord(t, 2006, time.January, 100, 1),
+				tests.NewRecord(t, 2006, time.January, 100, 1),
 			},
 			want: fin.Cents(math.Floor(123 * (1 + 1./100.))),
 		},
@@ -53,8 +54,8 @@ func TestHold_Run(t *testing.T) {
 			name:  "two cycles div zero",
 			start: fin.Cents(123),
 			market: []*pb.Record{
-				newRecord(t, 2006, time.January, 100, 0),
-				newRecord(t, 2006, time.February, 110, 0),
+				tests.NewRecord(t, 2006, time.January, 100, 0),
+				tests.NewRecord(t, 2006, time.February, 110, 0),
 			},
 			want: func() fin.Cents {
 				// cycle 1
@@ -70,8 +71,8 @@ func TestHold_Run(t *testing.T) {
 			name:  "two cycles div non-zero",
 			start: fin.Cents(123),
 			market: []*pb.Record{
-				newRecord(t, 2006, time.January, 100, 1),
-				newRecord(t, 2006, time.February, 110, 2),
+				tests.NewRecord(t, 2006, time.January, 100, 1),
+				tests.NewRecord(t, 2006, time.February, 110, 2),
 			},
 			want: func() fin.Cents {
 				// cycle 1
@@ -87,9 +88,9 @@ func TestHold_Run(t *testing.T) {
 			name:  "three cycles div zero",
 			start: fin.Cents(123),
 			market: []*pb.Record{
-				newRecord(t, 2006, time.January, 100, 0),
-				newRecord(t, 2006, time.February, 110, 0),
-				newRecord(t, 2006, time.March, 120, 0),
+				tests.NewRecord(t, 2006, time.January, 100, 0),
+				tests.NewRecord(t, 2006, time.February, 110, 0),
+				tests.NewRecord(t, 2006, time.March, 120, 0),
 			},
 			want: func() fin.Cents {
 				// cycle 1
@@ -108,9 +109,9 @@ func TestHold_Run(t *testing.T) {
 			name:  "three cycles div non-zero",
 			start: fin.Cents(123),
 			market: []*pb.Record{
-				newRecord(t, 2006, time.January, 100, 1),
-				newRecord(t, 2006, time.February, 110, 2),
-				newRecord(t, 2006, time.March, 120, 3),
+				tests.NewRecord(t, 2006, time.January, 100, 1),
+				tests.NewRecord(t, 2006, time.February, 110, 2),
+				tests.NewRecord(t, 2006, time.March, 120, 3),
 			},
 			want: func() fin.Cents {
 				// cycle 1
