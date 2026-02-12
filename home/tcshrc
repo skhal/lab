@@ -9,18 +9,6 @@
 
 if ( ! $?prompt ) goto end
 
-# -- DEVELOPMENT
-# `dev' starts a tmux session with shell history scoped to the session.
-alias dev '\\
-  tmux has -t "=$PWD:t:s/./_/" >& /dev/null || \\
-        tmux new -d -c "$PWD" -s "$PWD:t:s/./_/" && \\
-        tmux setenv -t "=$PWD:t" HISTFILE "$PWD"/.history && \\
-        tmux respawnw -k -t "=$PWD:t":0 ; \\
-  if ($?TMUX) \\
-    tmux switchc -t "=$PWD:t:s/./_/" ; \\
-  if ! ($?TMUX) \\
-    tmux attach -t "=$PWD:t:s/./_/" \\
-    '
 if ( ${?TMUX} ) then
   # In tmux(1) session.
   # Pick up histfile from tmux(1)
