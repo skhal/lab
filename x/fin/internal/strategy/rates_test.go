@@ -25,30 +25,30 @@ func TestRateOfReturn(t *testing.T) {
 	}{
 		{
 			name: "no change",
-			prev: tests.NewRecord(t, 2006, time.January, 100, 0),
-			curr: tests.NewRecord(t, 2006, time.February, 100, 0),
+			prev: tests.NewRecord(t, 2006, time.January, 100, 0, 0),
+			curr: tests.NewRecord(t, 2006, time.February, 100, 0, 0),
 			want: 1.,
 		},
 		{
 			name: "gain",
-			prev: tests.NewRecord(t, 2006, time.January, 100, 0),
-			curr: tests.NewRecord(t, 2006, time.February, 105, 0),
+			prev: tests.NewRecord(t, 2006, time.January, 100, 0, 0),
+			curr: tests.NewRecord(t, 2006, time.February, 105, 0, 0),
 			want: 1.05,
 		},
 		{
 			name: "loss",
-			prev: tests.NewRecord(t, 2006, time.January, 100, 0),
-			curr: tests.NewRecord(t, 2006, time.February, 95, 0),
+			prev: tests.NewRecord(t, 2006, time.January, 100, 0, 0),
+			curr: tests.NewRecord(t, 2006, time.February, 95, 0, 0),
 			want: 0.95,
 		},
 		{
 			name: "no prev zero return",
-			curr: tests.NewRecord(t, 2006, time.January, 95, 0),
+			curr: tests.NewRecord(t, 2006, time.January, 95, 0, 0),
 			want: 1.,
 		},
 		{
 			name: "no curr zero return",
-			prev: tests.NewRecord(t, 2006, time.January, 95, 0),
+			prev: tests.NewRecord(t, 2006, time.January, 95, 0, 0),
 			want: 1.,
 		},
 	}
@@ -73,16 +73,16 @@ func TestRateOfDividend(t *testing.T) {
 	}{
 		{
 			name: "no dividend",
-			rec:  tests.NewRecord(t, 2006, time.January, 100, 0),
+			rec:  tests.NewRecord(t, 2006, time.January, 100, 0, 0),
 		},
 		{
 			name: "dividend",
-			rec:  tests.NewRecord(t, 2006, time.January, 100, 5),
+			rec:  tests.NewRecord(t, 2006, time.January, 100, 5, 0),
 			want: 0.05,
 		},
 		{
 			name: "no sp composite zero return",
-			rec:  tests.NewRecord(t, 2005, time.January, 0, 5),
+			rec:  tests.NewRecord(t, 2005, time.January, 0, 5, 0),
 		},
 	}
 	for _, tc := range tests {

@@ -47,21 +47,42 @@ func skipHeader(r *csv.Reader) error {
 
 func readRecords(r *csv.Reader) ([]*pb.Record, error) {
 	var records []*pb.Record
-	for i := 0; ; i += 1 {
+	for lineNum := headerLines + 1; ; lineNum += 1 {
 		row, err := r.Read()
 		if err == io.EOF {
 			break
 		}
 		if err != nil {
-			lineNum := headerLines + i + 1 // +1 to count from 1
 			return nil, fmt.Errorf("%d: %v", lineNum, err)
 		}
 		rec, err := parseRow(row)
 		if err != nil {
-			lineNum := headerLines + i + 1 // +1 to count from 1
+			return nil, fmt.Errorf("%d: %v", lineNum, err)
+		}
+		if err := validate(rec, records); err != nil {
 			return nil, fmt.Errorf("%d: %v", lineNum, err)
 		}
 		records = append(records, rec)
 	}
 	return records, nil
+}
+
+func validate(rec *pb.Record, prev []*pb.Record) error {
+	if len(prev) < 1 {
+		return nil
+	}
+	isNextMonth := func(prev *pb.Date, next *pb.Date) bool {
+		switch next.GetMonth() - prev.GetMonth() {
+		case 1: // same year
+			return next.GetYear() == prev.GetYear()
+		case -11: // next year, Jan - Dec = 1 - 12 = -11
+			return next.GetYear() == prev.GetYear()+1
+		default:
+			return false
+		}
+	}
+	if !isNextMonth(prev[len(prev)-1].GetDate(), rec.GetDate()) {
+		return fmt.Errorf("not next month")
+	}
+	return nil
 }

@@ -35,7 +35,7 @@ func TestRun(t *testing.T) {
 			name: "one record call strategy",
 			bal:  123,
 			market: []*pb.Record{
-				tests.NewRecord(t, 2006, time.January, 2, 3),
+				tests.NewRecord(t, 2006, time.January, 2, 3, 0),
 			},
 			strategy: new(flipStrategy),
 			want: want{
@@ -47,8 +47,8 @@ func TestRun(t *testing.T) {
 			name: "two records call strategy",
 			bal:  123,
 			market: []*pb.Record{
-				tests.NewRecord(t, 2006, time.January, 2, 3),
-				tests.NewRecord(t, 2006, time.February, 2, 3),
+				tests.NewRecord(t, 2006, time.January, 2, 3, 0),
+				tests.NewRecord(t, 2006, time.February, 2, 3, 0),
 			},
 			strategy: new(flipStrategy),
 			want: want{
