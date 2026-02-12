@@ -18,3 +18,8 @@ if ( ! $?TMUX && -d ${user_base_path_} ) then
   set path = (${path} ${user_base_path_}/bin)
 endif
 unset user_base_path_
+
+# Pipe `go doc` and `go help` through $PAGER
+if ( -x "$HOME"/go/bin/go ) then
+  alias go '"$HOME"/go/bin/go \!*'
+endif
