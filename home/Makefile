@@ -5,7 +5,7 @@
 #
 # Flavor: FreeBSD
 
-INSTALL_PATHS = ctags.d go npm nvim pkg rust vim vimrc.d
+INSTALL_PATHS = ctags.d go npm nvim pkg rust tcshrc.d vim vimrc.d
 SOURCES = tcshrc vimrc tmux.conf gitconfig
 INSTALL_TARGETS = ${SOURCES:S,^,${HOME}/.,}
 

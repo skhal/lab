@@ -7,9 +7,6 @@
 
 # .tcshrc - tcsh resource script, read at the beginning of each shell.
 
-setenv EDITOR nvim
-setenv PAGER less
-
 if ( ! $?prompt ) goto end
 
 # -- PROMPT
@@ -125,3 +122,9 @@ if ( ${?TMUX} ) then
 endif
 
 end:
+
+if ( -d "$HOME"/.tcshrc.d ) then
+  foreach f ( "$HOME"/.tcshrc.d/*.tcsh )
+    source "$f"
+  end
+endif
