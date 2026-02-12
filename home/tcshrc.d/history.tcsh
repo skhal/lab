@@ -7,21 +7,14 @@ if ( ! $?prompt ) exit
 
 set history = 10000
 set savehist = (10000 merge)
-# Isolate Linux VMs history from BSD (default)
-if ( "$OSTYPE" == "linux" ) then
-  set histfile = "$HOME"/.history."$OSTYPE"
-endif
+set histfile = "${HOME}"/.history
 
-# update histfile for tmux(1) sessions if one is set
+# update histfile if in tmux(1) session and the session had HISTFILE set.
 if ( ${?TMUX} ) then
   # Pick up histfile from tmux(1)
   set histfile_ = `tmux show-env HISTFILE >& /dev/stdout`
   if ( ! $? ) then
-    set histfile_ = "${histfile_:s/HISTFILE=//}"
-    if ( "$OSTYPE" == "linux" ) then
-      set histfile_ = "${histfile_}.$OSTYPE"
-    endif
-    set histfile = "${histfile_}"
+    set histfile = "${histfile_:s/HISTFILE=//}"
   endif
   unset histfile_
   # Pick up ssh-agent socket from tmux(1)
@@ -39,4 +32,9 @@ if ( ${?TMUX} ) then
     alias postcmd dev-update-environment
   endif
   unset postcmd_
+endif
+
+# Isolate Linux VMs history from BSD (default)
+if ( "$OSTYPE" == "linux" ) then
+  set histfile = "${histfile}.${OSTYPE}"
 endif
