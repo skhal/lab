@@ -718,6 +718,12 @@ package test`,
 package test`,
 		},
 		{
+			name: "long go:generate",
+			code: `
+//go:generate "Doc comments" are comments that appear immediately before top-level package, const, func, type, and var declarations with no intervening newlines. Every exported (capitalized) name should have a doc comment.
+package test`,
+		},
+		{
 			name: "long multiline comment",
 			code: `
 // "Doc comments" are comments that appear immediately before top-level

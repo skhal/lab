@@ -19,8 +19,9 @@ import (
 
 const (
 	// keep-sorted start
-	maxLineLength = 80
-	nolint        = "NOLINT"
+	goGeneratePrefix = "//go:generate"
+	maxLineLength    = 80
+	nolintSuffix     = "NOLINT"
 	// keep-sorted end
 )
 
@@ -311,10 +312,15 @@ func checkComment(fs *token.FileSet, c *ast.Comment) error {
 	)
 	var ee []error
 	for line := range strings.Lines(c.Text) {
-		if len(line) > maxLineLength && !hasNolint(line) {
-			pos := fs.Position(f.Pos(int(c.Pos()) + offset))
-			err := fmt.Errorf("%s: %w: beyond %d chars (%d)", pos, ErrLongComment, maxLineLength, len(c.Text))
-			ee = append(ee, err)
+		if len(line) > maxLineLength {
+			switch { // exclude good cases, default to error
+			case hasNolint(line):
+			case hasGoGenerate(line):
+			default:
+				pos := fs.Position(f.Pos(int(c.Pos()) + offset))
+				err := fmt.Errorf("%s: %w: beyond %d chars (%d)", pos, ErrLongComment, maxLineLength, len(c.Text))
+				ee = append(ee, err)
+			}
 		}
 		offset += len(line)
 	}
@@ -322,5 +328,9 @@ func checkComment(fs *token.FileSet, c *ast.Comment) error {
 }
 
 func hasNolint(line string) bool {
-	return strings.HasSuffix(line, nolint)
+	return strings.HasSuffix(line, nolintSuffix)
+}
+
+func hasGoGenerate(line string) bool {
+	return strings.HasPrefix(line, goGeneratePrefix)
 }
