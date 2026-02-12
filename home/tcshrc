@@ -9,13 +9,6 @@
 
 if ( ! $?prompt ) goto end
 
-# -- HISTORY
-set history = 10000
-set savehist = (10000 merge)
-if ( "$OSTYPE" == "linux" ) then
-  set histfile = "$HOME"/.history."$OSTYPE"
-endif
-
 # -- COMPLETION
 set autolist = ambiguous
 # Use history to aid expansion
