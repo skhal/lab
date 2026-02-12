@@ -18,18 +18,18 @@ if ( ${?TMUX} ) then
   endif
   unset histfile_
   # Pick up ssh-agent socket from tmux(1)
-  alias dev-update-environment '\\
+  alias tmux-update-environment '\\
     if ( ${?TMUX} ) \\
       setenv SSH_AUTH_SOCK `tmux show-env SSH_AUTH_SOCK | cut -d'=' -f 2` \\
     '
   set postcmd_ = `alias postcmd \
-    | sed -E 's/dev-update-environment//' \
+    | sed -E 's/tmux-update-environment//' \
     | sed -E 's/;[[:space:]]*;/;/' \
     | sed -E 's/;$//'`
   if ( ${?postcmd_} && ${#postcmd_} ) then
-    alias postcmd "${postcmd_}; dev-update-environment"
+    alias postcmd "${postcmd_}; tmux-update-environment"
   else
-    alias postcmd dev-update-environment
+    alias postcmd tmux-update-environment
   endif
   unset postcmd_
 endif
