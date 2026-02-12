@@ -9,12 +9,6 @@
 
 if ( ! $?prompt ) goto end
 
-# -- COMPLETION
-set autolist = ambiguous
-# Use history to aid expansion
-set autoexpand
-set autorehash
-
 # -- PAINT LS(1).
 setenv CLICOLOR 1
 
