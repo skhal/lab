@@ -12,13 +12,6 @@ if ( ! $?prompt ) goto end
 # -- PAINT LS(1).
 setenv CLICOLOR 1
 
-# -- C++ SETUP
-set llvm_base_ = "/usr/local/llvm19"
-if ( ! $?TMUX && -d ${llvm_base_} ) then
-  set path = (${path} ${llvm_base_}/bin)
-endif
-unset llvm_base_
-
 # -- DEVELOPMENT
 # `dev' starts a tmux session with shell history scoped to the session.
 alias dev '\\
