@@ -3,7 +3,6 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Package fin provides common units for market analysis.
 package fin
 
 import "fmt"

@@ -3,7 +3,6 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Package pb holds Protobuf schema for Shiller market data.
 package pb
 
 // protoc_cmd_go compiles Protobuf to Go
