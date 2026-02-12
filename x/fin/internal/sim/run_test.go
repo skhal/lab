@@ -13,6 +13,7 @@ import (
 	"github.com/skhal/lab/x/fin/internal/fin"
 	"github.com/skhal/lab/x/fin/internal/pb"
 	"github.com/skhal/lab/x/fin/internal/sim"
+	"github.com/skhal/lab/x/fin/internal/tests"
 )
 
 func TestRun(t *testing.T) {
@@ -34,7 +35,7 @@ func TestRun(t *testing.T) {
 			name: "one record call strategy",
 			bal:  123,
 			market: []*pb.Record{
-				newRecord(t, newDate(t, 2006, time.January), 2, 3),
+				tests.NewRecord(t, 2006, time.January, 2, 3),
 			},
 			strategy: new(flipStrategy),
 			want: want{
@@ -46,8 +47,8 @@ func TestRun(t *testing.T) {
 			name: "two records call strategy",
 			bal:  123,
 			market: []*pb.Record{
-				newRecord(t, newDate(t, 2006, time.January), 2, 3),
-				newRecord(t, newDate(t, 2006, time.February), 2, 3),
+				tests.NewRecord(t, 2006, time.January, 2, 3),
+				tests.NewRecord(t, 2006, time.February, 2, 3),
 			},
 			strategy: new(flipStrategy),
 			want: want{
@@ -78,26 +79,6 @@ func (s *flipStrategy) Run(c fin.Cents, market []*pb.Record) fin.Cents {
 	} else {
 		return -c
 	}
-}
-
-func newRecord(t *testing.T, d *pb.Date, sp, div int32) *pb.Record {
-	t.Helper()
-	return pb.Record_builder{
-		Date: d,
-		Quote: pb.Quote_builder{
-			SpComposite: pb.Cents_builder{Cents: &sp}.Build(),
-			Dividend:    pb.Cents_builder{Cents: &div}.Build(),
-		}.Build(),
-	}.Build()
-}
-
-func newDate(t *testing.T, year int32, month time.Month) *pb.Date {
-	t.Helper()
-	m := int32(month)
-	return pb.Date_builder{
-		Year:  &year,
-		Month: &m,
-	}.Build()
 }
 
 func newTime(t *testing.T, year int, month time.Month) time.Time {
