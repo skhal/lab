@@ -6,5 +6,5 @@
 */ -}}
 
 {{.Name}} - {{.Description}}
-{{template "quote.txt" .Start -}}
-{{template "quote.txt" .End -}}
+{{template "quote.txt" .Start}}
+{{template "quote.txt" .End}} ({{ .Performance }})

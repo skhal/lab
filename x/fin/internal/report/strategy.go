@@ -22,6 +22,11 @@ type StrategyInfo struct {
 	End         fin.Quote // strategy result
 }
 
+// Performance returns the ratio of the end to start balances.
+func (si *StrategyInfo) Performance() float64 {
+	return float64(si.End.Balance) / float64(si.Start.Balance)
+}
+
 // Strategy generates a report for a single strategy.
 func Strategy(w io.Writer, info StrategyInfo) error {
 	return tmpls.ExecuteTemplate(w, "strategy.txt", info)
