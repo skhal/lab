@@ -13,8 +13,7 @@ import (
 )
 
 type hold struct {
-	reinvestDiv bool
-	last        *pb.Record
+	last *pb.Record
 }
 
 // Hold createsa a hold strategy.
@@ -22,21 +21,10 @@ func Hold() *Runner {
 	return New(&hold{})
 }
 
-// HoldReinvest creates a hold strategy with dividend reinvestment.
-func HoldReinvest() *Runner {
-	return New(&hold{reinvestDiv: true})
-}
-
-// Cycle executes a single cycle of the hold strategy.
+// Cycle implements [Cycler] interface.
 func (s *hold) Cycle(q Quote, rec *pb.Record) Quote {
 	bal := s.invest(q.Bal, rec)
-	div := s.payDividend(q.Bal, rec)
-	if s.reinvestDiv {
-		bal += div
-		div = 0
-	} else {
-		div += q.Div
-	}
+	div := s.payDividend(q.Bal, rec) + q.Div
 	s.last = rec
 	return Quote{Bal: bal, Div: div}
 }
@@ -49,4 +37,22 @@ func (s *hold) invest(c fin.Cents, curr *pb.Record) fin.Cents {
 func (s *hold) payDividend(c fin.Cents, rec *pb.Record) fin.Cents {
 	ror := DivRateOfReturn(rec)
 	return fin.Cents(math.Floor(float64(c) * float64(ror)))
+}
+
+type holdReinvest struct {
+	hold *hold
+}
+
+// HoldReinvest creates a hold strategy with dividend reinvestment.
+func HoldReinvest() *Runner {
+	s := &holdReinvest{new(hold)}
+	return New(s)
+}
+
+// Cycle implements [Cycler] interface.
+func (s *holdReinvest) Cycle(q Quote, rec *pb.Record) Quote {
+	q = s.hold.Cycle(q, rec)
+	q.Bal += q.Div
+	q.Div = 0
+	return q
 }
