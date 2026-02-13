@@ -26,10 +26,10 @@ type withhold struct {
 type Percent int
 
 // Withhold creates a withholder for a strategy c at annual percent.
-func Withhold(c Cycler, annual Percent) *Runner {
+func Withhold(p Percent, c Cycler) *Runner {
 	h := &withhold{
 		c:    c,
-		rate: float64(annual) / 100.,
+		rate: float64(p) / 100.,
 	}
 	return New(h)
 }
