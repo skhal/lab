@@ -15,7 +15,7 @@ import (
 	"github.com/skhal/lab/x/fin/internal/tests"
 )
 
-func TestWithhold_Run(t *testing.T) {
+func TestRetain_Run(t *testing.T) {
 	cycle := func(q strategy.Quote, _ *pb.Record) strategy.Quote {
 		return q
 	}
@@ -67,7 +67,7 @@ func TestWithhold_Run(t *testing.T) {
 	}
 	for _, tc := range tctc {
 		t.Run(tc.name, func(t *testing.T) {
-			s := strategy.Withhold(tc.percent, strategy.New(CycleFunc(cycle)))
+			s := strategy.Retain(tc.percent, strategy.New(CycleFunc(cycle)))
 
 			got := s.Run(tc.start, tc.market)
 

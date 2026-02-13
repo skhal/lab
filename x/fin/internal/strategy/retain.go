@@ -13,10 +13,9 @@ import (
 	"github.com/skhal/lab/x/fin/internal/pb"
 )
 
-// withhold removes a set fraction of balance every year. For example, a 3%
-// withhold takes 3% every year on January. It wraps strategies, i.e. one may
-// set withholding on any strategy.
-type withhold struct {
+// retain withholds [retain.rate] value every year from underlying strategy
+// [retain.c] in January.
+type retain struct {
 	c    Cycler
 	rate float64
 	last *pb.Record
@@ -25,26 +24,26 @@ type withhold struct {
 // Percent is a value in the range [0, 100].
 type Percent int
 
-// Withhold creates a withholder for a strategy c at annual percent.
-func Withhold(p Percent, c Cycler) *Runner {
-	h := &withhold{
+// Retain creates a withholder for a strategy c at annual percent.
+func Retain(p Percent, c Cycler) *Runner {
+	h := &retain{
 		c:    c,
 		rate: float64(p) / 100.,
 	}
 	return New(h)
 }
 
-// Cycle withholds percent at the beginning of the year and runs wrapped
+// Cycle retains percent at the beginning of the year and runs wrapped
 // strategy.
-func (s *withhold) Cycle(q Quote, rec *pb.Record) Quote {
-	if s.shouldWithhold(rec) {
+func (s *retain) Cycle(q Quote, rec *pb.Record) Quote {
+	if s.shouldRetain(rec) {
 		q = s.withhold(q)
 	}
 	s.last = rec
 	return s.c.Cycle(q, rec)
 }
 
-func (s *withhold) shouldWithhold(rec *pb.Record) bool {
+func (s *retain) shouldRetain(rec *pb.Record) bool {
 	// the strategy must run for at least one cycle
 	if s.last == nil {
 		return false
@@ -52,7 +51,7 @@ func (s *withhold) shouldWithhold(rec *pb.Record) bool {
 	return rec.GetDate().GetMonth() == int32(time.January)
 }
 
-func (s *withhold) withhold(q Quote) Quote {
+func (s *retain) withhold(q Quote) Quote {
 	applyTo := func(c fin.Cents) fin.Cents {
 		return c - fin.Cents(math.Floor(float64(c)*s.rate))
 	}
