@@ -62,7 +62,7 @@ func parseFlags() (file string, months int, runners []*strategyRunner, err error
 	flag.IntVar(&months, "n", 12, "number of latest months to process")
 	sflagOpts := func() string {
 		nn := make([]string, 0, len(strategies))
-		for name, _ := range strategies {
+		for name := range strategies {
 			nn = append(nn, name)
 		}
 		return strings.Join(nn, ",")
