@@ -129,7 +129,7 @@ func TestHold_Run(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			s := strategy.NewHold()
+			s := strategy.Hold()
 
 			got := s.Run(tc.start, tc.market)
 

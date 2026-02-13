@@ -243,7 +243,7 @@ func HoldCoollectDiv() *namedRunner {
 	return &namedRunner{
 		name:   "hold-collect-div",
 		desc:   "hold s&p, collect dividends",
-		runner: strategy.NewHold(),
+		runner: strategy.Hold(),
 	}
 }
 
@@ -253,7 +253,7 @@ func HoldReinvestDiv() *namedRunner {
 	return &namedRunner{
 		name:   "hold-reinvest-div",
 		desc:   "hold s&p, reinvest dividends",
-		runner: strategy.NewHold(strategy.HoldOptReinvestDiv()),
+		runner: strategy.HoldReinvest(),
 	}
 }
 
@@ -263,7 +263,7 @@ func Withhold3HoldCollectDiv() *namedRunner {
 	return &namedRunner{
 		name:   "withhold-3-hold-collect-div",
 		desc:   "withhold 3% yearly, hold s&p, collect dividends",
-		runner: strategy.NewWithhold(strategy.NewHold(), strategy.Percent(3)),
+		runner: strategy.NewWithhold(strategy.Hold(), strategy.Percent(3)),
 	}
 }
 
@@ -273,7 +273,7 @@ func Withhold4HoldCollectDiv() *namedRunner {
 	return &namedRunner{
 		name:   "withhold-4-hold-collect-div",
 		desc:   "withhold 4% yearly, hold s&p, collect dividends",
-		runner: strategy.NewWithhold(strategy.NewHold(), strategy.Percent(4)),
+		runner: strategy.NewWithhold(strategy.Hold(), strategy.Percent(4)),
 	}
 }
 
@@ -283,7 +283,7 @@ func Withhold3HoldReinvestDiv() *namedRunner {
 	return &namedRunner{
 		name:   "withhold-3-hold-reinvest-div",
 		desc:   "withhold 3% yearly, hold s&p, reinvest dividends",
-		runner: strategy.NewWithhold(strategy.NewHold(strategy.HoldOptReinvestDiv()), strategy.Percent(3)),
+		runner: strategy.NewWithhold(strategy.HoldReinvest(), strategy.Percent(3)),
 	}
 }
 
@@ -293,6 +293,6 @@ func Withhold4HoldReinvestDiv() *namedRunner {
 	return &namedRunner{
 		name:   "withhold-4-hold-reinvest-div",
 		desc:   "withhold 4% yearly, hold s&p, reinvest dividends",
-		runner: strategy.NewWithhold(strategy.NewHold(strategy.HoldOptReinvestDiv()), strategy.Percent(4)),
+		runner: strategy.NewWithhold(strategy.HoldReinvest(), strategy.Percent(4)),
 	}
 }

@@ -12,37 +12,26 @@ import (
 	"github.com/skhal/lab/x/fin/internal/pb"
 )
 
-// hold implements a strategy to hold investment. It has an option to re-invest
-// dividends (off by default).
 type hold struct {
-	reinvestDividends bool
-	last              *pb.Record
+	reinvestDiv bool
+	last        *pb.Record
 }
 
-// NewHold createsa a hold strategy.
-func NewHold(opts ...HoldOpt) *Runner {
-	h := new(hold)
-	for _, opt := range opts {
-		opt(h)
-	}
-	return New(h)
+// Hold createsa a hold strategy.
+func Hold() *Runner {
+	return New(&hold{})
 }
 
-// HoldOpt is an option
-type HoldOpt func(*hold)
-
-// HoldOptReinvestDiv turns on dividend re-investment in the Hold strategy.
-func HoldOptReinvestDiv() HoldOpt {
-	return func(s *hold) {
-		s.reinvestDividends = true
-	}
+// HoldReinvest creates a hold strategy with dividend reinvestment.
+func HoldReinvest() *Runner {
+	return New(&hold{reinvestDiv: true})
 }
 
 // Cycle executes a single cycle of the hold strategy.
 func (s *hold) Cycle(q Quote, rec *pb.Record) Quote {
 	bal := s.invest(q.Bal, rec)
 	div := s.payDividend(q.Bal, rec)
-	if s.reinvestDividends {
+	if s.reinvestDiv {
 		bal += div
 		div = 0
 	} else {
