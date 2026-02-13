@@ -50,7 +50,7 @@ func run() error {
 	return runStrategies(runners, fetchLastN(m.GetRecords(), nmonth))
 }
 
-func parseFlags() (file string, months int, runners []*strategyRunner, err error) {
+func parseFlags() (file string, months int, runners []*namedRunner, err error) {
 	flag.Usage = func() {
 		w := flag.CommandLine.Output()
 		fmt.Fprintf(w, "usage: %s [flags] file\n", filepath.Base(os.Args[0]))
@@ -90,7 +90,7 @@ func readFile(name string) (*pb.Market, error) {
 	return m, nil
 }
 
-func runStrategies(strategies []*strategyRunner, market []*pb.Record) error {
+func runStrategies(strategies []*namedRunner, market []*pb.Record) error {
 	infos := make([]*report.StrategyInfo, 0, len(strategies))
 	for _, r := range strategies {
 		infos = append(infos, r.Run(market))
@@ -99,7 +99,7 @@ func runStrategies(strategies []*strategyRunner, market []*pb.Record) error {
 }
 
 var (
-	strategies        = make(map[string]*strategyRunner)
+	strategies        = make(map[string]*namedRunner)
 	defaultStrategies = []string{
 		"hold-collect-div",
 		"hold-reinvest-div",
@@ -111,12 +111,12 @@ var (
 )
 
 func init() {
-	register := func(name, desc string, s *strategy.Runner) {
+	register := func(name, desc string, r *strategy.Runner) {
 		if r, ok := strategies[name]; ok {
 			err := fmt.Errorf("strategy with name %s already exists: %s", name, r.Description())
 			panic(err)
 		}
-		strategies[name] = newStrategyRunner(name, desc, s)
+		strategies[name] = newNamedRunner(name, desc, r)
 	}
 	register("hold-collect-div", "hold s&p, collect dividends", strategy.NewHold())
 	register("hold-reinvest-div", "hold s&p, reinvest dividends", strategy.NewHold(strategy.HoldOptReinvestDiv()))
@@ -126,45 +126,45 @@ func init() {
 	register("withhold-4-hold-reinvest-div", "withhold 4% yearly, hold s&p, reinvest dividends", strategy.NewWithhold(strategy.NewHold(strategy.HoldOptReinvestDiv()), strategy.Percent(4)))
 }
 
-type strategyRunner struct {
-	name     string
-	desc     string
-	strategy *strategy.Runner
+type namedRunner struct {
+	name   string
+	desc   string
+	runner *strategy.Runner
 }
 
-func newStrategyRunner(name, desc string, s *strategy.Runner) *strategyRunner {
-	return &strategyRunner{
-		name:     name,
-		desc:     desc,
-		strategy: s,
+func newNamedRunner(name, desc string, r *strategy.Runner) *namedRunner {
+	return &namedRunner{
+		name:   name,
+		desc:   desc,
+		runner: r,
 	}
 }
 
 // Name returns the strategy name.
-func (r *strategyRunner) Name() string { return r.name }
+func (nr *namedRunner) Name() string { return nr.name }
 
 // Description gices a strategy description.
-func (r *strategyRunner) Description() string { return r.desc }
+func (nr *namedRunner) Description() string { return nr.desc }
 
 // Run executes strategy.
-func (r *strategyRunner) Run(market []*pb.Record) *report.StrategyInfo {
+func (nr *namedRunner) Run(market []*pb.Record) *report.StrategyInfo {
 	info := report.StrategyInfo{
-		Name:        r.Name(),
-		Description: r.Description(),
+		Name:        nr.Name(),
+		Description: nr.Description(),
 	}
-	info.Start, info.End = sim.Run(fin.Cents(100), market, r.strategy)
+	info.Start, info.End = sim.Run(fin.Cents(100), market, nr.runner)
 	return &info
 }
 
 type strategyListFlag struct {
-	runners []*strategyRunner
+	runners []*namedRunner
 
 	seen map[string]bool
 	set  bool
 }
 
 func newStrategyListFlag(names ...string) *strategyListFlag {
-	runners := make([]*strategyRunner, 0, len(names))
+	runners := make([]*namedRunner, 0, len(names))
 	for _, name := range names {
 		r, ok := strategies[name]
 		if !ok {
@@ -179,13 +179,13 @@ func newStrategyListFlag(names ...string) *strategyListFlag {
 }
 
 // Runners returns a list of registered runners.
-func (f *strategyListFlag) Runners() []*strategyRunner {
+func (f *strategyListFlag) Runners() []*namedRunner {
 	return f.runners
 }
 
 // Set implements flag.Value interface.
 func (f *strategyListFlag) Set(s string) error {
-	var runners []*strategyRunner
+	var runners []*namedRunner
 	for name := range strings.SplitSeq(s, ",") {
 		r, ok := strategies[name]
 		if !ok {
