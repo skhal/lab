@@ -17,12 +17,6 @@ import (
 )
 
 func TestHold_Run(t *testing.T) {
-	invest := func(bal, spa, spb fin.Cents) fin.Cents {
-		return fin.Cents(math.Floor(float64(bal) * float64(spb) / float64(spa)))
-	}
-	dividend := func(bal, sp, div fin.Cents) fin.Cents {
-		return fin.Cents(math.Floor(float64(bal) * float64(div) / float64(sp)))
-	}
 	tests := []struct {
 		name   string
 		start  fin.Cents
@@ -40,30 +34,42 @@ func TestHold_Run(t *testing.T) {
 			market: []*pb.Record{
 				tests.NewRecord(t, 2006, time.January, 100, 0, 0),
 			},
-			want: fin.Cents(123),
+			want: func() fin.Cents {
+				// cycle 1
+				c, d := func(c fin.Cents) (inv, div fin.Cents) {
+					return c, dividend(t, c, 100, 0)
+				}(fin.Cents(123))
+				return c + d
+			}(),
 		},
 		{
 			name:  "one cycle div non-zero",
 			start: fin.Cents(123),
 			market: []*pb.Record{
-				tests.NewRecord(t, 2006, time.January, 100, 1, 0),
+				tests.NewRecord(t, 2006, time.January, 100, 20, 0),
 			},
-			want: fin.Cents(math.Floor(123 * (1 + 1./100.))),
+			want: func() fin.Cents {
+				// cycle 1
+				c, d := func(c fin.Cents) (inv, div fin.Cents) {
+					return c, dividend(t, c, 100, 20)
+				}(fin.Cents(123))
+				return c + d
+			}(),
 		},
 		{
 			name:  "two cycles div zero",
 			start: fin.Cents(123),
 			market: []*pb.Record{
 				tests.NewRecord(t, 2006, time.January, 100, 0, 0),
-				tests.NewRecord(t, 2006, time.February, 110, 0, 0),
+				tests.NewRecord(t, 2006, time.February, 125, 0, 0),
 			},
 			want: func() fin.Cents {
 				// cycle 1
-				c := fin.Cents(123)
-				d := dividend(c, 100, 0)
+				c, d := func(c fin.Cents) (inv, div fin.Cents) {
+					return c, dividend(t, c, 100, 0)
+				}(fin.Cents(123))
 				// cycle 2
-				c = invest(c, 100, 110) // update
-				d += dividend(c, 110, 0)
+				c, d = invest(t, c, 100, 125), d+dividend(t, c, 125, 0)
 				return c + d
 			}(),
 		},
@@ -71,16 +77,16 @@ func TestHold_Run(t *testing.T) {
 			name:  "two cycles div non-zero",
 			start: fin.Cents(123),
 			market: []*pb.Record{
-				tests.NewRecord(t, 2006, time.January, 100, 1, 0),
-				tests.NewRecord(t, 2006, time.February, 110, 2, 0),
+				tests.NewRecord(t, 2006, time.January, 100, 20, 0),
+				tests.NewRecord(t, 2006, time.February, 125, 40, 0),
 			},
 			want: func() fin.Cents {
 				// cycle 1
-				c := fin.Cents(123)
-				d := dividend(c, 100, 1)
+				c, d := func(c fin.Cents) (inv, div fin.Cents) {
+					return c, dividend(t, c, 100, 20)
+				}(fin.Cents(123))
 				// cycle 2
-				c = invest(c, 100, 110) // update
-				d += dividend(c, 110, 2)
+				c, d = invest(t, c, 100, 125), d+dividend(t, c, 125, 40)
 				return c + d
 			}(),
 		},
@@ -89,19 +95,18 @@ func TestHold_Run(t *testing.T) {
 			start: fin.Cents(123),
 			market: []*pb.Record{
 				tests.NewRecord(t, 2006, time.January, 100, 0, 0),
-				tests.NewRecord(t, 2006, time.February, 110, 0, 0),
-				tests.NewRecord(t, 2006, time.March, 120, 0, 0),
+				tests.NewRecord(t, 2006, time.February, 125, 0, 0),
+				tests.NewRecord(t, 2006, time.March, 150, 0, 0),
 			},
 			want: func() fin.Cents {
 				// cycle 1
-				c := fin.Cents(123)
-				d := dividend(c, 100, 0)
+				c, d := func(c fin.Cents) (inv, div fin.Cents) {
+					return c, dividend(t, c, 100, 0)
+				}(fin.Cents(123))
 				// cycle 2
-				c = invest(c, 100, 110) // update
-				d += dividend(c, 110, 0)
+				c, d = invest(t, c, 100, 125), d+dividend(t, c, 125, 0)
 				// cycle 3
-				c = invest(c, 110, 120) // update
-				d += dividend(c, 120, 0)
+				c, d = invest(t, c, 125, 150), d+dividend(t, c, 150, 0)
 				return c + d
 			}(),
 		},
@@ -109,20 +114,19 @@ func TestHold_Run(t *testing.T) {
 			name:  "three cycles div non-zero",
 			start: fin.Cents(123),
 			market: []*pb.Record{
-				tests.NewRecord(t, 2006, time.January, 100, 1, 0),
-				tests.NewRecord(t, 2006, time.February, 110, 2, 0),
-				tests.NewRecord(t, 2006, time.March, 120, 3, 0),
+				tests.NewRecord(t, 2006, time.January, 100, 20, 0),
+				tests.NewRecord(t, 2006, time.February, 125, 40, 0),
+				tests.NewRecord(t, 2006, time.March, 150, 60, 0),
 			},
 			want: func() fin.Cents {
 				// cycle 1
-				c := fin.Cents(123)
-				d := dividend(c, 100, 1)
+				c, d := func(c fin.Cents) (inv, div fin.Cents) {
+					return c, dividend(t, c, 100, 20)
+				}(fin.Cents(123))
 				// cycle 2
-				c = invest(c, 100, 110) // update
-				d += dividend(c, 110, 2)
+				c, d = invest(t, c, 100, 125), d+dividend(t, c, 125, 40)
 				// cycle 3
-				c = invest(c, 110, 120) // update
-				d += dividend(c, 120, 3)
+				c, d = invest(t, c, 125, 150), d+dividend(t, c, 150, 60)
 				return c + d
 			}(),
 		},
@@ -134,9 +138,146 @@ func TestHold_Run(t *testing.T) {
 			got := s.Run(tc.start, tc.market)
 
 			if got != tc.want {
-				t.Errorf("NewHold().Run(%s, _) = %s; want %s", tc.start, got, tc.want)
+				t.Errorf("Hold().Run(%s, _) = %s; want %s", tc.start, got, tc.want)
 				t.Log(tc.market)
 			}
 		})
 	}
+}
+
+func TestHoldReinvest_Run(t *testing.T) {
+	tests := []struct {
+		name   string
+		start  fin.Cents
+		market []*pb.Record
+		want   fin.Cents
+	}{
+		{
+			name:  "no cycles",
+			start: fin.Cents(123),
+			want:  fin.Cents(123),
+		},
+		{
+			name:  "one cycle div zero",
+			start: fin.Cents(123),
+			market: []*pb.Record{
+				tests.NewRecord(t, 2006, time.January, 100, 0, 0),
+			},
+			want: func() fin.Cents {
+				// cycle 1
+				c, d := func(c fin.Cents) (inv, div fin.Cents) {
+					return c + dividend(t, c, 100, 0), 0
+				}(fin.Cents(123))
+				return c + d
+			}(),
+		},
+		{
+			name:  "one cycle div non-zero",
+			start: fin.Cents(123),
+			market: []*pb.Record{
+				tests.NewRecord(t, 2006, time.January, 100, 20, 0),
+			},
+			want: func() fin.Cents {
+				// cycle 1
+				c, d := func(c fin.Cents) (inv, div fin.Cents) {
+					return c + dividend(t, c, 100, 20), 0
+				}(fin.Cents(123))
+				return c + d
+			}(),
+		},
+		{
+			name:  "two cycles div zero",
+			start: fin.Cents(123),
+			market: []*pb.Record{
+				tests.NewRecord(t, 2006, time.January, 100, 0, 0),
+				tests.NewRecord(t, 2006, time.February, 125, 0, 0),
+			},
+			want: func() fin.Cents {
+				// cycle 1
+				c, d := func(c fin.Cents) (inv, div fin.Cents) {
+					return c + dividend(t, c, 100, 0), 0
+				}(fin.Cents(123))
+				// cycle 2
+				c, d = invest(t, c, 100, 125)+dividend(t, c, 125, 0), 0
+				return c + d
+			}(),
+		},
+		{
+			name:  "two cycles div non-zero",
+			start: fin.Cents(123),
+			market: []*pb.Record{
+				tests.NewRecord(t, 2006, time.January, 100, 20, 0),
+				tests.NewRecord(t, 2006, time.February, 125, 40, 0),
+			},
+			want: func() fin.Cents {
+				// cycle 1
+				c, d := func(c fin.Cents) (inv, div fin.Cents) {
+					return c + dividend(t, c, 100, 20), 0
+				}(fin.Cents(123))
+				// cycle 2
+				c, d = invest(t, c, 100, 125)+dividend(t, c, 125, 40), 0
+				return c + d
+			}(),
+		},
+		{
+			name:  "three cycles div zero",
+			start: fin.Cents(123),
+			market: []*pb.Record{
+				tests.NewRecord(t, 2006, time.January, 100, 0, 0),
+				tests.NewRecord(t, 2006, time.February, 125, 0, 0),
+				tests.NewRecord(t, 2006, time.March, 150, 0, 0),
+			},
+			want: func() fin.Cents {
+				// cycle 1
+				c, d := func(c fin.Cents) (inv, div fin.Cents) {
+					return c + dividend(t, c, 100, 0), 0
+				}(fin.Cents(123))
+				// cycle 2
+				c, d = invest(t, c, 100, 125)+dividend(t, c, 125, 0), 0
+				// cycle 3
+				c, d = invest(t, c, 125, 150)+dividend(t, c, 150, 0), 0
+				return c + d
+			}(),
+		},
+		{
+			name:  "three cycles div non-zero",
+			start: fin.Cents(123),
+			market: []*pb.Record{
+				tests.NewRecord(t, 2006, time.January, 100, 20, 0),
+				tests.NewRecord(t, 2006, time.February, 125, 40, 0),
+				tests.NewRecord(t, 2006, time.March, 150, 60, 0),
+			},
+			want: func() fin.Cents {
+				// cycle 1
+				c, d := func(c fin.Cents) (inv, div fin.Cents) {
+					return c + dividend(t, c, 100, 20), 0
+				}(fin.Cents(123))
+				// cycle 2
+				c, d = invest(t, c, 100, 125)+dividend(t, c, 125, 40), 0
+				// cycle 3
+				c, d = invest(t, c, 125, 150)+dividend(t, c, 150, 60), 0
+				return c + d
+			}(),
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			got := strategy.HoldReinvest().Run(tc.start, tc.market)
+
+			if got != tc.want {
+				t.Errorf("HoldReinvest().Run(%s, _) = %s; want %s", tc.start, got, tc.want)
+				t.Log(tc.market)
+			}
+		})
+	}
+}
+
+func invest(t *testing.T, bal, spa, spb fin.Cents) fin.Cents {
+	t.Helper()
+	return fin.Cents(math.Floor(float64(bal) * float64(spb) / float64(spa)))
+}
+
+func dividend(t *testing.T, bal, sp, div fin.Cents) fin.Cents {
+	t.Helper()
+	return fin.Cents(math.Floor(float64(bal) * float64(div) / float64(sp)))
 }
