@@ -12,16 +12,16 @@ import (
 	"github.com/skhal/lab/x/fin/internal/pb"
 )
 
-// Hold implements a strategy to hold investment. It has an option to re-invest
+// hold implements a strategy to hold investment. It has an option to re-invest
 // dividends (off by default).
-type Hold struct {
+type hold struct {
 	reinvestDividends bool
 	last              *pb.Record
 }
 
 // NewHold createsa a hold strategy.
 func NewHold(opts ...HoldOpt) *Runner {
-	h := new(Hold)
+	h := new(hold)
 	for _, opt := range opts {
 		opt(h)
 	}
@@ -29,17 +29,17 @@ func NewHold(opts ...HoldOpt) *Runner {
 }
 
 // HoldOpt is an option
-type HoldOpt func(*Hold)
+type HoldOpt func(*hold)
 
 // HoldOptReinvestDiv turns on dividend re-investment in the Hold strategy.
 func HoldOptReinvestDiv() HoldOpt {
-	return func(s *Hold) {
+	return func(s *hold) {
 		s.reinvestDividends = true
 	}
 }
 
 // Cycle executes a single cycle of the hold strategy.
-func (s *Hold) Cycle(q Quote, rec *pb.Record) Quote {
+func (s *hold) Cycle(q Quote, rec *pb.Record) Quote {
 	bal := s.invest(q.Bal, rec)
 	div := s.payDividend(q.Bal, rec)
 	if s.reinvestDividends {
@@ -52,12 +52,12 @@ func (s *Hold) Cycle(q Quote, rec *pb.Record) Quote {
 	return Quote{Bal: bal, Div: div}
 }
 
-func (s *Hold) invest(c fin.Cents, curr *pb.Record) fin.Cents {
+func (s *hold) invest(c fin.Cents, curr *pb.Record) fin.Cents {
 	ror := SPRateOfReturn(s.last, curr)
 	return fin.Cents(math.Floor(float64(c) * float64(ror)))
 }
 
-func (s *Hold) payDividend(c fin.Cents, rec *pb.Record) fin.Cents {
+func (s *hold) payDividend(c fin.Cents, rec *pb.Record) fin.Cents {
 	ror := DivRateOfReturn(rec)
 	return fin.Cents(math.Floor(float64(c) * float64(ror)))
 }
