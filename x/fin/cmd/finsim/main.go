@@ -35,7 +35,8 @@ func main() {
 }
 
 func run() error {
-	ifile, nmonth, runners, err := parseFlags()
+	reg := createRegistry()
+	ifile, nmonth, runners, err := parseFlags(reg)
 	if err != nil {
 		return err
 	}
@@ -50,7 +51,23 @@ func run() error {
 	return runStrategies(runners, fetchLastN(m.GetRecords(), nmonth))
 }
 
-func parseFlags() (file string, months int, runners []*namedRunner, err error) {
+func createRegistry() *registry {
+	reg := newRegistry()
+	mustRegister := func(name, desc string, r *strategy.Runner) {
+		if err := reg.Register(name, desc, r); err != nil {
+			panic(err)
+		}
+	}
+	mustRegister("hold-collect-div", "hold s&p, collect dividends", strategy.NewHold())
+	mustRegister("hold-reinvest-div", "hold s&p, reinvest dividends", strategy.NewHold(strategy.HoldOptReinvestDiv()))
+	mustRegister("withhold-3-hold-collect-div", "withhold 3% yearly, hold s&p, collect dividends", strategy.NewWithhold(strategy.NewHold(), strategy.Percent(3)))
+	mustRegister("withhold-4-hold-collect-div", "withhold 4% yearly, hold s&p, collect dividends", strategy.NewWithhold(strategy.NewHold(), strategy.Percent(4)))
+	mustRegister("withhold-3-hold-reinvest-div", "withhold 3% yearly, hold s&p, reinvest dividends", strategy.NewWithhold(strategy.NewHold(strategy.HoldOptReinvestDiv()), strategy.Percent(3)))
+	mustRegister("withhold-4-hold-reinvest-div", "withhold 4% yearly, hold s&p, reinvest dividends", strategy.NewWithhold(strategy.NewHold(strategy.HoldOptReinvestDiv()), strategy.Percent(4)))
+	return reg
+}
+
+func parseFlags(reg *registry) (file string, months int, runners []*namedRunner, err error) {
 	flag.Usage = func() {
 		w := flag.CommandLine.Output()
 		fmt.Fprintf(w, "usage: %s [flags] file\n", filepath.Base(os.Args[0]))
@@ -59,15 +76,8 @@ func parseFlags() (file string, months int, runners []*namedRunner, err error) {
 		flag.PrintDefaults()
 	}
 	flag.IntVar(&months, "n", 12, "number of latest months to process")
-	sflag := newStrategyListFlag(defaultStrategies...)
-	sflagOpts := func() string {
-		nn := make([]string, 0, len(strategies))
-		for name := range strategies {
-			nn = append(nn, name)
-		}
-		return strings.Join(nn, ",")
-	}
-	flag.Var(sflag, "s", fmt.Sprintf("comma separated list of strategies to run, options:\n%s\n", sflagOpts()))
+	sflag := newStrategyListFlag(reg)
+	flag.Var(sflag, "s", sflag.Help())
 	flag.Parse()
 	if flag.NArg() != 1 {
 		err = errors.New("missing input file")
@@ -98,32 +108,43 @@ func runStrategies(strategies []*namedRunner, market []*pb.Record) error {
 	return report.Strategies(os.Stdout, infos)
 }
 
-var (
-	strategies        = make(map[string]*namedRunner)
-	defaultStrategies = []string{
-		"hold-collect-div",
-		"hold-reinvest-div",
-		"withhold-3-hold-collect-div",
-		"withhold-4-hold-collect-div",
-		"withhold-3-hold-reinvest-div",
-		"withhold-4-hold-reinvest-div",
-	}
-)
+type registry struct {
+	runners map[string]*namedRunner
+}
 
-func init() {
-	register := func(name, desc string, r *strategy.Runner) {
-		if r, ok := strategies[name]; ok {
-			err := fmt.Errorf("strategy with name %s already exists: %s", name, r.Description())
-			panic(err)
-		}
-		strategies[name] = newNamedRunner(name, desc, r)
+func newRegistry() *registry {
+	return &registry{make(map[string]*namedRunner)}
+}
+
+// Get retrieves a strategy runner from the registry. It returns a boolean flag
+// to indicate whether a runner with a given name is available.
+func (reg *registry) Get(name string) (*namedRunner, bool) {
+	r, ok := reg.runners[name]
+	return r, ok
+}
+
+// Len returns the number of registered runners.
+func (reg *registry) Len() int {
+	return len(reg.runners)
+}
+
+// Register adds a strategy runner to the registry.
+func (reg *registry) Register(name, desc string, r *strategy.Runner) error {
+	if _, ok := reg.runners[name]; ok {
+		return fmt.Errorf("duplicate runner %s", name)
 	}
-	register("hold-collect-div", "hold s&p, collect dividends", strategy.NewHold())
-	register("hold-reinvest-div", "hold s&p, reinvest dividends", strategy.NewHold(strategy.HoldOptReinvestDiv()))
-	register("withhold-3-hold-collect-div", "withhold 3% yearly, hold s&p, collect dividends", strategy.NewWithhold(strategy.NewHold(), strategy.Percent(3)))
-	register("withhold-4-hold-collect-div", "withhold 4% yearly, hold s&p, collect dividends", strategy.NewWithhold(strategy.NewHold(), strategy.Percent(4)))
-	register("withhold-3-hold-reinvest-div", "withhold 3% yearly, hold s&p, reinvest dividends", strategy.NewWithhold(strategy.NewHold(strategy.HoldOptReinvestDiv()), strategy.Percent(3)))
-	register("withhold-4-hold-reinvest-div", "withhold 4% yearly, hold s&p, reinvest dividends", strategy.NewWithhold(strategy.NewHold(strategy.HoldOptReinvestDiv()), strategy.Percent(4)))
+	reg.runners[name] = newNamedRunner(name, desc, r)
+	return nil
+}
+
+// Walk applies f to every registered strategy. The callback may return false
+// to stop the iteration short.
+func (reg *registry) Walk(f func(*namedRunner) bool) {
+	for _, r := range reg.runners {
+		if !f(r) {
+			break
+		}
+	}
 }
 
 type namedRunner struct {
@@ -157,25 +178,35 @@ func (nr *namedRunner) Run(market []*pb.Record) *report.StrategyInfo {
 }
 
 type strategyListFlag struct {
+	reg     *registry
 	runners []*namedRunner
 
 	seen map[string]bool
 	set  bool
 }
 
-func newStrategyListFlag(names ...string) *strategyListFlag {
-	runners := make([]*namedRunner, 0, len(names))
-	for _, name := range names {
-		r, ok := strategies[name]
-		if !ok {
-			panic(fmt.Errorf("unsupported strategy %s", name))
-		}
+func newStrategyListFlag(reg *registry) *strategyListFlag {
+	runners := make([]*namedRunner, 0, reg.Len())
+	reg.Walk(func(r *namedRunner) bool {
 		runners = append(runners, r)
-	}
+		return true
+	})
 	return &strategyListFlag{
+		reg:     reg,
 		runners: runners,
 		seen:    make(map[string]bool),
 	}
+}
+
+// Help generates a help message for the flag.
+func (f *strategyListFlag) Help() string {
+	names := make([]string, 0, f.reg.Len())
+	f.reg.Walk(func(r *namedRunner) bool {
+		names = append(names, r.Name())
+		return true
+	})
+	opts := strings.Join(names, "\n")
+	return fmt.Sprintf("comma-separated list of strategies to run:\n%s\n", opts)
 }
 
 // Runners returns a list of registered runners.
@@ -187,7 +218,7 @@ func (f *strategyListFlag) Runners() []*namedRunner {
 func (f *strategyListFlag) Set(s string) error {
 	var runners []*namedRunner
 	for name := range strings.SplitSeq(s, ",") {
-		r, ok := strategies[name]
+		r, ok := f.reg.Get(name)
 		if !ok {
 			return fmt.Errorf("unsupported strategy %s", name)
 		}
