@@ -10,17 +10,11 @@ import (
 
 	"github.com/skhal/lab/x/fin/internal/fin"
 	"github.com/skhal/lab/x/fin/internal/pb"
+	"github.com/skhal/lab/x/fin/internal/strategy"
 )
 
-// Strategy emulates an investment behavior.
-type Strategy interface {
-	// Run applies underlying strategy to the market. It begins with startBalance
-	// and returns endBalance.
-	Run(startBalance fin.Cents, market []*pb.Record) (endBalance fin.Cents)
-}
-
 // Run executes strategy s for market. It return the beginning and end balances.
-func Run(c fin.Cents, market []*pb.Record, s Strategy) (start, end fin.Quote) {
+func Run(c fin.Cents, market []*pb.Record, s *strategy.Runner) (start, end fin.Quote) {
 	if len(market) == 0 {
 		return
 	}

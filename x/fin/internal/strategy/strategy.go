@@ -21,21 +21,25 @@ func (b Quote) Total() fin.Cents {
 	return b.Bal + b.Div
 }
 
-// CycleFunc is a single cycle to process a record, implementing some strategy.
-type CycleFunc func(q Quote, prev, curr *pb.Record) Quote
-
-type strategy struct {
-	cf CycleFunc
+// Cycler is a strategy that can process a single cycle.
+type Cycler interface {
+	// Cycle processes a single market record.
+	Cycle(q Quote, prev, curr *pb.Record) Quote
 }
 
-// New createas a strategy, backed by the cycle function c.
-func New(c CycleFunc) *strategy {
-	return &strategy{c}
+// Runner represents a strategy backed by Cycler.
+type Runner struct {
+	c Cycler
+}
+
+// New createas a strategy, backed by Cycler.
+func New(c Cycler) *Runner {
+	return &Runner{c}
 }
 
 // Run executes the strategy on a set of rectors starting with a given balance.
 // It returns the end balance.
-func (s *strategy) Run(start fin.Cents, market []*pb.Record) fin.Cents {
+func (s *Runner) Run(start fin.Cents, market []*pb.Record) fin.Cents {
 	var prev *pb.Record
 	q := Quote{Bal: start}
 	for _, rec := range market {
@@ -46,6 +50,6 @@ func (s *strategy) Run(start fin.Cents, market []*pb.Record) fin.Cents {
 }
 
 // Cycle executes one cycle of a strategy backed by the cycle function.
-func (s *strategy) Cycle(q Quote, prev, curr *pb.Record) Quote {
-	return s.cf(q, prev, curr)
+func (s *Runner) Cycle(q Quote, prev, curr *pb.Record) Quote {
+	return s.c.Cycle(q, prev, curr)
 }

@@ -13,20 +13,23 @@ import (
 	"github.com/skhal/lab/x/fin/internal/fin"
 	"github.com/skhal/lab/x/fin/internal/pb"
 	"github.com/skhal/lab/x/fin/internal/sim"
+	"github.com/skhal/lab/x/fin/internal/strategy"
 	"github.com/skhal/lab/x/fin/internal/tests"
 )
 
 func TestRun(t *testing.T) {
+	cycle := func(q strategy.Quote, prev, curr *pb.Record) strategy.Quote {
+		return strategy.Quote{Bal: -q.Bal, Div: -q.Div}
+	}
 	type want struct {
 		start fin.Quote
 		end   fin.Quote
 	}
 	tests := []struct {
-		name     string
-		bal      fin.Cents
-		market   []*pb.Record
-		strategy sim.Strategy
-		want     want
+		name   string
+		bal    fin.Cents
+		market []*pb.Record
+		want   want
 	}{
 		{
 			name: "empty do nothing",
@@ -37,7 +40,6 @@ func TestRun(t *testing.T) {
 			market: []*pb.Record{
 				tests.NewRecord(t, 2006, time.January, 2, 3, 0),
 			},
-			strategy: new(flipStrategy),
 			want: want{
 				start: fin.Quote{Date: newTime(t, 2006, time.January), Balance: 123},
 				end:   fin.Quote{Date: newTime(t, 2006, time.February), Balance: -123},
@@ -50,7 +52,6 @@ func TestRun(t *testing.T) {
 				tests.NewRecord(t, 2006, time.January, 2, 3, 0),
 				tests.NewRecord(t, 2006, time.February, 2, 3, 0),
 			},
-			strategy: new(flipStrategy),
 			want: want{
 				start: fin.Quote{Date: newTime(t, 2006, time.January), Balance: 123},
 				end:   fin.Quote{Date: newTime(t, 2006, time.March), Balance: 123},
@@ -59,7 +60,7 @@ func TestRun(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			start, end := sim.Run(tc.bal, tc.market, tc.strategy)
+			start, end := sim.Run(tc.bal, tc.market, strategy.New(CycleFunc(cycle)))
 
 			if diff := cmp.Diff(tc.want.start, start); diff != "" {
 				t.Errorf("sim.Run() = start, _; mismatch (-want, +got):\n%s", diff)
@@ -71,14 +72,10 @@ func TestRun(t *testing.T) {
 	}
 }
 
-type flipStrategy struct{}
+type CycleFunc func(q strategy.Quote, prev, curr *pb.Record) strategy.Quote
 
-func (s *flipStrategy) Run(c fin.Cents, market []*pb.Record) fin.Cents {
-	if len(market)%2 == 0 {
-		return c
-	} else {
-		return -c
-	}
+func (cf CycleFunc) Cycle(q strategy.Quote, prev, curr *pb.Record) strategy.Quote {
+	return cf(q, prev, curr)
 }
 
 func newTime(t *testing.T, year int, month time.Month) time.Time {

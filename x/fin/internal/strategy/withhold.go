@@ -21,32 +21,16 @@ type Withhold struct {
 	rate float64
 }
 
-// Cycler is a strategy that can process a single cycle.
-type Cycler interface {
-	// Cycle processes a single market record.
-	Cycle(q Quote, prev, curr *pb.Record) Quote
-}
-
 // Percent is a value in the range [0, 100].
 type Percent int
 
 // NewWithhold creates a withholder for a strategy c at annual percent.
-func NewWithhold(c Cycler, annual Percent) *Withhold {
-	return &Withhold{
+func NewWithhold(c Cycler, annual Percent) *Runner {
+	h := &Withhold{
 		c:    c,
 		rate: float64(annual) / 100.,
 	}
-}
-
-// Run executes the strategy.
-func (s *Withhold) Run(c fin.Cents, market []*pb.Record) fin.Cents {
-	var prev *pb.Record
-	q := Quote{Bal: c}
-	for _, rec := range market {
-		q = s.Cycle(q, prev, rec)
-		prev = rec
-	}
-	return q.Total()
+	return New(h)
 }
 
 // Cycle withholds percent at the beginning of the year and runs wrapped

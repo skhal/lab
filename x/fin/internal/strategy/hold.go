@@ -19,12 +19,12 @@ type Hold struct {
 }
 
 // NewHold createsa a hold strategy.
-func NewHold(opts ...HoldOpt) *Hold {
-	s := new(Hold)
+func NewHold(opts ...HoldOpt) *Runner {
+	h := new(Hold)
 	for _, opt := range opts {
-		opt(s)
+		opt(h)
 	}
-	return s
+	return New(h)
 }
 
 // HoldOpt is an option
@@ -35,17 +35,6 @@ func HoldOptReinvestDiv() HoldOpt {
 	return func(s *Hold) {
 		s.reinvestDividends = true
 	}
-}
-
-// Run executes the strategy.
-func (s *Hold) Run(c fin.Cents, market []*pb.Record) fin.Cents {
-	var prev *pb.Record
-	q := Quote{Bal: c}
-	for _, rec := range market {
-		q = s.Cycle(q, prev, rec)
-		prev = rec
-	}
-	return q.Total()
 }
 
 // Cycle executes a single cycle of the hold strategy.

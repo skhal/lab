@@ -67,7 +67,7 @@ func TestWithhold_Run(t *testing.T) {
 	}
 	for _, tc := range tctc {
 		t.Run(tc.name, func(t *testing.T) {
-			s := strategy.NewWithhold(strategy.New(cycle), tc.percent)
+			s := strategy.NewWithhold(strategy.New(CycleFunc(cycle)), tc.percent)
 
 			got := s.Run(tc.start, tc.market)
 
@@ -77,4 +77,10 @@ func TestWithhold_Run(t *testing.T) {
 			}
 		})
 	}
+}
+
+type CycleFunc func(q strategy.Quote, prev, curr *pb.Record) strategy.Quote
+
+func (cf CycleFunc) Cycle(q strategy.Quote, prev, curr *pb.Record) strategy.Quote {
+	return cf(q, prev, curr)
 }

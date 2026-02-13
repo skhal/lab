@@ -111,7 +111,7 @@ var (
 )
 
 func init() {
-	register := func(name, desc string, s sim.Strategy) {
+	register := func(name, desc string, s *strategy.Runner) {
 		if r, ok := strategies[name]; ok {
 			err := fmt.Errorf("strategy with name %s already exists: %s", name, r.Description())
 			panic(err)
@@ -129,10 +129,10 @@ func init() {
 type strategyRunner struct {
 	name     string
 	desc     string
-	strategy sim.Strategy
+	strategy *strategy.Runner
 }
 
-func newStrategyRunner(name, desc string, s sim.Strategy) *strategyRunner {
+func newStrategyRunner(name, desc string, s *strategy.Runner) *strategyRunner {
 	return &strategyRunner{
 		name:     name,
 		desc:     desc,
