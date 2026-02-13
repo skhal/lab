@@ -55,11 +55,12 @@ func strategiesPerformance(w io.Writer, infos []*StrategyInfo) error {
 			if c > 0 {
 				fmt.Fprint(&b, " | ")
 			}
-			rate := 1.0
 			if c != r {
-				rate = float64(cinfo.End.Balance) / float64(rinfo.End.Balance)
+				rate := float64(cinfo.End.Balance) / float64(rinfo.End.Balance)
+				fmt.Fprintf(&b, "%.2f", rate)
+			} else {
+				fmt.Fprintf(&b, "%4s", "")
 			}
-			fmt.Fprintf(&b, "%.2f", rate)
 		}
 		fmt.Fprintln(&b)
 		io.Copy(w, &b)
