@@ -58,12 +58,12 @@ func createRegistry() *registry {
 			panic(err)
 		}
 	}
-	mustRegister(HoldCoollectDiv())
-	mustRegister(HoldReinvestDiv())
-	mustRegister(Withhold3HoldCollectDiv())
-	mustRegister(Withhold4HoldCollectDiv())
-	mustRegister(Withhold3HoldReinvestDiv())
-	mustRegister(Withhold4HoldReinvestDiv())
+	mustRegister(HoldCoollect())
+	mustRegister(HoldReinvest())
+	mustRegister(Withhold3HoldCollect())
+	mustRegister(Withhold4HoldCollect())
+	mustRegister(Withhold3HoldReinvest())
+	mustRegister(Withhold4HoldReinvest())
 	return reg
 }
 
@@ -239,7 +239,7 @@ func (f *strategyListFlag) String() string {
 
 // HoldCoollectDiv creates a strategy to hold SP composite index and collect
 // dividends.
-func HoldCoollectDiv() *namedRunner {
+func HoldCoollect() *namedRunner {
 	return &namedRunner{
 		name:   "hold-collect-div",
 		desc:   "hold s&p, collect dividends",
@@ -249,7 +249,7 @@ func HoldCoollectDiv() *namedRunner {
 
 // HoldReinvestDiv creates a strategy to hold SP composite index and reinvest
 // dividend payouts into the index.
-func HoldReinvestDiv() *namedRunner {
+func HoldReinvest() *namedRunner {
 	return &namedRunner{
 		name:   "hold-reinvest-div",
 		desc:   "hold s&p, reinvest dividends",
@@ -259,7 +259,7 @@ func HoldReinvestDiv() *namedRunner {
 
 // Withhold3HoldCollectDiv creates a strategy to withhold 3% every year from
 // [HoldCollectDiv] strategy.
-func Withhold3HoldCollectDiv() *namedRunner {
+func Withhold3HoldCollect() *namedRunner {
 	return &namedRunner{
 		name:   "withhold-3-hold-collect-div",
 		desc:   "withhold 3% yearly, hold s&p, collect dividends",
@@ -269,7 +269,7 @@ func Withhold3HoldCollectDiv() *namedRunner {
 
 // Withhold4HoldCollectDiv creates a strategy to withhold 4% every year from
 // [HoldCollectDiv] strategy.
-func Withhold4HoldCollectDiv() *namedRunner {
+func Withhold4HoldCollect() *namedRunner {
 	return &namedRunner{
 		name:   "withhold-4-hold-collect-div",
 		desc:   "withhold 4% yearly, hold s&p, collect dividends",
@@ -279,7 +279,7 @@ func Withhold4HoldCollectDiv() *namedRunner {
 
 // Withhold3HoldReinvestDiv creates a strategy to withhold 3% every year from
 // [HoldReinvestDiv] strategy.
-func Withhold3HoldReinvestDiv() *namedRunner {
+func Withhold3HoldReinvest() *namedRunner {
 	return &namedRunner{
 		name:   "withhold-3-hold-reinvest-div",
 		desc:   "withhold 3% yearly, hold s&p, reinvest dividends",
@@ -289,7 +289,7 @@ func Withhold3HoldReinvestDiv() *namedRunner {
 
 // Withhold4HoldReinvestDiv creates a strategy to withhold 4% every year from
 // [HoldReinvestDiv] strategy.
-func Withhold4HoldReinvestDiv() *namedRunner {
+func Withhold4HoldReinvest() *namedRunner {
 	return &namedRunner{
 		name:   "withhold-4-hold-reinvest-div",
 		desc:   "withhold 4% yearly, hold s&p, reinvest dividends",
