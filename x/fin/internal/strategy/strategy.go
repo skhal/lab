@@ -29,7 +29,7 @@ type Cycler interface {
 
 // Runner represents a strategy backed by Cycler.
 type Runner struct {
-	c Cycler
+	Cycler
 }
 
 // New createas a strategy, backed by Cycler.
@@ -45,9 +45,4 @@ func (s *Runner) Run(start fin.Cents, market []*pb.Record) fin.Cents {
 		q = s.Cycle(q, rec)
 	}
 	return q.Total()
-}
-
-// Cycle executes one cycle of a strategy backed by the cycle function.
-func (s *Runner) Cycle(q Quote, rec *pb.Record) Quote {
-	return s.c.Cycle(q, rec)
 }
