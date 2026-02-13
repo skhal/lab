@@ -110,10 +110,13 @@ func runStrategies(strategies []*namedRunner, market []*pb.Record) error {
 
 type registry struct {
 	runners map[string]*namedRunner
+	order   []string
 }
 
 func newRegistry() *registry {
-	return &registry{make(map[string]*namedRunner)}
+	return &registry{
+		runners: make(map[string]*namedRunner),
+	}
 }
 
 // Get retrieves a strategy runner from the registry. It returns a boolean flag
@@ -130,17 +133,20 @@ func (reg *registry) Len() int {
 
 // Register adds a strategy runner to the registry.
 func (reg *registry) Register(r *namedRunner) error {
-	if _, ok := reg.runners[r.Name()]; ok {
-		return fmt.Errorf("duplicate runner %s", r.Name())
+	name := r.Name()
+	if _, ok := reg.runners[name]; ok {
+		return fmt.Errorf("duplicate runner %s", name)
 	}
-	reg.runners[r.Name()] = r
+	reg.runners[name] = r
+	reg.order = append(reg.order, name)
 	return nil
 }
 
 // Walk applies f to every registered strategy. The callback may return false
 // to stop the iteration short.
 func (reg *registry) Walk(f func(*namedRunner) bool) {
-	for _, r := range reg.runners {
+	for _, n := range reg.order {
+		r := reg.runners[n]
 		if !f(r) {
 			break
 		}
