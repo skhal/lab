@@ -23,9 +23,9 @@ func Hold() *Runner {
 
 // Cycle implements [Cycler] interface.
 func (s *hold) Cycle(q Quote, rec *pb.Record) Quote {
+	defer func() { s.last = rec }()
 	bal := s.invest(q.Bal, rec)
 	div := s.payDividend(q.Bal, rec) + q.Div
-	s.last = rec
 	return Quote{Bal: bal, Div: div}
 }
 

@@ -36,10 +36,10 @@ func Retain(p Percent, c Cycler) *Runner {
 // Cycle retains percent at the beginning of the year and runs wrapped
 // strategy.
 func (s *retain) Cycle(q Quote, rec *pb.Record) Quote {
+	defer func() { s.last = rec }()
 	if s.shouldRetain(rec) {
 		q = s.withhold(q)
 	}
-	s.last = rec
 	return s.c.Cycle(q, rec)
 }
 
