@@ -58,8 +58,8 @@ func parseFlags() (file string, months int, runners []*strategyRunner, err error
 		fmt.Fprintln(w, "flags:")
 		flag.PrintDefaults()
 	}
-	sflag := newStrategyListFlag(defaultStrategies...)
 	flag.IntVar(&months, "n", 12, "number of latest months to process")
+	sflag := newStrategyListFlag(defaultStrategies...)
 	sflagOpts := func() string {
 		nn := make([]string, 0, len(strategies))
 		for name := range strategies {
@@ -103,6 +103,10 @@ var (
 	defaultStrategies = []string{
 		"hold-collect-div",
 		"hold-reinvest-div",
+		"withhold-3-hold-collect-div",
+		"withhold-4-hold-collect-div",
+		"withhold-3-hold-reinvest-div",
+		"withhold-4-hold-reinvest-div",
 	}
 )
 
@@ -116,6 +120,10 @@ func init() {
 	}
 	register("hold-collect-div", "hold s&p, collect dividends", strategy.NewHold())
 	register("hold-reinvest-div", "hold s&p, reinvest dividends", strategy.NewHold(strategy.HoldOptReinvestDiv()))
+	register("withhold-3-hold-collect-div", "withhold 3% yearly, hold s&p, collect dividends", strategy.NewWithhold(strategy.NewHold(), strategy.Percent(3)))
+	register("withhold-4-hold-collect-div", "withhold 4% yearly, hold s&p, collect dividends", strategy.NewWithhold(strategy.NewHold(), strategy.Percent(4)))
+	register("withhold-3-hold-reinvest-div", "withhold 3% yearly, hold s&p, reinvest dividends", strategy.NewWithhold(strategy.NewHold(strategy.HoldOptReinvestDiv()), strategy.Percent(3)))
+	register("withhold-4-hold-reinvest-div", "withhold 4% yearly, hold s&p, reinvest dividends", strategy.NewWithhold(strategy.NewHold(strategy.HoldOptReinvestDiv()), strategy.Percent(4)))
 }
 
 type strategyRunner struct {

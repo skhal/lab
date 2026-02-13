@@ -37,36 +37,28 @@ func HoldOptReinvestDiv() HoldOpt {
 	}
 }
 
-type quote struct {
-	bal fin.Cents
-	div fin.Cents
-}
-
-func (b quote) total() fin.Cents {
-	return b.bal + b.div
-}
-
 // Run executes the strategy.
 func (s *Hold) Run(c fin.Cents, market []*pb.Record) fin.Cents {
 	var prev *pb.Record
-	q := quote{bal: c}
+	q := Quote{Bal: c}
 	for _, rec := range market {
-		q = s.cycle(q, prev, rec)
+		q = s.Cycle(q, prev, rec)
 		prev = rec
 	}
-	return q.total()
+	return q.Total()
 }
 
-func (s *Hold) cycle(q quote, prev, curr *pb.Record) quote {
-	bal := s.invest(q.bal, prev, curr)
-	div := s.payDividend(q.bal, curr)
+// Cycle executes a single cycle of the hold strategy.
+func (s *Hold) Cycle(q Quote, prev, curr *pb.Record) Quote {
+	bal := s.invest(q.Bal, prev, curr)
+	div := s.payDividend(q.Bal, curr)
 	if s.reinvestDividends {
 		bal += div
 		div = 0
 	} else {
-		div += q.div
+		div += q.Div
 	}
-	return quote{bal: bal, div: div}
+	return Quote{Bal: bal, Div: div}
 }
 
 func (s *Hold) invest(c fin.Cents, prev, curr *pb.Record) fin.Cents {
