@@ -95,7 +95,12 @@ local registrations = {
 		end,
 		subs = {
 			package = function(opts)
-				if opts.file:find("main.go$") ~= nil then
+				local is_command = function(file)
+					local abspath = vim.fs.abspath(file)
+					local dirname = vim.fs.dirname(abspath)
+					return vim.fs.basename(vim.fs.dirname(dirname)) == "cmd"
+				end
+				if opts.file:find("main.go$") ~= nil or is_command(opts.file) then
 					return "main"
 				end
 				local abspath = vim.fs.abspath(opts.file)
