@@ -53,18 +53,17 @@ func run() error {
 
 func createRegistry() *registry {
 	reg := newRegistry()
-	mustRegister := func(name, desc string, r *strategy.Runner) {
-		nr := newNamedRunner(name, desc, r)
+	mustRegister := func(nr *namedRunner) {
 		if err := reg.Register(nr); err != nil {
 			panic(err)
 		}
 	}
-	mustRegister("hold-collect-div", "hold s&p, collect dividends", strategy.NewHold())
-	mustRegister("hold-reinvest-div", "hold s&p, reinvest dividends", strategy.NewHold(strategy.HoldOptReinvestDiv()))
-	mustRegister("withhold-3-hold-collect-div", "withhold 3% yearly, hold s&p, collect dividends", strategy.NewWithhold(strategy.NewHold(), strategy.Percent(3)))
-	mustRegister("withhold-4-hold-collect-div", "withhold 4% yearly, hold s&p, collect dividends", strategy.NewWithhold(strategy.NewHold(), strategy.Percent(4)))
-	mustRegister("withhold-3-hold-reinvest-div", "withhold 3% yearly, hold s&p, reinvest dividends", strategy.NewWithhold(strategy.NewHold(strategy.HoldOptReinvestDiv()), strategy.Percent(3)))
-	mustRegister("withhold-4-hold-reinvest-div", "withhold 4% yearly, hold s&p, reinvest dividends", strategy.NewWithhold(strategy.NewHold(strategy.HoldOptReinvestDiv()), strategy.Percent(4)))
+	mustRegister(HoldCoollectDiv())
+	mustRegister(HoldReinvestDiv())
+	mustRegister(Withhold3HoldCollectDiv())
+	mustRegister(Withhold4HoldCollectDiv())
+	mustRegister(Withhold3HoldReinvestDiv())
+	mustRegister(Withhold4HoldReinvestDiv())
 	return reg
 }
 
@@ -154,14 +153,6 @@ type namedRunner struct {
 	runner *strategy.Runner
 }
 
-func newNamedRunner(name, desc string, r *strategy.Runner) *namedRunner {
-	return &namedRunner{
-		name:   name,
-		desc:   desc,
-		runner: r,
-	}
-}
-
 // Name returns the strategy name.
 func (nr *namedRunner) Name() string { return nr.name }
 
@@ -244,4 +235,64 @@ func (f *strategyListFlag) String() string {
 		names = append(names, r.Name())
 	}
 	return strings.Join(names, ",")
+}
+
+// HoldCoollectDiv creates a strategy to hold SP composite index and collect
+// dividends.
+func HoldCoollectDiv() *namedRunner {
+	return &namedRunner{
+		name:   "hold-collect-div",
+		desc:   "hold s&p, collect dividends",
+		runner: strategy.NewHold(),
+	}
+}
+
+// HoldReinvestDiv creates a strategy to hold SP composite index and reinvest
+// dividend payouts into the index.
+func HoldReinvestDiv() *namedRunner {
+	return &namedRunner{
+		name:   "hold-reinvest-div",
+		desc:   "hold s&p, reinvest dividends",
+		runner: strategy.NewHold(strategy.HoldOptReinvestDiv()),
+	}
+}
+
+// Withhold3HoldCollectDiv creates a strategy to withhold 3% every year from
+// [HoldCollectDiv] strategy.
+func Withhold3HoldCollectDiv() *namedRunner {
+	return &namedRunner{
+		name:   "withhold-3-hold-collect-div",
+		desc:   "withhold 3% yearly, hold s&p, collect dividends",
+		runner: strategy.NewWithhold(strategy.NewHold(), strategy.Percent(3)),
+	}
+}
+
+// Withhold4HoldCollectDiv creates a strategy to withhold 4% every year from
+// [HoldCollectDiv] strategy.
+func Withhold4HoldCollectDiv() *namedRunner {
+	return &namedRunner{
+		name:   "withhold-4-hold-collect-div",
+		desc:   "withhold 4% yearly, hold s&p, collect dividends",
+		runner: strategy.NewWithhold(strategy.NewHold(), strategy.Percent(4)),
+	}
+}
+
+// Withhold3HoldReinvestDiv creates a strategy to withhold 3% every year from
+// [HoldReinvestDiv] strategy.
+func Withhold3HoldReinvestDiv() *namedRunner {
+	return &namedRunner{
+		name:   "withhold-3-hold-reinvest-div",
+		desc:   "withhold 3% yearly, hold s&p, reinvest dividends",
+		runner: strategy.NewWithhold(strategy.NewHold(strategy.HoldOptReinvestDiv()), strategy.Percent(3)),
+	}
+}
+
+// Withhold4HoldReinvestDiv creates a strategy to withhold 4% every year from
+// [HoldReinvestDiv] strategy.
+func Withhold4HoldReinvestDiv() *namedRunner {
+	return &namedRunner{
+		name:   "withhold-4-hold-reinvest-div",
+		desc:   "withhold 4% yearly, hold s&p, reinvest dividends",
+		runner: strategy.NewWithhold(strategy.NewHold(strategy.HoldOptReinvestDiv()), strategy.Percent(4)),
+	}
 }
