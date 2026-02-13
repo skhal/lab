@@ -54,7 +54,8 @@ func run() error {
 func createRegistry() *registry {
 	reg := newRegistry()
 	mustRegister := func(name, desc string, r *strategy.Runner) {
-		if err := reg.Register(name, desc, r); err != nil {
+		nr := newNamedRunner(name, desc, r)
+		if err := reg.Register(nr); err != nil {
 			panic(err)
 		}
 	}
@@ -129,11 +130,11 @@ func (reg *registry) Len() int {
 }
 
 // Register adds a strategy runner to the registry.
-func (reg *registry) Register(name, desc string, r *strategy.Runner) error {
-	if _, ok := reg.runners[name]; ok {
-		return fmt.Errorf("duplicate runner %s", name)
+func (reg *registry) Register(r *namedRunner) error {
+	if _, ok := reg.runners[r.Name()]; ok {
+		return fmt.Errorf("duplicate runner %s", r.Name())
 	}
-	reg.runners[name] = newNamedRunner(name, desc, r)
+	reg.runners[r.Name()] = r
 	return nil
 }
 
