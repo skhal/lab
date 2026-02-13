@@ -18,7 +18,7 @@ import (
 )
 
 func TestRun(t *testing.T) {
-	cycle := func(q strategy.Quote, prev, curr *pb.Record) strategy.Quote {
+	cycle := func(q strategy.Quote, _ *pb.Record) strategy.Quote {
 		return strategy.Quote{Bal: -q.Bal, Div: -q.Div}
 	}
 	type want struct {
@@ -72,10 +72,10 @@ func TestRun(t *testing.T) {
 	}
 }
 
-type CycleFunc func(q strategy.Quote, prev, curr *pb.Record) strategy.Quote
+type CycleFunc func(strategy.Quote, *pb.Record) strategy.Quote
 
-func (cf CycleFunc) Cycle(q strategy.Quote, prev, curr *pb.Record) strategy.Quote {
-	return cf(q, prev, curr)
+func (cf CycleFunc) Cycle(q strategy.Quote, rec *pb.Record) strategy.Quote {
+	return cf(q, rec)
 }
 
 func newTime(t *testing.T, year int, month time.Month) time.Time {

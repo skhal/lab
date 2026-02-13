@@ -14,7 +14,7 @@ import (
 )
 
 // Run executes strategy s for market. It return the beginning and end balances.
-func Run(c fin.Cents, market []*pb.Record, s *strategy.Runner) (start, end fin.Quote) {
+func Run(c fin.Cents, market []*pb.Record, r *strategy.Runner) (start, end fin.Quote) {
 	if len(market) == 0 {
 		return
 	}
@@ -25,7 +25,7 @@ func Run(c fin.Cents, market []*pb.Record, s *strategy.Runner) (start, end fin.Q
 	d := newTime(market[len(market)-1].GetDate())
 	end = fin.Quote{
 		Date:    nextMonth(d),
-		Balance: s.Run(c, market),
+		Balance: r.Run(c, market),
 	}
 	return start, end
 }

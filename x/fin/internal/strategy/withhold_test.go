@@ -16,7 +16,7 @@ import (
 )
 
 func TestWithhold_Run(t *testing.T) {
-	cycle := func(q strategy.Quote, prev, curr *pb.Record) strategy.Quote {
+	cycle := func(q strategy.Quote, _ *pb.Record) strategy.Quote {
 		return q
 	}
 	tctc := []struct {
@@ -79,8 +79,8 @@ func TestWithhold_Run(t *testing.T) {
 	}
 }
 
-type CycleFunc func(q strategy.Quote, prev, curr *pb.Record) strategy.Quote
+type CycleFunc func(strategy.Quote, *pb.Record) strategy.Quote
 
-func (cf CycleFunc) Cycle(q strategy.Quote, prev, curr *pb.Record) strategy.Quote {
-	return cf(q, prev, curr)
+func (cf CycleFunc) Cycle(q strategy.Quote, rec *pb.Record) strategy.Quote {
+	return cf(q, rec)
 }

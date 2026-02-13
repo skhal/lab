@@ -19,6 +19,7 @@ import (
 type Withhold struct {
 	c    Cycler
 	rate float64
+	last *pb.Record
 }
 
 // Percent is a value in the range [0, 100].
@@ -35,19 +36,20 @@ func NewWithhold(c Cycler, annual Percent) *Runner {
 
 // Cycle withholds percent at the beginning of the year and runs wrapped
 // strategy.
-func (s *Withhold) Cycle(q Quote, prev, curr *pb.Record) Quote {
-	if s.shouldWithhold(prev, curr) {
+func (s *Withhold) Cycle(q Quote, rec *pb.Record) Quote {
+	if s.shouldWithhold(rec) {
 		q = s.withhold(q)
 	}
-	return s.c.Cycle(q, prev, curr)
+	s.last = rec
+	return s.c.Cycle(q, rec)
 }
 
-func (s *Withhold) shouldWithhold(prev, curr *pb.Record) bool {
+func (s *Withhold) shouldWithhold(rec *pb.Record) bool {
 	// the strategy must run for at least one cycle
-	if prev == nil {
+	if s.last == nil {
 		return false
 	}
-	return curr.GetDate().GetMonth() == int32(time.January)
+	return rec.GetDate().GetMonth() == int32(time.January)
 }
 
 func (s *Withhold) withhold(q Quote) Quote {

@@ -24,7 +24,7 @@ func (b Quote) Total() fin.Cents {
 // Cycler is a strategy that can process a single cycle.
 type Cycler interface {
 	// Cycle processes a single market record.
-	Cycle(q Quote, prev, curr *pb.Record) Quote
+	Cycle(Quote, *pb.Record) Quote
 }
 
 // Runner represents a strategy backed by Cycler.
@@ -40,16 +40,14 @@ func New(c Cycler) *Runner {
 // Run executes the strategy on a set of rectors starting with a given balance.
 // It returns the end balance.
 func (s *Runner) Run(start fin.Cents, market []*pb.Record) fin.Cents {
-	var prev *pb.Record
 	q := Quote{Bal: start}
 	for _, rec := range market {
-		q = s.Cycle(q, prev, rec)
-		prev = rec
+		q = s.Cycle(q, rec)
 	}
 	return q.Total()
 }
 
 // Cycle executes one cycle of a strategy backed by the cycle function.
-func (s *Runner) Cycle(q Quote, prev, curr *pb.Record) Quote {
-	return s.c.Cycle(q, prev, curr)
+func (s *Runner) Cycle(q Quote, rec *pb.Record) Quote {
+	return s.c.Cycle(q, rec)
 }

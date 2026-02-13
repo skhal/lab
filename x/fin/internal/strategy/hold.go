@@ -16,6 +16,7 @@ import (
 // dividends (off by default).
 type Hold struct {
 	reinvestDividends bool
+	last              *pb.Record
 }
 
 // NewHold createsa a hold strategy.
@@ -38,20 +39,21 @@ func HoldOptReinvestDiv() HoldOpt {
 }
 
 // Cycle executes a single cycle of the hold strategy.
-func (s *Hold) Cycle(q Quote, prev, curr *pb.Record) Quote {
-	bal := s.invest(q.Bal, prev, curr)
-	div := s.payDividend(q.Bal, curr)
+func (s *Hold) Cycle(q Quote, rec *pb.Record) Quote {
+	bal := s.invest(q.Bal, rec)
+	div := s.payDividend(q.Bal, rec)
 	if s.reinvestDividends {
 		bal += div
 		div = 0
 	} else {
 		div += q.Div
 	}
+	s.last = rec
 	return Quote{Bal: bal, Div: div}
 }
 
-func (s *Hold) invest(c fin.Cents, prev, curr *pb.Record) fin.Cents {
-	ror := SPRateOfReturn(prev, curr)
+func (s *Hold) invest(c fin.Cents, curr *pb.Record) fin.Cents {
+	ror := SPRateOfReturn(s.last, curr)
 	return fin.Cents(math.Floor(float64(c) * float64(ror)))
 }
 
