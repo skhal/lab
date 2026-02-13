@@ -17,13 +17,9 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
 
-	"github.com/skhal/lab/x/fin/internal/fin"
 	"github.com/skhal/lab/x/fin/internal/pb"
 	"github.com/skhal/lab/x/fin/internal/report"
-	"github.com/skhal/lab/x/fin/internal/sim"
-	"github.com/skhal/lab/x/fin/internal/strategy"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -35,8 +31,7 @@ func main() {
 }
 
 func run() error {
-	reg := createRegistry()
-	ifile, nmonth, runners, err := parseFlags(reg)
+	ifile, nmonth, runners, err := parseFlags(createRegistry())
 	if err != nil {
 		return err
 	}
@@ -106,199 +101,4 @@ func runStrategies(strategies []*namedRunner, market []*pb.Record) error {
 		infos = append(infos, r.Run(market))
 	}
 	return report.Strategies(os.Stdout, infos)
-}
-
-type registry struct {
-	runners map[string]*namedRunner
-	order   []string
-}
-
-func newRegistry() *registry {
-	return &registry{
-		runners: make(map[string]*namedRunner),
-	}
-}
-
-// Get retrieves a strategy runner from the registry. It returns a boolean flag
-// to indicate whether a runner with a given name is available.
-func (reg *registry) Get(name string) (*namedRunner, bool) {
-	r, ok := reg.runners[name]
-	return r, ok
-}
-
-// Len returns the number of registered runners.
-func (reg *registry) Len() int {
-	return len(reg.runners)
-}
-
-// Register adds a strategy runner to the registry.
-func (reg *registry) Register(r *namedRunner) error {
-	name := r.Name()
-	if _, ok := reg.runners[name]; ok {
-		return fmt.Errorf("duplicate runner %s", name)
-	}
-	reg.runners[name] = r
-	reg.order = append(reg.order, name)
-	return nil
-}
-
-// Walk applies f to every registered strategy. The callback may return false
-// to stop the iteration short.
-func (reg *registry) Walk(f func(*namedRunner) bool) {
-	for _, n := range reg.order {
-		r := reg.runners[n]
-		if !f(r) {
-			break
-		}
-	}
-}
-
-type namedRunner struct {
-	name   string
-	desc   string
-	runner *strategy.Runner
-}
-
-// Name returns the strategy name.
-func (nr *namedRunner) Name() string { return nr.name }
-
-// Description gices a strategy description.
-func (nr *namedRunner) Description() string { return nr.desc }
-
-// Run executes strategy.
-func (nr *namedRunner) Run(market []*pb.Record) *report.StrategyInfo {
-	info := report.StrategyInfo{
-		Name:        nr.Name(),
-		Description: nr.Description(),
-	}
-	info.Start, info.End = sim.Run(fin.Cents(100), market, nr.runner)
-	return &info
-}
-
-type strategyListFlag struct {
-	reg     *registry
-	runners []*namedRunner
-
-	seen map[string]bool
-	set  bool
-}
-
-func newStrategyListFlag(reg *registry) *strategyListFlag {
-	runners := make([]*namedRunner, 0, reg.Len())
-	reg.Walk(func(r *namedRunner) bool {
-		runners = append(runners, r)
-		return true
-	})
-	return &strategyListFlag{
-		reg:     reg,
-		runners: runners,
-		seen:    make(map[string]bool),
-	}
-}
-
-// Help generates a help message for the flag.
-func (f *strategyListFlag) Help() string {
-	names := make([]string, 0, f.reg.Len())
-	f.reg.Walk(func(r *namedRunner) bool {
-		names = append(names, r.Name())
-		return true
-	})
-	opts := strings.Join(names, "\n")
-	return fmt.Sprintf("comma-separated list of strategies to run:\n%s\n", opts)
-}
-
-// Runners returns a list of registered runners.
-func (f *strategyListFlag) Runners() []*namedRunner {
-	return f.runners
-}
-
-// Set implements flag.Value interface.
-func (f *strategyListFlag) Set(s string) error {
-	var runners []*namedRunner
-	for name := range strings.SplitSeq(s, ",") {
-		r, ok := f.reg.Get(name)
-		if !ok {
-			return fmt.Errorf("unsupported strategy %s", name)
-		}
-		if f.seen[name] {
-			return fmt.Errorf("duplicate strategy %s", name)
-		}
-		f.seen[name] = true
-		runners = append(runners, r)
-	}
-	if !f.set {
-		f.set = true
-		f.runners = f.runners[:0]
-	}
-	f.runners = append(f.runners, runners...)
-	return nil
-}
-
-// String implements flag.Valaue interface.
-func (f *strategyListFlag) String() string {
-	names := make([]string, 0, len(f.runners))
-	for _, r := range f.runners {
-		names = append(names, r.Name())
-	}
-	return strings.Join(names, ",")
-}
-
-// HoldDiv creates a strategy to hold SP composite index and collect
-// dividends.
-func Hold() *namedRunner {
-	return &namedRunner{
-		name:   "hold",
-		desc:   "hold s&p, collect dividends",
-		runner: strategy.Hold(),
-	}
-}
-
-// HoldReinvestDiv creates a strategy to hold SP composite index and reinvest
-// dividend payouts into the index.
-func HoldReinvest() *namedRunner {
-	return &namedRunner{
-		name:   "hold-reinvest",
-		desc:   "hold s&p, reinvest dividends",
-		runner: strategy.HoldReinvest(),
-	}
-}
-
-// Retain3HoldDiv creates a strategy to retain 3% every year from
-// [HoldDiv] strategy.
-func Retain3Hold() *namedRunner {
-	return &namedRunner{
-		name:   "retain-3-hold",
-		desc:   "retain 3% yearly, hold s&p, collect dividends",
-		runner: strategy.Retain(strategy.Percent(3), strategy.Hold()),
-	}
-}
-
-// Retain4HoldDiv creates a strategy to retain 4% every year from
-// [HoldDiv] strategy.
-func Retain4Hold() *namedRunner {
-	return &namedRunner{
-		name:   "retain-4-hold",
-		desc:   "retain 4% yearly, hold s&p, collect dividends",
-		runner: strategy.Retain(strategy.Percent(4), strategy.Hold()),
-	}
-}
-
-// Retain3HoldReinvestDiv creates a strategy to retain 3% every year from
-// [HoldReinvestDiv] strategy.
-func Retain3HoldReinvest() *namedRunner {
-	return &namedRunner{
-		name:   "retain-3-hold-reinvest",
-		desc:   "retain 3% yearly, hold s&p, reinvest dividends",
-		runner: strategy.Retain(strategy.Percent(3), strategy.HoldReinvest()),
-	}
-}
-
-// Retain4HoldReinvestDiv creates a strategy to retain 4% every year from
-// [HoldReinvestDiv] strategy.
-func Retain4HoldReinvest() *namedRunner {
-	return &namedRunner{
-		name:   "retain-4-hold-reinvest",
-		desc:   "retain 4% yearly, hold s&p, reinvest dividends",
-		runner: strategy.Retain(strategy.Percent(4), strategy.HoldReinvest()),
-	}
 }
