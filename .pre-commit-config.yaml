@@ -14,7 +14,12 @@ repos:
   - id: check-shebang-scripts-are-executable
   - id: check-yaml
   - id: end-of-file-fixer
-    exclude: "(.*/testdata/.*|\\.diff|\\.patch)$"
+    exclude: |
+      (?x)^(
+        .*/testdata/.*
+        |.*\.diff
+        |.*\.patch
+      )$
   - id: trailing-whitespace
     exclude: "(\\.diff|\\.patch)$"
     # keep-sorted end
@@ -46,7 +51,11 @@ repos:
     language: system
     types_or: [go]
     pass_filenames: true
-    exclude: "(testdata|nvim/plugin/lab-skeleton/share/new.*$)"
+    exclude: |
+      (?x)^(
+        .*/testdata/.*
+        |nvim/plugin/lab-skeleton/share/new.*
+      )$
   - id: check-issue
     name: "Issue is set"
     entry: check-issue
@@ -58,7 +67,18 @@ repos:
     language: system
     stages: [pre-commit]
     exclude_types: [json]
-    exclude: "(MODULE\\.bazel\\.lock|go\\.(mod|sum)|.*/(test)?data/.*|_string.go$|.pb.go$|\\.diff$|\\.patch$|home/vim/templates/skel.*$|nvim/plugin/lab-skeleton/share/new.*$)"
+    exclude: |
+      (?x)^(
+        .*/MODULE\.bazel\.lock
+        |.*/go\.(mod|sum)
+        |.*/(test)?data/.*
+        |.*_string\.go
+        |.*\.pb\.go
+        |.*\.diff
+        |.*\.patch
+        |home/vim/templates/skel.*
+        |nvim/plugin/lab-skeleton/share/new.*
+      )$
   - id: check-nosubmit
     name: "No-submit is not set"
     entry: check-nosubmit
@@ -67,7 +87,11 @@ repos:
     name: "Lint TODO format"
     entry: check-todo
     language: system
-    exclude: "(\\.diff|\\.patch)$"
+    exclude: |
+      (?x)^(
+        .*\.diff
+        |.*\.patch
+      )$
   - id: clang-format
     name: "Format C/C++"
     entry: clang-format21 -i
@@ -87,7 +111,11 @@ repos:
     entry: goimports
     language: system
     types_or: [go]
-    exclude: "(.pb.go$|nvim/plugin/lab-skeleton/share/new.*$)"
+    exclude: |
+      (?x)^(
+        .*\.pb\.go
+        |nvim/plugin/lab-skeleton/share/new.*
+      )$
     args: ["-w"]
   - id: html-format
     name: "Format HTML"
@@ -173,7 +201,11 @@ repos:
     entry: typos
     language: system
     types: [text]
-    exclude: "^(.*\\.diff|infra/net.lab.*\\.conf)$"
+    exclude: |
+      (?x)^(
+        .*\.diff
+        |infra/net\.lab.*\.conf
+      )$
   - id: yaml-format
     name: "Format YAML"
     entry: yamlfmt
