@@ -816,6 +816,19 @@ func TestCheckDir(t *testing.T) {
 			want: check.ErrCommentPrefix,
 		},
 		{
+			name: "command doc",
+			path: "testdata/cmd/doc",
+		},
+		{
+			name: "command doc",
+			path: "testdata/cmd/doc-words",
+		},
+		{
+			name: "command invalid prefix",
+			path: "testdata/cmd/invalidprefix",
+			want: check.ErrCommentPrefix,
+		},
+		{
 			name: "no doc",
 			path: "testdata/nodoc",
 			want: check.ErrNoDoc,

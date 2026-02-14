@@ -13,6 +13,7 @@ import (
 	"go/token"
 	"io/fs"
 	"maps"
+	"path/filepath"
 	"slices"
 	"strings"
 )
@@ -175,7 +176,17 @@ func checkTypeSpecDoc(fs *token.FileSet, decl *ast.GenDecl, spec *ast.TypeSpec) 
 func checkDoc(fs *token.FileSet, cg *ast.CommentGroup, name string, k kind) error {
 	prefix := name
 	if k == kindPackage {
-		prefix = fmt.Sprintf("Package %s", name)
+		switch name {
+		case "main":
+			fname := fs.File(cg.Pos()).Name()
+			cmd := filepath.Base(filepath.Dir(fname))
+			// can't use strings.Title as it processes every word: "foo-bar" becomes
+			// "Foo-Bar", want "Foo-bar". The package names are ASCII and should be
+			// safe to process by index.
+			prefix = fmt.Sprintf("%s%s", strings.ToUpper(cmd[:1]), cmd[1:])
+		default:
+			prefix = fmt.Sprintf("Package %s", name)
+		}
 	}
 	if !strings.HasPrefix(cg.Text(), prefix) {
 		pos := fs.Position(cg.Pos())
