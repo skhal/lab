@@ -167,6 +167,13 @@ func Test() {}`,
 func Test() {}`,
 		},
 		{
+			name: "exported with comment invalid prefix",
+			code: `package test
+// some comment
+func Test() {}`,
+			want: check.ErrCommentPrefix,
+		},
+		{
 			name: "not exported no comment",
 			code: `package test
 func test() {}`,

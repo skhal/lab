@@ -74,7 +74,7 @@ func checkFuncDecl(fs *token.FileSet, decl *ast.FuncDecl) error {
 		return nil
 	}
 	if decl.Doc != nil {
-		return nil
+		return checkDoc(fs, decl.Doc, decl.Name.Name, kindFunc)
 	}
 	return newErrNoDoc(fs, decl.Name, kindFunc)
 }
@@ -155,28 +155,29 @@ func checkTypeSpec(fs *token.FileSet, decl *ast.GenDecl, spec *ast.TypeSpec) err
 }
 
 func checkTypeSpecDoc(fs *token.FileSet, decl *ast.GenDecl, spec *ast.TypeSpec) error {
-	checkDoc := func(doc *ast.CommentGroup) error {
-		if name := spec.Name.Name; !strings.HasPrefix(doc.Text(), name) {
-			pos := fs.Position(doc.Pos())
-			return fmt.Errorf("%s: %s %s: %w", pos, kindType, name, ErrCommentPrefix)
-		}
-		return nil
-	}
 	// A comment attached to a struct in a type group:
 	//  type (
 	//    // comment
 	//    A struct {}
 	//  )
 	if spec.Doc != nil {
-		return checkDoc(spec.Doc)
+		return checkDoc(fs, spec.Doc, spec.Name.Name, kindType)
 	}
 	// A comment attached to the type group, allow only one type inside:
 	//  // comment
 	//  type A struct {}
 	if decl.Doc != nil && len(decl.Specs) == 1 {
-		return checkDoc(decl.Doc)
+		return checkDoc(fs, decl.Doc, spec.Name.Name, kindType)
 	}
 	return newErrNoDoc(fs, spec.Name, kindType)
+}
+
+func checkDoc(fs *token.FileSet, cg *ast.CommentGroup, name string, k kind) error {
+	if !strings.HasPrefix(cg.Text(), name) {
+		pos := fs.Position(cg.Pos())
+		return fmt.Errorf("%s: %s %s: %w", pos, k, name, ErrCommentPrefix)
+	}
+	return nil
 }
 
 func checkTypeSpecFields(fs *token.FileSet, ts *ast.TypeSpec) error {
