@@ -811,6 +811,11 @@ func TestCheckDir(t *testing.T) {
 			path: "testdata/doc",
 		},
 		{
+			name: "invalid prefix",
+			path: "testdata/invalidprefix",
+			want: check.ErrCommentPrefix,
+		},
+		{
 			name: "no doc",
 			path: "testdata/nodoc",
 			want: check.ErrNoDoc,

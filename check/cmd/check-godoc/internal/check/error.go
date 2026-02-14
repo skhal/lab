@@ -36,12 +36,13 @@ type kind int
 const (
 	_ kind = iota
 	// keep-sorted start
-	kindConst  // const
-	kindField  // field
-	kindFunc   // func
-	kindMethod // method
-	kindType   // type
-	kindVar    // var
+	kindConst   // const
+	kindField   // field
+	kindFunc    // func
+	kindMethod  // method
+	kindPackage // package
+	kindType    // type
+	kindVar     // var
 	// keep-sorted end
 )
 

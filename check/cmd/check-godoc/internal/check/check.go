@@ -173,9 +173,13 @@ func checkTypeSpecDoc(fs *token.FileSet, decl *ast.GenDecl, spec *ast.TypeSpec) 
 }
 
 func checkDoc(fs *token.FileSet, cg *ast.CommentGroup, name string, k kind) error {
-	if !strings.HasPrefix(cg.Text(), name) {
+	prefix := name
+	if k == kindPackage {
+		prefix = fmt.Sprintf("Package %s", name)
+	}
+	if !strings.HasPrefix(cg.Text(), prefix) {
 		pos := fs.Position(cg.Pos())
-		return fmt.Errorf("%s: %s %s: %w", pos, k, name, ErrCommentPrefix)
+		return fmt.Errorf("%s: %s %s: %w, want %q", pos, k, name, ErrCommentPrefix, prefix)
 	}
 	return nil
 }
@@ -264,7 +268,6 @@ func checkPackages(fs *token.FileSet, pkgs map[string]*ast.Package) error {
 		return fmt.Errorf("%w: %s", ErrMultiPackage, names)
 	}
 	for _, p := range pkgs {
-		// one package
 		return checkPackage(fs, p)
 	}
 	return nil
@@ -281,7 +284,7 @@ func checkPackage(fs *token.FileSet, pkg *ast.Package) error {
 	case 0:
 		return fmt.Errorf("package %s: %w", pkg.Name, ErrNoDoc)
 	case 1:
-		return nil
+		return checkDoc(fs, docs[0], pkg.Name, kindPackage)
 	default:
 		locs := make([]string, 0, len(docs))
 		for _, d := range docs {

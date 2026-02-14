@@ -3,6 +3,6 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Package doc demonstrates a valid ducomentation that starts with "Package foo"
-// prefix: https://go.dev/doc/comment#package
+// Documentation starts with a wrong prefix, want "Package doc":
+// https://go.dev/doc/comment#package
 package doc

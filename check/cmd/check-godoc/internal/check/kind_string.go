@@ -12,13 +12,14 @@ func _() {
 	_ = x[kindField-2]
 	_ = x[kindFunc-3]
 	_ = x[kindMethod-4]
-	_ = x[kindType-5]
-	_ = x[kindVar-6]
+	_ = x[kindPackage-5]
+	_ = x[kindType-6]
+	_ = x[kindVar-7]
 }
 
-const _kind_name = "constfieldfuncmethodtypevar"
+const _kind_name = "constfieldfuncmethodpackagetypevar"
 
-var _kind_index = [...]uint8{0, 5, 10, 14, 20, 24, 27}
+var _kind_index = [...]uint8{0, 5, 10, 14, 20, 27, 31, 34}
 
 func (i kind) String() string {
 	idx := int(i) - 1

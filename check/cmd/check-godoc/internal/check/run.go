@@ -3,7 +3,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Check package ensures that Go exported symbols and the package include
+// Package check ensures that Go exported symbols and the package include
 // documentation.
 package check
 
