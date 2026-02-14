@@ -28,7 +28,7 @@ M_unpack = C|,| |g
 #
 M_go_bin_path = S|^|${GO_BIN_PATH}/|
 M_target = ${M_package}:T:C|@.*$$||:${M_go_bin_path}
-INSTALL_TARGETS = ${PACKAGES:${M_target}} ${SOURCES:${M_go_bin_path}}
+INSTALL_TARGETS = ${SOURCES:${M_go_bin_path}} ${PACKAGES:${M_target}}
 
 install: ${INSTALL_TARGETS} .PHONY
 
