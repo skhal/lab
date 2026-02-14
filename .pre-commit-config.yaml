@@ -157,7 +157,7 @@ repos:
     types_or: [binary]
   - id: proto-doc
     name: "Validate Protobuf documentation"
-    entry: check-pbcomment
+    entry: check-pbdoc
     language: system
     types_or: [proto]
   - id: proto-format
