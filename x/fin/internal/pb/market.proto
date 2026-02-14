@@ -12,26 +12,42 @@ import "google/protobuf/go_features.proto";
 option features.(.pb.go).api_level = API_OPAQUE;
 option go_package = "github.com/skhal/lab/x/fin/internal/pb";
 
+// Market is historical market data. A single record corresponds to one date.
+// Data should not have date gaps.
 message Market {
+  // records are market data, one per date.
   repeated Record records = 1;
 }
 
+// Record describes market on a single date.
 message Record {
+  // date is the record date.
   Date date = 1;
+  // quote is the market summary.
   Quote quote = 2;
 }
 
+// Date is a year-month pair.
 message Date {
+  // year is the year of the date.
   int32 year = 1;
+  // month is the month of the date.
   int32 month = 2;
 }
 
+// Quote summarizes market.
 message Quote {
+  // sp_composite is the value of S&P composite index.
   Cents sp_composite = 1;
+  // dividend is the dividends payhout for S&P composite index.
   Cents dividend = 2;
+  // earnings are S&P composite index earnings.
   Cents earnings = 3;
 }
 
+// Cents is the smallest unit of values. Use it instead of floating numbers to
+// remove error accumulation.
 message Cents {
+  // cents is the total value.
   int32 cents = 1;
 }
