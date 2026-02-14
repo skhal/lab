@@ -3,7 +3,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Check-pbcomment verifies that every item in a Protobuf definition includes a
+// Check-pbdoc verifies that every item in a Protobuf definition includes a
 // documentation comment.
 //
 // Synopsis:
@@ -15,7 +15,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/skhal/lab/check/cmd/check-pbcomment/internal/check"
+	"github.com/skhal/lab/check/cmd/check-pbdoc/internal/check"
 )
 
 func main() {

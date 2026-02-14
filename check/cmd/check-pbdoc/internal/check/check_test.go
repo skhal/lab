@@ -9,7 +9,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/skhal/lab/check/cmd/check-pbcomment/internal/check"
+	"github.com/skhal/lab/check/cmd/check-pbdoc/internal/check"
 )
 
 func TestCheckFile(t *testing.T) {
