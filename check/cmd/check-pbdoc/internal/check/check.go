@@ -10,6 +10,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"strings"
 
 	"github.com/bufbuild/protocompile/ast"
 	"github.com/bufbuild/protocompile/parser"
@@ -102,8 +103,17 @@ func checkFieldNode(f *ast.FileNode, n *ast.FieldNode) error {
 }
 
 func checkLeadingComments(f *ast.FileNode, n ast.Node, prefix func() string) error {
-	if ni := f.NodeInfo(n); ni.LeadingComments().Len() == 0 {
+	ni := f.NodeInfo(n)
+	if ni.LeadingComments().Len() == 0 {
 		return fmt.Errorf("%s %s: missing comment", ni.Start(), prefix())
+	}
+	firstLine := ni.LeadingComments().Index(0)
+	switch node := n.(type) {
+	case *ast.MessageNode:
+		p := fmt.Sprintf("// %s", node.Name.Val)
+		if !strings.HasPrefix(firstLine.RawText(), p) {
+			return fmt.Errorf("%s %s: wrong comment prefix, want %q", ni.Start(), prefix(), p)
+		}
 	}
 	return nil
 }

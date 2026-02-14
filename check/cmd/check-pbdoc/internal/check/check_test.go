@@ -12,7 +12,7 @@ import (
 	"github.com/skhal/lab/check/cmd/check-pbdoc/internal/check"
 )
 
-func TestCheckFile(t *testing.T) {
+func TestCheckFile_message(t *testing.T) {
 	tests := []struct {
 		name    string
 		s       string
@@ -26,9 +26,19 @@ func TestCheckFile(t *testing.T) {
 			s: `
 edition = "2024";
 package test;
-// test comment
+// Test comment
 message Test {}
 `,
+		},
+		{
+			name: "message with comment wrong prefix",
+			s: `
+edition = "2024";
+package test;
+// a comment
+message Test {}
+`,
+			wantErr: true,
 		},
 		{
 			name: "message no comment",
@@ -44,7 +54,7 @@ message Test {}
 			s: `
 edition = "2024";
 package test;
-// foo comment
+// Foo comment
 message Foo {
 	// test comment
 	string test = 1;
@@ -56,13 +66,104 @@ message Foo {
 			s: `
 edition = "2024";
 package test;
-// foo comment
+// Foo comment
 message Foo {
 	string test = 1;
 }
 `,
 			wantErr: true,
 		},
+		{
+			name: "nested message with comment",
+			s: `
+edition = "2024";
+package test;
+// Foo comment
+message Foo {
+	// Test comment
+	message Test {}
+}
+`,
+		},
+		{
+			name: "nested message with comment wrong prefix",
+			s: `
+edition = "2024";
+package test;
+// Foo comment
+message Foo {
+	// A comment
+	message Test {}
+}
+`,
+			wantErr: true,
+		},
+		{
+			name: "nested message no comment",
+			s: `
+edition = "2024";
+package test;
+// Foo comment
+message Foo {
+	message Test {}
+}
+`,
+			wantErr: true,
+		},
+		{
+			name: "nested message field with comment",
+			s: `
+edition = "2024";
+package test;
+// Foo comment
+message Foo {
+	// Bar comment
+	message Bar {
+		// test comment
+		string test = 1;
+	}
+}
+`,
+		},
+		{
+			name: "nested message field no comment",
+			s: `
+edition = "2024";
+package test;
+// Foo comment
+message Foo {
+	// Bar comment
+	message Bar {
+		string test = 1;
+	}
+}
+`,
+			wantErr: true,
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			err := check.CheckFile("test.proto", strings.NewReader(tc.s))
+
+			if err == nil {
+				if tc.wantErr {
+					t.Error("CheckFile() want error")
+					t.Log(tc.s)
+				}
+			} else if !tc.wantErr {
+				t.Errorf("CheckFile() unexpected error %v", err)
+				t.Log(tc.s)
+			}
+		})
+	}
+}
+
+func TestCheckFile_enum(t *testing.T) {
+	tests := []struct {
+		name    string
+		s       string
+		wantErr bool
+	}{
 		{
 			name: "enum with comment",
 			s: `
@@ -106,65 +207,11 @@ enum Foo {
 			wantErr: true,
 		},
 		{
-			name: "nested message with comment",
-			s: `
-edition = "2024";
-package test;
-// foo comment
-message Foo {
-	// test comment
-	message Test {}
-}
-`,
-		},
-		{
-			name: "nested message no comment",
-			s: `
-edition = "2024";
-package test;
-// foo comment
-message Foo {
-	message Test {}
-}
-`,
-			wantErr: true,
-		},
-		{
-			name: "nested message field with comment",
-			s: `
-edition = "2024";
-package test;
-// foo comment
-message Foo {
-	// bar comment
-	message Bar {
-		// test comment
-		string test = 1;
-	}
-}
-`,
-		},
-		{
-			name: "nested message field no comment",
-			s: `
-edition = "2024";
-package test;
-// foo comment
-message Foo {
-	// bar comment
-	message Bar {
-		string test = 1;
-	}
-}
-`,
-			wantErr: true,
-		},
-		{
 			name: "nested enum with comment",
 			s: `
 edition = "2024";
 package test;
-// foo comment
+// Foo comment
 message Foo {
 	// test comment
 	enum Test {}
@@ -176,7 +223,7 @@ message Foo {
 			s: `
 edition = "2024";
 package test;
-// foo comment
+// Foo comment
 message Foo {
 	enum Test {}
 }
@@ -188,7 +235,7 @@ message Foo {
 			s: `
 edition = "2024";
 package test;
-// foo comment
+// Foo comment
 message Foo {
 	// bar comment
 	enum Bar {
@@ -203,7 +250,7 @@ message Foo {
 			s: `
 edition = "2024";
 package test;
-// foo comment
+// Foo comment
 message Foo {
 	// bar comment
 	enum Bar {
