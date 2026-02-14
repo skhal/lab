@@ -124,6 +124,19 @@ func checkGenDeclVarValueSpec(fs *token.FileSet, decl *ast.GenDecl) error {
 		if decl.Doc != nil {
 			continue
 		}
+		if s.Doc != nil {
+			names := func() string {
+				nn := make([]string, 0, len(s.Names))
+				for _, n := range s.Names {
+					nn = append(nn, n.Name)
+				}
+				return strings.Join(nn, ",")
+			}
+			if err := checkDoc(fs, s.Doc, names(), kindVar); err != nil {
+				ee = append(ee, err)
+			}
+			continue
+		}
 		for _, n := range s.Names {
 			if !n.IsExported() {
 				continue

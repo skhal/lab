@@ -317,6 +317,16 @@ var (
 )`,
 		},
 		{
+			name: "exported group with doc",
+			code: `package test
+var (
+	// A comment
+	A = 1
+	// B comment
+	B = 1
+)`,
+		},
+		{
 			name: "exported group multiple some line comment",
 			code: `package test
 var (
