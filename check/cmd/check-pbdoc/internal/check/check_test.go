@@ -6,6 +6,7 @@
 package check_test
 
 import (
+	"errors"
 	"strings"
 	"testing"
 
@@ -16,7 +17,7 @@ func TestCheckFile_message(t *testing.T) {
 	tests := []struct {
 		name    string
 		s       string
-		wantErr bool
+		wantErr error
 	}{
 		{
 			name: "empty",
@@ -38,7 +39,7 @@ package test;
 // a comment
 message Test {}
 `,
-			wantErr: true,
+			wantErr: check.ErrCommentPrefix,
 		},
 		{
 			name: "message no comment",
@@ -47,7 +48,7 @@ edition = "2024";
 package test;
 message Test {}
 `,
-			wantErr: true,
+			wantErr: check.ErrNoComment,
 		},
 		{
 			name: "message field with comment",
@@ -71,7 +72,7 @@ message Foo {
 	string test = 1;
 }
 `,
-			wantErr: true,
+			wantErr: check.ErrNoComment,
 		},
 		{
 			name: "nested message with comment",
@@ -96,7 +97,7 @@ message Foo {
 	message Test {}
 }
 `,
-			wantErr: true,
+			wantErr: check.ErrCommentPrefix,
 		},
 		{
 			name: "nested message no comment",
@@ -108,7 +109,7 @@ message Foo {
 	message Test {}
 }
 `,
-			wantErr: true,
+			wantErr: check.ErrNoComment,
 		},
 		{
 			name: "nested message field with comment",
@@ -138,20 +139,15 @@ message Foo {
 	}
 }
 `,
-			wantErr: true,
+			wantErr: check.ErrNoComment,
 		},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			err := check.CheckFile("test.proto", strings.NewReader(tc.s))
 
-			if err == nil {
-				if tc.wantErr {
-					t.Error("CheckFile() want error")
-					t.Log(tc.s)
-				}
-			} else if !tc.wantErr {
-				t.Errorf("CheckFile() unexpected error %v", err)
+			if !errors.Is(err, tc.wantErr) {
+				t.Errorf("CheckFile() unexpected error %v, want %v", err, tc.wantErr)
 				t.Log(tc.s)
 			}
 		})
@@ -162,7 +158,7 @@ func TestCheckFile_enum(t *testing.T) {
 	tests := []struct {
 		name    string
 		s       string
-		wantErr bool
+		wantErr error
 	}{
 		{
 			name: "enum with comment",
@@ -181,7 +177,7 @@ package test;
 // a comment
 enum Test {}
 `,
-			wantErr: true,
+			wantErr: check.ErrCommentPrefix,
 		},
 		{
 			name: "enum no comment",
@@ -190,7 +186,7 @@ edition = "2024";
 package test;
 enum Test {}
 `,
-			wantErr: true,
+			wantErr: check.ErrNoComment,
 		},
 		{
 			name: "enumerator with comment",
@@ -214,7 +210,7 @@ enum Foo {
 	FOO_TEST = 1;
 }
 `,
-			wantErr: true,
+			wantErr: check.ErrNoComment,
 		},
 		{
 			name: "nested enum with comment",
@@ -239,7 +235,7 @@ message Foo {
 	enum Test {}
 }
 `,
-			wantErr: true,
+			wantErr: check.ErrCommentPrefix,
 		},
 		{
 			name: "nested enum no comment",
@@ -251,7 +247,7 @@ message Foo {
 	enum Test {}
 }
 `,
-			wantErr: true,
+			wantErr: check.ErrNoComment,
 		},
 		{
 			name: "nested enum enumerator with comment",
@@ -281,20 +277,15 @@ message Foo {
 	}
 }
 `,
-			wantErr: true,
+			wantErr: check.ErrNoComment,
 		},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			err := check.CheckFile("test.proto", strings.NewReader(tc.s))
 
-			if err == nil {
-				if tc.wantErr {
-					t.Error("CheckFile() want error")
-					t.Log(tc.s)
-				}
-			} else if !tc.wantErr {
-				t.Errorf("CheckFile() unexpected error %v", err)
+			if !errors.Is(err, tc.wantErr) {
+				t.Errorf("CheckFile() unexpected error %v, want %v", err, tc.wantErr)
 				t.Log(tc.s)
 			}
 		})

@@ -17,6 +17,17 @@ import (
 	"github.com/bufbuild/protocompile/reporter"
 )
 
+var (
+	// ErrCommentPrefix means the comments starts with a wrong prefix.
+	// Message or enumeration documentation must start with the item name:
+	//	// Foo ...
+	// 	message Foo {}
+	ErrCommentPrefix = errors.New("wrong comment prefix")
+
+	// ErrNoComment means no documentation found.
+	ErrNoComment = errors.New("missing documentation")
+)
+
 // CheckFile validates that every item in the Protobuf, represented by the r
 // reader, is documented, i.e., includes a comment. It returns a consolidated
 // error of found violations.
@@ -105,16 +116,16 @@ func checkFieldNode(f *ast.FileNode, n *ast.FieldNode) error {
 func checkLeadingComments(f *ast.FileNode, n ast.Node, prefix func() string) error {
 	ni := f.NodeInfo(n)
 	if ni.LeadingComments().Len() == 0 {
-		return fmt.Errorf("%s %s: missing comment", ni.Start(), prefix())
+		return fmt.Errorf("%s %s: %w", ni.Start(), prefix(), ErrNoComment)
 	}
 	switch node := n.(type) {
 	case *ast.EnumNode:
 		if err := checkLeadingCommentsPrefix(ni, node.Name.Val); err != nil {
-			return fmt.Errorf("%s %s: %v", ni.Start(), prefix(), err)
+			return fmt.Errorf("%s %s: %w", ni.Start(), prefix(), err)
 		}
 	case *ast.MessageNode:
 		if err := checkLeadingCommentsPrefix(ni, node.Name.Val); err != nil {
-			return fmt.Errorf("%s %s: %v", ni.Start(), prefix(), err)
+			return fmt.Errorf("%s %s: %w", ni.Start(), prefix(), err)
 		}
 	}
 	return nil
@@ -123,7 +134,7 @@ func checkLeadingComments(f *ast.FileNode, n ast.Node, prefix func() string) err
 func checkLeadingCommentsPrefix(ni ast.NodeInfo, name string) error {
 	p := fmt.Sprintf("// %s", name)
 	if !strings.HasPrefix(ni.LeadingComments().Index(0).RawText(), p) {
-		return fmt.Errorf("wrong comment prefix, want %q", p)
+		return fmt.Errorf("%w, want %q", ErrCommentPrefix, p)
 	}
 	return nil
 }
