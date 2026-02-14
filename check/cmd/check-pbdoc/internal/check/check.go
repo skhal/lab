@@ -107,13 +107,23 @@ func checkLeadingComments(f *ast.FileNode, n ast.Node, prefix func() string) err
 	if ni.LeadingComments().Len() == 0 {
 		return fmt.Errorf("%s %s: missing comment", ni.Start(), prefix())
 	}
-	firstLine := ni.LeadingComments().Index(0)
 	switch node := n.(type) {
-	case *ast.MessageNode:
-		p := fmt.Sprintf("// %s", node.Name.Val)
-		if !strings.HasPrefix(firstLine.RawText(), p) {
-			return fmt.Errorf("%s %s: wrong comment prefix, want %q", ni.Start(), prefix(), p)
+	case *ast.EnumNode:
+		if err := checkLeadingCommentsPrefix(ni, node.Name.Val); err != nil {
+			return fmt.Errorf("%s %s: %v", ni.Start(), prefix(), err)
 		}
+	case *ast.MessageNode:
+		if err := checkLeadingCommentsPrefix(ni, node.Name.Val); err != nil {
+			return fmt.Errorf("%s %s: %v", ni.Start(), prefix(), err)
+		}
+	}
+	return nil
+}
+
+func checkLeadingCommentsPrefix(ni ast.NodeInfo, name string) error {
+	p := fmt.Sprintf("// %s", name)
+	if !strings.HasPrefix(ni.LeadingComments().Index(0).RawText(), p) {
+		return fmt.Errorf("wrong comment prefix, want %q", p)
 	}
 	return nil
 }

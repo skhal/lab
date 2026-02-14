@@ -169,9 +169,19 @@ func TestCheckFile_enum(t *testing.T) {
 			s: `
 edition = "2024";
 package test;
-// test comment
+// Test comment
 enum Test {}
 `,
+		},
+		{
+			name: "enum with comment wrong prefix",
+			s: `
+edition = "2024";
+package test;
+// a comment
+enum Test {}
+`,
+			wantErr: true,
 		},
 		{
 			name: "enum no comment",
@@ -187,7 +197,7 @@ enum Test {}
 			s: `
 edition = "2024";
 package test;
-// foo comment
+// Foo comment
 enum Foo {
 	// test comment
 	FOO_TEST = 1;
@@ -199,7 +209,7 @@ enum Foo {
 			s: `
 edition = "2024";
 package test;
-// foo comment
+// Foo comment
 enum Foo {
 	FOO_TEST = 1;
 }
@@ -213,10 +223,23 @@ edition = "2024";
 package test;
 // Foo comment
 message Foo {
-	// test comment
+	// Test comment
 	enum Test {}
 }
 `,
+		},
+		{
+			name: "nested enum with comment wrong prefix",
+			s: `
+edition = "2024";
+package test;
+// Foo comment
+message Foo {
+	// a comment
+	enum Test {}
+}
+`,
+			wantErr: true,
 		},
 		{
 			name: "nested enum no comment",
@@ -237,7 +260,7 @@ edition = "2024";
 package test;
 // Foo comment
 message Foo {
-	// bar comment
+	// Bar comment
 	enum Bar {
 		// test comment
 		BAR_TEST = 1;
@@ -252,7 +275,7 @@ edition = "2024";
 package test;
 // Foo comment
 message Foo {
-	// bar comment
+	// Bar comment
 	enum Bar {
 		BAR_TEST = 1;
 	}
