@@ -155,19 +155,26 @@ func checkTypeSpec(fs *token.FileSet, decl *ast.GenDecl, spec *ast.TypeSpec) err
 }
 
 func checkTypeSpecDoc(fs *token.FileSet, decl *ast.GenDecl, spec *ast.TypeSpec) error {
+	checkDoc := func(doc *ast.CommentGroup) error {
+		if name := spec.Name.Name; !strings.HasPrefix(doc.Text(), name) {
+			pos := fs.Position(doc.Pos())
+			return fmt.Errorf("%s: %s %s: %w", pos, kindType, name, ErrCommentPrefix)
+		}
+		return nil
+	}
 	// A comment attached to a struct in a type group:
 	//  type (
 	//    // comment
 	//    A struct {}
 	//  )
 	if spec.Doc != nil {
-		return nil
+		return checkDoc(spec.Doc)
 	}
 	// A comment attached to the type group, allow only one type inside:
 	//  // comment
 	//  type A struct {}
 	if decl.Doc != nil && len(decl.Specs) == 1 {
-		return nil
+		return checkDoc(decl.Doc)
 	}
 	return newErrNoDoc(fs, spec.Name, kindType)
 }

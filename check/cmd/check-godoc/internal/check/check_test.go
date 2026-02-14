@@ -382,8 +382,15 @@ type A struct {}`,
 		{
 			name: "exported comment",
 			code: `package test
+// A test comment
+type A struct {}`,
+		},
+		{
+			name: "exported comment invalid prefix",
+			code: `package test
 // test comment
 type A struct {}`,
+			want: check.ErrCommentPrefix,
 		},
 		{
 			name: "exported line comment",
@@ -407,10 +414,19 @@ type (
 		{
 			name: "group one exported comment",
 			code: `package test
+// A test comment
+type (
+  A struct {}
+)`,
+		},
+		{
+			name: "group one exported comment invalid prefix",
+			code: `package test
 // test comment
 type (
   A struct {}
 )`,
+			want: check.ErrCommentPrefix,
 		},
 		{
 			name: "group one exported line comment",
@@ -466,6 +482,17 @@ type (
 )`,
 		},
 		{
+			name: "group two exported invalid prefix",
+			code: `package test
+type (
+	// test
+  A struct {}
+	// test
+  B struct {}
+)`,
+			want: check.ErrCommentPrefix,
+		},
+		{
 			name: "group two not exported no comment",
 			code: `package test
 type (
@@ -497,7 +524,7 @@ func TestCheckAST_fields(t *testing.T) {
 		{
 			name: "exported no comment",
 			code: `package test
-// type comment
+// A type comment
 type A struct {
 	A int
 }`,
@@ -506,7 +533,7 @@ type A struct {
 		{
 			name: "exported with comment",
 			code: `package test
-// type comment
+// A type comment
 type A struct {
 	// comment
 	A int
@@ -515,7 +542,7 @@ type A struct {
 		{
 			name: "exported line comment",
 			code: `package test
-// type comment
+// A type comment
 type A struct {
 	A int // comment
 }`,
@@ -523,7 +550,7 @@ type A struct {
 		{
 			name: "two exported no comments",
 			code: `package test
-// type comment
+// A type comment
 type A struct {
 	A int
 	B int
@@ -533,7 +560,7 @@ type A struct {
 		{
 			name: "two exported one comment",
 			code: `package test
-// type comment
+// A type comment
 type A struct {
 	// comment
 	A int
@@ -544,7 +571,7 @@ type A struct {
 		{
 			name: "one exported no comment",
 			code: `package test
-// type comment
+// A type comment
 type A struct {
 	A int
 	b int
@@ -554,7 +581,7 @@ type A struct {
 		{
 			name: "one exported with comment",
 			code: `package test
-// type comment
+// A type comment
 type A struct {
 	// comment
 	A int
@@ -564,7 +591,7 @@ type A struct {
 		{
 			name: "multiple exported names no comment",
 			code: `package test
-// type comment
+// A type comment
 type A struct {
 	A, B int
 }`,
@@ -573,7 +600,7 @@ type A struct {
 		{
 			name: "multiple exported names one comment",
 			code: `package test
-// type comment
+// A type comment
 type A struct {
 	// comment
 	A, B int
@@ -583,7 +610,7 @@ type A struct {
 		{
 			name: "multiple exported names one line comment",
 			code: `package test
-// type comment
+// A type comment
 type A struct {
 	A, B int // comment
 }`,
@@ -613,7 +640,7 @@ func TestCheckAST_methods(t *testing.T) {
 		{
 			name: "exported no comment",
 			code: `package test
-// type comment
+// A type comment
 type A interface {
 	A()
 }`,
@@ -622,7 +649,7 @@ type A interface {
 		{
 			name: "exported with comment",
 			code: `package test
-// type comment
+// A type comment
 type A interface {
 	// comment
 	A()
@@ -631,7 +658,7 @@ type A interface {
 		{
 			name: "exported line comment",
 			code: `package test
-// type comment
+// A type comment
 type A interface {
 	A() // comment
 }`,
@@ -639,7 +666,7 @@ type A interface {
 		{
 			name: "two exported no comments",
 			code: `package test
-// type comment
+// A type comment
 type A interface {
 	A()
 	B()
@@ -649,7 +676,7 @@ type A interface {
 		{
 			name: "two exported one comment",
 			code: `package test
-// type comment
+// A type comment
 type A interface {
 	// comment
 	A()
@@ -660,7 +687,7 @@ type A interface {
 		{
 			name: "one exported no comment",
 			code: `package test
-// type comment
+// A type comment
 type A interface {
 	A()
 	b()
@@ -670,7 +697,7 @@ type A interface {
 		{
 			name: "one exported with comment",
 			code: `package test
-// type comment
+// A type comment
 type A interface {
 	// comment
 	A()

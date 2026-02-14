@@ -27,6 +27,9 @@ var ErrMultiDoc = errors.New("multiple documentation")
 // ErrLongComment means the comment line is beyond line length limit.
 var ErrLongComment = errors.New("long comment")
 
+// ErrCommentPrefix means the comment does not start with type name, etc.
+var ErrCommentPrefix = errors.New("invalid comment prefix")
+
 type kind int
 
 //go:generate stringer -type=kind -linecomment
