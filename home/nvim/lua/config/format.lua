@@ -11,6 +11,9 @@ conform.setup({
 		["clang-format"] = {
 			command = "clang-format21",
 		},
+		["markdownfmt"] = {
+			append_args = { "-soft-wraps" },
+		},
 		["shfmt"] = {
 			append_args = { "-bn", "-ci", "-p" },
 		},

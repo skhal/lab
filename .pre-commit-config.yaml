@@ -149,7 +149,9 @@ repos:
     entry: markdownfmt
     language: system
     types_or: [markdown]
-    args: ["-w"]
+    args:
+    - "-soft-wraps"
+    - "-w"
   - id: no-binary
     name: "No binaries"
     entry: "Binaries are not allowed"

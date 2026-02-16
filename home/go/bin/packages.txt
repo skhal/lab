@@ -13,6 +13,7 @@
 #   github.com/foo/bar@latest -ldflags '-s'
 #
 # keep-sorted start
+github.com/Kunde21/markdownfmt/v3/cmd/markdownfmt@latest
 github.com/bazelbuild/bazel-watcher/cmd/ibazel@v0.28.0
 github.com/bazelbuild/buildtools/buildifier@latest
 github.com/bazelbuild/buildtools/buildozer@latest
@@ -21,7 +22,6 @@ github.com/google/keep-sorted@v0.7.1
 github.com/google/yamlfmt/cmd/yamlfmt@v0.21.0
 github.com/jstemmer/gotags@latest
 github.com/protocolbuffers/txtpbfmt/cmd/txtpbfmt@latest
-github.com/shurcooL/markdownfmt@latest
 github.com/skhal/lab/check/cmd/check-go-test@latest
 github.com/skhal/lab/check/cmd/check-godoc@latest
 github.com/skhal/lab/check/cmd/check-issue@latest
