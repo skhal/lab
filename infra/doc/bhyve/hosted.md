@@ -95,3 +95,84 @@ Virtual Switch: public
   bytes-in: 0 (OB)
   bytes-out: 0 (OB)
 ```
+
+Use tmux(1) to attach to VM consoles
+([doc](https://github.com/freebsd/vm-bhyve/wiki/Using-tmux)). Otherwise
+disconnecting from consoles is non-trivial `~+Ctrl-d`.
+
+**WARNING**: tmux(1) will run under super-user.
+
+```console
+% doas pkg install tmux
+% doas vm set console=tmux
+```
+
+## FreeBSD VM
+
+Pick up an ISO from https://download.freebsd.org/releases/ISO-IMAGES/15.0/ and
+add it to vm-bhyve(8) (minimize traffic by using `.xz` archive):
+
+```console
+% doas vm iso https://download.freebsd.org/releases/ISO-IMAGES/15.0/FreeBSD-15.0-RELEASE-amd64-bootonly.iso.xz
+% doas vm iso
+DATASTORE           FILENAME
+default             FreeBSD-15.0-RELEASE-amd64-bootonly.iso.xz
+```
+
+It didn't open the archive, extract it manually:
+
+```console
+# cd /usr/vm/.iso
+# xz -d FreeBSD-15.0-RELEASE-amd64-bootonly.iso
+# vm iso
+DATASTORE           FILENAME
+default             FreeBSD-15.0-RELEASE-amd64-bootonly.iso
+```
+
+Create a VM and install downloaded image:
+
+```console
+% doas vm create -t freebsd-zvol freebsd
+```
+
+It creates a VM with sparse ZVOL, i.e., ZFS dataset allocates data as needed
+instead of pre-allocating a block as typically done with `.img` files that back
+the virtual filesystem:
+
+```console
+% grep disk /usr/vm/freebsd/freebsd.conf
+disk0_type="virtio-blk"
+disk0_name="disk0"
+disk0_dev="sparse-zvol"
+```
+
+Change RAM to 512MB or 1024MB:
+
+```console
+% doas vm edit freebsd
+```
+
+Install the OS:
+
+```console
+% doas vm install freebsd FreeBSD-15.0-RELEASE-amd64-bootonly.iso
+Starting freebsd
+  * found guest in /usr/vm/freebsd
+  * booting...
+% doas vm list
+NAME     DATASTORE  LOADER     CPU  MEMORY  VNC  AUTO  STATE
+freebsd  default    bhyveload  1    512M    -    No    Bootloader (994)
+% doas vm console freebsd
+```
+
+FreeBSD starts up and offers to install the system or use live CD.
+
+Notice that vm-bhyve(8) creates a separate ZFS dataset for the VM and a sub-set
+to emulate the disk:
+
+```console
+% zfs list -r zroot/usr/vm/freebsd
+NAME                         USED  AVAIL  REFER  MOUNTPOINT
+zroot/usr/vm/freebsd         176K  1.73T   120K  /usr/vm/freebsd
+zroot/usr/vm/freebsd/disk0    56K  1.73T    56K  -
+```
