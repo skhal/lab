@@ -30,6 +30,7 @@ github.com/skhal/lab/check/cmd/check-nextid@latest
 github.com/skhal/lab/check/cmd/check-nosubmit@latest
 github.com/skhal/lab/check/cmd/check-pbdoc@latest
 github.com/skhal/lab/check/cmd/check-todo@latest
+github.com/skhal/lab/infra/cmd/alpine@latest
 github.com/skhal/lab/iq/cmd/iq@latest
 github.com/skhal/lab/x/compdb/cmd/compdb@latest
 github.com/skhal/lab/x/mdview@latest
