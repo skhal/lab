@@ -13,4 +13,5 @@
 
 Run bhyve:
 
+- [On the host](./hosted.md)
 - [In a jail](./enjailed.md)
