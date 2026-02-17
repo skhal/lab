@@ -176,3 +176,56 @@ NAME                         USED  AVAIL  REFER  MOUNTPOINT
 zroot/usr/vm/freebsd         176K  1.73T   120K  /usr/vm/freebsd
 zroot/usr/vm/freebsd/disk0    56K  1.73T    56K  -
 ```
+
+## Alpine VM
+
+Pick up an ISO from https://dl-cdn.alpinelinux.org/alpine/latest-stable/releases/x86_64
+or use `infra/cmd/alpine`:
+
+```console
+% alpine
+https://dl-cdn.alpinelinux.org/alpine/latest-stable/releases/x86_64/alpine-virt-3.23.3-x86_64.iso
+% doas vm iso https://dl-cdn.alpinelinux.org/alpine/latest-stable/releases/x86_64/alpine-virt-3.23.3-x86_64.iso
+% doas vm iso
+DATASTORE           FILENAME
+default             FreeBSD-15.0-RELEASE-amd64-bootonly.iso
+default             alpine-virt-3.23.3-x86_64.iso
+```
+
+Create a new vm:
+
+```console
+% doas vm create -t linux-zvol alpine
+% doas vm install alpine alpine-virt-3.23.3-x86_64.iso
+Starting alpine
+  * found guest in /usr/vm/alpine
+  * booting...
+% doas vm console alpine
+```
+
+The system boots live CD without network. Setup network and verify it works:
+
+```console
+% setup-interfaces
+% rc-service networking restart
+% nslookup alpinelinux.org
+Server:         192.168.10.1
+Address:        192.168.10.1:53
+
+Non-authoritative answer:
+Name:   alpinelinux.org
+Address: 213.219.36.190
+
+Non-authoritative answer:
+Name:   alpinelinux.org
+Address: 2a01:7e00:e000:2fc::4
+```
+
+Verify:
+
+```console
+% zfs list -r zroot/usr/vm/alpine
+NAME                        USED  AVAIL  REFER  MOUNTPOINT
+zroot/usr/vm/alpine         192K  1.73T   136K  /usr/vm/alpine
+zroot/usr/vm/alpine/disk0    56K  1.73T    56K  -
+```
