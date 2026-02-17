@@ -13,3 +13,4 @@
 
 - [bhyve/](./bhyve/) - BSD hypervisor runs different Operating Systems under
   FreeBSD.
+- [vpn/](./vpn/) - Virtual Private Network setup
