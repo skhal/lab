@@ -10,6 +10,7 @@ require (
 	github.com/protocolbuffers/txtpbfmt v0.0.0-20251016062345-16587c79cd91
 	google.golang.org/grpc v1.75.1
 	google.golang.org/protobuf v1.36.9
+	gopkg.in/yaml.v3 v3.0.1
 )
 
 require (

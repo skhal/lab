@@ -69,8 +69,8 @@ repos:
     exclude_types: [json]
     exclude: |
       (?x)^(
-        .*/MODULE\.bazel\.lock
-        |.*/go\.(mod|sum)
+         MODULE\.bazel\.lock
+        |go\.(mod|sum)
         |.*/(test)?data/.*
         |.*_string\.go
         |.*\.pb\.go
