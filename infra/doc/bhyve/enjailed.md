@@ -11,9 +11,9 @@
 
 # DESCRIPTION
 
-## Jail setup
+## Jail bootstrap
 
-First, create an empty jail with VNET:
+Create an empty VNET jail:
 
 ```console
 # zfs clone zroot/usr/jail/15.0@skel zroot/usr/jail/bhyve
@@ -87,8 +87,9 @@ PING freebsd.org (96.47.72.84): 56 data bytes
 round-trip min/avg/max/stddev = 29.651/29.651/29.651/0.000 ms
 ```
 
-Next, add a ZFS data for VMs and delegate it to the jail for management. The
-goal is to let bhyve jail manage the dataset: mount, create sub-datasets, etc.
+## Enajil ZFS
+
+The goal is to store VMs in a ZFS dataset under jail management.
 
 According to zfs-jail(8), a dataset must meet following requirements before a
 jail can manage it:
@@ -152,8 +153,7 @@ zroot/usr/jail/bhyve/vm  mounted     no                  -
 zroot/usr/jail/bhyve/vm  mountpoint  /usr/jail/bhyve/vm  inherited from zroot/usr
 ```
 
-Before we test the setup within the jail, we need to add ZFS support to the
-jail and enable ZFS service to manage the mounts:
+Enable ZFS service inside the jail to mount the dataset:
 
 ```console
 # pkg -r /usr/jail/bhyve/ install FreeBSD-zfs
@@ -161,25 +161,43 @@ jail and enable ZFS service to manage the mounts:
 zfs_enable: NO -> yes
 ```
 
-At this point everything is set up except the fact that ZFS dataset is not
-enjailed with zfs-jail(8).
+jail(8) can
+[attach](https://github.com/freebsd/freebsd-src/blob/349808d8bd197165390a286bccdaa29a1d77c7ab/usr.sbin/jail/jail.c#L101)
+ZFS datasets during jail startup, right after `exec.created` runs. It picks up
+datasets from `zfs.dataset` param.
 
-Apparently jail(8) can
-[attach ZFS datasets](https://github.com/freebsd/freebsd-src/blob/349808d8bd197165390a286bccdaa29a1d77c7ab/usr.sbin/jail/jail.c#L101)
-during the start command sequence, right after `exec.created` runs, if jail
-configuration has `zfs.dataset` param set. It
-[checks](https://github.com/freebsd/freebsd-src/blob/349808d8bd197165390a286bccdaa29a1d77c7ab/usr.sbin/jail/command.c#L614)
-that the ZFS dataset has `jailed` property set.
+Note that the dataset to be enjailed must have `jailed` property set:
+[check](https://github.com/freebsd/freebsd-src/blob/349808d8bd197165390a286bccdaa29a1d77c7ab/usr.sbin/jail/command.c#L614)
+.
 
-Keep in mind that there is no analogous step to zfs-unjail(8) the dataset. We
-need to manually run it. Based on where zfs-jail(8) runs in the start sequence,
-natural place in the stop sequence is `exec.poststop`:
+There is also no symmetric zfs-unjail(8) option. There is no way to run the
+command manually in easy way because it needs to be run on the host while jail
+is still available. Stop commands
+[sequence](https://github.com/freebsd/freebsd-src/blob/e1e18cc12e68762b641646b203d9ac42d10e3b1f/usr.sbin/jail/jail.c#L112-L114)
+does not have a hook for that: it runs `exec.prestop` in the host environment,
+then `exec.stop` in the jail environment, and executes `jail stop`. Commands
+to be run after `jail stop` don't have access to the jail because it was
+removed, resulting in "invalid jail name".
 
 ```console
 % grep zfs /etc/jail.conf.d/bhyve.conf
   allow.mount.zfs;
   zfs.dataset = "zroot/usr/jail/${name}/vm";
-  exec.poststop += "/sbin/zfs unjail zroot/usr/jail/${name}/vm";
+```
+
+Include ZFS service in the shutdown sequence to unmount the VMs dataset:
+
+```console
+# diff -u /usr/jail/bhyve/etc/rc.d/zfs{.orig,}
+--- /usr/jail/bhyve/etc/rc.d/zfs.orig	2026-02-18 14:10:06.114400000 -0600
++++ /usr/jail/bhyve/etc/rc.d/zfs	2026-02-18 14:10:24.899516000 -0600
+@@ -5,6 +5,7 @@
+ # PROVIDE: zfs
+ # REQUIRE: zfsbe
+ # BEFORE: FILESYSTEMS var
++# KEYWORD: shutdown
+
+ . /etc/rc.subr
 ```
 
 Verify work:
@@ -191,15 +209,4 @@ Verify work:
 % doas jexec bhyve zfs mount
 zroot/usr/jail/bhyve            /
 zroot/usr/jail/bhyve/vm         /usr/jail/bhyve/vm
-```
-
-At last, lets change the VMs mount point inside the jail (keep in mind that ZFS auto-mounts the dataset when `mountpoint` property is set):
-
-```console
-% doas jexec bhyve zfs umount zroot/usr/jail/bhyve/vm
-% doas jexec bhyve zfs set mountpoint=/vm zroot/usr/jail/bhyve/vm
-% doas jexec bhyve zfs mount
-zroot/usr/jail/bhyve            /
-zroot/usr/jail/bhyve/vm         /vm
-% doas jexec bhyve rm -rf /usr/jail/
 ```
