@@ -210,3 +210,33 @@ Verify work:
 zroot/usr/jail/bhyve            /
 zroot/usr/jail/bhyve/vm         /usr/jail/bhyve/vm
 ```
+
+## Bootstrap VM
+
+On the host:
+
+```console
+# diff -u /boot/loader.conf{.orig,}
+--- /boot/loader.conf.orig	2026-02-18 14:36:21.704895000 -0600
++++ /boot/loader.conf	2026-02-18 14:36:42.107293000 -0600
+@@ -1,4 +1,7 @@
++# keep-sorted start
++nmdm_load="YES"
+ autoboot_delay="-1"
+ kern.geom.label.disk_ident.enable="0"
+ kern.geom.label.gptid.enable="0"
+ zfs_load="YES"
++# keep-sorted end
+# kldload nmdm
+```
+
+In the Jail:
+
+```console
+# pkg install vm-bhyve
+# sysrc rc_debug="yes"
+# mkdir /usr/local/etc/rc.conf.d
+# sysrc -f /usr/local/etc/rc.conf.d/vm vm_enable=yes
+# sysrc -f /usr/local/etc/rc.conf.d/vm vm_dir="zfs:zroot/usr/jail/bhyve/vm"
+# vm init
+```
