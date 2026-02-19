@@ -11,7 +11,7 @@ set -e
 
 case "$1" in
   doc | help)
-    if [ -t 1 ]; then
+    if ! [ -t 1 ]; then
       break
     fi
     exec go "$@" | $PAGER
