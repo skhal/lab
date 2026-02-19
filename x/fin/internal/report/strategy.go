@@ -16,15 +16,15 @@ import (
 // StrategyInfo summarizes the results of a strategy. It includes strategy name,
 // description, and starting/end quotes.
 type StrategyInfo struct {
-	Name        string    // strategy name
-	Description string    // strategy description
-	Start       fin.Quote // strategy starting quote
-	End         fin.Quote // strategy result
+	Name        string      // strategy name
+	Description string      // strategy description
+	Start       fin.Balance // start balance
+	End         fin.Balance // end balance
 }
 
 // Performance returns the ratio of the end to start balances.
 func (si *StrategyInfo) Performance() float64 {
-	return float64(si.End.Balance) / float64(si.Start.Balance)
+	return float64(si.End.Cash) / float64(si.Start.Cash)
 }
 
 // Strategy generates a report for a single strategy.
@@ -61,7 +61,7 @@ func strategiesPerformance(w io.Writer, infos []*StrategyInfo) error {
 				fmt.Fprint(&b, " | ")
 			}
 			if c != r {
-				rate := float64(cinfo.End.Balance) / float64(rinfo.End.Balance)
+				rate := float64(cinfo.End.Cash) / float64(rinfo.End.Cash)
 				fmt.Fprintf(&b, "%.2f", rate)
 			} else {
 				fmt.Fprintf(&b, "%4s", "")

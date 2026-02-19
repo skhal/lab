@@ -5,4 +5,4 @@
   license that can be found in the LICENSE file.
 */ -}}
 
-${{.Balance}} on {{.Date.Format "2006 Jan" -}}
+${{.Cash}} on {{.Date.Format "2006 Jan" -}}

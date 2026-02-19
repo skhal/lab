@@ -22,8 +22,8 @@ func TestRun(t *testing.T) {
 		return fin.Position{Investment: -pos.Investment, Dividend: -pos.Dividend}
 	}
 	type want struct {
-		start fin.Quote
-		end   fin.Quote
+		start fin.Balance
+		end   fin.Balance
 	}
 	tests := []struct {
 		name   string
@@ -41,8 +41,8 @@ func TestRun(t *testing.T) {
 				tests.NewRecord(t, 2006, time.January, 2, 3, 0),
 			},
 			want: want{
-				start: fin.Quote{Date: newTime(t, 2006, time.January), Balance: 123},
-				end:   fin.Quote{Date: newTime(t, 2006, time.February), Balance: -123},
+				start: fin.Balance{Date: newTime(t, 2006, time.January), Cash: 123},
+				end:   fin.Balance{Date: newTime(t, 2006, time.February), Cash: -123},
 			},
 		},
 		{
@@ -53,8 +53,8 @@ func TestRun(t *testing.T) {
 				tests.NewRecord(t, 2006, time.February, 2, 3, 0),
 			},
 			want: want{
-				start: fin.Quote{Date: newTime(t, 2006, time.January), Balance: 123},
-				end:   fin.Quote{Date: newTime(t, 2006, time.March), Balance: 123},
+				start: fin.Balance{Date: newTime(t, 2006, time.January), Cash: 123},
+				end:   fin.Balance{Date: newTime(t, 2006, time.March), Cash: 123},
 			},
 		},
 	}

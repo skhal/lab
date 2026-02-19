@@ -22,47 +22,47 @@ func TestRetain_Run(t *testing.T) {
 	tctc := []struct {
 		name    string
 		percent strategy.Percent
-		start   fin.Cents
+		start   fin.Position
 		market  []*pb.Record
-		want    fin.Cents
+		want    fin.Position
 	}{
 		{
 			name:  "zero percent no year",
-			start: fin.Cents(100),
+			start: fin.Position{Investment: 100},
 			market: []*pb.Record{
 				tests.NewRecord(t, 2006, time.January, 111, 122, 133),
 				tests.NewRecord(t, 2006, time.February, 211, 222, 233),
 			},
-			want: fin.Cents(100),
+			want: fin.Position{Investment: 100},
 		},
 		{
 			name:  "zero percent with year",
-			start: fin.Cents(100),
+			start: fin.Position{Investment: 100},
 			market: []*pb.Record{
 				tests.NewRecord(t, 2006, time.December, 111, 122, 133),
 				tests.NewRecord(t, 2007, time.January, 211, 222, 233),
 			},
-			want: fin.Cents(100),
+			want: fin.Position{Investment: 100},
 		},
 		{
 			name:    "one percent no year",
 			percent: strategy.Percent(1),
-			start:   fin.Cents(100),
+			start:   fin.Position{Investment: 100},
 			market: []*pb.Record{
 				tests.NewRecord(t, 2006, time.January, 111, 122, 133),
 				tests.NewRecord(t, 2006, time.February, 211, 222, 233),
 			},
-			want: fin.Cents(100),
+			want: fin.Position{Investment: 100},
 		},
 		{
 			name:    "one percent with year",
 			percent: strategy.Percent(1),
-			start:   fin.Cents(100),
+			start:   fin.Position{Investment: 100},
 			market: []*pb.Record{
 				tests.NewRecord(t, 2006, time.December, 111, 122, 133),
 				tests.NewRecord(t, 2007, time.January, 211, 222, 233),
 			},
-			want: fin.Cents(99),
+			want: fin.Position{Investment: 99},
 		},
 	}
 	for _, tc := range tctc {

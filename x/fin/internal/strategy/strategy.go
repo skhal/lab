@@ -28,10 +28,9 @@ func New(c Cycler) *Runner {
 
 // Run executes the strategy on a set of rectors starting with a given balance.
 // It returns the end balance.
-func (s *Runner) Run(start fin.Cents, market []*pb.Record) fin.Cents {
-	pos := fin.Position{Investment: start}
+func (s *Runner) Run(pos fin.Position, market []*pb.Record) fin.Position {
 	for _, rec := range market {
 		pos = s.Cycle(pos, rec)
 	}
-	return pos.Total()
+	return pos
 }
