@@ -23,11 +23,11 @@ func Hold() *Runner {
 }
 
 // Cycle implements [Cycler] interface.
-func (s *hold) Cycle(q Quote, rec *pb.Record) Quote {
+func (s *hold) Cycle(pos fin.Position, rec *pb.Record) fin.Position {
 	defer func() { s.last = rec }()
-	bal := s.invest(q.Bal, rec)
-	div := s.payDividend(q.Bal, rec) + q.Div
-	return Quote{Bal: bal, Div: div}
+	bal := s.invest(pos.Investment, rec)
+	div := s.payDividend(pos.Investment, rec) + pos.Dividend
+	return fin.Position{Investment: bal, Dividend: div}
 }
 
 func (s *hold) invest(c fin.Cents, curr *pb.Record) fin.Cents {
@@ -51,9 +51,9 @@ func HoldReinvest() *Runner {
 }
 
 // Cycle implements [Cycler] interface.
-func (s *holdReinvest) Cycle(q Quote, rec *pb.Record) Quote {
-	q = s.hold.Cycle(q, rec)
-	q.Bal += q.Div
-	q.Div = 0
-	return q
+func (s *holdReinvest) Cycle(pos fin.Position, rec *pb.Record) fin.Position {
+	pos = s.hold.Cycle(pos, rec)
+	pos.Investment += pos.Dividend
+	pos.Dividend = 0
+	return pos
 }

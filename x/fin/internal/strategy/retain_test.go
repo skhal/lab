@@ -16,8 +16,8 @@ import (
 )
 
 func TestRetain_Run(t *testing.T) {
-	cycle := func(q strategy.Quote, _ *pb.Record) strategy.Quote {
-		return q
+	cycle := func(pos fin.Position, _ *pb.Record) fin.Position {
+		return pos
 	}
 	tctc := []struct {
 		name    string
@@ -79,8 +79,8 @@ func TestRetain_Run(t *testing.T) {
 	}
 }
 
-type CycleFunc func(strategy.Quote, *pb.Record) strategy.Quote
+type CycleFunc func(fin.Position, *pb.Record) fin.Position
 
-func (cf CycleFunc) Cycle(q strategy.Quote, rec *pb.Record) strategy.Quote {
-	return cf(q, rec)
+func (cf CycleFunc) Cycle(pos fin.Position, rec *pb.Record) fin.Position {
+	return cf(pos, rec)
 }

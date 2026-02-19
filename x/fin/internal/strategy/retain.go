@@ -35,12 +35,12 @@ func Retain(p Percent, c Cycler) *Runner {
 
 // Cycle retains percent at the beginning of the year and runs wrapped
 // strategy.
-func (s *retain) Cycle(q Quote, rec *pb.Record) Quote {
+func (s *retain) Cycle(pos fin.Position, rec *pb.Record) fin.Position {
 	defer func() { s.last = rec }()
 	if s.shouldRetain(rec) {
-		q = s.withhold(q)
+		pos = s.withhold(pos)
 	}
-	return s.c.Cycle(q, rec)
+	return s.c.Cycle(pos, rec)
 }
 
 func (s *retain) shouldRetain(rec *pb.Record) bool {
@@ -51,12 +51,12 @@ func (s *retain) shouldRetain(rec *pb.Record) bool {
 	return rec.GetDate().GetMonth() == int32(time.January)
 }
 
-func (s *retain) withhold(q Quote) Quote {
+func (s *retain) withhold(pos fin.Position) fin.Position {
 	applyTo := func(c fin.Cents) fin.Cents {
 		return c - fin.Cents(math.Floor(float64(c)*s.rate))
 	}
-	return Quote{
-		Bal: applyTo(q.Bal),
-		Div: applyTo(q.Div),
+	return fin.Position{
+		Investment: applyTo(pos.Investment),
+		Dividend:   applyTo(pos.Dividend),
 	}
 }

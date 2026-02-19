@@ -10,21 +10,10 @@ import (
 	"github.com/skhal/lab/x/fin/internal/pb"
 )
 
-// Quote holds account balance and dividends payout.
-type Quote struct {
-	Bal fin.Cents // account balance
-	Div fin.Cents // paid dividends
-}
-
-// Total gives a sum for the account balance and dividends.
-func (b Quote) Total() fin.Cents {
-	return b.Bal + b.Div
-}
-
 // Cycler is a strategy that can process a single cycle.
 type Cycler interface {
 	// Cycle processes a single market record.
-	Cycle(Quote, *pb.Record) Quote
+	Cycle(fin.Position, *pb.Record) fin.Position
 }
 
 // Runner represents a strategy backed by Cycler.
@@ -40,9 +29,9 @@ func New(c Cycler) *Runner {
 // Run executes the strategy on a set of rectors starting with a given balance.
 // It returns the end balance.
 func (s *Runner) Run(start fin.Cents, market []*pb.Record) fin.Cents {
-	q := Quote{Bal: start}
+	pos := fin.Position{Investment: start}
 	for _, rec := range market {
-		q = s.Cycle(q, rec)
+		pos = s.Cycle(pos, rec)
 	}
-	return q.Total()
+	return pos.Total()
 }

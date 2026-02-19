@@ -18,8 +18,8 @@ import (
 )
 
 func TestRun(t *testing.T) {
-	cycle := func(q strategy.Quote, _ *pb.Record) strategy.Quote {
-		return strategy.Quote{Bal: -q.Bal, Div: -q.Div}
+	cycle := func(pos fin.Position, _ *pb.Record) fin.Position {
+		return fin.Position{Investment: -pos.Investment, Dividend: -pos.Dividend}
 	}
 	type want struct {
 		start fin.Quote
@@ -72,10 +72,10 @@ func TestRun(t *testing.T) {
 	}
 }
 
-type CycleFunc func(strategy.Quote, *pb.Record) strategy.Quote
+type CycleFunc func(fin.Position, *pb.Record) fin.Position
 
-func (cf CycleFunc) Cycle(q strategy.Quote, rec *pb.Record) strategy.Quote {
-	return cf(q, rec)
+func (cf CycleFunc) Cycle(pos fin.Position, rec *pb.Record) fin.Position {
+	return cf(pos, rec)
 }
 
 func newTime(t *testing.T, year int, month time.Month) time.Time {
