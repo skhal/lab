@@ -15,6 +15,7 @@ case "$1" in
       break
     fi
     exec go "$@" | $PAGER
+    exit
     ;;
 esac
 
