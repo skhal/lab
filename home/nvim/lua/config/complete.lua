@@ -3,7 +3,11 @@
 -- Use of this source code is governed by a BSD-style
 -- license that can be found in the LICENSE file.
 
+-- keep-sorted start
+vim.o.pumwidth = 50
 vim.o.winborder = "rounded"
+-- keep-sorted end
+
 if vim.fn.exists("+pumborder") == 1 then
 	vim.o.pumborder = "rounded"
 end
