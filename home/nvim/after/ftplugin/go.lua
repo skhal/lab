@@ -7,7 +7,7 @@
 vim.bo.equalprg = "goimports"
 vim.bo.expandtab = false
 -- keep-sorted end
---
+
 local M = {
 	source = function()
 		local f = vim.fn.expand("%")

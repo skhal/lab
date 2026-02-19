@@ -8,7 +8,7 @@ if vim.fn.exists("+pumborder") == 1 then
 	vim.o.pumborder = "rounded"
 end
 
-vim.cmd([[set completeopt+=menuone,noselect,popup]])
+vim.cmd([[set completeopt+=menuone,preinsert,popup]])
 
 vim.lsp.config("*", {
 	-- ref: https://github.com/hrsh7th/cmp-nvim-lsp/blob/cbc7b02bb99fae35cb42f514762b89b5126651ef/lua/cmp_nvim_lsp/init.lua
