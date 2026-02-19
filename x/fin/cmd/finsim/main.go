@@ -3,7 +3,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// finsim simulates financial market using Shiller data. It supports different
+// Finsim simulates financial market using Shiller data. It supports different
 // strategies, e.g. hold the investment position and re-invest dividends.
 //
 // Synopsis:
@@ -18,6 +18,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/skhal/lab/x/fin/internal/fin"
 	"github.com/skhal/lab/x/fin/internal/pb"
 	"github.com/skhal/lab/x/fin/internal/report"
 	"google.golang.org/protobuf/proto"
@@ -31,11 +32,11 @@ func main() {
 }
 
 func run() error {
-	ifile, nmonth, runners, err := parseFlags(createRegistry())
+	ifile, balance, nmonth, runners, err := parseFlags(createRegistry())
 	if err != nil {
 		return err
 	}
-	m, err := readFile(ifile)
+	market, err := readFile(ifile)
 	if err != nil {
 		return err
 	}
@@ -43,7 +44,7 @@ func run() error {
 		n = max(len(recs)-n, 0)
 		return recs[n:]
 	}
-	return runStrategies(runners, fetchLastN(m.GetRecords(), nmonth))
+	return runStrategies(runners, balance, fetchLastN(market.GetRecords(), nmonth))
 }
 
 func createRegistry() *registry {
@@ -62,7 +63,7 @@ func createRegistry() *registry {
 	return reg
 }
 
-func parseFlags(reg *registry) (file string, months int, runners []*namedRunner, err error) {
+func parseFlags(reg *registry) (file string, balance fin.Cents, months int, runners []*namedRunner, err error) {
 	flag.Usage = func() {
 		w := flag.CommandLine.Output()
 		fmt.Fprintf(w, "usage: %s [flags] file\n", filepath.Base(os.Args[0]))
@@ -70,10 +71,16 @@ func parseFlags(reg *registry) (file string, months int, runners []*namedRunner,
 		fmt.Fprintln(w, "flags:")
 		flag.PrintDefaults()
 	}
+	bal := flag.Int("bal", 100, "initial balance in dollars")
 	flag.IntVar(&months, "n", 12, "number of latest months to process")
 	sflag := newStrategyListFlag(reg)
 	flag.Var(sflag, "s", sflag.Help())
 	flag.Parse()
+	if *bal < 0 {
+		err = errors.New("negative balance")
+		return
+	}
+	balance = fin.Cents(*bal * 100) // bal is in dollars
 	if flag.NArg() != 1 {
 		err = errors.New("missing input file")
 		return
@@ -95,10 +102,10 @@ func readFile(name string) (*pb.Market, error) {
 	return m, nil
 }
 
-func runStrategies(strategies []*namedRunner, market []*pb.Record) error {
+func runStrategies(strategies []*namedRunner, balance fin.Cents, market []*pb.Record) error {
 	infos := make([]*report.StrategyInfo, 0, len(strategies))
 	for _, r := range strategies {
-		infos = append(infos, r.Run(market))
+		infos = append(infos, r.Run(balance, market))
 	}
 	return report.Strategies(os.Stdout, infos)
 }

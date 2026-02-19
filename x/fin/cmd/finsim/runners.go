@@ -26,12 +26,12 @@ func (nr *namedRunner) Name() string { return nr.name }
 func (nr *namedRunner) Description() string { return nr.desc }
 
 // Run executes strategy.
-func (nr *namedRunner) Run(market []*pb.Record) *report.StrategyInfo {
+func (nr *namedRunner) Run(bal fin.Cents, market []*pb.Record) *report.StrategyInfo {
 	info := report.StrategyInfo{
 		Name:        nr.Name(),
 		Description: nr.Description(),
 	}
-	info.Start, info.End = sim.Run(fin.Cents(100), market, nr.runner)
+	info.Start, info.End = sim.Run(bal, market, nr.runner)
 	return &info
 }
 
