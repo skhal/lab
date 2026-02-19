@@ -10,6 +10,7 @@ import (
 
 	"github.com/skhal/lab/x/fin/internal/fin"
 	"github.com/skhal/lab/x/fin/internal/pb"
+	"github.com/skhal/lab/x/fin/internal/ror"
 )
 
 type hold struct {
@@ -30,13 +31,13 @@ func (s *hold) Cycle(q Quote, rec *pb.Record) Quote {
 }
 
 func (s *hold) invest(c fin.Cents, curr *pb.Record) fin.Cents {
-	ror := SPRateOfReturn(s.last, curr)
-	return fin.Cents(math.Floor(float64(c) * float64(ror)))
+	r := ror.SPComposite(s.last, curr)
+	return fin.Cents(math.Floor(float64(c) * float64(r)))
 }
 
 func (s *hold) payDividend(c fin.Cents, rec *pb.Record) fin.Cents {
-	ror := DivRateOfReturn(rec)
-	return fin.Cents(math.Floor(float64(c) * float64(ror)))
+	r := ror.Dividend(rec)
+	return fin.Cents(math.Floor(float64(c) * float64(r)))
 }
 
 type holdReinvest struct {

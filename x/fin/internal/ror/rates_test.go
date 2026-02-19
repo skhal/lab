@@ -3,7 +3,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package strategy_test
+package ror_test
 
 import (
 	"math"
@@ -12,7 +12,7 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/skhal/lab/x/fin/internal/pb"
-	"github.com/skhal/lab/x/fin/internal/strategy"
+	"github.com/skhal/lab/x/fin/internal/ror"
 	"github.com/skhal/lab/x/fin/internal/tests"
 )
 
@@ -21,7 +21,7 @@ func TestRateOfReturn(t *testing.T) {
 		name string
 		prev *pb.Record
 		curr *pb.Record
-		want strategy.Rate
+		want ror.Rate
 	}{
 		{
 			name: "no change",
@@ -54,7 +54,7 @@ func TestRateOfReturn(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			r := strategy.SPRateOfReturn(tc.prev, tc.curr)
+			r := ror.SPComposite(tc.prev, tc.curr)
 
 			if !cmp.Equal(tc.want, r, floatComparer) {
 				t.Errorf("RateOfReturn() = %.2f; want %.2f", r, tc.want)
@@ -69,7 +69,7 @@ func TestRateOfDividend(t *testing.T) {
 	tests := []struct {
 		name string
 		rec  *pb.Record
-		want strategy.Rate
+		want ror.Rate
 	}{
 		{
 			name: "no dividend",
@@ -87,7 +87,7 @@ func TestRateOfDividend(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			r := strategy.DivRateOfReturn(tc.rec)
+			r := ror.Dividend(tc.rec)
 
 			if !cmp.Equal(tc.want, r, floatComparer) {
 				t.Errorf("RateOfDividend() = %.2f; want %.2f", r, tc.want)
