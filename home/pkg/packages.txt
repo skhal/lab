@@ -19,7 +19,7 @@ cmake
 doas
 fzf
 git
-go125
+go126
 graphviz
 groff
 jq

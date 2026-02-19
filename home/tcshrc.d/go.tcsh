@@ -6,7 +6,7 @@
 if ( ! $?prompt ) exit
 
 # Pick up system install
-set base_path_ = "/usr/local/go125"
+set base_path_ = "/usr/local/go126"
 if ( ! $?TMUX && -d ${base_path_} ) then
   set path = (${path} ${base_path_}/bin)
 endif
