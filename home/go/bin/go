@@ -10,6 +10,12 @@ set -e
 : ${PAGER:=/usr/bin/less -s}
 
 case "$1" in
-  doc | help) exec go "$@" | $PAGER ;;
-  *) exec go "$@" ;;
+  doc | help)
+    if [ -t 1 ]; then
+      break
+    fi
+    exec go "$@" | $PAGER
+    ;;
 esac
+
+exec go "$@"
