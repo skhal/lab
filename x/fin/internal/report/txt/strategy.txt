@@ -7,4 +7,4 @@
 
 {{.Name}} - {{.Description}}
 {{template "quote.txt" .Start}}
-{{template "quote.txt" .End}} ({{ .Performance }})
+{{template "quote.txt" .End}} ({{.Performance | printf "%.2f"}})
