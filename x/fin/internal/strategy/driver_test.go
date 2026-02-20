@@ -6,6 +6,7 @@
 package strategy_test
 
 import (
+	"math"
 	"testing"
 	"time"
 
@@ -378,4 +379,14 @@ func TestDrive_rebalance(t *testing.T) {
 			}
 		})
 	}
+}
+
+func invest(t *testing.T, bal, spa, spb fin.Cents) fin.Cents {
+	t.Helper()
+	return fin.Cents(math.Floor(float64(bal) * float64(spb) / float64(spa)))
+}
+
+func dividend(t *testing.T, bal, sp, div fin.Cents) fin.Cents {
+	t.Helper()
+	return fin.Cents(math.Floor(float64(bal) * float64(div) / float64(sp)))
 }
