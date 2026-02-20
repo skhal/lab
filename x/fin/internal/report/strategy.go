@@ -28,7 +28,7 @@ func (si *StrategyInfo) Performance() float64 {
 }
 
 // Strategy generates a report for a single strategy.
-func Strategy(w io.Writer, info StrategyInfo) error {
+func Strategy(w io.Writer, info *StrategyInfo) error {
 	return tmpls.ExecuteTemplate(w, "strategy.txt", info)
 }
 

@@ -1,0 +1,3 @@
+test-strategy - test strategy description
+$1.00 on 2006 Jan
+$0.00 on 0001 Jan (0)
