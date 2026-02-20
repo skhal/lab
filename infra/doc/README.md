@@ -13,4 +13,6 @@
 
 - [bhyve/](./bhyve/) - BSD hypervisor runs different Operating Systems under
   FreeBSD.
-- [vpn/](./vpn/) - Virtual Private Network setup
+- [jail/](./jail/) - Setup jails to contain services or provide virtual
+  environments.
+- [vpn/](./vpn/) - Virtual Private Network setup.
