@@ -6,5 +6,5 @@
 */ -}}
 
 {{.Name}} - {{.Description}}
-{{template "quote.txt" .Start}}
-{{template "quote.txt" .End}} ({{.Performance | printf "%.2f"}})
+{{template "balance.txt" .Start}}
+{{template "balance.txt" .End}} ({{.Performance | printf "%.2f"}})
