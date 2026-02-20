@@ -84,16 +84,17 @@ PING alpinelinux.org (213.219.36.190): 56 data bytes
 round-trip min/avg/max/stddev = 107.647/107.647/107.647/0.000 ms
 ```
 
-Install Alpine environment:
+Install Alpine environment (as of 20 Feb '26, 3.23.3 has broken BusyBox and
+`apk upgrade` fails - use 3.22.x instead):
 
 ```console
 % doas jexec alpine su -
 root@alpine:~ # mkdir -vp /compat/alpine
 /compat
 /compat/alpine
-root@alpine:~ # fetch -o /tmp https://dl-cdn.alpinelinux.org/alpine/v3.23/releases/x86_64/alpine-minirootfs-3.23.3-x86_64.tar.gz
-/tmp/alpine-minirootfs-3.23.3-x86_64.tar.gz           3626 kB 9921 kBps    00s
-root@alpine:~ # tar -C /compat/alpine -xzf /tmp/alpine-minirootfs-3.23.3-x86_64.tar.gz
+root@alpine:~ # fetch -o /tmp https://dl-cdn.alpinelinux.org/alpine/v3.22/releases/x86_64/alpine-minirootfs-3.22.3-x86_64.tar.gz
+alpine-minirootfs-3.22.3-x86_64.tar.gz           3626 kB 9921 kBps    00s
+root@alpine:~ # tar -C /compat/alpine -xzf /tmp/alpine-minirootfs-3.22.3-x86_64.tar.gz
 ```
 
 If we try to run any of the alpine binaries, they'll fail with high probability
@@ -134,4 +135,13 @@ PING alpinelinux.org (213.219.36.190): 56 data bytes
 --- alpinelinux.org ping statistics ---
 1 packets transmitted, 1 packets received, 0% packet loss
 round-trip min/avg/max = 106.767/106.767/106.767 ms
+```
+
+## Install Bazel
+
+```console
+# apk update
+# apk upgrade
+# echo "https://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories
+# apk install bazel8
 ```
