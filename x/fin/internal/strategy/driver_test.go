@@ -38,8 +38,14 @@ func TestDrive_norebalance(t *testing.T) {
 			},
 			want: []fin.Balance{
 				{Cash: fin.Cents(123)},
-				tests.NewBalance(t, 2006, time.January, 0, tests.NewPosition(t, 123, 0)),
-				tests.NewBalance(t, 2006, time.February, 123),
+				{
+					Date:     tests.NewTime(t, 2006, time.January),
+					Position: tests.NewPosition(t, 123, 0),
+				},
+				{
+					Date: tests.NewTime(t, 2006, time.February),
+					Cash: fin.Cents(123),
+				},
 			},
 		},
 		{
@@ -50,18 +56,26 @@ func TestDrive_norebalance(t *testing.T) {
 			},
 			want: []fin.Balance{
 				{Cash: fin.Cents(123)},
-				tests.NewBalance(t, 2006, time.January, 0, func() fin.Position {
-					c, d := func(c fin.Cents) (inv, div fin.Cents) {
-						return c, dividend(t, c, 100, 20)
-					}(fin.Cents(123))
-					return fin.Position{Investment: c, Dividend: d}
-				}()),
-				tests.NewBalance(t, 2006, time.February, func() int64 {
-					c, d := func(c fin.Cents) (inv, div fin.Cents) {
-						return c, dividend(t, c, 100, 20)
-					}(fin.Cents(123))
-					return int64(c + d)
-				}()),
+				{
+					Date: tests.NewTime(t, 2006, time.January),
+					Position: func() fin.Position {
+						// record 1
+						c, d := func(c fin.Cents) (inv, div fin.Cents) {
+							return c, dividend(t, c, 100, 20)
+						}(fin.Cents(123))
+						return fin.Position{Investment: c, Dividend: d}
+					}(),
+				},
+				{
+					Date: tests.NewTime(t, 2006, time.February),
+					Cash: func() fin.Cents {
+						// record 1
+						c, d := func(c fin.Cents) (inv, div fin.Cents) {
+							return c, dividend(t, c, 100, 20)
+						}(fin.Cents(123))
+						return c + d
+					}(),
+				},
 			},
 		},
 		{
@@ -73,25 +87,36 @@ func TestDrive_norebalance(t *testing.T) {
 			},
 			want: []fin.Balance{
 				{Cash: fin.Cents(123)},
-				tests.NewBalance(t, 2006, time.January, 0, tests.NewPosition(t, 123, 0)),
-				tests.NewBalance(t, 2006, time.February, 0, func() fin.Position {
-					// record 1
-					c, d := func(c fin.Cents) (inv, div fin.Cents) {
-						return c, 0
-					}(fin.Cents(123))
-					// record 2
-					c, d = invest(t, c, 100, 125), 0
-					return fin.Position{Investment: c, Dividend: d}
-				}()),
-				tests.NewBalance(t, 2006, time.March, func() int64 {
-					// record 1
-					c, d := func(c fin.Cents) (inv, div fin.Cents) {
-						return c, 0
-					}(fin.Cents(123))
-					// record 2
-					c, d = invest(t, c, 100, 125), 0
-					return int64(c + d)
-				}()),
+				{
+					Date: tests.NewTime(t, 2006, time.January),
+					Position: fin.Position{
+						Investment: 123,
+					},
+				},
+				{
+					Date: tests.NewTime(t, 2006, time.February),
+					Position: func() fin.Position {
+						// record 1
+						c, d := func(c fin.Cents) (inv, div fin.Cents) {
+							return c, 0
+						}(fin.Cents(123))
+						// record 2
+						c, d = invest(t, c, 100, 125), 0
+						return fin.Position{Investment: c, Dividend: d}
+					}(),
+				},
+				{
+					Date: tests.NewTime(t, 2006, time.March),
+					Cash: func() fin.Cents {
+						// record 1
+						c, d := func(c fin.Cents) (inv, div fin.Cents) {
+							return c, 0
+						}(fin.Cents(123))
+						// record 2
+						c, d = invest(t, c, 100, 125), 0
+						return c + d
+					}(),
+				},
 			},
 		},
 		{
@@ -103,31 +128,40 @@ func TestDrive_norebalance(t *testing.T) {
 			},
 			want: []fin.Balance{
 				{Cash: fin.Cents(123)},
-				tests.NewBalance(t, 2006, time.January, 0, func() fin.Position {
-					// record 1
-					c, d := func(c fin.Cents) (inv, div fin.Cents) {
-						return c, dividend(t, c, 100, 20)
-					}(fin.Cents(123))
-					return fin.Position{Investment: c, Dividend: d}
-				}()),
-				tests.NewBalance(t, 2006, time.February, 0, func() fin.Position {
-					// record 1
-					c, d := func(c fin.Cents) (inv, div fin.Cents) {
-						return c, dividend(t, c, 100, 20)
-					}(fin.Cents(123))
-					// record 2
-					c, d = invest(t, c, 100, 125), d+dividend(t, c, 125, 40)
-					return fin.Position{Investment: c, Dividend: d}
-				}()),
-				tests.NewBalance(t, 2006, time.March, func() int64 {
-					// record 1
-					c, d := func(c fin.Cents) (inv, div fin.Cents) {
-						return c, dividend(t, c, 100, 20)
-					}(fin.Cents(123))
-					// record 2
-					c, d = invest(t, c, 100, 125), d+dividend(t, c, 125, 40)
-					return int64(c + d)
-				}()),
+				{
+					Date: tests.NewTime(t, 2006, time.January),
+					Position: func() fin.Position {
+						// record 1
+						c, d := func(c fin.Cents) (inv, div fin.Cents) {
+							return c, dividend(t, c, 100, 20)
+						}(fin.Cents(123))
+						return fin.Position{Investment: c, Dividend: d}
+					}(),
+				},
+				{
+					Date: tests.NewTime(t, 2006, time.February),
+					Position: func() fin.Position {
+						// record 1
+						c, d := func(c fin.Cents) (inv, div fin.Cents) {
+							return c, dividend(t, c, 100, 20)
+						}(fin.Cents(123))
+						// record 2
+						c, d = invest(t, c, 100, 125), d+dividend(t, c, 125, 40)
+						return fin.Position{Investment: c, Dividend: d}
+					}(),
+				},
+				{
+					Date: tests.NewTime(t, 2006, time.March),
+					Cash: func() fin.Cents {
+						// record 1
+						c, d := func(c fin.Cents) (inv, div fin.Cents) {
+							return c, dividend(t, c, 100, 20)
+						}(fin.Cents(123))
+						// record 2
+						c, d = invest(t, c, 100, 125), d+dividend(t, c, 125, 40)
+						return c + d
+					}(),
+				},
 			},
 		},
 	}
@@ -174,16 +208,22 @@ func TestDrive_rebalance(t *testing.T) {
 			rebf: doublePosition,
 			want: []fin.Balance{
 				{Cash: fin.Cents(123)},
-				tests.NewBalance(t, 2006, time.January, 0, func() fin.Position {
-					// record 1
-					pos := tests.NewPosition(t, 123, 0)
-					return doublePosition(pos)
-				}()),
-				tests.NewBalance(t, 2006, time.February, func() int64 {
-					// record 1
-					pos := tests.NewPosition(t, 123, 0)
-					return int64(doublePosition(pos).Total())
-				}()),
+				{
+					Date: tests.NewTime(t, 2006, time.January),
+					Position: func() fin.Position {
+						// record 1
+						pos := tests.NewPosition(t, 123, 0)
+						return doublePosition(pos)
+					}(),
+				},
+				{
+					Date: tests.NewTime(t, 2006, time.February),
+					Cash: func() fin.Cents {
+						// record 1
+						pos := tests.NewPosition(t, 123, 0)
+						return doublePosition(pos).Total()
+					}(),
+				},
 			},
 		},
 		{
@@ -195,22 +235,28 @@ func TestDrive_rebalance(t *testing.T) {
 			rebf: doublePosition,
 			want: []fin.Balance{
 				{Cash: fin.Cents(123)},
-				tests.NewBalance(t, 2006, time.January, 0, func() fin.Position {
-					// record 1
-					c, d := func(c fin.Cents) (inv, div fin.Cents) {
-						return c, dividend(t, c, 100, 20)
-					}(fin.Cents(123))
-					pos := fin.Position{Investment: c, Dividend: d}
-					return doublePosition(pos)
-				}()),
-				tests.NewBalance(t, 2006, time.February, func() int64 {
-					// record 1
-					c, d := func(c fin.Cents) (inv, div fin.Cents) {
-						return c, dividend(t, c, 100, 20)
-					}(fin.Cents(123))
-					pos := fin.Position{Investment: c, Dividend: d}
-					return int64(doublePosition(pos).Total())
-				}()),
+				{
+					Date: tests.NewTime(t, 2006, time.January),
+					Position: func() fin.Position {
+						// record 1
+						c, d := func(c fin.Cents) (inv, div fin.Cents) {
+							return c, dividend(t, c, 100, 20)
+						}(fin.Cents(123))
+						pos := fin.Position{Investment: c, Dividend: d}
+						return doublePosition(pos)
+					}(),
+				},
+				{
+					Date: tests.NewTime(t, 2006, time.February),
+					Cash: func() fin.Cents {
+						// record 1
+						c, d := func(c fin.Cents) (inv, div fin.Cents) {
+							return c, dividend(t, c, 100, 20)
+						}(fin.Cents(123))
+						pos := fin.Position{Investment: c, Dividend: d}
+						return doublePosition(pos).Total()
+					}(),
+				},
 			},
 		},
 		{
@@ -223,38 +269,47 @@ func TestDrive_rebalance(t *testing.T) {
 			rebf: doublePosition,
 			want: []fin.Balance{
 				{Cash: fin.Cents(123)},
-				tests.NewBalance(t, 2006, time.January, 0, func() fin.Position {
-					// record 1
-					c, d := func(c fin.Cents) (inv, div fin.Cents) {
-						return c, 0
-					}(fin.Cents(123))
-					pos := fin.Position{Investment: c, Dividend: d}
-					return doublePosition(pos)
-				}()),
-				tests.NewBalance(t, 2006, time.February, 0, func() fin.Position {
-					// record 1
-					c, d := func(c fin.Cents) (inv, div fin.Cents) {
-						return c, 0
-					}(fin.Cents(123))
-					pos := fin.Position{Investment: c, Dividend: d}
-					pos = doublePosition(pos)
-					// record 2
-					c, d = invest(t, pos.Investment, 100, 125), 0
-					pos = fin.Position{Investment: c, Dividend: d}
-					return doublePosition(pos)
-				}()),
-				tests.NewBalance(t, 2006, time.March, func() int64 {
-					// record 1
-					c, d := func(c fin.Cents) (inv, div fin.Cents) {
-						return c, 0
-					}(fin.Cents(123))
-					pos := fin.Position{Investment: c, Dividend: d}
-					pos = doublePosition(pos)
-					// record 2
-					c, d = invest(t, pos.Investment, 100, 125), 0
-					pos = fin.Position{Investment: c, Dividend: d}
-					return int64(doublePosition(pos).Total())
-				}()),
+				{
+					Date: tests.NewTime(t, 2006, time.January),
+					Position: func() fin.Position {
+						// record 1
+						c, d := func(c fin.Cents) (inv, div fin.Cents) {
+							return c, 0
+						}(fin.Cents(123))
+						pos := fin.Position{Investment: c, Dividend: d}
+						return doublePosition(pos)
+					}(),
+				},
+				{
+					Date: tests.NewTime(t, 2006, time.February),
+					Position: func() fin.Position {
+						// record 1
+						c, d := func(c fin.Cents) (inv, div fin.Cents) {
+							return c, 0
+						}(fin.Cents(123))
+						pos := fin.Position{Investment: c, Dividend: d}
+						pos = doublePosition(pos)
+						// record 2
+						c, d = invest(t, pos.Investment, 100, 125), 0
+						pos = fin.Position{Investment: c, Dividend: d}
+						return doublePosition(pos)
+					}(),
+				},
+				{
+					Date: tests.NewTime(t, 2006, time.March),
+					Cash: func() fin.Cents {
+						// record 1
+						c, d := func(c fin.Cents) (inv, div fin.Cents) {
+							return c, 0
+						}(fin.Cents(123))
+						pos := fin.Position{Investment: c, Dividend: d}
+						pos = doublePosition(pos)
+						// record 2
+						c, d = invest(t, pos.Investment, 100, 125), 0
+						pos = fin.Position{Investment: c, Dividend: d}
+						return doublePosition(pos).Total()
+					}(),
+				},
 			},
 		},
 		{
@@ -267,38 +322,49 @@ func TestDrive_rebalance(t *testing.T) {
 			rebf: doublePosition,
 			want: []fin.Balance{
 				{Cash: fin.Cents(123)},
-				tests.NewBalance(t, 2006, time.January, 0, func() fin.Position {
-					// record 1
-					c, d := func(c fin.Cents) (inv, div fin.Cents) {
-						return c, dividend(t, c, 100, 20)
-					}(fin.Cents(123))
-					pos := fin.Position{Investment: c, Dividend: d}
-					return doublePosition(pos)
-				}()),
-				tests.NewBalance(t, 2006, time.February, 0, func() fin.Position {
-					// record 1
-					c, d := func(c fin.Cents) (inv, div fin.Cents) {
-						return c, dividend(t, c, 100, 20)
-					}(fin.Cents(123))
-					pos := fin.Position{Investment: c, Dividend: d}
-					pos = doublePosition(pos)
-					// record 2
-					c, d = invest(t, pos.Investment, 100, 125), pos.Dividend+dividend(t, pos.Investment, 125, 40)
-					pos = fin.Position{Investment: c, Dividend: d}
-					return doublePosition(pos)
-				}()),
-				tests.NewBalance(t, 2006, time.March, func() int64 {
-					// record 1
-					c, d := func(c fin.Cents) (inv, div fin.Cents) {
-						return c, dividend(t, c, 100, 20)
-					}(fin.Cents(123))
-					pos := fin.Position{Investment: c, Dividend: d}
-					pos = doublePosition(pos)
-					// record 2
-					c, d = invest(t, pos.Investment, 100, 125), pos.Dividend+dividend(t, pos.Investment, 125, 40)
-					pos = fin.Position{Investment: c, Dividend: d}
-					return int64(doublePosition(pos).Total())
-				}()),
+				{
+					Date: tests.NewTime(t, 2006, time.January),
+					Position: func() fin.Position {
+						// record 1
+						c, d := func(c fin.Cents) (inv, div fin.Cents) {
+							return c, dividend(t, c, 100, 20)
+						}(fin.Cents(123))
+						pos := fin.Position{Investment: c, Dividend: d}
+						return doublePosition(pos)
+					}(),
+				},
+				{
+					Date: tests.NewTime(t, 2006, time.February),
+					Position: func() fin.Position {
+						// record 1
+						c, d := func(c fin.Cents) (inv, div fin.Cents) {
+							return c, dividend(t, c, 100, 20)
+						}(fin.Cents(123))
+						pos := fin.Position{Investment: c, Dividend: d}
+						pos = doublePosition(pos)
+						// record 2
+						c = invest(t, pos.Investment, 100, 125)
+						d = pos.Dividend + dividend(t, pos.Investment, 125, 40)
+						pos = fin.Position{Investment: c, Dividend: d}
+						return doublePosition(pos)
+					}(),
+				},
+				{
+					Date: tests.NewTime(t, 2006, time.March),
+					Cash: func() fin.Cents {
+						// record 1
+						c, d := func(c fin.Cents) (inv, div fin.Cents) {
+							return c, dividend(t, c, 100, 20)
+						}(fin.Cents(123))
+						pos := fin.Position{Investment: c, Dividend: d}
+						pos = doublePosition(pos)
+						// record 2
+						c = invest(t, pos.Investment, 100, 125)
+						d = pos.Dividend + dividend(t, pos.Investment, 125, 40)
+						pos = fin.Position{Investment: c, Dividend: d}
+						return doublePosition(pos).Total()
+					}(),
+				},
 			},
 		},
 	}
