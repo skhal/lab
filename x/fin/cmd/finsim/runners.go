@@ -9,14 +9,13 @@ import (
 	"github.com/skhal/lab/x/fin/internal/fin"
 	"github.com/skhal/lab/x/fin/internal/pb"
 	"github.com/skhal/lab/x/fin/internal/report"
-	"github.com/skhal/lab/x/fin/internal/sim"
 	"github.com/skhal/lab/x/fin/internal/strategy"
 )
 
 type namedRunner struct {
-	name   string
-	desc   string
-	runner *strategy.Runner
+	name        string
+	desc        string
+	rebalancers []strategy.RebalanceFunc
 }
 
 // Name returns the strategy name.
@@ -31,7 +30,9 @@ func (nr *namedRunner) Run(bal fin.Cents, market []*pb.Record) *report.StrategyI
 		Name:        nr.Name(),
 		Description: nr.Description(),
 	}
-	info.Start, info.End = sim.Run(bal, market, nr.runner)
+	bals := strategy.Drive(bal, market, nr.rebalancers...)
+	info.Start = bals[0]
+	info.End = bals[len(bals)-1]
 	return &info
 }
 
@@ -39,9 +40,8 @@ func (nr *namedRunner) Run(bal fin.Cents, market []*pb.Record) *report.StrategyI
 // dividends.
 func Hold() *namedRunner {
 	return &namedRunner{
-		name:   "hold",
-		desc:   "hold s&p, collect dividends",
-		runner: strategy.Hold(),
+		name: "hold",
+		desc: "hold s&p, collect dividends",
 	}
 }
 
@@ -49,9 +49,11 @@ func Hold() *namedRunner {
 // dividend payouts into the index.
 func HoldReinvest() *namedRunner {
 	return &namedRunner{
-		name:   "hold-reinvest",
-		desc:   "hold s&p, reinvest dividends",
-		runner: strategy.HoldReinvest(),
+		name: "hold-reinvest",
+		desc: "hold s&p, reinvest dividends",
+		rebalancers: []strategy.RebalanceFunc{
+			strategy.ReinvestDividend,
+		},
 	}
 }
 
@@ -59,9 +61,14 @@ func HoldReinvest() *namedRunner {
 // [HoldDiv] strategy.
 func Retain3Hold() *namedRunner {
 	return &namedRunner{
-		name:   "retain-3-hold",
-		desc:   "retain 3% yearly, hold s&p, collect dividends",
-		runner: strategy.Retain(strategy.Percent(3), strategy.Hold()),
+		name: "retain-3-hold",
+		desc: "retain 3% yearly, hold s&p, collect dividends",
+		rebalancers: []strategy.RebalanceFunc{
+			func(rate float64) strategy.RebalanceFunc {
+				yw := strategy.YearlyWithdrawer{Rate: rate}
+				return yw.Rebalance
+			}(0.03),
+		},
 	}
 }
 
@@ -69,9 +76,14 @@ func Retain3Hold() *namedRunner {
 // [HoldDiv] strategy.
 func Retain4Hold() *namedRunner {
 	return &namedRunner{
-		name:   "retain-4-hold",
-		desc:   "retain 4% yearly, hold s&p, collect dividends",
-		runner: strategy.Retain(strategy.Percent(4), strategy.Hold()),
+		name: "retain-4-hold",
+		desc: "retain 4% yearly, hold s&p, collect dividends",
+		rebalancers: []strategy.RebalanceFunc{
+			func(rate float64) strategy.RebalanceFunc {
+				yw := strategy.YearlyWithdrawer{Rate: rate}
+				return yw.Rebalance
+			}(0.04),
+		},
 	}
 }
 
@@ -79,9 +91,15 @@ func Retain4Hold() *namedRunner {
 // [HoldReinvestDiv] strategy.
 func Retain3HoldReinvest() *namedRunner {
 	return &namedRunner{
-		name:   "retain-3-hold-reinvest",
-		desc:   "retain 3% yearly, hold s&p, reinvest dividends",
-		runner: strategy.Retain(strategy.Percent(3), strategy.HoldReinvest()),
+		name: "retain-3-hold-reinvest",
+		desc: "retain 3% yearly, hold s&p, reinvest dividends",
+		rebalancers: []strategy.RebalanceFunc{
+			strategy.ReinvestDividend,
+			func(rate float64) strategy.RebalanceFunc {
+				yw := strategy.YearlyWithdrawer{Rate: rate}
+				return yw.Rebalance
+			}(0.03),
+		},
 	}
 }
 
@@ -89,8 +107,14 @@ func Retain3HoldReinvest() *namedRunner {
 // [HoldReinvestDiv] strategy.
 func Retain4HoldReinvest() *namedRunner {
 	return &namedRunner{
-		name:   "retain-4-hold-reinvest",
-		desc:   "retain 4% yearly, hold s&p, reinvest dividends",
-		runner: strategy.Retain(strategy.Percent(4), strategy.HoldReinvest()),
+		name: "retain-4-hold-reinvest",
+		desc: "retain 4% yearly, hold s&p, reinvest dividends",
+		rebalancers: []strategy.RebalanceFunc{
+			strategy.ReinvestDividend,
+			func(rate float64) strategy.RebalanceFunc {
+				yw := strategy.YearlyWithdrawer{Rate: rate}
+				return yw.Rebalance
+			}(0.04),
+		},
 	}
 }
