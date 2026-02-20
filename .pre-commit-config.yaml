@@ -21,7 +21,12 @@ repos:
         |.*\.patch
       )$
   - id: trailing-whitespace
-    exclude: "(\\.diff|\\.patch)$"
+    exclude: |
+      (?x)^(
+        .*/testdata/.*
+        |.*\.diff
+        |.*\.patch
+      )$
     # keep-sorted end
 - repo: local
   hooks:

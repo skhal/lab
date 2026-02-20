@@ -7,6 +7,7 @@ package report_test
 
 import (
 	"flag"
+	"fmt"
 	"strings"
 	"testing"
 	"time"
@@ -78,4 +79,81 @@ func TestStrategy(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestStrategies(t *testing.T) {
+	tt := []struct {
+		name    string
+		infos   []*report.StrategyInfo
+		golden  gotests.GoldenFile
+		wantErr bool
+	}{
+		{
+			name: "one strategy",
+			infos: []*report.StrategyInfo{
+				{
+					Name:        "test-strategy",
+					Description: "test strategy description",
+					Start:       tests.NewBalance(t, 2006, time.January, 100),
+					End:         tests.NewBalance(t, 2006, time.February, 110),
+				},
+			},
+			golden: gotests.GoldenFile("testdata/strategies_one.txt"),
+		},
+		{
+			name: "two strategies",
+			infos: []*report.StrategyInfo{
+				{
+					Name:        "test-strategy-a",
+					Description: "test strategy A description",
+					Start:       tests.NewBalance(t, 2006, time.January, 100),
+					End:         tests.NewBalance(t, 2006, time.February, 110),
+				},
+				{
+					Name:        "test-strategy-b",
+					Description: "test strategy B description",
+					Start:       tests.NewBalance(t, 2006, time.January, 100),
+					End:         tests.NewBalance(t, 2006, time.February, 120),
+				},
+			},
+			golden: gotests.GoldenFile("testdata/strategies_two.txt"),
+		},
+	}
+	for _, tc := range tt {
+		t.Run(tc.name, func(t *testing.T) {
+			b := new(strings.Builder)
+
+			err := report.Strategies(b, tc.infos)
+			got := b.String()
+
+			if tc.wantErr {
+				if err == nil {
+					t.Fatalf("report.Strategies() want error\n%s", infosStringer(tc.infos))
+				}
+			} else {
+				if err != nil {
+					t.Fatalf("report.Strategies() unexpected error %v\n%s", err, infosStringer(tc.infos))
+				}
+			}
+			if *update {
+				tc.golden.Write(t, got)
+			}
+			if diff := tc.golden.Diff(t, got); diff != "" {
+				t.Errorf("report.Strategies() mismatch (-want, +got):\n%s", diff)
+			}
+		})
+	}
+}
+
+type infosStringer []*report.StrategyInfo
+
+func (infos infosStringer) String() string {
+	b := new(strings.Builder)
+	for i, info := range infos {
+		if i > 0 {
+			fmt.Fprintln(b)
+		}
+		fmt.Fprint(b, info)
+	}
+	return b.String()
 }

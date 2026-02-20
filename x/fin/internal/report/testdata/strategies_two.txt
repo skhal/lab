@@ -1,0 +1,15 @@
+test-strategy-a - test strategy A description
+$1.00 on 2006 Jan
+$1.10 on 2006 Feb (1.1)
+---
+test-strategy-b - test strategy B description
+$1.00 on 2006 Jan
+$1.20 on 2006 Feb (1.2)
+
+Performance:
+     [0] |  [1]
+[0]      | 1.09
+[1] 0.92 |     
+
+[0] test-strategy-a
+[1] test-strategy-b

@@ -41,6 +41,9 @@ func Strategies(w io.Writer, infos []*StrategyInfo) error {
 }
 
 func strategiesPerformance(w io.Writer, infos []*StrategyInfo) error {
+	if len(infos) < 2 {
+		return nil
+	}
 	header := func() {
 		var b bytes.Buffer
 		fmt.Fprint(&b, "    ")
