@@ -16,15 +16,19 @@ import (
 	"github.com/skhal/lab/x/fin/internal/ror"
 )
 
+// RebalanceFunc implements a position rebalance at the end of the month.
+type RebalanceFunc func(fin.Position) fin.Position
+
 // Drive runs balance balance through market records. It returns a sequence of
 // balance changes.
-func Drive(cash fin.Cents, recs []*pb.Record) []fin.Balance {
-	d := new(driver)
+func Drive(cash fin.Cents, recs []*pb.Record, reb ...RebalanceFunc) []fin.Balance {
+	d := &driver{rebfns: reb}
 	return d.drive(cash, recs)
 }
 
 type driver struct {
-	last *pb.Record
+	last   *pb.Record
+	rebfns []RebalanceFunc
 }
 
 // drive runs the balanace through market records. It is responsible for
@@ -79,7 +83,9 @@ func (d *driver) openPosition(bal fin.Balance) fin.Balance {
 func (d *driver) process(bal fin.Balance, rec *pb.Record) fin.Balance {
 	defer func() { d.last = rec }()
 	pos := d.update(bal.Position, rec)
-	// TODO(github.com/skhal/lab/issues/143): apply strategies
+	for fn := range slices.Values(d.rebfns) {
+		pos = fn(pos)
+	}
 	return fin.Balance{
 		Date:     newTime(rec.GetDate()),
 		Cash:     bal.Cash,
