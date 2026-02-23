@@ -87,18 +87,23 @@ func (cmd *simCommand) loadData() error {
 	if err := proto.Unmarshal(b, m); err != nil {
 		return err
 	}
-	fetchLastN := func(recs []*pb.Record, n int) []*pb.Record {
-		n = max(len(recs)-n, 0)
-		return recs[n:]
-	}
-	cmd.data = fetchLastN(m.GetRecords(), cmd.months)
+	cmd.data = m.GetRecords()
 	return nil
 }
 
 func (cmd *simCommand) runStrategies() error {
 	infos := make([]*report.StrategyInfo, 0, len(cmd.runners))
 	for _, r := range cmd.runners {
-		infos = append(infos, r.Run(cmd.balance, cmd.data))
+		info := cmd.runStrategy(r)
+		infos = append(infos, info)
 	}
 	return report.Strategies(os.Stdout, infos)
+}
+
+func (cmd *simCommand) runStrategy(r *namedRunner) *report.StrategyInfo {
+	fetchLastN := func(recs []*pb.Record, n int) []*pb.Record {
+		n = max(len(recs)-n, 0)
+		return recs[n:]
+	}
+	return r.Run(cmd.balance, fetchLastN(cmd.data, cmd.months))
 }
