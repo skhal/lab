@@ -8,7 +8,6 @@ package strategy
 import (
 	"iter"
 	"math"
-	"slices"
 	"time"
 
 	"github.com/skhal/lab/x/fin/internal/fin"
@@ -60,7 +59,7 @@ func (d *driver) run(cash fin.Cents, recs []*pb.Record) iter.Seq[fin.Balance] {
 		}
 		bal = d.openPosition(bal)
 		// do not yield a balance with open position
-		for rec := range slices.Values(recs) {
+		for _, rec := range recs {
 			bal = d.process(bal, rec)
 			if !yield(bal) {
 				return
@@ -81,9 +80,9 @@ func (d *driver) openPosition(bal fin.Balance) fin.Balance {
 }
 
 func (d *driver) process(bal fin.Balance, rec *pb.Record) fin.Balance {
-	defer func() { d.last = rec }()
+	defer func(r *pb.Record) { d.last = r }(rec)
 	pos := d.update(bal.Position, rec)
-	for fn := range slices.Values(d.rebfns) {
+	for _, fn := range d.rebfns {
 		pos = fn(pos)
 	}
 	return fin.Balance{
@@ -95,10 +94,10 @@ func (d *driver) process(bal fin.Balance, rec *pb.Record) fin.Balance {
 
 func (d *driver) update(pos fin.Position, rec *pb.Record) fin.Position {
 	inv := d.returnOnInvestment(pos.Investment, rec)
-	div := d.payDividend(pos.Investment, rec)
+	div := pos.Dividend + d.payDividend(pos.Investment, rec)
 	return fin.Position{
 		Investment: inv,
-		Dividend:   pos.Dividend + div,
+		Dividend:   div,
 	}
 }
 
@@ -116,9 +115,10 @@ func (d *driver) payDividend(c fin.Cents, rec *pb.Record) fin.Cents {
 }
 
 func (d *driver) closePosition(bal fin.Balance) fin.Balance {
-	bal.Cash += bal.Position.Total()
-	bal.Position = fin.Position{}
-	return bal
+	return fin.Balance{
+		Date: bal.Date,
+		Cash: bal.Cash + bal.Position.Total(),
+	}
 }
 
 func newTime(date *pb.Date) time.Time {
