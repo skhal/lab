@@ -12,10 +12,23 @@ type registry struct {
 	order   []string
 }
 
-func newRegistry() *registry {
-	return &registry{
+// NewRegistry creates a registry with pre-defines strategies.
+func NewRegistry() *registry {
+	reg := &registry{
 		runners: make(map[string]*namedRunner),
 	}
+	mustRegister := func(nr *namedRunner) {
+		if err := reg.Register(nr); err != nil {
+			panic(err)
+		}
+	}
+	mustRegister(Hold())
+	mustRegister(HoldReinvest())
+	mustRegister(Retain3Hold())
+	mustRegister(Retain4Hold())
+	mustRegister(Retain3HoldReinvest())
+	mustRegister(Retain4HoldReinvest())
+	return reg
 }
 
 // Get retrieves a strategy runner from the registry. It returns a boolean flag

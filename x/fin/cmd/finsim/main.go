@@ -26,26 +26,10 @@ import (
 
 func main() {
 	var cmd simCommand
-	if err := cmd.Run(createRegistry()); err != nil {
+	if err := cmd.Run(NewRegistry()); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
-}
-
-func createRegistry() *registry {
-	reg := newRegistry()
-	mustRegister := func(nr *namedRunner) {
-		if err := reg.Register(nr); err != nil {
-			panic(err)
-		}
-	}
-	mustRegister(Hold())
-	mustRegister(HoldReinvest())
-	mustRegister(Retain3Hold())
-	mustRegister(Retain4Hold())
-	mustRegister(Retain3HoldReinvest())
-	mustRegister(Retain4HoldReinvest())
-	return reg
 }
 
 type simCommand struct {
