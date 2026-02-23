@@ -25,26 +25,11 @@ import (
 )
 
 func main() {
-	if err := run(); err != nil {
+	var cmd simCommand
+	if err := cmd.Run(createRegistry()); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
-}
-
-func run() error {
-	ifile, balance, nmonth, runners, err := parseFlags(createRegistry())
-	if err != nil {
-		return err
-	}
-	market, err := readFile(ifile)
-	if err != nil {
-		return err
-	}
-	fetchLastN := func(recs []*pb.Record, n int) []*pb.Record {
-		n = max(len(recs)-n, 0)
-		return recs[n:]
-	}
-	return runStrategies(runners, balance, fetchLastN(market.GetRecords(), nmonth))
 }
 
 func createRegistry() *registry {
@@ -63,7 +48,28 @@ func createRegistry() *registry {
 	return reg
 }
 
-func parseFlags(reg *registry) (file string, balance fin.Cents, months int, runners []*namedRunner, err error) {
+type simCommand struct {
+	file string
+	data []*pb.Record
+
+	balance fin.Cents
+	months  int
+
+	runners []*namedRunner
+}
+
+// Run executes the command.
+func (cmd *simCommand) Run(reg *registry) error {
+	if err := cmd.parseFlags(reg); err != nil {
+		return err
+	}
+	if err := cmd.loadData(); err != nil {
+		return err
+	}
+	return cmd.runStrategies()
+}
+
+func (cmd *simCommand) parseFlags(reg *registry) error {
 	flag.Usage = func() {
 		w := flag.CommandLine.Output()
 		fmt.Fprintf(w, "usage: %s [flags] file\n", filepath.Base(os.Args[0]))
@@ -72,40 +78,43 @@ func parseFlags(reg *registry) (file string, balance fin.Cents, months int, runn
 		flag.PrintDefaults()
 	}
 	bal := flag.Int("bal", 100, "initial balance in dollars")
-	flag.IntVar(&months, "n", 12, "number of latest months to process")
+	flag.IntVar(&cmd.months, "n", 12, "number of latest months to process")
 	sflag := newStrategyListFlag(reg)
 	flag.Var(sflag, "s", sflag.Help())
 	flag.Parse()
-	if *bal < 0 {
-		err = errors.New("negative balance")
-		return
-	}
-	balance = fin.Cents(*bal * 100) // bal is in dollars
 	if flag.NArg() != 1 {
-		err = errors.New("missing input file")
-		return
+		return errors.New("missing input file")
 	}
-	file = flag.Arg(0)
-	runners = sflag.Runners()
-	return
+	if *bal < 0 {
+		return errors.New("negative balance")
+	}
+	cmd.balance = fin.Cents(*bal * 100) // bal is in dollars
+	cmd.file = flag.Arg(0)
+	cmd.runners = sflag.Runners()
+	return nil
 }
 
-func readFile(name string) (*pb.Market, error) {
-	b, err := os.ReadFile(name)
+func (cmd *simCommand) loadData() error {
+	b, err := os.ReadFile(cmd.file)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	var m = new(pb.Market)
 	if err := proto.Unmarshal(b, m); err != nil {
-		return nil, err
+		return err
 	}
-	return m, nil
+	fetchLastN := func(recs []*pb.Record, n int) []*pb.Record {
+		n = max(len(recs)-n, 0)
+		return recs[n:]
+	}
+	cmd.data = fetchLastN(m.GetRecords(), cmd.months)
+	return nil
 }
 
-func runStrategies(strategies []*namedRunner, balance fin.Cents, market []*pb.Record) error {
-	infos := make([]*report.StrategyInfo, 0, len(strategies))
-	for _, r := range strategies {
-		infos = append(infos, r.Run(balance, market))
+func (cmd *simCommand) runStrategies() error {
+	infos := make([]*report.StrategyInfo, 0, len(cmd.runners))
+	for _, r := range cmd.runners {
+		infos = append(infos, r.Run(cmd.balance, cmd.data))
 	}
 	return report.Strategies(os.Stdout, infos)
 }
