@@ -26,6 +26,9 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// Market is historical market data. A single record corresponds to one date.
+// Data should not have date gaps.
+// Next ID: 2
 type Market struct {
 	state              protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Records *[]*Record             `protobuf:"bytes,1,rep,name=records"`
@@ -74,6 +77,7 @@ func (x *Market) SetRecords(v []*Record) {
 type Market_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
+	// records are market data, one per date.
 	Records []*Record
 }
 
@@ -85,6 +89,8 @@ func (b0 Market_builder) Build() *Market {
 	return m0
 }
 
+// Record describes market on a single date.
+// Next ID: 3
 type Record struct {
 	state            protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Date  *Date                  `protobuf:"bytes,1,opt,name=date"`
@@ -165,7 +171,9 @@ func (x *Record) ClearQuote() {
 type Record_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
-	Date  *Date
+	// date is the record date.
+	Date *Date
+	// quote is the market summary.
 	Quote *Quote
 }
 
@@ -178,6 +186,8 @@ func (b0 Record_builder) Build() *Record {
 	return m0
 }
 
+// Date is a year-month pair.
+// Next ID: 3
 type Date struct {
 	state                  protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Year        int32                  `protobuf:"varint,1,opt,name=year"`
@@ -264,7 +274,9 @@ func (x *Date) ClearMonth() {
 type Date_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
-	Year  *int32
+	// year is the year of the date.
+	Year *int32
+	// month is the month of the date.
 	Month *int32
 }
 
@@ -283,11 +295,14 @@ func (b0 Date_builder) Build() *Date {
 	return m0
 }
 
+// Quote summarizes market.
+// Next ID: 5
 type Quote struct {
 	state                  protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_SpComposite *Cents                 `protobuf:"bytes,1,opt,name=sp_composite,json=spComposite"`
 	xxx_hidden_Dividend    *Cents                 `protobuf:"bytes,2,opt,name=dividend"`
 	xxx_hidden_Earnings    *Cents                 `protobuf:"bytes,3,opt,name=earnings"`
+	xxx_hidden_Cpi         *Cents                 `protobuf:"bytes,4,opt,name=cpi"`
 	unknownFields          protoimpl.UnknownFields
 	sizeCache              protoimpl.SizeCache
 }
@@ -338,6 +353,13 @@ func (x *Quote) GetEarnings() *Cents {
 	return nil
 }
 
+func (x *Quote) GetCpi() *Cents {
+	if x != nil {
+		return x.xxx_hidden_Cpi
+	}
+	return nil
+}
+
 func (x *Quote) SetSpComposite(v *Cents) {
 	x.xxx_hidden_SpComposite = v
 }
@@ -348,6 +370,10 @@ func (x *Quote) SetDividend(v *Cents) {
 
 func (x *Quote) SetEarnings(v *Cents) {
 	x.xxx_hidden_Earnings = v
+}
+
+func (x *Quote) SetCpi(v *Cents) {
+	x.xxx_hidden_Cpi = v
 }
 
 func (x *Quote) HasSpComposite() bool {
@@ -371,6 +397,13 @@ func (x *Quote) HasEarnings() bool {
 	return x.xxx_hidden_Earnings != nil
 }
 
+func (x *Quote) HasCpi() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Cpi != nil
+}
+
 func (x *Quote) ClearSpComposite() {
 	x.xxx_hidden_SpComposite = nil
 }
@@ -383,12 +416,21 @@ func (x *Quote) ClearEarnings() {
 	x.xxx_hidden_Earnings = nil
 }
 
+func (x *Quote) ClearCpi() {
+	x.xxx_hidden_Cpi = nil
+}
+
 type Quote_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
+	// sp_composite is the value of S&P composite index.
 	SpComposite *Cents
-	Dividend    *Cents
-	Earnings    *Cents
+	// dividend is the dividends payhout for S&P composite index.
+	Dividend *Cents
+	// earnings are S&P composite index earnings.
+	Earnings *Cents
+	// cpi is consumer price index.
+	Cpi *Cents
 }
 
 func (b0 Quote_builder) Build() *Quote {
@@ -398,9 +440,13 @@ func (b0 Quote_builder) Build() *Quote {
 	x.xxx_hidden_SpComposite = b.SpComposite
 	x.xxx_hidden_Dividend = b.Dividend
 	x.xxx_hidden_Earnings = b.Earnings
+	x.xxx_hidden_Cpi = b.Cpi
 	return m0
 }
 
+// Cents is the smallest unit of values. Use it instead of floating numbers to
+// remove error accumulation.
+// Next ID: 2
 type Cents struct {
 	state                  protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Cents       int32                  `protobuf:"varint,1,opt,name=cents"`
@@ -462,6 +508,7 @@ func (x *Cents) ClearCents() {
 type Cents_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
+	// cents is the total value.
 	Cents *int32
 }
 
@@ -488,11 +535,12 @@ const file_market_proto_rawDesc = "" +
 	"\x05quote\x18\x02 \x01(\v2\x15.x.fin.internal.QuoteR\x05quote\"0\n" +
 	"\x04Date\x12\x12\n" +
 	"\x04year\x18\x01 \x01(\x05R\x04year\x12\x14\n" +
-	"\x05month\x18\x02 \x01(\x05R\x05month\"\xa7\x01\n" +
+	"\x05month\x18\x02 \x01(\x05R\x05month\"\xd0\x01\n" +
 	"\x05Quote\x128\n" +
 	"\fsp_composite\x18\x01 \x01(\v2\x15.x.fin.internal.CentsR\vspComposite\x121\n" +
 	"\bdividend\x18\x02 \x01(\v2\x15.x.fin.internal.CentsR\bdividend\x121\n" +
-	"\bearnings\x18\x03 \x01(\v2\x15.x.fin.internal.CentsR\bearnings\"\x1d\n" +
+	"\bearnings\x18\x03 \x01(\v2\x15.x.fin.internal.CentsR\bearnings\x12'\n" +
+	"\x03cpi\x18\x04 \x01(\v2\x15.x.fin.internal.CentsR\x03cpi\"\x1d\n" +
 	"\x05Cents\x12\x14\n" +
 	"\x05cents\x18\x01 \x01(\x05R\x05centsB0Z&github.com/skhal/lab/x/fin/internal/pb\x92\x03\x05\xd2>\x02\x10\x03b\beditionsp\xe8\a"
 
@@ -511,11 +559,12 @@ var file_market_proto_depIdxs = []int32{
 	4, // 3: x.fin.internal.Quote.sp_composite:type_name -> x.fin.internal.Cents
 	4, // 4: x.fin.internal.Quote.dividend:type_name -> x.fin.internal.Cents
 	4, // 5: x.fin.internal.Quote.earnings:type_name -> x.fin.internal.Cents
-	6, // [6:6] is the sub-list for method output_type
-	6, // [6:6] is the sub-list for method input_type
-	6, // [6:6] is the sub-list for extension type_name
-	6, // [6:6] is the sub-list for extension extendee
-	0, // [0:6] is the sub-list for field type_name
+	4, // 6: x.fin.internal.Quote.cpi:type_name -> x.fin.internal.Cents
+	7, // [7:7] is the sub-list for method output_type
+	7, // [7:7] is the sub-list for method input_type
+	7, // [7:7] is the sub-list for extension type_name
+	7, // [7:7] is the sub-list for extension extendee
+	0, // [0:7] is the sub-list for field type_name
 }
 
 func init() { file_market_proto_init() }

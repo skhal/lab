@@ -13,7 +13,7 @@ import (
 )
 
 // NewRecord testing helper creates a market record for tests.
-func NewRecord(t *testing.T, y int32, m time.Month, sp, div, earn int32) *pb.Record {
+func NewRecord(t *testing.T, y int32, m time.Month, sp, div, earn, cpi int32) *pb.Record {
 	t.Helper()
 	month := int32(m)
 	return pb.Record_builder{
@@ -25,6 +25,7 @@ func NewRecord(t *testing.T, y int32, m time.Month, sp, div, earn int32) *pb.Rec
 			SpComposite: pb.Cents_builder{Cents: &sp}.Build(),
 			Dividend:    pb.Cents_builder{Cents: &div}.Build(),
 			Earnings:    pb.Cents_builder{Cents: &earn}.Build(),
+			Cpi:         pb.Cents_builder{Cents: &cpi}.Build(),
 		}.Build(),
 	}.Build()
 }

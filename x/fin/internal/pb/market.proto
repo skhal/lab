@@ -14,12 +14,14 @@ option go_package = "github.com/skhal/lab/x/fin/internal/pb";
 
 // Market is historical market data. A single record corresponds to one date.
 // Data should not have date gaps.
+// Next ID: 2
 message Market {
   // records are market data, one per date.
   repeated Record records = 1;
 }
 
 // Record describes market on a single date.
+// Next ID: 3
 message Record {
   // date is the record date.
   Date date = 1;
@@ -28,6 +30,7 @@ message Record {
 }
 
 // Date is a year-month pair.
+// Next ID: 3
 message Date {
   // year is the year of the date.
   int32 year = 1;
@@ -36,6 +39,7 @@ message Date {
 }
 
 // Quote summarizes market.
+// Next ID: 5
 message Quote {
   // sp_composite is the value of S&P composite index.
   Cents sp_composite = 1;
@@ -43,10 +47,13 @@ message Quote {
   Cents dividend = 2;
   // earnings are S&P composite index earnings.
   Cents earnings = 3;
+  // cpi is consumer price index.
+  Cents cpi = 4;
 }
 
 // Cents is the smallest unit of values. Use it instead of floating numbers to
 // remove error accumulation.
+// Next ID: 2
 message Cents {
   // cents is the total value.
   int32 cents = 1;

@@ -35,7 +35,7 @@ func TestDrive_norebalance(t *testing.T) {
 			name: "one record no dividend",
 			cash: fin.Cents(123),
 			recs: []*pb.Record{
-				tests.NewRecord(t, 2006, time.January, 100, 0, 0),
+				tests.NewRecord(t, 2006, time.January, 100, 0, 0, 0),
 			},
 			want: []fin.Balance{
 				{Cash: fin.Cents(123)},
@@ -53,7 +53,7 @@ func TestDrive_norebalance(t *testing.T) {
 			name: "one record with dividend",
 			cash: fin.Cents(123),
 			recs: []*pb.Record{
-				tests.NewRecord(t, 2006, time.January, 100, 20, 0),
+				tests.NewRecord(t, 2006, time.January, 100, 20, 0, 0),
 			},
 			want: []fin.Balance{
 				{Cash: fin.Cents(123)},
@@ -83,8 +83,8 @@ func TestDrive_norebalance(t *testing.T) {
 			name: "two records no dividend",
 			cash: fin.Cents(123),
 			recs: []*pb.Record{
-				tests.NewRecord(t, 2006, time.January, 100, 0, 0),
-				tests.NewRecord(t, 2006, time.February, 125, 0, 0),
+				tests.NewRecord(t, 2006, time.January, 100, 0, 0, 0),
+				tests.NewRecord(t, 2006, time.February, 125, 0, 0, 0),
 			},
 			want: []fin.Balance{
 				{Cash: fin.Cents(123)},
@@ -124,8 +124,8 @@ func TestDrive_norebalance(t *testing.T) {
 			name: "two records with dividend",
 			cash: fin.Cents(123),
 			recs: []*pb.Record{
-				tests.NewRecord(t, 2006, time.January, 100, 20, 0),
-				tests.NewRecord(t, 2006, time.February, 125, 40, 0),
+				tests.NewRecord(t, 2006, time.January, 100, 20, 0, 0),
+				tests.NewRecord(t, 2006, time.February, 125, 40, 0, 0),
 			},
 			want: []fin.Balance{
 				{Cash: fin.Cents(123)},
@@ -204,7 +204,7 @@ func TestDrive_rebalance(t *testing.T) {
 			name: "one record no dividend",
 			cash: fin.Cents(123),
 			recs: []*pb.Record{
-				tests.NewRecord(t, 2006, time.January, 100, 0, 0),
+				tests.NewRecord(t, 2006, time.January, 100, 0, 0, 0),
 			},
 			rebf: doublePosition,
 			want: []fin.Balance{
@@ -231,7 +231,7 @@ func TestDrive_rebalance(t *testing.T) {
 			name: "one record with dividend",
 			cash: fin.Cents(123),
 			recs: []*pb.Record{
-				tests.NewRecord(t, 2006, time.January, 100, 20, 0),
+				tests.NewRecord(t, 2006, time.January, 100, 20, 0, 0),
 			},
 			rebf: doublePosition,
 			want: []fin.Balance{
@@ -264,8 +264,8 @@ func TestDrive_rebalance(t *testing.T) {
 			name: "two records no dividend",
 			cash: fin.Cents(123),
 			recs: []*pb.Record{
-				tests.NewRecord(t, 2006, time.January, 100, 0, 0),
-				tests.NewRecord(t, 2006, time.February, 125, 0, 0),
+				tests.NewRecord(t, 2006, time.January, 100, 0, 0, 0),
+				tests.NewRecord(t, 2006, time.February, 125, 0, 0, 0),
 			},
 			rebf: doublePosition,
 			want: []fin.Balance{
@@ -317,8 +317,8 @@ func TestDrive_rebalance(t *testing.T) {
 			name: "two records with dividend",
 			cash: fin.Cents(123),
 			recs: []*pb.Record{
-				tests.NewRecord(t, 2006, time.January, 100, 20, 0),
-				tests.NewRecord(t, 2006, time.February, 125, 40, 0),
+				tests.NewRecord(t, 2006, time.January, 100, 20, 0, 0),
+				tests.NewRecord(t, 2006, time.February, 125, 40, 0, 0),
 			},
 			rebf: doublePosition,
 			want: []fin.Balance{

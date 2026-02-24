@@ -19,6 +19,7 @@ const (
 	colSPComposite = 1
 	colDividend    = 2
 	colEarnings    = 3
+	colCPI         = 4
 )
 
 func parseRow(row []string) (*pb.Record, error) {
@@ -103,6 +104,7 @@ func parseQuote(row []string) (*pb.Quote, error) {
 		{cell{"sp somposite", colSPComposite}, centsParser{q.SetSpComposite}},
 		{cell{"dividend", colDividend}, centsParser{q.SetDividend}},
 		{cell{"earnings", colEarnings}, centsParser{q.SetEarnings}},
+		{cell{"cpi", colCPI}, centsParser{q.SetCpi}},
 	} {
 		if err := item.p.Parse(row, item.c); err != nil {
 			return nil, err
