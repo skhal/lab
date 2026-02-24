@@ -21,6 +21,7 @@ import (
 	"github.com/skhal/lab/x/fin/internal/fin"
 	"github.com/skhal/lab/x/fin/internal/pb"
 	"github.com/skhal/lab/x/fin/internal/report"
+	"github.com/skhal/lab/x/fin/internal/sim"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -37,7 +38,9 @@ type simCommand struct {
 	data []*pb.Record
 
 	balance fin.Cents
-	months  int
+
+	cycles         int
+	cycleLenMonths int
 
 	runners []*namedRunner
 }
@@ -61,8 +64,9 @@ func (cmd *simCommand) parseFlags(reg *registry) error {
 		fmt.Fprintln(w, "flags:")
 		flag.PrintDefaults()
 	}
-	bal := flag.Int("bal", 100, "initial balance in dollars")
-	flag.IntVar(&cmd.months, "n", 12, "number of latest months to process")
+	bal := flag.Int("bal", 1, "initial balance in dollars")
+	flag.IntVar(&cmd.cycles, "cycles", 1, "number of cycles")
+	flag.IntVar(&cmd.cycleLenMonths, "cycle-len", 60, "cycle length in months")
 	sflag := newStrategyListFlag(reg)
 	flag.Var(sflag, "s", sflag.Help())
 	flag.Parse()
@@ -92,18 +96,19 @@ func (cmd *simCommand) loadData() error {
 }
 
 func (cmd *simCommand) runStrategies() error {
-	infos := make([]*report.StrategyInfo, 0, len(cmd.runners))
+	simdata := make([]*report.SimulationData, 0, len(cmd.runners))
 	for _, r := range cmd.runners {
-		info := cmd.runStrategy(r)
-		infos = append(infos, info)
+		res := cmd.runStrategy(r)
+		simdata = append(simdata, &report.SimulationData{
+			Name:   r.Name(),
+			Desc:   r.Description(),
+			Result: res,
+		})
 	}
-	return report.Strategies(os.Stdout, infos)
+	return report.Simulation(os.Stdout, simdata)
 }
 
-func (cmd *simCommand) runStrategy(r *namedRunner) *report.StrategyInfo {
-	fetchLastN := func(recs []*pb.Record, n int) []*pb.Record {
-		n = max(len(recs)-n, 0)
-		return recs[n:]
-	}
-	return r.Run(cmd.balance, fetchLastN(cmd.data, cmd.months))
+func (cmd *simCommand) runStrategy(r *namedRunner) *sim.Result {
+	runner := sim.NewRunner(cmd.cycles, cmd.cycleLenMonths, r.rebalancers)
+	return runner.Run(cmd.balance, cmd.data)
 }
