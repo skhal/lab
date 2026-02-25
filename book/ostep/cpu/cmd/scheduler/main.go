@@ -84,7 +84,7 @@ func (c *command) parseFlags() error {
 	fs.Var(newJobSpecFlag(&c.JobSpecs), "job-spec", fmt.Sprintf("comma separated list of job specifications [n:]m, where n is the arrival time (default to 0) and m is the duration (%d is random)", randomDuration))
 	fs.Var(&policyFlag{&c.Policy}, "policy", func() string {
 		var names []string
-		for _, s := range []policy{policyFIFO, policyShortestJobFirst} {
+		for _, s := range []policy{policyFIFO, policyShortestJobFirst, policyShortestTimeToCompletionFirst} {
 			names = append(names, s.String())
 		}
 		return fmt.Sprintf("scheduler policy: %s", strings.Join(names, ","))
