@@ -14,6 +14,7 @@ import (
 	"math/rand/v2"
 	"os"
 	"path/filepath"
+	"strings"
 	"text/template"
 )
 
@@ -32,14 +33,6 @@ func main() {
 		os.Exit(1)
 	}
 }
-
-//go:generate stringer -type=sched -linecomment
-type sched int
-
-const (
-	_         sched = iota
-	schedFIFO       // fifo
-)
 
 type jobSpec struct {
 	duration int
@@ -112,7 +105,13 @@ func (c *command) parseFlags() error {
 	}
 	fs.Var(newJobsFlag(&c.JobSpecs), "jobs", "number of random jobs")
 	fs.Var(newJobSpecFlag(&c.JobSpecs), "job-spec", fmt.Sprintf("comma separated list of job durations\n%d is random duration", randomDuration))
-	fs.Var(&schedulerFlag{&c.Sched}, "sched", "scheduler to run")
+	fs.Var(&schedulerFlag{&c.Sched}, "sched", func() string {
+		var names []string
+		for _, s := range []sched{schedFIFO, schedShortestJobFirst} {
+			names = append(names, s.String())
+		}
+		return fmt.Sprintf("scheduler to run: %s", strings.Join(names, ","))
+	}())
 	fs.BoolVar(&c.Trace, "trace", false, "print trace")
 	if err := fs.Parse(os.Args[1:]); err != nil {
 		return err
@@ -186,19 +185,6 @@ func (j *Job) Stat() jobStat {
 		Turnaround: j.complete - j.arrive,
 		Wait:       j.run - j.arrive,
 	}
-}
-
-type scheduler interface {
-	Add(*Job)
-	Next() (*Job, bool)
-}
-
-func newScheduler(s sched) scheduler {
-	switch s {
-	case schedFIFO:
-		return &fifoScheduler{}
-	}
-	panic(fmt.Errorf("unsupported scheduler %s", s))
 }
 
 type simulator struct {
@@ -290,44 +276,4 @@ func (c *cycler) Cycle() int {
 // Next advances to the next cycle.
 func (c *cycler) Next() {
 	c.num += 1
-}
-
-type fifoScheduler struct {
-	cycler *cycler
-
-	pending   []*Job
-	running   *Job
-	completed []*Job
-}
-
-// Add emulates job arrival to the scheduler.
-func (s *fifoScheduler) Add(j *Job) {
-	j.Arrive()
-	s.pending = append(s.pending, j)
-}
-
-// Next returns the next job to run. The second returned parameter indicates
-// whether the scheduler was able to pick up the job.
-func (s *fifoScheduler) Next() (*Job, bool) {
-	s.update()
-	if s.running == nil {
-		return nil, false
-	}
-	s.running.Run()
-	return s.running, true
-}
-
-func (s *fifoScheduler) update() {
-	if s.running != nil {
-		if !s.running.Done() {
-			return
-		}
-		s.running.Complete()
-		s.completed = append(s.completed, s.running)
-		s.running = nil
-	}
-	if len(s.pending) == 0 {
-		return
-	}
-	s.running, s.pending = s.pending[0], s.pending[1:]
 }

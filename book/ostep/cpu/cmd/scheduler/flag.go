@@ -28,6 +28,8 @@ func (sf *schedulerFlag) Set(s string) error {
 	switch s {
 	case "fifo":
 		*sf.sched = schedFIFO
+	case "sjf":
+		*sf.sched = schedShortestJobFirst
 	default:
 		return fmt.Errorf("invalid scheduler %s", s)
 	}

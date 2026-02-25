@@ -9,11 +9,12 @@ func _() {
 	// Re-run the stringer command to generate them again.
 	var x [1]struct{}
 	_ = x[schedFIFO-1]
+	_ = x[schedShortestJobFirst-2]
 }
 
-const _sched_name = "fifo"
+const _sched_name = "fifosjf"
 
-var _sched_index = [...]uint8{0, 4}
+var _sched_index = [...]uint8{0, 4, 7}
 
 func (i sched) String() string {
 	idx := int(i) - 1
