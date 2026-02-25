@@ -251,11 +251,11 @@ func (s *simulator) Run() iter.Seq[cycle] {
 			if !ok && len(s.pending) == 0 {
 				break
 			}
-			c := cycle{
-				Num: s.cycler.Cycle(),
-				Job: job,
+			job.Run()
+			if job.Done() {
+				job.Complete()
 			}
-			if !yield(c) {
+			if !yield(cycle{Num: s.cycler.Cycle(), Job: job}) {
 				break
 			}
 			s.cycler.Next()
@@ -272,6 +272,7 @@ func (s *simulator) addJobs() {
 		if n := job.Spec.Arrival; n < cycle {
 			panic(fmt.Errorf("got a job with arrival %d before cycle %d", job.Spec.Arrival, cycle))
 		} else if n == cycle {
+			job.Arrive()
 			s.sched.Add(job)
 			lastAdded = idx
 		} else {

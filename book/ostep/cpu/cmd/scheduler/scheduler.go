@@ -51,7 +51,6 @@ func newCoreScheduler(f updateFunc) *coreScheduler {
 
 // Add emulates job arrival to the scheduler.
 func (s *coreScheduler) Add(j *Job) {
-	j.Arrive()
 	s.state.pending = append(s.state.pending, j)
 }
 
@@ -62,7 +61,6 @@ func (s *coreScheduler) Next() (*Job, bool) {
 	if s.state.running == nil {
 		return nil, false
 	}
-	s.state.running.Run()
 	return s.state.running, true
 }
 
@@ -71,7 +69,6 @@ func fifoPolicy(state *schedState) {
 		if !state.running.Done() {
 			return
 		}
-		state.running.Complete()
 		state.completed = append(state.completed, state.running)
 		state.running = nil
 	}
@@ -86,7 +83,6 @@ func shortestJobFirstPolicy(state *schedState) {
 		if !state.running.Done() {
 			return
 		}
-		state.running.Complete()
 		state.completed = append(state.completed, state.running)
 		state.running = nil
 	}
@@ -106,7 +102,6 @@ func shortestJobFirstPolicy(state *schedState) {
 func shortestTimeToCompletionFirstPolicy(st *schedState) {
 	if st.running != nil {
 		if st.running.Done() {
-			st.running.Complete()
 			st.completed = append(st.completed, st.running)
 			st.running = nil
 		}
