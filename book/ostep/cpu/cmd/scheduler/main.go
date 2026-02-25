@@ -48,6 +48,7 @@ type jobSpec struct {
 type command struct {
 	JobSpecs []jobSpec
 	Sched    sched
+	Trace    bool
 }
 
 var report *template.Template
@@ -62,9 +63,13 @@ jobs:
   {{.ID}} duration: {{.Duration}}
 {{- end}}
 
+{{- if .Cmd.Trace}}
+
 run:
 {{- range .Sim.Run}}
   {{.Num | printf "%-2d"}} j{{.Job.ID}}
+{{- end}}
+{{- else}}{{range .Sim.Run}}{{end}}
 {{- end}}
 
 stats:
@@ -103,8 +108,9 @@ func (c *command) parseFlags() error {
 		fs.PrintDefaults()
 	}
 	fs.Var(newJobsFlag(&c.JobSpecs), "jobs", "number of random jobs")
-	fs.Var(&schedulerFlag{&c.Sched}, "sched", "scheduler to run")
 	fs.Var(newJobSpecFlag(&c.JobSpecs), "job-spec", fmt.Sprintf("comma separated list of job durations\n%d is random duration", randomDuration))
+	fs.Var(&schedulerFlag{&c.Sched}, "sched", "scheduler to run")
+	fs.BoolVar(&c.Trace, "trace", false, "print trace")
 	if err := fs.Parse(os.Args[1:]); err != nil {
 		return err
 	}
