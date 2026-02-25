@@ -109,50 +109,56 @@ func (c *command) parseFlags() error {
 
 // Job describes a job.
 type Job struct {
-	cycler *cycler
-
 	// ID is a unique job identifier.
 	ID int
 
 	// Spec is the job's configuration
 	Spec JobSpec
 
-	// cycles is the number of cycles the job has run for.
-	cycles int
+	state *jobState
+}
+
+type jobState struct {
+	cycler *cycler
+
+	runCycles int
 
 	// arrive, run, and complete are cycles when corresponding events happen.
-	arrive   int
-	run      int
-	complete int
+	cycleArrive   int
+	cycleStart    int
+	cycleComplete int
 }
 
 // LeftCycles calculates the number of cycles left for the job to run to
 // completion.
 func (j *Job) LeftCycles() int {
-	return j.Spec.Duration - j.cycles
+	return j.Spec.Duration - j.state.runCycles
 }
 
-// Arrive marks the job arrived.
-func (j *Job) Arrive() {
-	j.arrive = j.cycler.Cycle()
+// Init initializes the job state.
+func (j *Job) Init(c *cycler) {
+	j.state = &jobState{
+		cycler:      c,
+		cycleArrive: c.Cycle(),
+	}
 }
 
 // Complete marks the job complete.
 func (j *Job) Complete() {
-	j.complete = j.cycler.Cycle()
+	j.state.cycleComplete = j.state.cycler.Cycle()
 }
 
 // Done returns true if the job has completed the cycles, else false.
 func (j *Job) Done() bool {
-	return j.cycles == j.Spec.Duration
+	return j.state.runCycles == j.Spec.Duration
 }
 
 // Run executes the job for one cycle.
 func (j *Job) Run() {
-	if j.cycles == 0 {
-		j.run = j.cycler.Cycle()
+	if j.state.runCycles == 0 {
+		j.state.cycleStart = j.state.cycler.Cycle()
 	}
-	j.cycles += 1
+	j.state.runCycles += 1
 }
 
 type jobStat struct {
@@ -165,10 +171,9 @@ type jobStat struct {
 // times.
 func (j *Job) Stat() jobStat {
 	return jobStat{
-		Response: j.run - j.arrive,
-		// +1 in turnaround because the job runs and completes in the same cycle.
-		Turnaround: j.complete - j.arrive + 1,
-		Wait:       j.run - j.arrive,
+		Response:   j.state.cycleStart - j.state.cycleArrive,
+		Turnaround: j.state.cycleComplete - j.state.cycleArrive,
+		Wait:       j.state.cycleStart - j.state.cycleArrive,
 	}
 }
 
@@ -199,8 +204,7 @@ func newSimulator(jobs []JobSpec, s scheduler) *simulator {
 			dur = minDuration + rand.IntN(maxDuration-minDuration)
 		}
 		j := &Job{
-			cycler: c,
-			ID:     i + 1,
+			ID: i + 1,
 			Spec: JobSpec{
 				Arrival:  job.Arrival,
 				Duration: dur,
@@ -312,7 +316,7 @@ func (s *simulator) addJobs() {
 		if n := job.Spec.Arrival; n < cycle {
 			panic(fmt.Errorf("got a job with arrival %d before cycle %d", job.Spec.Arrival, cycle))
 		} else if n == cycle {
-			job.Arrive()
+			job.Init(s.cycler)
 			s.sched.Add(job)
 			lastAdded = idx
 		} else {
