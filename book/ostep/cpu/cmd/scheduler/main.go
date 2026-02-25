@@ -54,7 +54,10 @@ type command struct {
 var report *template.Template
 
 func init() {
-	const tmpl = `{{- /* empty line */ -}}
+	const tmpl = `
+{{- define "stats" -}}
+Response: {{.Response | printf "%-3d" }} Turnaround: {{.Turnaround | printf "%-3d" }} Wait: {{.Wait | printf "%-3d" }}
+{{- end -}}
 jobs: {{len .Cmd.JobSpecs}}
 scheduler: {{.Cmd.Sched}}
 
@@ -74,11 +77,11 @@ run:
 
 stats:
 {{- range .Sim.Jobs}}
-  {{.ID | printf "%-2d"}} {{.Stat}}
+  {{.ID | printf "%-2d"}} {{template "stats" .Stat}}
 {{- end}}
 
 average:
-  {{" " | printf "%2s"}} {{.Sim.Stats}}
+  {{" " | printf "%2s"}} {{template "stats" .Sim.Stats}}
 `
 	report = template.Must(template.New("report").Parse(tmpl))
 }
@@ -173,11 +176,6 @@ type jobStat struct {
 	Response   int
 	Turnaround int
 	Wait       int
-}
-
-// String implements [fmt.Stringer] interface.
-func (js jobStat) String() string {
-	return fmt.Sprintf("Response: %2d Turnaround %2d Wait %2d", js.Response, js.Turnaround, js.Wait)
 }
 
 // Stat returns job statistics including the response, turnaround, and wait
