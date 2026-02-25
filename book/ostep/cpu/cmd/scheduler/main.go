@@ -16,6 +16,8 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
+
+	"github.com/skhal/lab/book/ostep/cpu/cmd/scheduler/internal/scheduler"
 )
 
 const (
@@ -30,7 +32,7 @@ func main() {
 			{Duration: randomDuration},
 			{Duration: randomDuration},
 		},
-		Policy: policyFIFO,
+		Policy: scheduler.PolicyFIFO,
 	}
 	if err := cmd.Run(os.Args); err != nil {
 		fmt.Fprintln(os.Stderr, err)
@@ -48,7 +50,7 @@ type JobSpec struct {
 
 type command struct {
 	JobSpecs []JobSpec
-	Policy   policy
+	Policy   scheduler.Policy
 	Trace    bool
 }
 
@@ -59,13 +61,13 @@ func (c *command) Run(args []string) error {
 	}
 	return report.Execute(os.Stdout, struct {
 		Jobs   int
-		Policy policy
+		Policy scheduler.Policy
 		Sim    *simulator
 		Trace  bool
 	}{
 		Jobs:   len(c.JobSpecs),
 		Policy: c.Policy,
-		Sim:    newSimulator(c.JobSpecs, newScheduler(c.Policy)),
+		Sim:    newSimulator(c.JobSpecs, scheduler.New(c.Policy)),
 		Trace:  c.Trace,
 	})
 }
@@ -84,7 +86,11 @@ func (c *command) parseFlags(args []string) error {
 	fs.Var(newJobSpecFlag(&c.JobSpecs), "job-spec", fmt.Sprintf("comma separated list of job specifications [n:]m, where n is the arrival time (default to 0) and m is the duration (%d is random)", randomDuration))
 	fs.Var(&policyFlag{&c.Policy}, "policy", func() string {
 		var names []string
-		for _, s := range []policy{policyFIFO, policyShortestJobFirst, policyShortestTimeToCompletionFirst} {
+		for _, s := range []scheduler.Policy{
+			scheduler.PolicyFIFO,
+			scheduler.PolicySJF,
+			scheduler.PolicySTCF,
+		} {
 			names = append(names, s.String())
 		}
 		return fmt.Sprintf("scheduler policy: %s", strings.Join(names, ","))
@@ -116,6 +122,11 @@ type Job struct {
 	Spec JobSpec
 
 	state *jobState
+}
+
+// Duration returns the number of cycles the job would take to complete.
+func (j *Job) Duration() int {
+	return j.Spec.Duration
 }
 
 type jobState struct {
@@ -178,14 +189,19 @@ func (j *Job) Stat() jobStat {
 	}
 }
 
-type scheduler interface {
-	Add(*Job)
-	Next() (*Job, bool)
+// Scheduler manages jobs.
+type Scheduler interface {
+	// Add introduces the job to the scheduler.
+	Add(scheduler.Job)
+
+	// Next retrieves the next job to run for one cycle. The second return =
+	// parameter indicates whether the scheduler was able to pick up a job.
+	Next() (scheduler.Job, bool)
 }
 
 type simulator struct {
 	cycler *cycler
-	sched  scheduler
+	sched  Scheduler
 
 	Jobs    []*Job
 	pending []*Job
@@ -193,7 +209,7 @@ type simulator struct {
 
 const randomDuration = 0
 
-func newSimulator(jobs []JobSpec, s scheduler) *simulator {
+func newSimulator(jobs []JobSpec, s Scheduler) *simulator {
 	c := new(cycler)
 	jj := make([]*Job, 0, len(jobs))
 	sort.Slice(jobs, func(i, j int) bool {
@@ -257,8 +273,9 @@ func (s *simulator) Run() iter.Seq[cycle] {
 			if !ok && len(s.pending) == 0 {
 				break
 			}
-			job.Run()
-			if !yield(cycle{Num: s.cycler.Cycle(), Job: job}) {
+			j := job.(*Job)
+			j.Run()
+			if !yield(cycle{Num: s.cycler.Cycle(), Job: j}) {
 				break
 			}
 			s.cycler.Next()

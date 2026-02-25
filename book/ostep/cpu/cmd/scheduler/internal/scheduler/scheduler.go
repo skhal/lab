@@ -3,36 +3,57 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package main
+package scheduler
 
 import "fmt"
 
-//go:generate stringer -type=policy -linecomment
-type policy int
+// Policy enumerates available scheduling policies.
+//
+//go:generate stringer -type=Policy -linecomment
+type Policy int
 
 const (
-	_                                   policy = iota
-	policyFIFO                                 // fifo
-	policyShortestJobFirst                     // sjf
-	policyShortestTimeToCompletionFirst        // stcf
+	_ Policy = iota
+	// PolicyFIFO runs first-in-first-out job.
+	PolicyFIFO // fifo
+	// PolicySJF runs the job that is shortest to finish.
+	PolicySJF // sjf
+	// PolicySTCF preempts currently running job to pick up the shortest to
+	// complete job.
+	PolicySTCF // stcf
 )
 
-func newScheduler(s policy) *coreScheduler {
+// New creates a scheduler for a specified policy.
+func New(s Policy) *coreScheduler {
 	switch s {
-	case policyFIFO:
+	case PolicyFIFO:
 		return newCoreScheduler(fifoPolicy)
-	case policyShortestJobFirst:
+	case PolicySJF:
 		return newCoreScheduler(shortestJobFirstPolicy)
-	case policyShortestTimeToCompletionFirst:
+	case PolicySTCF:
 		return newCoreScheduler(shortestTimeToCompletionFirstPolicy)
 	}
 	panic(fmt.Errorf("unsupported policy %s", s))
 }
 
+// Job is a unit of work, managed by scheduler.
+type Job interface {
+	// Done reports whether the job completed.
+	Done() bool
+
+	// Duration returns the number of cycles the job would take to complete.
+	// It should be job's specification duration, not outstanding number of
+	// cycles.
+	Duration() int
+
+	// LeftCycles returns the number of cycles left for the job to complete.
+	LeftCycles() int
+}
+
 type schedState struct {
-	pending   []*Job
-	running   *Job
-	completed []*Job
+	pending   []Job
+	running   Job
+	completed []Job
 }
 
 type updateFunc func(state *schedState)
@@ -50,13 +71,13 @@ func newCoreScheduler(f updateFunc) *coreScheduler {
 }
 
 // Add emulates job arrival to the scheduler.
-func (s *coreScheduler) Add(j *Job) {
+func (s *coreScheduler) Add(j Job) {
 	s.state.pending = append(s.state.pending, j)
 }
 
 // Next returns the next job to run. The second returned parameter indicates
 // whether the scheduler was able to pick up the job.
-func (s *coreScheduler) Next() (*Job, bool) {
+func (s *coreScheduler) Next() (Job, bool) {
 	s.update(s.state)
 	if s.state.running == nil {
 		return nil, false
@@ -91,7 +112,7 @@ func shortestJobFirstPolicy(state *schedState) {
 	}
 	shortest := 0
 	for i, job := range state.pending {
-		if job.Spec.Duration < state.pending[shortest].Spec.Duration {
+		if job.Duration() < state.pending[shortest].Duration() {
 			shortest = i
 		}
 	}
@@ -109,7 +130,7 @@ func shortestTimeToCompletionFirstPolicy(st *schedState) {
 	if len(st.pending) == 0 {
 		return
 	}
-	next := func() (*Job, int) {
+	next := func() (Job, int) {
 		var (
 			njob = st.running
 			nidx int
