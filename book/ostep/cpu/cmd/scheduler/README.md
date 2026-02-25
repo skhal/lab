@@ -34,9 +34,8 @@ Auxiliary:
 
 ## Algorithms
 
-The selected job runs uninterrupted.
-
-**FIFO**: (First In First Out), runs the jobs in the order of arrival.
+**FIFO**: (First In First Out), runs the jobs in the order of arrival,
+uninterrupted.
 
 ```console
 % scheduler -job-spec 7,4,1
@@ -57,7 +56,7 @@ average:
      Response: 6   Turnaround: 10  Wait: 6
 ```
 
-**SJF**: (Shortest Job First), runs shortest job first.
+**SJF**: (Shortest Job First), runs shortest job first, uninterrupted.
 
 ```console
 % scheduler -job-spec 7,4,1 -policy sjf
@@ -83,9 +82,9 @@ Notice how all average metrics improve in SJF compared to FIFO.
 *Corollary*: running short duration jobs before resources hungry long job
 improves system responsiveness.
 
-**STCF**: (Shortest Time to Complete First), preempts running task and runs a
-job that would complete first, e.g. the shortest time left for the task to
-complete.
+**STCF**: (Shortest Time to Complete First), preempts running task to run
+another one that would take shorter time to complete, otherwise continues with
+the running one.
 
 ```console
 % scheduler -job-spec 7,1:4,2:1 -policy stcf -trace
