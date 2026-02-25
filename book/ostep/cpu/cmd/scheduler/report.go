@@ -19,7 +19,7 @@ policy: {{.Policy}}
 
 jobs:
 {{- range .Sim.Jobs}}
-  {{.ID}} arrival: {{.Arrival}} duration: {{.Duration}}
+  {{.ID}} arrival: {{.Spec.Arrival}} duration: {{.Spec.Duration}}
 {{- end}}
 
 {{- if .Trace}}

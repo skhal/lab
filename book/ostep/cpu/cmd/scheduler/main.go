@@ -25,10 +25,10 @@ const (
 
 func main() {
 	cmd := &command{
-		JobSpecs: []jobSpec{
-			{duration: randomDuration},
-			{duration: randomDuration},
-			{duration: randomDuration},
+		JobSpecs: []JobSpec{
+			{Duration: randomDuration},
+			{Duration: randomDuration},
+			{Duration: randomDuration},
 		},
 		Policy: policyFIFO,
 	}
@@ -38,13 +38,16 @@ func main() {
 	}
 }
 
-type jobSpec struct {
-	arrival  int
-	duration int
+// JobSpec is the job's configuration.
+type JobSpec struct {
+	// Arrival is the cycle when the job arrives to the scheduler.
+	Arrival int
+	// Duration is the number of cycles the job is expected to run.
+	Duration int
 }
 
 type command struct {
-	JobSpecs []jobSpec
+	JobSpecs []JobSpec
 	Policy   policy
 	Trace    bool
 }
@@ -110,10 +113,9 @@ type Job struct {
 
 	// ID is a unique job identifier.
 	ID int
-	// Arrival is the cycle when the job should be added to the scheduler.
-	Arrival int
-	// Duration is the number of cycles the job should run for.
-	Duration int
+
+	// Spec is the job's configuration
+	Spec JobSpec
 
 	// cycles is the number of cycles the job has run for.
 	cycles int
@@ -136,7 +138,7 @@ func (j *Job) Complete() {
 
 // Done returns true if the job has completed the cycles, else false.
 func (j *Job) Done() bool {
-	return j.cycles == j.Duration
+	return j.cycles == j.Spec.Duration
 }
 
 // Run executes the job for one cycle.
@@ -178,22 +180,24 @@ type simulator struct {
 
 const randomDuration = 0
 
-func newSimulator(jobs []jobSpec, s scheduler) *simulator {
+func newSimulator(jobs []JobSpec, s scheduler) *simulator {
 	c := new(cycler)
 	jj := make([]*Job, 0, len(jobs))
 	sort.Slice(jobs, func(i, j int) bool {
-		return jobs[i].arrival < jobs[j].arrival
+		return jobs[i].Arrival < jobs[j].Arrival
 	})
 	for i, job := range jobs {
-		dur := job.duration
+		dur := job.Duration
 		if dur == randomDuration {
 			dur = minDuration + rand.IntN(maxDuration-minDuration)
 		}
 		j := &Job{
-			cycler:   c,
-			ID:       i + 1,
-			Arrival:  job.arrival,
-			Duration: dur,
+			cycler: c,
+			ID:     i + 1,
+			Spec: JobSpec{
+				Arrival:  job.Arrival,
+				Duration: dur,
+			},
 		}
 		jj = append(jj, j)
 	}
@@ -259,8 +263,8 @@ func (s *simulator) addJobs() {
 		lastAdded = -1
 	)
 	for idx, job := range s.pending {
-		if n := job.Arrival; n < cycle {
-			panic(fmt.Errorf("got a job with arrival %d before cycle %d", job.Arrival, cycle))
+		if n := job.Spec.Arrival; n < cycle {
+			panic(fmt.Errorf("got a job with arrival %d before cycle %d", job.Spec.Arrival, cycle))
 		} else if n == cycle {
 			s.sched.Add(job)
 			lastAdded = idx

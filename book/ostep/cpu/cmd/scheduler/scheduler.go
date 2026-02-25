@@ -92,7 +92,7 @@ func shortestJobFirstPolicy(state *schedState) {
 	}
 	shortest := 0
 	for i, job := range state.pending {
-		if job.Duration < state.pending[shortest].Duration {
+		if job.Spec.Duration < state.pending[shortest].Spec.Duration {
 			shortest = i
 		}
 	}

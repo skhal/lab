@@ -37,11 +37,11 @@ func (sf *policyFlag) Set(s string) error {
 }
 
 type jobSpecFlag struct {
-	specs *[]jobSpec
+	specs *[]JobSpec
 	set   bool
 }
 
-func newJobSpecFlag(specs *[]jobSpec) *jobSpecFlag {
+func newJobSpecFlag(specs *[]JobSpec) *jobSpecFlag {
 	return &jobSpecFlag{
 		specs: specs,
 	}
@@ -54,7 +54,7 @@ func (jsf *jobSpecFlag) String() string {
 	}
 	ss := make([]string, 0, len(*jsf.specs))
 	for _, spec := range *jsf.specs {
-		ss = append(ss, strconv.Itoa(spec.duration))
+		ss = append(ss, strconv.Itoa(spec.Duration))
 	}
 	return strings.Join(ss, ",")
 }
@@ -87,17 +87,17 @@ func (jsf *jobSpecFlag) Set(s string) error {
 		if err != nil {
 			return fmt.Errorf("invalid job spec %s: %s", spec, err)
 		}
-		*jsf.specs = append(*jsf.specs, jobSpec{arrival: arr, duration: dur})
+		*jsf.specs = append(*jsf.specs, JobSpec{Arrival: arr, Duration: dur})
 	}
 	return nil
 }
 
 type jobsFlag struct {
-	specs *[]jobSpec
+	specs *[]JobSpec
 	set   bool
 }
 
-func newJobsFlag(specs *[]jobSpec) *jobsFlag {
+func newJobsFlag(specs *[]JobSpec) *jobsFlag {
 	return &jobsFlag{
 		specs: specs,
 	}
@@ -122,9 +122,9 @@ func (jf *jobsFlag) Set(s string) error {
 		return err
 	}
 	for range n {
-		*jf.specs = append(*jf.specs, jobSpec{
+		*jf.specs = append(*jf.specs, JobSpec{
 			// arrival: 0 // arrive at the same time
-			duration: randomDuration,
+			Duration: randomDuration,
 		})
 	}
 	return nil
