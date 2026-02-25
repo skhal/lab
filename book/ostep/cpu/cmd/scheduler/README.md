@@ -47,20 +47,6 @@ jobs:
   2 duration: 4
   3 duration: 7
 
-run:
-  1  j1
-  2  j2
-  3  j2
-  4  j2
-  5  j2
-  6  j3
-  7  j3
-  8  j3
-  9  j3
-  10 j3
-  11 j3
-  12 j3
-
 stats:
   1  Response:  0 Turnaround  1 Wait  0
   2  Response:  1 Turnaround  5 Wait  1
