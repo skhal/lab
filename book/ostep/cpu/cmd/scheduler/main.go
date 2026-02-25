@@ -145,7 +145,7 @@ func (j *Job) Init(c *cycler) {
 
 // Done returns true if the job has completed the cycles, else false.
 func (j *Job) Done() bool {
-	return j.state.runCycles == j.Spec.Duration
+	return j.LeftCycles() == 0
 }
 
 // Run executes the job for one cycle.
@@ -168,9 +168,12 @@ type jobStat struct {
 // Stat returns job statistics including the response, turnaround, and wait
 // times.
 func (j *Job) Stat() jobStat {
+	if j.state == nil {
+		return jobStat{}
+	}
 	return jobStat{
 		Response:   j.state.cycleStart - j.state.cycleArrive,
-		Turnaround: j.state.cycleComplete - j.state.cycleArrive,
+		Turnaround: j.state.cycleComplete - j.state.cycleArrive + 1,
 		Wait:       j.state.cycleStart - j.state.cycleArrive,
 	}
 }
