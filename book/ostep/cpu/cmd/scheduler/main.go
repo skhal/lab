@@ -143,11 +143,6 @@ func (j *Job) Init(c *cycler) {
 	}
 }
 
-// Complete marks the job complete.
-func (j *Job) Complete() {
-	j.state.cycleComplete = j.state.cycler.Cycle()
-}
-
 // Done returns true if the job has completed the cycles, else false.
 func (j *Job) Done() bool {
 	return j.state.runCycles == j.Spec.Duration
@@ -159,6 +154,9 @@ func (j *Job) Run() {
 		j.state.cycleStart = j.state.cycler.Cycle()
 	}
 	j.state.runCycles += 1
+	if j.Done() {
+		j.state.cycleComplete = j.state.cycler.Cycle()
+	}
 }
 
 type jobStat struct {
@@ -257,9 +255,6 @@ func (s *simulator) Run() iter.Seq[cycle] {
 				break
 			}
 			job.Run()
-			if job.Done() {
-				job.Complete()
-			}
 			if !yield(cycle{Num: s.cycler.Cycle(), Job: job}) {
 				break
 			}
