@@ -5,14 +5,13 @@
   license that can be found in the LICENSE file.
 -->
 
-Name
-====
+# Name
 
 **cpu** - CPU virtualization
 
-Description
-===========
+# Description
 
 Applications
 
--	[process-run](./cmd/process-run/): schedule processes on a single CPU.
+- [process-run](./cmd/process-run/): schedule processes on a single CPU.
+- [scheduler](./cmd/scheduler/): schedule jobs with different policies
