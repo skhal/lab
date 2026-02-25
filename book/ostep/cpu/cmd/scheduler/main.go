@@ -3,8 +3,8 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Scheduler implements basic CPU schedulers: first-in-first-out, shortest
-// job run, and round robin.
+// Scheduler implements basic CPU scheduler policies: first-in-first-out,
+// shortest job run.
 package main
 
 import (
@@ -31,7 +31,7 @@ func main() {
 			{duration: randomDuration},
 			{duration: randomDuration},
 		},
-		Sched: schedFIFO,
+		Policy: policyFIFO,
 	}
 	if err := cmd.Run(); err != nil {
 		fmt.Fprintln(os.Stderr, err)
@@ -46,7 +46,7 @@ type jobSpec struct {
 
 type command struct {
 	JobSpecs []jobSpec
-	Sched    sched
+	Policy   policy
 	Trace    bool
 }
 
@@ -58,7 +58,7 @@ func init() {
 Response: {{.Response | printf "%-3d" }} Turnaround: {{.Turnaround | printf "%-3d" }} Wait: {{.Wait | printf "%-3d" }}
 {{- end -}}
 jobs: {{len .Cmd.JobSpecs}}
-scheduler: {{.Cmd.Sched}}
+policy: {{.Cmd.Policy}}
 
 jobs:
 {{- range .Sim.Jobs}}
@@ -95,7 +95,7 @@ func (c *command) Run() error {
 		Sim *simulator
 	}{
 		Cmd: c,
-		Sim: newSimulator(c.JobSpecs, newScheduler(c.Sched)),
+		Sim: newSimulator(c.JobSpecs, newScheduler(c.Policy)),
 	})
 }
 
@@ -111,12 +111,12 @@ func (c *command) parseFlags() error {
 	}
 	fs.Var(newJobsFlag(&c.JobSpecs), "jobs", "number of random jobs")
 	fs.Var(newJobSpecFlag(&c.JobSpecs), "job-spec", fmt.Sprintf("comma separated list of job specifications [n:]m, where n is the arrival time (default to 0) and m is the duration (%d is random)", randomDuration))
-	fs.Var(&schedulerFlag{&c.Sched}, "sched", func() string {
+	fs.Var(&policyFlag{&c.Policy}, "policy", func() string {
 		var names []string
-		for _, s := range []sched{schedFIFO, schedShortestJobFirst} {
+		for _, s := range []policy{policyFIFO, policyShortestJobFirst} {
 			names = append(names, s.String())
 		}
-		return fmt.Sprintf("scheduler to run: %s", strings.Join(names, ","))
+		return fmt.Sprintf("scheduler policy: %s", strings.Join(names, ","))
 	}())
 	fs.BoolVar(&c.Trace, "trace", false, "print trace")
 	if err := fs.Parse(os.Args[1:]); err != nil {

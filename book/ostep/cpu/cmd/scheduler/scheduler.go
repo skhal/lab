@@ -7,23 +7,23 @@ package main
 
 import "fmt"
 
-//go:generate stringer -type=sched -linecomment
-type sched int
+//go:generate stringer -type=policy -linecomment
+type policy int
 
 const (
-	_                     sched = iota
-	schedFIFO                   // fifo
-	schedShortestJobFirst       // sjf
+	_                      policy = iota
+	policyFIFO                    // fifo
+	policyShortestJobFirst        // sjf
 )
 
-func newScheduler(s sched) *coreScheduler {
+func newScheduler(s policy) *coreScheduler {
 	switch s {
-	case schedFIFO:
+	case policyFIFO:
 		return newCoreScheduler(fifoPolicy)
-	case schedShortestJobFirst:
+	case policyShortestJobFirst:
 		return newCoreScheduler(shortestJobFirstPolicy)
 	}
-	panic(fmt.Errorf("unsupported scheduler %s", s))
+	panic(fmt.Errorf("unsupported policy %s", s))
 }
 
 type schedState struct {

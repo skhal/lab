@@ -11,27 +11,27 @@ import (
 	"strings"
 )
 
-type schedulerFlag struct {
-	sched *sched
+type policyFlag struct {
+	policy *policy
 }
 
 // String implements [fmt.Stringer] interface.
-func (sf *schedulerFlag) String() string {
-	if sf.sched == nil {
+func (sf *policyFlag) String() string {
+	if sf.policy == nil {
 		return ""
 	}
-	return sf.sched.String()
+	return sf.policy.String()
 }
 
 // Set implements [flag.Value] interface.
-func (sf *schedulerFlag) Set(s string) error {
+func (sf *policyFlag) Set(s string) error {
 	switch s {
 	case "fifo":
-		*sf.sched = schedFIFO
+		*sf.policy = policyFIFO
 	case "sjf":
-		*sf.sched = schedShortestJobFirst
+		*sf.policy = policyShortestJobFirst
 	default:
-		return fmt.Errorf("invalid scheduler %s", s)
+		return fmt.Errorf("invalid policy %s", s)
 	}
 	return nil
 }

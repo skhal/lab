@@ -60,7 +60,7 @@ average:
 **SJF**: (Shortest Job First), runs shortest job first.
 
 ```console
-% scheduler -job-spec 7,4,1 -sched sjf
+% scheduler -job-spec 7,4,1 -policy sjf
 jobs: 3
 scheduler: sjf
 
