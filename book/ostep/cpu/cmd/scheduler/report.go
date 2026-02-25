@@ -14,6 +14,11 @@ func init() {
 {{- define "stats" -}}
 Response: {{.Response | printf "%-3d" }} Turnaround: {{.Turnaround | printf "%-3d" }} Wait: {{.Wait | printf "%-3d" }}
 {{- end -}}
+
+{{- define "trace" -}}
+{{.Start}} run {{.Job.ID}} for {{.Cycles}} {{if eq .Cycles 1}}cycle{{else}}cycles{{end}} {{if .Job.Done}}[Done]{{end}}
+{{- end -}}
+
 jobs: {{.Jobs}}
 policy: {{.Policy}}
 
@@ -24,9 +29,9 @@ jobs:
 
 {{- if .Trace}}
 
-run:
-{{- range .Sim.Run}}
-  {{.Num | printf "%-2d"}} j{{.Job.ID}}
+trace:
+{{- range .Sim.Trace}}
+  {{template "trace" .}}
 {{- end}}
 {{- else}}{{range .Sim.Run}}{{end}}
 {{- end}}
