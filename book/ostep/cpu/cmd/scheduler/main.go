@@ -126,6 +126,12 @@ type Job struct {
 	complete int
 }
 
+// LeftCycles calculates the number of cycles left for the job to run to
+// completion.
+func (j *Job) LeftCycles() int {
+	return j.Spec.Duration - j.cycles
+}
+
 // Arrive marks the job arrived.
 func (j *Job) Arrive() {
 	j.arrive = j.cycler.Cycle()

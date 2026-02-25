@@ -82,3 +82,40 @@ Notice how all average metrics improve in SJF compared to FIFO.
 
 *Corollary*: running short duration jobs before resources hungry long job
 improves system responsiveness.
+
+**STCF**: (Shortest Time to Complete First), preempts running task and runs a
+job that would complete first, e.g. the shortest time left for the task to
+complete.
+
+```console
+% scheduler -job-spec 7,1:4,2:1 -policy stcf -trace
+jobs: 3
+policy: stcf
+
+jobs:
+  1 arrival: 0 duration: 7
+  2 arrival: 1 duration: 4
+  3 arrival: 2 duration: 1
+
+run:
+  1  j1
+  2  j2
+  3  j3
+  4  j2
+  5  j2
+  6  j2
+  7  j1
+  8  j1
+  9  j1
+  10 j1
+  11 j1
+  12 j1
+
+stats:
+  1  Response: 1   Turnaround: 13  Wait: 1
+  2  Response: 1   Turnaround: 6   Wait: 1
+  3  Response: 1   Turnaround: 2   Wait: 1
+
+average:
+     Response: 1   Turnaround: 7   Wait: 1
+```

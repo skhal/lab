@@ -11,9 +11,10 @@ import "fmt"
 type policy int
 
 const (
-	_                      policy = iota
-	policyFIFO                    // fifo
-	policyShortestJobFirst        // sjf
+	_                                   policy = iota
+	policyFIFO                                 // fifo
+	policyShortestJobFirst                     // sjf
+	policyShortestTimeToCompletionFirst        // stcf
 )
 
 func newScheduler(s policy) *coreScheduler {
@@ -22,6 +23,8 @@ func newScheduler(s policy) *coreScheduler {
 		return newCoreScheduler(fifoPolicy)
 	case policyShortestJobFirst:
 		return newCoreScheduler(shortestJobFirstPolicy)
+	case policyShortestTimeToCompletionFirst:
+		return newCoreScheduler(shortestTimeToCompletionFirstPolicy)
 	}
 	panic(fmt.Errorf("unsupported policy %s", s))
 }
@@ -98,4 +101,49 @@ func shortestJobFirstPolicy(state *schedState) {
 	}
 	state.running = state.pending[shortest]
 	state.pending = append(state.pending[:shortest], state.pending[shortest+1:]...)
+}
+
+func shortestTimeToCompletionFirstPolicy(st *schedState) {
+	if st.running != nil {
+		if st.running.Done() {
+			st.running.Complete()
+			st.completed = append(st.completed, st.running)
+			st.running = nil
+		}
+	}
+	if len(st.pending) == 0 {
+		return
+	}
+	next := func() (*Job, int) {
+		var (
+			njob = st.running
+			nidx int
+		)
+		for i, job := range st.pending {
+			if njob == nil {
+				njob = job
+				nidx = i
+				continue
+			}
+			if njob.LeftCycles() <= job.LeftCycles() {
+				continue
+			}
+			njob = job
+			nidx = i
+		}
+		return njob, nidx
+	}
+	switch job, i := next(); job {
+	case nil:
+		return
+	case st.running:
+		return
+	default:
+		if st.running == nil {
+			st.running = job
+			st.pending = append(st.pending[:i], st.pending[i+1:]...)
+		} else {
+			st.running, st.pending[i] = job, st.running
+		}
+	}
 }

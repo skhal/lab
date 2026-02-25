@@ -30,6 +30,8 @@ func (sf *policyFlag) Set(s string) error {
 		*sf.policy = policyFIFO
 	case "sjf":
 		*sf.policy = policyShortestJobFirst
+	case "stcf":
+		*sf.policy = policyShortestTimeToCompletionFirst
 	default:
 		return fmt.Errorf("invalid policy %s", s)
 	}

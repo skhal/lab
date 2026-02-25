@@ -10,11 +10,12 @@ func _() {
 	var x [1]struct{}
 	_ = x[policyFIFO-1]
 	_ = x[policyShortestJobFirst-2]
+	_ = x[policyShortestTimeToCompletionFirst-3]
 }
 
-const _policy_name = "fifosjf"
+const _policy_name = "fifosjfstcf"
 
-var _policy_index = [...]uint8{0, 4, 7}
+var _policy_index = [...]uint8{0, 4, 7, 11}
 
 func (i policy) String() string {
 	idx := int(i) - 1
