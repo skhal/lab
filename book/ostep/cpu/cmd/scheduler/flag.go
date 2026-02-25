@@ -62,15 +62,32 @@ func (jsf *jobSpecFlag) String() string {
 // Set implements [flag.Value] interface.
 func (jsf *jobSpecFlag) Set(s string) error {
 	defer func() { jsf.set = true }()
+	const (
+		// spec "n:m" stands for {arrival:n, duration:m}
+		idxArrival  = 0
+		idxDuration = 1
+	)
 	if !jsf.set {
 		*jsf.specs = (*jsf.specs)[:0]
 	}
-	for token := range strings.SplitSeq(s, ",") {
-		dur, err := strconv.Atoi(token)
-		if err != nil {
-			return fmt.Errorf("invalid jobs spec: %s", err)
+	for spec := range strings.SplitSeq(s, ",") {
+		fields := strings.Split(spec, ":")
+		switch len(fields) {
+		case 1:
+			fields = append([]string{"0"}, fields...)
+		case 2:
+		default:
+			return fmt.Errorf("invalid job spec %s: want [n:]m format", spec)
 		}
-		*jsf.specs = append(*jsf.specs, jobSpec{duration: dur})
+		arr, err := strconv.Atoi(fields[idxArrival])
+		if err != nil {
+			return fmt.Errorf("invalid job spec %s: %s", spec, err)
+		}
+		dur, err := strconv.Atoi(fields[idxDuration])
+		if err != nil {
+			return fmt.Errorf("invalid job spec %s: %s", spec, err)
+		}
+		*jsf.specs = append(*jsf.specs, jobSpec{arrival: arr, duration: dur})
 	}
 	return nil
 }
@@ -105,7 +122,10 @@ func (jf *jobsFlag) Set(s string) error {
 		return err
 	}
 	for range n {
-		*jf.specs = append(*jf.specs, jobSpec{duration: randomDuration})
+		*jf.specs = append(*jf.specs, jobSpec{
+			// arrival: 0 // arrive at the same time
+			duration: randomDuration,
+		})
 	}
 	return nil
 }

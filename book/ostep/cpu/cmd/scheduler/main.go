@@ -14,6 +14,7 @@ import (
 	"math/rand/v2"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 	"text/template"
 )
@@ -25,8 +26,12 @@ const (
 
 func main() {
 	cmd := &command{
-		JobSpecs: []jobSpec{{randomDuration}, {randomDuration}, {randomDuration}},
-		Sched:    schedFIFO,
+		JobSpecs: []jobSpec{
+			{duration: randomDuration},
+			{duration: randomDuration},
+			{duration: randomDuration},
+		},
+		Sched: schedFIFO,
 	}
 	if err := cmd.Run(); err != nil {
 		fmt.Fprintln(os.Stderr, err)
@@ -35,6 +40,7 @@ func main() {
 }
 
 type jobSpec struct {
+	arrival  int
 	duration int
 }
 
@@ -56,7 +62,7 @@ scheduler: {{.Cmd.Sched}}
 
 jobs:
 {{- range .Sim.Jobs}}
-  {{.ID}} duration: {{.Duration}}
+  {{.ID}} arrival: {{.Arrival}} duration: {{.Duration}}
 {{- end}}
 
 {{- if .Cmd.Trace}}
@@ -104,7 +110,7 @@ func (c *command) parseFlags() error {
 		fs.PrintDefaults()
 	}
 	fs.Var(newJobsFlag(&c.JobSpecs), "jobs", "number of random jobs")
-	fs.Var(newJobSpecFlag(&c.JobSpecs), "job-spec", fmt.Sprintf("comma separated list of job durations\n%d is random duration", randomDuration))
+	fs.Var(newJobSpecFlag(&c.JobSpecs), "job-spec", fmt.Sprintf("comma separated list of job specifications [n:]m, where n is the arrival time (default to 0) and m is the duration (%d is random)", randomDuration))
 	fs.Var(&schedulerFlag{&c.Sched}, "sched", func() string {
 		var names []string
 		for _, s := range []sched{schedFIFO, schedShortestJobFirst} {
@@ -136,6 +142,8 @@ type Job struct {
 
 	// ID is a unique job identifier.
 	ID int
+	// Arrival is the cycle when the job should be added to the scheduler.
+	Arrival int
 	// Duration is the number of cycles the job should run for.
 	Duration int
 
@@ -191,7 +199,8 @@ type simulator struct {
 	cycler *cycler
 	sched  scheduler
 
-	Jobs []*Job
+	Jobs    []*Job
+	pending []*Job
 }
 
 const randomDuration = 0
@@ -199,6 +208,9 @@ const randomDuration = 0
 func newSimulator(jobs []jobSpec, s scheduler) *simulator {
 	c := new(cycler)
 	jj := make([]*Job, 0, len(jobs))
+	sort.Slice(jobs, func(i, j int) bool {
+		return jobs[i].arrival < jobs[j].arrival
+	})
 	for i, job := range jobs {
 		dur := job.duration
 		if dur == randomDuration {
@@ -207,14 +219,16 @@ func newSimulator(jobs []jobSpec, s scheduler) *simulator {
 		j := &Job{
 			cycler:   c,
 			ID:       i + 1,
+			Arrival:  job.arrival,
 			Duration: dur,
 		}
 		jj = append(jj, j)
 	}
 	return &simulator{
-		cycler: c,
-		sched:  s,
-		Jobs:   jj,
+		cycler:  c,
+		sched:   s,
+		Jobs:    jj,
+		pending: append(([]*Job)(nil), jj...),
 	}
 }
 
@@ -247,20 +261,42 @@ type cycle struct {
 
 // Run executes the simulator.
 func (s *simulator) Run() iter.Seq[cycle] {
-	for _, j := range s.Jobs {
-		s.sched.Add(j)
-	}
 	return func(yield func(cycle) bool) {
-		for j, ok := s.sched.Next(); ok; j, ok = s.sched.Next() {
+		for {
+			s.addJobs()
 			s.cycler.Next()
+			job, ok := s.sched.Next()
+			if !ok && len(s.pending) == 0 {
+				break
+			}
 			c := cycle{
 				Num: s.cycler.Cycle(),
-				Job: j,
+				Job: job,
 			}
 			if !yield(c) {
 				break
 			}
 		}
+	}
+}
+
+func (s *simulator) addJobs() {
+	var (
+		cycle     = s.cycler.Cycle()
+		lastAdded = -1
+	)
+	for idx, job := range s.pending {
+		if n := job.Arrival; n < cycle {
+			panic(fmt.Errorf("got a job with arrival %d before cycle %d", job.Arrival, cycle))
+		} else if n == cycle {
+			s.sched.Add(job)
+			lastAdded = idx
+		} else {
+			break
+		}
+	}
+	if lastAdded >= 0 {
+		s.pending = s.pending[lastAdded+1:]
 	}
 }
 
