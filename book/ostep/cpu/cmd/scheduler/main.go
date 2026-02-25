@@ -165,8 +165,9 @@ type jobStat struct {
 // times.
 func (j *Job) Stat() jobStat {
 	return jobStat{
-		Response:   j.run - j.arrive,
-		Turnaround: j.complete - j.arrive,
+		Response: j.run - j.arrive,
+		// +1 in turnaround because the job runs and completes in the same cycle.
+		Turnaround: j.complete - j.arrive + 1,
 		Wait:       j.run - j.arrive,
 	}
 }
