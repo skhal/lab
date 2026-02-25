@@ -241,7 +241,6 @@ func (s *simulator) Run() iter.Seq[cycle] {
 	return func(yield func(cycle) bool) {
 		for {
 			s.addJobs()
-			s.cycler.Next()
 			job, ok := s.sched.Next()
 			if !ok && len(s.pending) == 0 {
 				break
@@ -253,6 +252,7 @@ func (s *simulator) Run() iter.Seq[cycle] {
 			if !yield(c) {
 				break
 			}
+			s.cycler.Next()
 		}
 	}
 }
