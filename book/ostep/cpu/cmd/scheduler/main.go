@@ -16,7 +16,6 @@ import (
 	"path/filepath"
 	"sort"
 	"strings"
-	"text/template"
 )
 
 const (
@@ -50,52 +49,21 @@ type command struct {
 	Trace    bool
 }
 
-var report *template.Template
-
-func init() {
-	const tmpl = `
-{{- define "stats" -}}
-Response: {{.Response | printf "%-3d" }} Turnaround: {{.Turnaround | printf "%-3d" }} Wait: {{.Wait | printf "%-3d" }}
-{{- end -}}
-jobs: {{len .Cmd.JobSpecs}}
-policy: {{.Cmd.Policy}}
-
-jobs:
-{{- range .Sim.Jobs}}
-  {{.ID}} arrival: {{.Arrival}} duration: {{.Duration}}
-{{- end}}
-
-{{- if .Cmd.Trace}}
-
-run:
-{{- range .Sim.Run}}
-  {{.Num | printf "%-2d"}} j{{.Job.ID}}
-{{- end}}
-{{- else}}{{range .Sim.Run}}{{end}}
-{{- end}}
-
-stats:
-{{- range .Sim.Jobs}}
-  {{.ID | printf "%-2d"}} {{template "stats" .Stat}}
-{{- end}}
-
-average:
-  {{" " | printf "%2s"}} {{template "stats" .Sim.Stats}}
-`
-	report = template.Must(template.New("report").Parse(tmpl))
-}
-
 // Run executes the command.
 func (c *command) Run() error {
 	if err := c.parseFlags(); err != nil {
 		return err
 	}
 	return report.Execute(os.Stdout, struct {
-		Cmd *command
-		Sim *simulator
+		Jobs   int
+		Policy policy
+		Sim    *simulator
+		Trace  bool
 	}{
-		Cmd: c,
-		Sim: newSimulator(c.JobSpecs, newScheduler(c.Policy)),
+		Jobs:   len(c.JobSpecs),
+		Policy: c.Policy,
+		Sim:    newSimulator(c.JobSpecs, newScheduler(c.Policy)),
+		Trace:  c.Trace,
 	})
 }
 
