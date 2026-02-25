@@ -32,7 +32,7 @@ func main() {
 		},
 		Policy: policyFIFO,
 	}
-	if err := cmd.Run(); err != nil {
+	if err := cmd.Run(os.Args); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
@@ -53,8 +53,8 @@ type command struct {
 }
 
 // Run executes the command.
-func (c *command) Run() error {
-	if err := c.parseFlags(); err != nil {
+func (c *command) Run(args []string) error {
+	if err := c.parseFlags(args); err != nil {
 		return err
 	}
 	return report.Execute(os.Stdout, struct {
@@ -70,11 +70,11 @@ func (c *command) Run() error {
 	})
 }
 
-func (c *command) parseFlags() error {
-	fs := flag.NewFlagSet(filepath.Base(os.Args[0]), flag.ExitOnError)
+func (c *command) parseFlags(args []string) error {
+	fs := flag.NewFlagSet(filepath.Base(args[0]), flag.ExitOnError)
 	fs.Usage = func() {
 		w := fs.Output()
-		bin := filepath.Base(os.Args[0])
+		bin := filepath.Base(args[0])
 		fmt.Fprintf(w, "usage: %s [flags]\n", bin)
 		fmt.Fprintln(w)
 		fmt.Fprintln(w, "flags:")
@@ -90,7 +90,7 @@ func (c *command) parseFlags() error {
 		return fmt.Sprintf("scheduler policy: %s", strings.Join(names, ","))
 	}())
 	fs.BoolVar(&c.Trace, "trace", false, "print trace")
-	if err := fs.Parse(os.Args[1:]); err != nil {
+	if err := fs.Parse(args[1:]); err != nil {
 		return err
 	}
 	validate := func(fs *flag.FlagSet) error {
