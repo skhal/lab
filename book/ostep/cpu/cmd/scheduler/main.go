@@ -24,8 +24,8 @@ const (
 
 func main() {
 	cmd := &command{
-		Jobs:  3,
-		Sched: schedFIFO,
+		JobSpecs: []jobSpec{{randomDuration}, {randomDuration}, {randomDuration}},
+		Sched:    schedFIFO,
 	}
 	if err := cmd.Run(); err != nil {
 		fmt.Fprintln(os.Stderr, err)
@@ -41,39 +41,20 @@ const (
 	schedFIFO       // fifo
 )
 
-type schedulerFlag struct {
-	sched *sched
-}
-
-// String implements [fmt.Stringer] interface.
-func (sf *schedulerFlag) String() string {
-	if sf.sched == nil {
-		return ""
-	}
-	return sf.sched.String()
-}
-
-// Set implements [flag.Value] interface.
-func (sf *schedulerFlag) Set(s string) error {
-	switch s {
-	case "fifo":
-		*sf.sched = schedFIFO
-	default:
-		return fmt.Errorf("invalid scheduler %s", s)
-	}
-	return nil
+type jobSpec struct {
+	duration int
 }
 
 type command struct {
-	Jobs  int
-	Sched sched
+	JobSpecs []jobSpec
+	Sched    sched
 }
 
 var report *template.Template
 
 func init() {
-	const tmpl = `
-jobs: {{.Cmd.Jobs}}
+	const tmpl = `{{- /* empty line */ -}}
+jobs: {{len .Cmd.JobSpecs}}
 scheduler: {{.Cmd.Sched}}
 
 jobs:
@@ -107,7 +88,7 @@ func (c *command) Run() error {
 		Sim *simulator
 	}{
 		Cmd: c,
-		Sim: newSimulator(c.Jobs, newScheduler(c.Sched)),
+		Sim: newSimulator(c.JobSpecs, newScheduler(c.Sched)),
 	})
 }
 
@@ -121,13 +102,22 @@ func (c *command) parseFlags() error {
 		fmt.Fprintln(w, "flags:")
 		fs.PrintDefaults()
 	}
-	fs.IntVar(&c.Jobs, "jobs", c.Jobs, "number of jobs")
+	fs.Var(newJobsFlag(&c.JobSpecs), "jobs", "number of random jobs")
 	fs.Var(&schedulerFlag{&c.Sched}, "sched", "scheduler to run")
+	fs.Var(newJobSpecFlag(&c.JobSpecs), "job-spec", fmt.Sprintf("comma separated list of job durations\n%d is random duration", randomDuration))
 	if err := fs.Parse(os.Args[1:]); err != nil {
 		return err
 	}
-	if c.Jobs < 0 {
-		return fmt.Errorf("negative jobs %d", c.Jobs)
+	validate := func(fs *flag.FlagSet) error {
+		seen := make(map[string]bool)
+		fs.Visit(func(f *flag.Flag) { seen[f.Name] = true })
+		if seen["jobs"] && seen["job-spec"] {
+			return fmt.Errorf("flags jobs and job-spec are mutually exclusive")
+		}
+		return nil
+	}
+	if err := validate(fs); err != nil {
+		return err
 	}
 	return nil
 }
@@ -214,14 +204,20 @@ type simulator struct {
 	Jobs []*Job
 }
 
-func newSimulator(jobs int, s scheduler) *simulator {
+const randomDuration = 0
+
+func newSimulator(jobs []jobSpec, s scheduler) *simulator {
 	c := new(cycler)
-	jj := make([]*Job, 0, jobs)
-	for i := range jobs {
+	jj := make([]*Job, 0, len(jobs))
+	for i, job := range jobs {
+		dur := job.duration
+		if dur == randomDuration {
+			dur = minDuration + rand.IntN(maxDuration-minDuration)
+		}
 		j := &Job{
 			cycler:   c,
 			ID:       i + 1,
-			Duration: minDuration + rand.IntN(maxDuration-minDuration),
+			Duration: dur,
 		}
 		jj = append(jj, j)
 	}
