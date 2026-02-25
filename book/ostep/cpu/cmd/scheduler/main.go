@@ -195,6 +195,11 @@ func (j *Job) Stat() jobStat {
 	}
 }
 
+type scheduler interface {
+	Add(*Job)
+	Next() (*Job, bool)
+}
+
 type simulator struct {
 	cycler *cycler
 	sched  scheduler

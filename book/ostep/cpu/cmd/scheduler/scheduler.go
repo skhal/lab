@@ -16,104 +16,86 @@ const (
 	schedShortestJobFirst       // sjf
 )
 
-type scheduler interface {
-	Add(*Job)
-	Next() (*Job, bool)
-}
-
-func newScheduler(s sched) scheduler {
+func newScheduler(s sched) *coreScheduler {
 	switch s {
 	case schedFIFO:
-		return &fifoScheduler{}
+		return newCoreScheduler(fifoPolicy)
 	case schedShortestJobFirst:
-		return &shortestJobFirstScheduler{}
+		return newCoreScheduler(shortestJobFirstPolicy)
 	}
 	panic(fmt.Errorf("unsupported scheduler %s", s))
 }
 
-type fifoScheduler struct {
-	cycler *cycler
-
+type schedState struct {
 	pending   []*Job
 	running   *Job
 	completed []*Job
 }
 
+type updateFunc func(state *schedState)
+
+type coreScheduler struct {
+	state  *schedState
+	update func(state *schedState)
+}
+
+func newCoreScheduler(f updateFunc) *coreScheduler {
+	return &coreScheduler{
+		state:  new(schedState),
+		update: f,
+	}
+}
+
 // Add emulates job arrival to the scheduler.
-func (s *fifoScheduler) Add(j *Job) {
+func (s *coreScheduler) Add(j *Job) {
 	j.Arrive()
-	s.pending = append(s.pending, j)
+	s.state.pending = append(s.state.pending, j)
 }
 
 // Next returns the next job to run. The second returned parameter indicates
 // whether the scheduler was able to pick up the job.
-func (s *fifoScheduler) Next() (*Job, bool) {
-	s.update()
-	if s.running == nil {
+func (s *coreScheduler) Next() (*Job, bool) {
+	s.update(s.state)
+	if s.state.running == nil {
 		return nil, false
 	}
-	s.running.Run()
-	return s.running, true
+	s.state.running.Run()
+	return s.state.running, true
 }
 
-func (s *fifoScheduler) update() {
-	if s.running != nil {
-		if !s.running.Done() {
+func fifoPolicy(state *schedState) {
+	if state.running != nil {
+		if !state.running.Done() {
 			return
 		}
-		s.running.Complete()
-		s.completed = append(s.completed, s.running)
-		s.running = nil
+		state.running.Complete()
+		state.completed = append(state.completed, state.running)
+		state.running = nil
 	}
-	if len(s.pending) == 0 {
+	if len(state.pending) == 0 {
 		return
 	}
-	s.running, s.pending = s.pending[0], s.pending[1:]
+	state.running, state.pending = state.pending[0], state.pending[1:]
 }
 
-type shortestJobFirstScheduler struct {
-	cycler *cycler
-
-	pending   []*Job
-	running   *Job
-	completed []*Job
-}
-
-// Add emulates job arrival to the scheduler.
-func (s *shortestJobFirstScheduler) Add(j *Job) {
-	j.Arrive()
-	s.pending = append(s.pending, j)
-}
-
-// Next returns the next job to run. The second returned parameter indicates
-// whether the scheduler was able to pick up the job.
-func (s *shortestJobFirstScheduler) Next() (*Job, bool) {
-	s.update()
-	if s.running == nil {
-		return nil, false
-	}
-	s.running.Run()
-	return s.running, true
-}
-
-func (s *shortestJobFirstScheduler) update() {
-	if s.running != nil {
-		if !s.running.Done() {
+func shortestJobFirstPolicy(state *schedState) {
+	if state.running != nil {
+		if !state.running.Done() {
 			return
 		}
-		s.running.Complete()
-		s.completed = append(s.completed, s.running)
-		s.running = nil
+		state.running.Complete()
+		state.completed = append(state.completed, state.running)
+		state.running = nil
 	}
-	if len(s.pending) == 0 {
+	if len(state.pending) == 0 {
 		return
 	}
 	shortest := 0
-	for i, job := range s.pending {
-		if job.Duration < s.pending[shortest].Duration {
+	for i, job := range state.pending {
+		if job.Duration < state.pending[shortest].Duration {
 			shortest = i
 		}
 	}
-	s.running = s.pending[shortest]
-	s.pending = append(s.pending[:shortest], s.pending[shortest+1:]...)
+	state.running = state.pending[shortest]
+	state.pending = append(state.pending[:shortest], state.pending[shortest+1:]...)
 }
