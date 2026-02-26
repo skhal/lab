@@ -90,6 +90,8 @@ local registrations = {
 				f = "new_main.go"
 			elseif file:find("_test%.go$") ~= nil then
 				f = "new_test.go"
+			elseif file:find("doc%.go$") ~= nil then
+				f = "new_doc.go"
 			end
 			return f
 		end,
