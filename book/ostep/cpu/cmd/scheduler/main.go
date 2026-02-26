@@ -62,12 +62,10 @@ func (c *command) Run(args []string) error {
 		return &Tracer{s}
 	}
 	return report.Execute(os.Stdout, struct {
-		Jobs   int
 		Policy scheduler.Policy
 		Sim    *sim.Simulator
 		Tracer *Tracer
 	}{
-		Jobs:   len(c.JobSpecs),
 		Policy: c.Policy,
 		Sim:    s,
 		Tracer: tracer(),

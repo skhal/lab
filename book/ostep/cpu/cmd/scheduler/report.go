@@ -19,7 +19,6 @@ Response: {{.Response | printf "%-3d" }} Turnaround: {{.Turnaround | printf "%-3
 {{.Start}} run {{.Job.ID}} for {{.Cycles}} {{if eq .Cycles 1}}cycle{{else}}cycles{{end}} {{if .Job.Done}}[Done]{{end}}
 {{- end -}}
 
-jobs: {{.Jobs}}
 policy: {{.Policy}}
 
 jobs:
