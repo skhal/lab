@@ -6,6 +6,7 @@
 package report
 
 import (
+	"embed"
 	"io"
 	"text/template"
 
@@ -14,48 +15,11 @@ import (
 	"github.com/skhal/lab/book/ostep/cpu/cmd/scheduler/internal/trace"
 )
 
-var report *template.Template
-
-func init() {
-	const tmpl = `
-{{- define "job" -}}
-{{.ID}} arrival: {{.Spec.Arrival}} duration: {{.Spec.Duration}}
-{{- end -}}
-
-{{- define "stats" -}}
-Response: {{.Response | printf "%-3d" }} Turnaround: {{.Turnaround | printf "%-3d" }} Wait: {{.Wait | printf "%-3d" }}
-{{- end -}}
-
-{{- define "trace" -}}
-{{.Start}} run {{.Job.ID}} for {{.Cycles}} {{if eq .Cycles 1}}cycle{{else}}cycles{{end}} {{if .Job.Done}}[Done]{{end}}
-{{- end -}}
-
-policy: {{.Policy}}
-
-jobs:
-{{- range .Sim.Jobs}}
-  {{template "job" .}}
-{{- end}}
-
-{{- if .Tracer}}
-
-trace:
-{{- range .Tracer.Trace}}
-  {{template "trace" .}}
-{{- end}}
-{{- else}}{{range .Sim.Run}}{{end}}
-{{- end}}
-
-stats:
-{{- range .Sim.Jobs}}
-  {{.ID | printf "%-2d"}} {{template "stats" .Stat}}
-{{- end}}
-
-average:
-  {{" " | printf "%2s"}} {{template "stats" .Sim.Stats}}
-`
-	report = template.Must(template.New("report").Parse(tmpl))
-}
+var (
+	//go:embed txt
+	efs   embed.FS
+	tmpls = template.Must(template.New("templates").ParseFS(efs, "txt/*.txt"))
+)
 
 // Data is the report input data.
 type Data struct {
@@ -72,5 +36,5 @@ type Data struct {
 
 // Generate creates a report and writes it to the writer.
 func Generate(w io.Writer, d Data) error {
-	return report.Execute(w, d)
+	return tmpls.ExecuteTemplate(w, "report.txt", d)
 }
