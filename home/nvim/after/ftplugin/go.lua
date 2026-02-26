@@ -13,6 +13,9 @@ local function select_source(file)
 	local opt_list = true
 	local files = vim.fn.globpath(vim.fs.dirname(file), "*.go", opt_nosuf, opt_list)
 	files = vim.tbl_filter(function(item)
+		if vim.fs.basename(file) == vim.fs.basename(item) then
+			return false
+		end
 		if item:find("doc%.go$") then
 			return false
 		end
