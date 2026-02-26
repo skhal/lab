@@ -130,7 +130,7 @@ func (j *Job) Duration() int {
 }
 
 type jobState struct {
-	cycler *cycler
+	cycler *scheduler.Cycler
 
 	runCycles int
 
@@ -147,7 +147,7 @@ func (j *Job) LeftCycles() int {
 }
 
 // Init initializes the job state.
-func (j *Job) Init(c *cycler) {
+func (j *Job) Init(c *scheduler.Cycler) {
 	j.state = &jobState{
 		cycler:      c,
 		cycleArrive: c.Cycle(),
@@ -200,7 +200,7 @@ type Scheduler interface {
 }
 
 type simulator struct {
-	cycler *cycler
+	cycler *scheduler.Cycler
 	sched  Scheduler
 
 	Jobs    []*Job
@@ -210,7 +210,7 @@ type simulator struct {
 const randomDuration = 0
 
 func newSimulator(jobs []JobSpec, s Scheduler) *simulator {
-	c := new(cycler)
+	c := new(scheduler.Cycler)
 	jj := make([]*Job, 0, len(jobs))
 	sort.Slice(jobs, func(i, j int) bool {
 		return jobs[i].Arrival < jobs[j].Arrival
@@ -341,18 +341,4 @@ func (s *simulator) addJobs() {
 	if lastAdded >= 0 {
 		s.pending = s.pending[lastAdded+1:]
 	}
-}
-
-type cycler struct {
-	num int
-}
-
-// Cycle returns current cycle.
-func (c *cycler) Cycle() int {
-	return c.num
-}
-
-// Next advances to the next cycle.
-func (c *cycler) Next() {
-	c.num += 1
 }
