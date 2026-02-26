@@ -11,6 +11,7 @@ import (
 	"flag"
 	"fmt"
 	"iter"
+	"math/rand/v2"
 	"os"
 	"path/filepath"
 	"strings"
@@ -20,7 +21,11 @@ import (
 	"github.com/skhal/lab/book/ostep/cpu/cmd/scheduler/internal/sim"
 )
 
-const randomDuration = 0
+const (
+	randomDuration = 0
+	minDuration    = 1
+	maxDuration    = 10
+)
 
 func main() {
 	cmd := &command{
@@ -48,6 +53,7 @@ func (c *command) Run(args []string) error {
 	if err := c.parseFlags(args); err != nil {
 		return err
 	}
+	c.randomizeJobs()
 	s := sim.New(c.JobSpecs, scheduler.New(c.Policy))
 	tracer := func() *Tracer {
 		if !c.Trace {
@@ -66,6 +72,14 @@ func (c *command) Run(args []string) error {
 		Sim:    s,
 		Tracer: tracer(),
 	})
+}
+
+func (c *command) randomizeJobs() {
+	for i, spec := range c.JobSpecs {
+		if spec.Duration == randomDuration {
+			c.JobSpecs[i].Duration = minDuration + rand.IntN(maxDuration-minDuration)
+		}
+	}
 }
 
 func (c *command) parseFlags(args []string) error {

@@ -8,17 +8,10 @@ package sim
 import (
 	"fmt"
 	"iter"
-	"math/rand/v2"
 	"sort"
 
 	"github.com/skhal/lab/book/ostep/cpu/cmd/scheduler/internal/job"
 	"github.com/skhal/lab/book/ostep/cpu/cmd/scheduler/internal/scheduler"
-)
-
-const (
-	randomDuration = 0
-	minDuration    = 1
-	maxDuration    = 10
 )
 
 // Scheduler manages jobs.
@@ -48,15 +41,11 @@ func New(jobs []job.Spec, s Scheduler) *Simulator {
 		return jobs[i].Arrival < jobs[j].Arrival
 	})
 	for i, spec := range jobs {
-		dur := spec.Duration
-		if dur == randomDuration {
-			dur = minDuration + rand.IntN(maxDuration-minDuration)
-		}
 		j := &job.Job{
 			ID: i + 1,
 			Spec: job.Spec{
 				Arrival:  spec.Arrival,
-				Duration: dur,
+				Duration: spec.Duration,
 			},
 		}
 		jj = append(jj, j)
