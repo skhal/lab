@@ -27,10 +27,10 @@ jobs:
   {{.ID}} arrival: {{.Spec.Arrival}} duration: {{.Spec.Duration}}
 {{- end}}
 
-{{- if .Trace}}
+{{- if .Tracer}}
 
 trace:
-{{- range .Sim.Trace}}
+{{- range .Tracer.Trace}}
   {{template "trace" .}}
 {{- end}}
 {{- else}}{{range .Sim.Run}}{{end}}

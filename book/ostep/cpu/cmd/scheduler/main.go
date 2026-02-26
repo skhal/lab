@@ -59,16 +59,23 @@ func (c *command) Run(args []string) error {
 	if err := c.parseFlags(args); err != nil {
 		return err
 	}
+	sim := newSimulator(c.JobSpecs, scheduler.New(c.Policy))
+	tracer := func() *Tracer {
+		if !c.Trace {
+			return nil
+		}
+		return &Tracer{sim}
+	}
 	return report.Execute(os.Stdout, struct {
 		Jobs   int
 		Policy scheduler.Policy
 		Sim    *simulator
-		Trace  bool
+		Tracer *Tracer
 	}{
 		Jobs:   len(c.JobSpecs),
 		Policy: c.Policy,
-		Sim:    newSimulator(c.JobSpecs, scheduler.New(c.Policy)),
-		Trace:  c.Trace,
+		Sim:    sim,
+		Tracer: tracer(),
 	})
 }
 
@@ -295,11 +302,16 @@ type Trace struct {
 	Job *Job
 }
 
+// Tracer generated traces from a sequence of cycles from the simulator.
+type Tracer struct {
+	sim *simulator
+}
+
 // Trace generates a stream of [Trace] data.
-func (s *simulator) Trace() iter.Seq[Trace] {
+func (t *Tracer) Trace() iter.Seq[Trace] {
 	return func(yield func(Trace) bool) {
 		var trace Trace
-		for cycle := range s.Run() {
+		for cycle := range t.sim.Run() {
 			if trace.Job == nil {
 				trace.Job = cycle.Job
 			}
