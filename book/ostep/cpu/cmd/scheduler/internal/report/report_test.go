@@ -60,6 +60,24 @@ func TestGenerate_fifo(t *testing.T) {
 			},
 			golden: "testdata/fifo/two_jobs_one_arrives_late.txt",
 		},
+		{
+			name: "canon book three jobs arrive immediately",
+			jobs: []job.Job{
+				{ID: 1, Spec: job.Spec{Duration: 10}},
+				{ID: 2, Spec: job.Spec{Duration: 10}},
+				{ID: 3, Spec: job.Spec{Duration: 10}},
+			},
+			golden: "testdata/fifo/canon_three_jobs_arrive_immediately.txt",
+		},
+		{
+			name: "canon book three skewed jobs arrive immediately",
+			jobs: []job.Job{
+				{ID: 1, Spec: job.Spec{Duration: 100}},
+				{ID: 2, Spec: job.Spec{Duration: 10}},
+				{ID: 3, Spec: job.Spec{Duration: 10}},
+			},
+			golden: "testdata/fifo/canon_three_skewed_jobs_arrive_immediately.txt",
+		},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
@@ -129,6 +147,24 @@ func TestGenerate_sjf(t *testing.T) {
 			},
 			golden: "testdata/sjf/two_jobs_one_arrives_late.txt",
 		},
+		{
+			name: "canon book three skewed jobs arrive immediately",
+			jobs: []job.Job{
+				{ID: 1, Spec: job.Spec{Duration: 100}},
+				{ID: 2, Spec: job.Spec{Duration: 10}},
+				{ID: 3, Spec: job.Spec{Duration: 10}},
+			},
+			golden: "testdata/sjf/canon_three_skewed_jobs_arrive_immediately.txt",
+		},
+		{
+			name: "canon book three skewed jobs arrive late",
+			jobs: []job.Job{
+				{ID: 1, Spec: job.Spec{Duration: 100}},
+				{ID: 2, Spec: job.Spec{Arrival: 10, Duration: 10}},
+				{ID: 3, Spec: job.Spec{Arrival: 10, Duration: 10}},
+			},
+			golden: "testdata/sjf/canon_three_skewed_jobs_arrive_late.txt",
+		},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
@@ -197,6 +233,15 @@ func TestGenerate_stcf(t *testing.T) {
 				{ID: 2, Spec: job.Spec{Arrival: 1, Duration: 3}},
 			},
 			golden: "testdata/stcf/two_jobs_one_arrives_late.txt",
+		},
+		{
+			name: "canon book three skewed jobs arrive late",
+			jobs: []job.Job{
+				{ID: 1, Spec: job.Spec{Duration: 100}},
+				{ID: 2, Spec: job.Spec{Arrival: 10, Duration: 10}},
+				{ID: 3, Spec: job.Spec{Arrival: 10, Duration: 10}},
+			},
+			golden: "testdata/stcf/canon_three_skewed_jobs_arrive_late.txt",
 		},
 	}
 	for _, tc := range tests {

@@ -1,0 +1,19 @@
+policy: fifo
+
+jobs:
+  1 arrival: 0 duration: 100
+  2 arrival: 0 duration: 10
+  3 arrival: 0 duration: 10
+
+trace:
+  0 run 1 for 100 cycles
+  100 run 2 for 10 cycles
+  110 run 3 for 10 cycles
+
+stats:
+  1  Response: 0   Turnaround: 100 Wait: 0  
+  2  Response: 100 Turnaround: 110 Wait: 100
+  3  Response: 110 Turnaround: 120 Wait: 110
+
+average:
+     Response: 70  Turnaround: 110 Wait: 70 

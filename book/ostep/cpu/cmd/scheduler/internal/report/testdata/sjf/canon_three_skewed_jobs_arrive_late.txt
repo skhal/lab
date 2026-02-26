@@ -1,0 +1,19 @@
+policy: sjf
+
+jobs:
+  1 arrival: 0 duration: 100
+  2 arrival: 10 duration: 10
+  3 arrival: 10 duration: 10
+
+trace:
+  0 run 1 for 100 cycles
+  100 run 2 for 10 cycles
+  110 run 3 for 10 cycles
+
+stats:
+  1  Response: 0   Turnaround: 100 Wait: 0  
+  2  Response: 90  Turnaround: 100 Wait: 90 
+  3  Response: 100 Turnaround: 110 Wait: 100
+
+average:
+     Response: 63  Turnaround: 103 Wait: 63 
