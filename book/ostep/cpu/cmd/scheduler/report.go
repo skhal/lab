@@ -11,6 +11,10 @@ var report *template.Template
 
 func init() {
 	const tmpl = `
+{{- define "job" -}}
+{{.ID}} arrival: {{.Spec.Arrival}} duration: {{.Spec.Duration}}
+{{- end -}}
+
 {{- define "stats" -}}
 Response: {{.Response | printf "%-3d" }} Turnaround: {{.Turnaround | printf "%-3d" }} Wait: {{.Wait | printf "%-3d" }}
 {{- end -}}
@@ -23,7 +27,7 @@ policy: {{.Policy}}
 
 jobs:
 {{- range .Sim.Jobs}}
-  {{.ID}} arrival: {{.Spec.Arrival}} duration: {{.Spec.Duration}}
+  {{template "job" .}}
 {{- end}}
 
 {{- if .Tracer}}
