@@ -42,9 +42,9 @@ func (t *Tracer) Trace() iter.Seq[Trace] {
 		var trace Trace
 		for cycle := range t.sim.Run() {
 			if trace.Job == nil {
-				trace.Job = cycle.Job
+				trace.Job = &cycle.Job
 			}
-			if trace.Job == cycle.Job {
+			if trace.Job.ID == cycle.Job.ID {
 				trace.Cycles += 1
 				continue
 			}
@@ -54,7 +54,7 @@ func (t *Tracer) Trace() iter.Seq[Trace] {
 			trace = Trace{
 				Start:  cycle.Num,
 				Cycles: 1,
-				Job:    cycle.Job,
+				Job:    &cycle.Job,
 			}
 		}
 		if trace.Job != nil {

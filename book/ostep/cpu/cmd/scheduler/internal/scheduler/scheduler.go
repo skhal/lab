@@ -46,14 +46,13 @@ type Job interface {
 	// cycles.
 	Duration() int
 
-	// LeftCycles returns the number of cycles left for the job to complete.
-	LeftCycles() int
+	// CyclesLeft returns the number of cycles left for the job to complete.
+	CyclesLeft() int
 }
 
 type schedState struct {
-	pending   []Job
-	running   Job
-	completed []Job
+	pending []Job
+	running Job
 }
 
 type updateFunc func(state *schedState)
@@ -90,7 +89,6 @@ func fifoPolicy(state *schedState) {
 		if !state.running.Done() {
 			return
 		}
-		state.completed = append(state.completed, state.running)
 		state.running = nil
 	}
 	if len(state.pending) == 0 {
@@ -104,7 +102,6 @@ func shortestJobFirstPolicy(state *schedState) {
 		if !state.running.Done() {
 			return
 		}
-		state.completed = append(state.completed, state.running)
 		state.running = nil
 	}
 	if len(state.pending) == 0 {
@@ -123,7 +120,6 @@ func shortestJobFirstPolicy(state *schedState) {
 func shortestTimeToCompletionFirstPolicy(st *schedState) {
 	if st.running != nil {
 		if st.running.Done() {
-			st.completed = append(st.completed, st.running)
 			st.running = nil
 		}
 	}
@@ -141,7 +137,7 @@ func shortestTimeToCompletionFirstPolicy(st *schedState) {
 				nidx = i
 				continue
 			}
-			if njob.LeftCycles() <= job.LeftCycles() {
+			if njob.CyclesLeft() <= job.CyclesLeft() {
 				continue
 			}
 			njob = job
