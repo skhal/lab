@@ -125,6 +125,9 @@ func checkGenDeclVarValueSpec(fs *token.FileSet, decl *ast.GenDecl) error {
 			continue
 		}
 		if s.Doc != nil {
+			if !slices.ContainsFunc(s.Names, (*ast.Ident).IsExported) {
+				continue
+			}
 			names := func() string {
 				nn := make([]string, 0, len(s.Names))
 				for _, n := range s.Names {

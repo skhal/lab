@@ -234,6 +234,12 @@ var A = 1 // test comment`,
 var a = 1`,
 		},
 		{
+			name: "not exported no comment",
+			code: `package test
+//go:directive
+var a = 1`,
+		},
+		{
 			name: "exported multiple no comment",
 			code: `package test
 var A, B = 1, 1`,
@@ -288,6 +294,14 @@ var (
 			code: `package test
 var (
 	A = 1 // test comment
+)`,
+		},
+		{
+			name: "not exported group with go directive",
+			code: `package test
+var (
+	//go:directive
+	a = 1
 )`,
 		},
 		{
@@ -368,6 +382,15 @@ var (
 	b = 1 // test comment
 )`,
 			want: check.ErrNoDoc,
+		},
+		{
+			name: "not exported group multiple with go directive",
+			code: `package test
+var (
+	//go:directive
+	a = 1
+	b = 1
+)`,
 		},
 	}
 	for _, tc := range tests {
