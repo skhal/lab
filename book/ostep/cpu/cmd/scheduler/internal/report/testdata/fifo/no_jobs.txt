@@ -1,0 +1,10 @@
+policy: fifo
+
+jobs:
+
+trace:
+
+stats:
+
+average:
+     Response: 0   Turnaround: 0   Wait: 0  

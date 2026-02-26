@@ -62,11 +62,14 @@ type Cycle struct {
 // Run executes the simulator.
 func (s *Simulator) Run() iter.Seq[Cycle] {
 	return func(yield func(Cycle) bool) {
-		for {
+		for ; ; s.cycler.Next() {
 			s.addJobs()
 			item, ok := s.sched.Next()
-			if !ok && len(s.pending) == 0 {
-				break
+			if !ok {
+				if len(s.pending) == 0 {
+					break
+				}
+				continue
 			}
 			lj := item.(*job.Live)
 			if completed := lj.Run(); completed != nil {
@@ -75,7 +78,6 @@ func (s *Simulator) Run() iter.Seq[Cycle] {
 			if !yield(Cycle{Num: s.cycler.Cycle(), Job: lj.Job}) {
 				break
 			}
-			s.cycler.Next()
 		}
 	}
 }

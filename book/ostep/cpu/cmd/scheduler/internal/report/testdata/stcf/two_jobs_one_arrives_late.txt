@@ -1,0 +1,17 @@
+policy: stcf
+
+jobs:
+  1 arrival: 0 duration: 5
+  2 arrival: 1 duration: 3
+
+trace:
+  0 run 1 for 1 cycle
+  1 run 2 for 3 cycles
+  4 run 1 for 4 cycles
+
+stats:
+  2  Response: 0   Turnaround: 3   Wait: 0  
+  1  Response: 0   Turnaround: 8   Wait: 0  
+
+average:
+     Response: 0   Turnaround: 5   Wait: 0  
