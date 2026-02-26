@@ -10,6 +10,7 @@ import (
 	"io"
 	"text/template"
 
+	"github.com/skhal/lab/book/ostep/cpu/cmd/scheduler/internal/job"
 	"github.com/skhal/lab/book/ostep/cpu/cmd/scheduler/internal/scheduler"
 	"github.com/skhal/lab/book/ostep/cpu/cmd/scheduler/internal/sim"
 	"github.com/skhal/lab/book/ostep/cpu/cmd/scheduler/internal/trace"
@@ -25,6 +26,9 @@ var (
 type Data struct {
 	// Policy is the active scheduler's policy.
 	Policy scheduler.Policy
+
+	// JobSpec are job specifications
+	JobSpecs []job.Spec
 
 	// Sim is the simulator reference.
 	Sim *sim.Simulator

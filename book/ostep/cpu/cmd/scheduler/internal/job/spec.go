@@ -7,8 +7,12 @@ package job
 
 // Spec is the job's configuration.
 type Spec struct {
+	// ID is the job identifier
+	ID int
+
 	// Arrival is the cycle when the job arrives to the scheduler.
 	Arrival int
+
 	// Duration is the number of cycles the job is expected to run.
 	Duration int
 }

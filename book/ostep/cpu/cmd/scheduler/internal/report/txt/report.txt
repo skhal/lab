@@ -5,8 +5,8 @@
   license that can be found in the LICENSE file.
 */ -}}
 
-{{- define "job" -}}
-{{.ID}} arrival: {{.Spec.Arrival}} duration: {{.Spec.Duration}}
+{{- define "job_spec" -}}
+{{.ID}} arrival: {{.Arrival}} duration: {{.Duration}}
 {{- end -}}
 
 {{- define "stats" -}}
@@ -20,8 +20,8 @@ Response: {{.Response | printf "%-3d" }} Turnaround: {{.Turnaround | printf "%-3
 policy: {{.Policy}}
 
 jobs:
-{{- range .Sim.Jobs}}
-  {{template "job" .}}
+{{- range .JobSpecs}}
+  {{template "job_spec" .}}
 {{- end}}
 
 {{- if .Tracer}}

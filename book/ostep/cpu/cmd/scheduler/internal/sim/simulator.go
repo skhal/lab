@@ -40,9 +40,9 @@ func New(jobs []job.Spec, s Scheduler) *Simulator {
 	sort.Slice(jobs, func(i, j int) bool {
 		return jobs[i].Arrival < jobs[j].Arrival
 	})
-	for i, spec := range jobs {
+	for _, spec := range jobs {
 		j := &job.Job{
-			ID: i + 1,
+			ID: spec.ID,
 			Spec: job.Spec{
 				Arrival:  spec.Arrival,
 				Duration: spec.Duration,

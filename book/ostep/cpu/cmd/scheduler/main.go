@@ -54,7 +54,7 @@ func (c *command) Run(args []string) error {
 	if err := c.parseFlags(args); err != nil {
 		return err
 	}
-	c.randomizeJobs()
+	c.updateJobSpecs()
 	s := sim.New(c.JobSpecs, scheduler.New(c.Policy))
 	tracer := func() *trace.Tracer {
 		if !c.Trace {
@@ -62,16 +62,17 @@ func (c *command) Run(args []string) error {
 		}
 		return trace.NewTracer(s)
 	}
-	report.Generate(os.Stdout, report.Data{
-		Policy: c.Policy,
-		Sim:    s,
-		Tracer: tracer(),
+	return report.Generate(os.Stdout, report.Data{
+		Policy:   c.Policy,
+		JobSpecs: c.JobSpecs,
+		Sim:      s,
+		Tracer:   tracer(),
 	})
-	return nil
 }
 
-func (c *command) randomizeJobs() {
+func (c *command) updateJobSpecs() {
 	for i, spec := range c.JobSpecs {
+		c.JobSpecs[i].ID = i + 1 // count from 1
 		if spec.Duration == randomDuration {
 			c.JobSpecs[i].Duration = minDuration + rand.IntN(maxDuration-minDuration)
 		}
