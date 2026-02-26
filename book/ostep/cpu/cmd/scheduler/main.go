@@ -63,7 +63,7 @@ func (c *command) Run(args []string) error {
 		return trace.NewTracer(s)
 	}
 	return report.Generate(os.Stdout, report.Data{
-		Policy: c.policy,
+		Policy: c.policy.String(),
 		Jobs:   jobs,
 		Sim:    s,
 		Tracer: tracer(),

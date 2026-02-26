@@ -11,7 +11,6 @@ import (
 	"text/template"
 
 	"github.com/skhal/lab/book/ostep/cpu/cmd/scheduler/internal/job"
-	"github.com/skhal/lab/book/ostep/cpu/cmd/scheduler/internal/scheduler"
 	"github.com/skhal/lab/book/ostep/cpu/cmd/scheduler/internal/sim"
 	"github.com/skhal/lab/book/ostep/cpu/cmd/scheduler/internal/trace"
 )
@@ -28,7 +27,7 @@ var (
 // Data is the report input data.
 type Data struct {
 	// Policy is the active scheduler's policy.
-	Policy scheduler.Policy
+	Policy string
 
 	// Jobs is a list of jobs in the system with ID and specification.
 	Jobs []job.Job
