@@ -11,11 +11,10 @@ import (
 	"strings"
 
 	"github.com/skhal/lab/book/ostep/cpu/cmd/scheduler/internal/job"
-	"github.com/skhal/lab/book/ostep/cpu/cmd/scheduler/internal/scheduler"
 )
 
 type policyFlag struct {
-	policy *scheduler.Policy
+	policy *Policy
 }
 
 // String implements [fmt.Stringer] interface.
@@ -30,11 +29,11 @@ func (sf *policyFlag) String() string {
 func (sf *policyFlag) Set(s string) error {
 	switch s {
 	case "fifo":
-		*sf.policy = scheduler.PolicyFIFO
+		*sf.policy = PolicyFIFO
 	case "sjf":
-		*sf.policy = scheduler.PolicySJF
+		*sf.policy = PolicySJF
 	case "stcf":
-		*sf.policy = scheduler.PolicySTCF
+		*sf.policy = PolicySTCF
 	default:
 		return fmt.Errorf("invalid policy %s", s)
 	}

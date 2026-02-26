@@ -35,7 +35,7 @@ func main() {
 			{Duration: randomDuration},
 			{Duration: randomDuration},
 		},
-		policy: scheduler.PolicyFIFO,
+		policy: PolicyFIFO,
 	}
 	if err := cmd.Run(os.Args); err != nil {
 		fmt.Fprintln(os.Stderr, err)
@@ -45,7 +45,7 @@ func main() {
 
 type command struct {
 	jobSpecs []job.Spec
-	policy   scheduler.Policy
+	policy   Policy
 	trace    bool
 }
 
@@ -70,13 +70,13 @@ func (c *command) Run(args []string) error {
 	})
 }
 
-func newScheduler(s scheduler.Policy) sim.Scheduler {
+func newScheduler(s Policy) sim.Scheduler {
 	switch s {
-	case scheduler.PolicyFIFO:
+	case PolicyFIFO:
 		return scheduler.NewFIFO()
-	case scheduler.PolicySJF:
+	case PolicySJF:
 		return scheduler.NewSJF()
-	case scheduler.PolicySTCF:
+	case PolicySTCF:
 		return scheduler.NewSTCF()
 	}
 	panic(fmt.Errorf("unsupported policy %s", s))
@@ -110,12 +110,12 @@ func (c *command) parseFlags(args []string) error {
 	fs.Var(newJobSpecFlag(&c.jobSpecs), "job-spec", fmt.Sprintf("comma separated list of job specifications [n:]m, where n is the arrival time (default to 0) and m is the duration (%d is random)", randomDuration))
 	fs.Var(&policyFlag{&c.policy}, "policy", func() string {
 		var names []string
-		for _, s := range []scheduler.Policy{
-			scheduler.PolicyFIFO,
-			scheduler.PolicySJF,
-			scheduler.PolicySTCF,
+		for _, pol := range []Policy{
+			PolicyFIFO,
+			PolicySJF,
+			PolicySTCF,
 		} {
-			names = append(names, s.String())
+			names = append(names, pol.String())
 		}
 		return fmt.Sprintf("scheduler policy: %s", strings.Join(names, ","))
 	}())
