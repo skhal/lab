@@ -67,6 +67,7 @@ local M = {
 			return
 		end
 		if not f:find("_test%.go$") then
+			select_source(f)
 			return
 		end
 		f = f:gsub("_test%.go$", ".go")
