@@ -30,12 +30,12 @@ const (
 
 func main() {
 	cmd := &command{
-		JobSpecs: []job.Spec{
+		jobSpecs: []job.Spec{
 			{Duration: randomDuration},
 			{Duration: randomDuration},
 			{Duration: randomDuration},
 		},
-		Policy: scheduler.PolicyFIFO,
+		policy: scheduler.PolicyFIFO,
 	}
 	if err := cmd.Run(os.Args); err != nil {
 		fmt.Fprintln(os.Stderr, err)
@@ -44,10 +44,10 @@ func main() {
 }
 
 type command struct {
-	JobSpecs []job.Spec
+	jobSpecs []job.Spec
 	jobs     []job.Job
-	Policy   scheduler.Policy
-	Trace    bool
+	policy   scheduler.Policy
+	trace    bool
 }
 
 // Run executes the command.
@@ -56,15 +56,15 @@ func (c *command) Run(args []string) error {
 		return err
 	}
 	c.makeJobs()
-	s := sim.New(c.jobs, scheduler.New(c.Policy))
+	s := sim.New(c.jobs, scheduler.New(c.policy))
 	tracer := func() *trace.Tracer {
-		if !c.Trace {
+		if !c.trace {
 			return nil
 		}
 		return trace.NewTracer(s)
 	}
 	return report.Generate(os.Stdout, report.Data{
-		Policy: c.Policy,
+		Policy: c.policy,
 		Jobs:   c.jobs,
 		Sim:    s,
 		Tracer: tracer(),
@@ -72,8 +72,8 @@ func (c *command) Run(args []string) error {
 }
 
 func (c *command) makeJobs() {
-	c.jobs = make([]job.Job, 0, len(c.JobSpecs))
-	for i, spec := range c.JobSpecs {
+	c.jobs = make([]job.Job, 0, len(c.jobSpecs))
+	for i, spec := range c.jobSpecs {
 		if spec.Duration == randomDuration {
 			spec.Duration = minDuration + rand.IntN(maxDuration-minDuration)
 		}
@@ -94,9 +94,9 @@ func (c *command) parseFlags(args []string) error {
 		fmt.Fprintln(w, "flags:")
 		fs.PrintDefaults()
 	}
-	fs.Var(newJobsFlag(&c.JobSpecs), "jobs", "number of random jobs")
-	fs.Var(newJobSpecFlag(&c.JobSpecs), "job-spec", fmt.Sprintf("comma separated list of job specifications [n:]m, where n is the arrival time (default to 0) and m is the duration (%d is random)", randomDuration))
-	fs.Var(&policyFlag{&c.Policy}, "policy", func() string {
+	fs.Var(newJobsFlag(&c.jobSpecs), "jobs", "number of random jobs")
+	fs.Var(newJobSpecFlag(&c.jobSpecs), "job-spec", fmt.Sprintf("comma separated list of job specifications [n:]m, where n is the arrival time (default to 0) and m is the duration (%d is random)", randomDuration))
+	fs.Var(&policyFlag{&c.policy}, "policy", func() string {
 		var names []string
 		for _, s := range []scheduler.Policy{
 			scheduler.PolicyFIFO,
@@ -107,7 +107,7 @@ func (c *command) parseFlags(args []string) error {
 		}
 		return fmt.Sprintf("scheduler policy: %s", strings.Join(names, ","))
 	}())
-	fs.BoolVar(&c.Trace, "trace", false, "print trace")
+	fs.BoolVar(&c.trace, "trace", false, "print trace")
 	if err := fs.Parse(args[1:]); err != nil {
 		return err
 	}
