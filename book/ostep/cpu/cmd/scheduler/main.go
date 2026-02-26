@@ -10,7 +10,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	"iter"
 	"math/rand/v2"
 	"os"
 	"path/filepath"
@@ -19,6 +18,7 @@ import (
 	"github.com/skhal/lab/book/ostep/cpu/cmd/scheduler/internal/job"
 	"github.com/skhal/lab/book/ostep/cpu/cmd/scheduler/internal/scheduler"
 	"github.com/skhal/lab/book/ostep/cpu/cmd/scheduler/internal/sim"
+	"github.com/skhal/lab/book/ostep/cpu/cmd/scheduler/internal/trace"
 )
 
 const (
@@ -55,16 +55,16 @@ func (c *command) Run(args []string) error {
 	}
 	c.randomizeJobs()
 	s := sim.New(c.JobSpecs, scheduler.New(c.Policy))
-	tracer := func() *Tracer {
+	tracer := func() *trace.Tracer {
 		if !c.Trace {
 			return nil
 		}
-		return &Tracer{s}
+		return trace.NewTracer(s)
 	}
 	return report.Execute(os.Stdout, struct {
 		Policy scheduler.Policy
 		Sim    *sim.Simulator
-		Tracer *Tracer
+		Tracer *trace.Tracer
 	}{
 		Policy: c.Policy,
 		Sim:    s,
@@ -119,48 +119,4 @@ func (c *command) parseFlags(args []string) error {
 		return err
 	}
 	return nil
-}
-
-// Trace summarizes multiple following cycles that belong to the same job. It
-// describes when the run started, how many cycles it took, and what job was
-// run.
-type Trace struct {
-	// Start is the cycle number when the trace starts.
-	Start int
-	// Cycles is the number of cycles of the trace.
-	Cycles int
-	// Job is the running job in this trace.
-	Job *job.Job
-}
-
-// Tracer generated traces from a sequence of cycles from the simulator.
-type Tracer struct {
-	sim *sim.Simulator
-}
-
-// Trace generates a stream of [Trace] data.
-func (t *Tracer) Trace() iter.Seq[Trace] {
-	return func(yield func(Trace) bool) {
-		var trace Trace
-		for cycle := range t.sim.Run() {
-			if trace.Job == nil {
-				trace.Job = cycle.Job
-			}
-			if trace.Job == cycle.Job {
-				trace.Cycles += 1
-				continue
-			}
-			if !yield(trace) {
-				return
-			}
-			trace = Trace{
-				Start:  cycle.Num,
-				Cycles: 1,
-				Job:    cycle.Job,
-			}
-		}
-		if trace.Job != nil {
-			yield(trace)
-		}
-	}
 }
