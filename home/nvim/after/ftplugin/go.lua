@@ -8,6 +8,17 @@ vim.bo.equalprg = "goimports"
 vim.bo.expandtab = false
 -- keep-sorted end
 
+local function select_and_edit(file, files)
+	vim.ui.select(files, {
+		prompt = "Select file from " .. vim.fs.dirname(file) .. ":",
+		format_item = function(item)
+			return vim.fs.basename(item)
+		end,
+	}, function(choice)
+		vim.cmd.edit(choice)
+	end)
+end
+
 local function select_source(file)
 	local opt_nosuf = false
 	local opt_list = true
@@ -30,11 +41,7 @@ local function select_source(file)
 		}, true, {})
 		return
 	end
-	vim.ui.select(files, {
-		prompt = "Select source:",
-	}, function(choice)
-		vim.cmd.edit(choice)
-	end)
+	select_and_edit(file, files)
 end
 
 local function select_test(file)
@@ -47,11 +54,7 @@ local function select_test(file)
 		}, true, {})
 		return
 	end
-	vim.ui.select(files, {
-		prompt = "Select test:",
-	}, function(choice)
-		vim.cmd.edit(choice)
-	end)
+	select_and_edit(file, files)
 end
 
 local M = {
