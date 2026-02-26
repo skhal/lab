@@ -9,6 +9,14 @@ vim.bo.expandtab = false
 -- keep-sorted end
 
 local M = {
+	doc = function()
+		local f = vim.fn.expand("%")
+		if f:find("doc.go$") then
+			return
+		end
+		f = vim.fs.joinpath(vim.fs.dirname(f), "doc.go")
+		vim.cmd.edit(f)
+	end,
 	source = function()
 		local f = vim.fn.expand("%")
 		if not f:find("_test%.go$") then
@@ -27,5 +35,6 @@ local M = {
 	end,
 }
 
+vim.keymap.set("n", "<localleader>rd", M.doc, { buffer = true })
 vim.keymap.set("n", "<localleader>rs", M.source, { buffer = true })
 vim.keymap.set("n", "<localleader>rt", M.test, { buffer = true })
