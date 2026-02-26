@@ -45,7 +45,6 @@ func main() {
 
 type command struct {
 	jobSpecs []job.Spec
-	jobs     []job.Job
 	policy   scheduler.Policy
 	trace    bool
 }
@@ -55,8 +54,8 @@ func (c *command) Run(args []string) error {
 	if err := c.parseFlags(args); err != nil {
 		return err
 	}
-	c.makeJobs()
-	s := sim.New(c.jobs, scheduler.New(c.policy))
+	jobs := newJobs(c.jobSpecs)
+	s := sim.New(jobs, scheduler.New(c.policy))
 	tracer := func() *trace.Tracer {
 		if !c.trace {
 			return nil
@@ -65,23 +64,24 @@ func (c *command) Run(args []string) error {
 	}
 	return report.Generate(os.Stdout, report.Data{
 		Policy: c.policy,
-		Jobs:   c.jobs,
+		Jobs:   jobs,
 		Sim:    s,
 		Tracer: tracer(),
 	})
 }
 
-func (c *command) makeJobs() {
-	c.jobs = make([]job.Job, 0, len(c.jobSpecs))
-	for i, spec := range c.jobSpecs {
+func newJobs(specs []job.Spec) []job.Job {
+	jobs := make([]job.Job, 0, len(specs))
+	for i, spec := range specs {
 		if spec.Duration == randomDuration {
 			spec.Duration = minDuration + rand.IntN(maxDuration-minDuration)
 		}
-		c.jobs = append(c.jobs, job.Job{
+		jobs = append(jobs, job.Job{
 			ID:   i + 1, // count from 1
 			Spec: spec,
 		})
 	}
+	return jobs
 }
 
 func (c *command) parseFlags(args []string) error {
