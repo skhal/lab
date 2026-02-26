@@ -11,23 +11,20 @@ import (
 	"flag"
 	"fmt"
 	"iter"
-	"math/rand/v2"
 	"os"
 	"path/filepath"
-	"sort"
 	"strings"
 
+	"github.com/skhal/lab/book/ostep/cpu/cmd/scheduler/internal/job"
 	"github.com/skhal/lab/book/ostep/cpu/cmd/scheduler/internal/scheduler"
+	"github.com/skhal/lab/book/ostep/cpu/cmd/scheduler/internal/sim"
 )
 
-const (
-	minDuration = 1
-	maxDuration = 10
-)
+const randomDuration = 0
 
 func main() {
 	cmd := &command{
-		JobSpecs: []JobSpec{
+		JobSpecs: []job.Spec{
 			{Duration: randomDuration},
 			{Duration: randomDuration},
 			{Duration: randomDuration},
@@ -40,16 +37,8 @@ func main() {
 	}
 }
 
-// JobSpec is the job's configuration.
-type JobSpec struct {
-	// Arrival is the cycle when the job arrives to the scheduler.
-	Arrival int
-	// Duration is the number of cycles the job is expected to run.
-	Duration int
-}
-
 type command struct {
-	JobSpecs []JobSpec
+	JobSpecs []job.Spec
 	Policy   scheduler.Policy
 	Trace    bool
 }
@@ -59,22 +48,22 @@ func (c *command) Run(args []string) error {
 	if err := c.parseFlags(args); err != nil {
 		return err
 	}
-	sim := newSimulator(c.JobSpecs, scheduler.New(c.Policy))
+	s := sim.New(c.JobSpecs, scheduler.New(c.Policy))
 	tracer := func() *Tracer {
 		if !c.Trace {
 			return nil
 		}
-		return &Tracer{sim}
+		return &Tracer{s}
 	}
 	return report.Execute(os.Stdout, struct {
 		Jobs   int
 		Policy scheduler.Policy
-		Sim    *simulator
+		Sim    *sim.Simulator
 		Tracer *Tracer
 	}{
 		Jobs:   len(c.JobSpecs),
 		Policy: c.Policy,
-		Sim:    sim,
+		Sim:    s,
 		Tracer: tracer(),
 	})
 }
@@ -120,176 +109,6 @@ func (c *command) parseFlags(args []string) error {
 	return nil
 }
 
-// Job describes a job.
-type Job struct {
-	// ID is a unique job identifier.
-	ID int
-
-	// Spec is the job's configuration
-	Spec JobSpec
-
-	state *jobState
-}
-
-// Duration returns the number of cycles the job would take to complete.
-func (j *Job) Duration() int {
-	return j.Spec.Duration
-}
-
-type jobState struct {
-	cycler *scheduler.Cycler
-
-	runCycles int
-
-	// arrive, run, and complete are cycles when corresponding events happen.
-	cycleArrive   int
-	cycleStart    int
-	cycleComplete int
-}
-
-// LeftCycles calculates the number of cycles left for the job to run to
-// completion.
-func (j *Job) LeftCycles() int {
-	return j.Spec.Duration - j.state.runCycles
-}
-
-// Init initializes the job state.
-func (j *Job) Init(c *scheduler.Cycler) {
-	j.state = &jobState{
-		cycler:      c,
-		cycleArrive: c.Cycle(),
-	}
-}
-
-// Done returns true if the job has completed the cycles, else false.
-func (j *Job) Done() bool {
-	return j.LeftCycles() == 0
-}
-
-// Run executes the job for one cycle.
-func (j *Job) Run() {
-	if j.state.runCycles == 0 {
-		j.state.cycleStart = j.state.cycler.Cycle()
-	}
-	j.state.runCycles += 1
-	if j.Done() {
-		j.state.cycleComplete = j.state.cycler.Cycle()
-	}
-}
-
-type jobStat struct {
-	Response   int
-	Turnaround int
-	Wait       int
-}
-
-// Stat returns job statistics including the response, turnaround, and wait
-// times.
-func (j *Job) Stat() jobStat {
-	if j.state == nil {
-		return jobStat{}
-	}
-	return jobStat{
-		Response:   j.state.cycleStart - j.state.cycleArrive,
-		Turnaround: j.state.cycleComplete - j.state.cycleArrive + 1,
-		Wait:       j.state.cycleStart - j.state.cycleArrive,
-	}
-}
-
-// Scheduler manages jobs.
-type Scheduler interface {
-	// Add introduces the job to the scheduler.
-	Add(scheduler.Job)
-
-	// Next retrieves the next job to run for one cycle. The second return =
-	// parameter indicates whether the scheduler was able to pick up a job.
-	Next() (scheduler.Job, bool)
-}
-
-type simulator struct {
-	cycler *scheduler.Cycler
-	sched  Scheduler
-
-	Jobs    []*Job
-	pending []*Job
-}
-
-const randomDuration = 0
-
-func newSimulator(jobs []JobSpec, s Scheduler) *simulator {
-	c := new(scheduler.Cycler)
-	jj := make([]*Job, 0, len(jobs))
-	sort.Slice(jobs, func(i, j int) bool {
-		return jobs[i].Arrival < jobs[j].Arrival
-	})
-	for i, job := range jobs {
-		dur := job.Duration
-		if dur == randomDuration {
-			dur = minDuration + rand.IntN(maxDuration-minDuration)
-		}
-		j := &Job{
-			ID: i + 1,
-			Spec: JobSpec{
-				Arrival:  job.Arrival,
-				Duration: dur,
-			},
-		}
-		jj = append(jj, j)
-	}
-	return &simulator{
-		cycler:  c,
-		sched:   s,
-		Jobs:    jj,
-		pending: append(([]*Job)(nil), jj...),
-	}
-}
-
-// Stats returns average job statistics including the response, turnaround, and
-// wait times.
-func (s *simulator) Stats() jobStat {
-	var avg jobStat
-	add := func(js jobStat) {
-		avg.Response += js.Response
-		avg.Turnaround += js.Turnaround
-		avg.Wait += js.Wait
-	}
-	finalize := func() {
-		n := len(s.Jobs)
-		avg.Response /= n
-		avg.Turnaround /= n
-		avg.Wait /= n
-	}
-	for _, j := range s.Jobs {
-		add(j.Stat())
-	}
-	finalize()
-	return avg
-}
-
-type cycle struct {
-	Num int
-	Job *Job
-}
-
-// Run executes the simulator.
-func (s *simulator) Run() iter.Seq[cycle] {
-	return func(yield func(cycle) bool) {
-		for {
-			s.addJobs()
-			job, ok := s.sched.Next()
-			if !ok && len(s.pending) == 0 {
-				break
-			}
-			j := job.(*Job)
-			j.Run()
-			if !yield(cycle{Num: s.cycler.Cycle(), Job: j}) {
-				break
-			}
-			s.cycler.Next()
-		}
-	}
-}
-
 // Trace summarizes multiple following cycles that belong to the same job. It
 // describes when the run started, how many cycles it took, and what job was
 // run.
@@ -299,12 +118,12 @@ type Trace struct {
 	// Cycles is the number of cycles of the trace.
 	Cycles int
 	// Job is the running job in this trace.
-	Job *Job
+	Job *job.Job
 }
 
 // Tracer generated traces from a sequence of cycles from the simulator.
 type Tracer struct {
-	sim *simulator
+	sim *sim.Simulator
 }
 
 // Trace generates a stream of [Trace] data.
@@ -331,26 +150,5 @@ func (t *Tracer) Trace() iter.Seq[Trace] {
 		if trace.Job != nil {
 			yield(trace)
 		}
-	}
-}
-
-func (s *simulator) addJobs() {
-	var (
-		cycle     = s.cycler.Cycle()
-		lastAdded = -1
-	)
-	for idx, job := range s.pending {
-		if n := job.Spec.Arrival; n < cycle {
-			panic(fmt.Errorf("got a job with arrival %d before cycle %d", job.Spec.Arrival, cycle))
-		} else if n == cycle {
-			job.Init(s.cycler)
-			s.sched.Add(job)
-			lastAdded = idx
-		} else {
-			break
-		}
-	}
-	if lastAdded >= 0 {
-		s.pending = s.pending[lastAdded+1:]
 	}
 }

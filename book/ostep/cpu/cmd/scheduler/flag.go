@@ -10,6 +10,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/skhal/lab/book/ostep/cpu/cmd/scheduler/internal/job"
 	"github.com/skhal/lab/book/ostep/cpu/cmd/scheduler/internal/scheduler"
 )
 
@@ -41,11 +42,11 @@ func (sf *policyFlag) Set(s string) error {
 }
 
 type jobSpecFlag struct {
-	specs *[]JobSpec
+	specs *[]job.Spec
 	set   bool
 }
 
-func newJobSpecFlag(specs *[]JobSpec) *jobSpecFlag {
+func newJobSpecFlag(specs *[]job.Spec) *jobSpecFlag {
 	return &jobSpecFlag{
 		specs: specs,
 	}
@@ -91,17 +92,17 @@ func (jsf *jobSpecFlag) Set(s string) error {
 		if err != nil {
 			return fmt.Errorf("invalid job spec %s: %s", spec, err)
 		}
-		*jsf.specs = append(*jsf.specs, JobSpec{Arrival: arr, Duration: dur})
+		*jsf.specs = append(*jsf.specs, job.Spec{Arrival: arr, Duration: dur})
 	}
 	return nil
 }
 
 type jobsFlag struct {
-	specs *[]JobSpec
+	specs *[]job.Spec
 	set   bool
 }
 
-func newJobsFlag(specs *[]JobSpec) *jobsFlag {
+func newJobsFlag(specs *[]job.Spec) *jobsFlag {
 	return &jobsFlag{
 		specs: specs,
 	}
@@ -126,7 +127,7 @@ func (jf *jobsFlag) Set(s string) error {
 		return err
 	}
 	for range n {
-		*jf.specs = append(*jf.specs, JobSpec{
+		*jf.specs = append(*jf.specs, job.Spec{
 			// arrival: 0 // arrive at the same time
 			Duration: randomDuration,
 		})
