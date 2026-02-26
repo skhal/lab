@@ -5,18 +5,7 @@
   license that can be found in the LICENSE file.
 */ -}}
 
-{{- define "job" -}}
-{{.ID}} arrival: {{.Spec.Arrival}} duration: {{.Spec.Duration}}
-{{- end -}}
-
-{{- define "stats" -}}
-Response: {{.Response | printf "%-3d" }} Turnaround: {{.Turnaround | printf "%-3d" }} Wait: {{.Wait | printf "%-3d" }}
-{{- end -}}
-
-{{- define "trace" -}}
-{{.Start}} run {{.Job.ID}} for {{.Cycles}} {{if eq .Cycles 1}}cycle{{else}}cycles{{end}}
-{{- end -}}
-
+{{- define "with_jobs" -}}
 policy: {{.Policy}}
 
 jobs:
@@ -41,4 +30,29 @@ stats:
 average:
 {{- with $avg := .Sim.CompletedJobs | AverageStats}}
   {{" " | printf "%2s"}} {{template "stats" $avg}}
+{{- end}}
+{{- end -}}
+
+{{- define "no_jobs" -}}
+policy: {{.Policy}}
+
+no jobs to run
+{{- end -}}
+
+{{- define "job" -}}
+{{.ID}} arrival: {{.Spec.Arrival}} duration: {{.Spec.Duration}}
+{{- end -}}
+
+{{- define "stats" -}}
+Response: {{.Response | printf "%-3d" }} Turnaround: {{.Turnaround | printf "%-3d" }} Wait: {{.Wait | printf "%-3d" }}
+{{- end -}}
+
+{{- define "trace" -}}
+{{.Start}} run {{.Job.ID}} for {{.Cycles}} {{if eq .Cycles 1}}cycle{{else}}cycles{{end}}
+{{- end -}}
+
+{{- if .Jobs -}}
+{{template "with_jobs" .}}
+{{- else -}}
+{{template "no_jobs" .}}
 {{- end}}
