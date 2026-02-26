@@ -3,9 +3,16 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package main
+package report
 
-import "text/template"
+import (
+	"io"
+	"text/template"
+
+	"github.com/skhal/lab/book/ostep/cpu/cmd/scheduler/internal/scheduler"
+	"github.com/skhal/lab/book/ostep/cpu/cmd/scheduler/internal/sim"
+	"github.com/skhal/lab/book/ostep/cpu/cmd/scheduler/internal/trace"
+)
 
 var report *template.Template
 
@@ -48,4 +55,22 @@ average:
   {{" " | printf "%2s"}} {{template "stats" .Sim.Stats}}
 `
 	report = template.Must(template.New("report").Parse(tmpl))
+}
+
+// Data is the report input data.
+type Data struct {
+	// Policy is the active scheduler's policy.
+	Policy scheduler.Policy
+
+	// Sim is the simulator reference.
+	Sim *sim.Simulator
+
+	// Tracer generates a trace from simulator. The report skips trace if the
+	// tracer is nil.
+	Tracer *trace.Tracer
+}
+
+// Generate creates a report and writes it to the writer.
+func Generate(w io.Writer, d Data) error {
+	return report.Execute(w, d)
 }

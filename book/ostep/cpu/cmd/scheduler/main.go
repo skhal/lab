@@ -16,6 +16,7 @@ import (
 	"strings"
 
 	"github.com/skhal/lab/book/ostep/cpu/cmd/scheduler/internal/job"
+	"github.com/skhal/lab/book/ostep/cpu/cmd/scheduler/internal/report"
 	"github.com/skhal/lab/book/ostep/cpu/cmd/scheduler/internal/scheduler"
 	"github.com/skhal/lab/book/ostep/cpu/cmd/scheduler/internal/sim"
 	"github.com/skhal/lab/book/ostep/cpu/cmd/scheduler/internal/trace"
@@ -61,15 +62,12 @@ func (c *command) Run(args []string) error {
 		}
 		return trace.NewTracer(s)
 	}
-	return report.Execute(os.Stdout, struct {
-		Policy scheduler.Policy
-		Sim    *sim.Simulator
-		Tracer *trace.Tracer
-	}{
+	report.Generate(os.Stdout, report.Data{
 		Policy: c.Policy,
 		Sim:    s,
 		Tracer: tracer(),
 	})
+	return nil
 }
 
 func (c *command) randomizeJobs() {
