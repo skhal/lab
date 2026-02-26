@@ -5,8 +5,6 @@
 
 package scheduler
 
-import "fmt"
-
 // Policy enumerates available scheduling policies.
 //
 //go:generate stringer -type=Policy -linecomment
@@ -23,17 +21,19 @@ const (
 	PolicySTCF // stcf
 )
 
-// New creates a scheduler for a specified policy.
-func New(s Policy) *coreScheduler {
-	switch s {
-	case PolicyFIFO:
-		return newCoreScheduler(fifoPolicy)
-	case PolicySJF:
-		return newCoreScheduler(shortestJobFirstPolicy)
-	case PolicySTCF:
-		return newCoreScheduler(shortestTimeToCompletionFirstPolicy)
-	}
-	panic(fmt.Errorf("unsupported policy %s", s))
+// NewFIFO creates a scheduler with First-in-First-out policy.
+func NewFIFO() *coreScheduler {
+	return newCoreScheduler(fifoPolicy)
+}
+
+// NewSJF creates a scheduler with Shortest-Job-First policy.
+func NewSJF() *coreScheduler {
+	return newCoreScheduler(shortestJobFirstPolicy)
+}
+
+// NewSTCF creates a scheduler with Shortest-Time-to-Complete-First policy.
+func NewSTCF() *coreScheduler {
+	return newCoreScheduler(shortestTimeToCompletionFirstPolicy)
 }
 
 // Job is a unit of work, managed by scheduler.

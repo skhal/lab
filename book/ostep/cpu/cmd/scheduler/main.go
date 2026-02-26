@@ -55,7 +55,7 @@ func (c *command) Run(args []string) error {
 		return err
 	}
 	jobs := newJobs(c.jobSpecs)
-	s := sim.New(jobs, scheduler.New(c.policy))
+	s := sim.New(jobs, newScheduler(c.policy))
 	tracer := func() *trace.Tracer {
 		if !c.trace {
 			return nil
@@ -68,6 +68,18 @@ func (c *command) Run(args []string) error {
 		Sim:    s,
 		Tracer: tracer(),
 	})
+}
+
+func newScheduler(s scheduler.Policy) sim.Scheduler {
+	switch s {
+	case scheduler.PolicyFIFO:
+		return scheduler.NewFIFO()
+	case scheduler.PolicySJF:
+		return scheduler.NewSJF()
+	case scheduler.PolicySTCF:
+		return scheduler.NewSTCF()
+	}
+	panic(fmt.Errorf("unsupported policy %s", s))
 }
 
 func newJobs(specs []job.Spec) []job.Job {
