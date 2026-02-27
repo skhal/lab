@@ -12,11 +12,18 @@ type Policy int
 
 const (
 	_ Policy = iota
+
 	// PolicyFIFO runs first-in-first-out job.
 	PolicyFIFO // fifo
+
 	// PolicySJF runs the job that is shortest to finish.
 	PolicySJF // sjf
+
 	// PolicySTCF preempts currently running job to pick up the shortest to
 	// complete job.
 	PolicySTCF // stcf
+
+	// PolicyRR is round-robin, give every pending task a chance to run one after
+	// the other.
+	PolicyRR // rr
 )

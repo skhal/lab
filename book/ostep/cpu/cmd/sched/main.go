@@ -78,6 +78,8 @@ func newScheduler(s Policy) sim.Scheduler {
 		return sched.NewSJF()
 	case PolicySTCF:
 		return sched.NewSTCF()
+	case PolicyRR:
+		return sched.NewRoundRobin()
 	}
 	panic(fmt.Errorf("unsupported policy %s", s))
 }
@@ -114,6 +116,7 @@ func (c *command) parseFlags(args []string) error {
 			PolicyFIFO,
 			PolicySJF,
 			PolicySTCF,
+			PolicyRR,
 		} {
 			names = append(names, pol.String())
 		}

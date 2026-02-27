@@ -34,6 +34,8 @@ func (sf *policyFlag) Set(s string) error {
 		*sf.policy = PolicySJF
 	case "stcf":
 		*sf.policy = PolicySTCF
+	case "rr":
+		*sf.policy = PolicyRR
 	default:
 		return fmt.Errorf("invalid policy %s", s)
 	}

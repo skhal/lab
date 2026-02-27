@@ -11,11 +11,12 @@ func _() {
 	_ = x[PolicyFIFO-1]
 	_ = x[PolicySJF-2]
 	_ = x[PolicySTCF-3]
+	_ = x[PolicyRR-4]
 }
 
-const _Policy_name = "fifosjfstcf"
+const _Policy_name = "fifosjfstcfrr"
 
-var _Policy_index = [...]uint8{0, 4, 7, 11}
+var _Policy_index = [...]uint8{0, 4, 7, 11, 13}
 
 func (i Policy) String() string {
 	idx := int(i) - 1

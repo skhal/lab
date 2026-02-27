@@ -1,0 +1,13 @@
+policy: rr
+
+jobs:
+  1 arrival: 0 duration: 5
+
+trace:
+  0 run 1 for 5 cycles
+
+stats:
+  1  Response: 0   Turnaround: 5   Wait: 0  
+
+average:
+     Response: 0   Turnaround: 5   Wait: 0  

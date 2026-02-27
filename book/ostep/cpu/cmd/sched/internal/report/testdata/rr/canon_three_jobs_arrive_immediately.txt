@@ -1,0 +1,46 @@
+policy: rr
+
+jobs:
+  1 arrival: 0 duration: 10
+  2 arrival: 0 duration: 10
+  3 arrival: 0 duration: 10
+
+trace:
+  0 run 1 for 1 cycle
+  1 run 2 for 1 cycle
+  2 run 3 for 1 cycle
+  3 run 1 for 1 cycle
+  4 run 2 for 1 cycle
+  5 run 3 for 1 cycle
+  6 run 1 for 1 cycle
+  7 run 2 for 1 cycle
+  8 run 3 for 1 cycle
+  9 run 1 for 1 cycle
+  10 run 2 for 1 cycle
+  11 run 3 for 1 cycle
+  12 run 1 for 1 cycle
+  13 run 2 for 1 cycle
+  14 run 3 for 1 cycle
+  15 run 1 for 1 cycle
+  16 run 2 for 1 cycle
+  17 run 3 for 1 cycle
+  18 run 1 for 1 cycle
+  19 run 2 for 1 cycle
+  20 run 3 for 1 cycle
+  21 run 1 for 1 cycle
+  22 run 2 for 1 cycle
+  23 run 3 for 1 cycle
+  24 run 1 for 1 cycle
+  25 run 2 for 1 cycle
+  26 run 3 for 1 cycle
+  27 run 1 for 1 cycle
+  28 run 2 for 1 cycle
+  29 run 3 for 1 cycle
+
+stats:
+  1  Response: 0   Turnaround: 28  Wait: 0  
+  2  Response: 1   Turnaround: 29  Wait: 1  
+  3  Response: 2   Turnaround: 30  Wait: 2  
+
+average:
+     Response: 1   Turnaround: 29  Wait: 1  

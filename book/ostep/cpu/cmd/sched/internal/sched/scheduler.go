@@ -5,19 +5,29 @@
 
 package sched
 
-// NewFIFO creates a scheduler with First-in-First-out policy.
+// NewFIFO creates a scheduler with First-in-First-out policy. It runs the jobs
+// based on the arrival time uninterrupted.
 func NewFIFO() *coreScheduler {
 	return newCoreScheduler(fifoPolicy)
 }
 
-// NewSJF creates a scheduler with Shortest-Job-First policy.
+// NewSJF creates a scheduler with Shortest-Job-First policy. It runs the
+// shortest job uninterrupted.
 func NewSJF() *coreScheduler {
 	return newCoreScheduler(shortestJobFirstPolicy)
 }
 
 // NewSTCF creates a scheduler with Shortest-Time-to-Complete-First policy.
+// It picks the job with shortest left work for next cycle. STCF is preemptive
+// algorithm.
 func NewSTCF() *coreScheduler {
 	return newCoreScheduler(shortestTimeToCompletionFirstPolicy)
+}
+
+// NewRoundRobin creates a scheduler with Round-Robin policy. It rotates
+// pending jobs by running a new one every cycle.
+func NewRoundRobin() *coreScheduler {
+	return newCoreScheduler(roundRobinPolicy)
 }
 
 // Job is a unit of work, managed by scheduler.
@@ -133,5 +143,20 @@ func shortestTimeToCompletionFirstPolicy(st *state) {
 		} else {
 			st.running, st.pending[i] = job, st.running
 		}
+	}
+}
+
+func roundRobinPolicy(st *state) {
+	if len(st.pending) == 0 {
+		return
+	}
+	if st.running == nil {
+		st.running = st.pending[0]
+		st.pending = st.pending[1:]
+	} else {
+		tmp := st.running
+		st.running = st.pending[0]
+		copy(st.pending, st.pending[1:])
+		st.pending[len(st.pending)-1] = tmp
 	}
 }
