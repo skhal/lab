@@ -61,6 +61,9 @@ func (s *coreScheduler) Add(j Job) {
 // Next returns the next job to run. The second returned parameter indicates
 // whether the scheduler was able to pick up the job.
 func (s *coreScheduler) Next() (Job, bool) {
+	if job := s.state.running; job != nil && job.Done() {
+		s.state.running = nil
+	}
 	s.update(s.state)
 	if s.state.running == nil {
 		return nil, false
@@ -70,10 +73,7 @@ func (s *coreScheduler) Next() (Job, bool) {
 
 func fifoPolicy(state *state) {
 	if state.running != nil {
-		if !state.running.Done() {
-			return
-		}
-		state.running = nil
+		return
 	}
 	if len(state.pending) == 0 {
 		return
@@ -83,10 +83,7 @@ func fifoPolicy(state *state) {
 
 func shortestJobFirstPolicy(state *state) {
 	if state.running != nil {
-		if !state.running.Done() {
-			return
-		}
-		state.running = nil
+		return
 	}
 	if len(state.pending) == 0 {
 		return
@@ -102,11 +99,6 @@ func shortestJobFirstPolicy(state *state) {
 }
 
 func shortestTimeToCompletionFirstPolicy(st *state) {
-	if st.running != nil {
-		if st.running.Done() {
-			st.running = nil
-		}
-	}
 	if len(st.pending) == 0 {
 		return
 	}
