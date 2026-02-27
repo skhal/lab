@@ -5,4 +5,4 @@
 
 // Package scheduler implements scheduling policies to select next job to run:
 // First-in-First-Out, Shortest job first, Shortest Time to Complete First, etc.
-package scheduler
+package sched

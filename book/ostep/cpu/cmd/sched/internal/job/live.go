@@ -8,7 +8,7 @@ package job
 import (
 	"fmt"
 
-	"github.com/skhal/lab/book/ostep/cpu/cmd/scheduler/internal/scheduler"
+	"github.com/skhal/lab/book/ostep/cpu/cmd/sched/internal/sched"
 )
 
 // Live is a job in the system that was added, possibly run, but did not
@@ -23,12 +23,12 @@ type Live struct {
 	cycleStart  int // cycle when the job started
 
 	// cycler gives access to the current cycle.
-	cycler *scheduler.Cycler
+	cycler *sched.Cycler
 }
 
 // NewLive creates a new Live job. It sets the job's arrive cycle to current
 // cycle from the cycler.
-func NewLive(j Job, c *scheduler.Cycler) *Live {
+func NewLive(j Job, c *sched.Cycler) *Live {
 	return &Live{
 		Job:         j,
 		cycleArrive: c.Cycle(),

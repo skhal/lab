@@ -3,7 +3,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package scheduler
+package sched
 
 // NewFIFO creates a scheduler with First-in-First-out policy.
 func NewFIFO() *coreScheduler {

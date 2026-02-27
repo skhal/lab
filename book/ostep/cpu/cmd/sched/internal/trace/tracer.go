@@ -8,8 +8,8 @@ package trace
 import (
 	"iter"
 
-	"github.com/skhal/lab/book/ostep/cpu/cmd/scheduler/internal/job"
-	"github.com/skhal/lab/book/ostep/cpu/cmd/scheduler/internal/sim"
+	"github.com/skhal/lab/book/ostep/cpu/cmd/sched/internal/job"
+	"github.com/skhal/lab/book/ostep/cpu/cmd/sched/internal/sim"
 )
 
 // Trace summarizes multiple following cycles that belong to the same job. It

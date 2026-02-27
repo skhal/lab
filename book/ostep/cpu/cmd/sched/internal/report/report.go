@@ -10,9 +10,9 @@ import (
 	"io"
 	"text/template"
 
-	"github.com/skhal/lab/book/ostep/cpu/cmd/scheduler/internal/job"
-	"github.com/skhal/lab/book/ostep/cpu/cmd/scheduler/internal/sim"
-	"github.com/skhal/lab/book/ostep/cpu/cmd/scheduler/internal/trace"
+	"github.com/skhal/lab/book/ostep/cpu/cmd/sched/internal/job"
+	"github.com/skhal/lab/book/ostep/cpu/cmd/sched/internal/sim"
+	"github.com/skhal/lab/book/ostep/cpu/cmd/sched/internal/trace"
 )
 
 var (

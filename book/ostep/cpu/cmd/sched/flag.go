@@ -10,7 +10,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/skhal/lab/book/ostep/cpu/cmd/scheduler/internal/job"
+	"github.com/skhal/lab/book/ostep/cpu/cmd/sched/internal/job"
 )
 
 type policyFlag struct {

@@ -15,11 +15,11 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/skhal/lab/book/ostep/cpu/cmd/scheduler/internal/job"
-	"github.com/skhal/lab/book/ostep/cpu/cmd/scheduler/internal/report"
-	"github.com/skhal/lab/book/ostep/cpu/cmd/scheduler/internal/scheduler"
-	"github.com/skhal/lab/book/ostep/cpu/cmd/scheduler/internal/sim"
-	"github.com/skhal/lab/book/ostep/cpu/cmd/scheduler/internal/trace"
+	"github.com/skhal/lab/book/ostep/cpu/cmd/sched/internal/job"
+	"github.com/skhal/lab/book/ostep/cpu/cmd/sched/internal/report"
+	"github.com/skhal/lab/book/ostep/cpu/cmd/sched/internal/sched"
+	"github.com/skhal/lab/book/ostep/cpu/cmd/sched/internal/sim"
+	"github.com/skhal/lab/book/ostep/cpu/cmd/sched/internal/trace"
 )
 
 const (
@@ -73,11 +73,11 @@ func (c *command) Run(args []string) error {
 func newScheduler(s Policy) sim.Scheduler {
 	switch s {
 	case PolicyFIFO:
-		return scheduler.NewFIFO()
+		return sched.NewFIFO()
 	case PolicySJF:
-		return scheduler.NewSJF()
+		return sched.NewSJF()
 	case PolicySTCF:
-		return scheduler.NewSTCF()
+		return sched.NewSTCF()
 	}
 	panic(fmt.Errorf("unsupported policy %s", s))
 }

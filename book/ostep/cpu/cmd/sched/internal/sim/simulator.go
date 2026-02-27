@@ -10,23 +10,23 @@ import (
 	"iter"
 	"sort"
 
-	"github.com/skhal/lab/book/ostep/cpu/cmd/scheduler/internal/job"
-	"github.com/skhal/lab/book/ostep/cpu/cmd/scheduler/internal/scheduler"
+	"github.com/skhal/lab/book/ostep/cpu/cmd/sched/internal/job"
+	"github.com/skhal/lab/book/ostep/cpu/cmd/sched/internal/sched"
 )
 
 // Scheduler manages jobs.
 type Scheduler interface {
 	// Add introduces the job to the scheduler.
-	Add(scheduler.Job)
+	Add(sched.Job)
 
 	// Next retrieves the next job to run for one cycle. The second return =
 	// parameter indicates whether the scheduler was able to pick up a job.
-	Next() (scheduler.Job, bool)
+	Next() (sched.Job, bool)
 }
 
 // Simulator runs a simulation of running multiple jobs with a scheduler.
 type Simulator struct {
-	cycler *scheduler.Cycler
+	cycler *sched.Cycler
 	sched  Scheduler
 
 	pending   []job.Job
@@ -39,7 +39,7 @@ func New(jobs []job.Job, s Scheduler) *Simulator {
 		return jobs[i].Spec.Arrival < jobs[j].Spec.Arrival
 	})
 	return &Simulator{
-		cycler:  new(scheduler.Cycler),
+		cycler:  new(sched.Cycler),
 		sched:   s,
 		pending: jobs,
 	}

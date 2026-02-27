@@ -10,11 +10,11 @@ import (
 	"flag"
 	"testing"
 
-	"github.com/skhal/lab/book/ostep/cpu/cmd/scheduler/internal/job"
-	"github.com/skhal/lab/book/ostep/cpu/cmd/scheduler/internal/report"
-	"github.com/skhal/lab/book/ostep/cpu/cmd/scheduler/internal/scheduler"
-	"github.com/skhal/lab/book/ostep/cpu/cmd/scheduler/internal/sim"
-	"github.com/skhal/lab/book/ostep/cpu/cmd/scheduler/internal/trace"
+	"github.com/skhal/lab/book/ostep/cpu/cmd/sched/internal/job"
+	"github.com/skhal/lab/book/ostep/cpu/cmd/sched/internal/report"
+	"github.com/skhal/lab/book/ostep/cpu/cmd/sched/internal/sched"
+	"github.com/skhal/lab/book/ostep/cpu/cmd/sched/internal/sim"
+	"github.com/skhal/lab/book/ostep/cpu/cmd/sched/internal/trace"
 	"github.com/skhal/lab/go/tests"
 )
 
@@ -82,7 +82,7 @@ func TestGenerate_fifo(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			var b bytes.Buffer
-			simu := sim.New(tc.jobs, scheduler.NewFIFO())
+			simu := sim.New(tc.jobs, sched.NewFIFO())
 			data := report.Data{
 				Policy: "fifo",
 				Jobs:   tc.jobs,
@@ -169,7 +169,7 @@ func TestGenerate_sjf(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			var b bytes.Buffer
-			simu := sim.New(tc.jobs, scheduler.NewSJF())
+			simu := sim.New(tc.jobs, sched.NewSJF())
 			data := report.Data{
 				Policy: "sjf",
 				Jobs:   tc.jobs,
@@ -256,7 +256,7 @@ func TestGenerate_stcf(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			var b bytes.Buffer
-			simu := sim.New(tc.jobs, scheduler.NewSTCF())
+			simu := sim.New(tc.jobs, sched.NewSTCF())
 			data := report.Data{
 				Policy: "stcf",
 				Jobs:   tc.jobs,
