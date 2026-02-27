@@ -39,9 +39,9 @@ trace:
   39 run 1 for 81 cycles
 
 stats:
-  2  Response: 0   Turnaround: 28  Wait: 0  
-  3  Response: 1   Turnaround: 29  Wait: 1  
-  1  Response: 0   Turnaround: 120 Wait: 0  
+  2  Response: 0   Turnaround: 28  Wait: 18 
+  3  Response: 1   Turnaround: 29  Wait: 19 
+  1  Response: 0   Turnaround: 120 Wait: 20 
 
 average:
-     Response: 0   Turnaround: 59  Wait: 0  
+     Response: 0   Turnaround: 59  Wait: 19 

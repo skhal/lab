@@ -73,10 +73,13 @@ func (j *Live) complete() *Completed {
 		if j.cyclesCompleted == 0 {
 			return Stats{}
 		}
+		// +1 because the job arrives anr runs in the same cycle,
+		// [sim.Simulator.Run].
+		turnaround := cycle - j.cycleArrive + 1
 		return Stats{
 			Response:   j.cycleStart - j.cycleArrive,
-			Turnaround: cycle - j.cycleArrive + 1,
-			Wait:       j.cycleStart - j.cycleArrive,
+			Turnaround: turnaround,
+			Wait:       turnaround - j.cyclesCompleted,
 		}
 	}
 	cj := &Completed{

@@ -38,9 +38,9 @@ trace:
   29 run 3 for 1 cycle
 
 stats:
-  1  Response: 0   Turnaround: 28  Wait: 0  
-  2  Response: 1   Turnaround: 29  Wait: 1  
-  3  Response: 2   Turnaround: 30  Wait: 2  
+  1  Response: 0   Turnaround: 28  Wait: 18 
+  2  Response: 1   Turnaround: 29  Wait: 19 
+  3  Response: 2   Turnaround: 30  Wait: 20 
 
 average:
-     Response: 1   Turnaround: 29  Wait: 1  
+     Response: 1   Turnaround: 29  Wait: 19 

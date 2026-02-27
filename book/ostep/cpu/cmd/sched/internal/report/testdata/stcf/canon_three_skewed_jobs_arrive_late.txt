@@ -14,7 +14,7 @@ trace:
 stats:
   2  Response: 0   Turnaround: 10  Wait: 0  
   3  Response: 10  Turnaround: 20  Wait: 10 
-  1  Response: 0   Turnaround: 120 Wait: 0  
+  1  Response: 0   Turnaround: 120 Wait: 20 
 
 average:
-     Response: 3   Turnaround: 50  Wait: 3  
+     Response: 3   Turnaround: 50  Wait: 10 
