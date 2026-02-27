@@ -78,6 +78,15 @@ func TestGenerate_fifo(t *testing.T) {
 			},
 			golden: "testdata/fifo/canon_three_skewed_jobs_arrive_immediately.txt",
 		},
+		{
+			name: "homework three skewed jobs arrive immediately",
+			jobs: []job.Job{
+				{ID: 1, Spec: job.Spec{Duration: 1}},
+				{ID: 2, Spec: job.Spec{Duration: 4}},
+				{ID: 3, Spec: job.Spec{Duration: 7}},
+			},
+			golden: "testdata/fifo/homework_three_skewed_jobs_arrive_immediately.txt",
+		},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
