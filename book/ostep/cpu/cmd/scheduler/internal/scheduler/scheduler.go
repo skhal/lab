@@ -34,21 +34,21 @@ type Job interface {
 	CyclesLeft() int
 }
 
-type schedState struct {
+type state struct {
 	pending []Job
 	running Job
 }
 
-type updateFunc func(state *schedState)
+type updateFunc func(state *state)
 
 type coreScheduler struct {
-	state  *schedState
-	update func(state *schedState)
+	state  *state
+	update func(state *state)
 }
 
 func newCoreScheduler(f updateFunc) *coreScheduler {
 	return &coreScheduler{
-		state:  new(schedState),
+		state:  new(state),
 		update: f,
 	}
 }
@@ -68,7 +68,7 @@ func (s *coreScheduler) Next() (Job, bool) {
 	return s.state.running, true
 }
 
-func fifoPolicy(state *schedState) {
+func fifoPolicy(state *state) {
 	if state.running != nil {
 		if !state.running.Done() {
 			return
@@ -81,7 +81,7 @@ func fifoPolicy(state *schedState) {
 	state.running, state.pending = state.pending[0], state.pending[1:]
 }
 
-func shortestJobFirstPolicy(state *schedState) {
+func shortestJobFirstPolicy(state *state) {
 	if state.running != nil {
 		if !state.running.Done() {
 			return
@@ -101,7 +101,7 @@ func shortestJobFirstPolicy(state *schedState) {
 	state.pending = append(state.pending[:shortest], state.pending[shortest+1:]...)
 }
 
-func shortestTimeToCompletionFirstPolicy(st *schedState) {
+func shortestTimeToCompletionFirstPolicy(st *state) {
 	if st.running != nil {
 		if st.running.Done() {
 			st.running = nil
