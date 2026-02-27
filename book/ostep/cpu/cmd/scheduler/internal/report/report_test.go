@@ -243,6 +243,15 @@ func TestGenerate_stcf(t *testing.T) {
 			},
 			golden: "testdata/stcf/canon_three_skewed_jobs_arrive_late.txt",
 		},
+		{
+			name: "canon book three jobs arrive immediately",
+			jobs: []job.Job{
+				{ID: 1, Spec: job.Spec{Duration: 10}},
+				{ID: 2, Spec: job.Spec{Duration: 10}},
+				{ID: 3, Spec: job.Spec{Duration: 10}},
+			},
+			golden: "testdata/stcf/canon_three_jobs_arrive_immediately.txt",
+		},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
