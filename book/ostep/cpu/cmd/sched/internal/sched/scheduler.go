@@ -7,27 +7,27 @@ package sched
 
 // NewFIFO creates a scheduler with First-in-First-out policy. It runs the jobs
 // based on the arrival time uninterrupted.
-func NewFIFO() *coreScheduler {
-	return newCoreScheduler(fifoPolicy)
+func NewFIFO() *scheduler {
+	return newScheduler(fifoPolicy)
 }
 
 // NewSJF creates a scheduler with Shortest-Job-First policy. It runs the
 // shortest job uninterrupted.
-func NewSJF() *coreScheduler {
-	return newCoreScheduler(shortestJobFirstPolicy)
+func NewSJF() *scheduler {
+	return newScheduler(shortestJobFirstPolicy)
 }
 
 // NewSTCF creates a scheduler with Shortest-Time-to-Complete-First policy.
 // It picks the job with shortest left work for next cycle. STCF is preemptive
 // algorithm.
-func NewSTCF() *coreScheduler {
-	return newCoreScheduler(shortestTimeToCompletionFirstPolicy)
+func NewSTCF() *scheduler {
+	return newScheduler(shortestTimeToCompletionFirstPolicy)
 }
 
 // NewRoundRobin creates a scheduler with Round-Robin policy. It rotates
 // pending jobs by running a new one every cycle.
-func NewRoundRobin() *coreScheduler {
-	return newCoreScheduler(roundRobinPolicy)
+func NewRoundRobin() *scheduler {
+	return newScheduler(roundRobinPolicy)
 }
 
 // Job is a unit of work, managed by scheduler.
@@ -51,26 +51,26 @@ type state struct {
 
 type updateFunc func(state *state)
 
-type coreScheduler struct {
+type scheduler struct {
 	state  *state
 	update func(state *state)
 }
 
-func newCoreScheduler(f updateFunc) *coreScheduler {
-	return &coreScheduler{
+func newScheduler(f updateFunc) *scheduler {
+	return &scheduler{
 		state:  new(state),
 		update: f,
 	}
 }
 
 // Add emulates job arrival to the scheduler.
-func (s *coreScheduler) Add(j Job) {
+func (s *scheduler) Add(j Job) {
 	s.state.pending = append(s.state.pending, j)
 }
 
 // Next returns the next job to run. The second returned parameter indicates
 // whether the scheduler was able to pick up the job.
-func (s *coreScheduler) Next() (Job, bool) {
+func (s *scheduler) Next() (Job, bool) {
 	if job := s.state.running; job != nil && job.Done() {
 		s.state.running = nil
 	}
