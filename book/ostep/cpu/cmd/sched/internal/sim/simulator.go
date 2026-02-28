@@ -8,6 +8,7 @@ package sim
 import (
 	"fmt"
 	"iter"
+	"slices"
 	"sort"
 
 	"github.com/skhal/lab/book/ostep/cpu/cmd/sched/internal/job"
@@ -71,11 +72,20 @@ func (s *Simulator) Run() iter.Seq[Cycle] {
 				}
 				continue
 			}
-			lj := item.(*job.Live)
-			if completed := lj.Run(); completed != nil {
+			live := item.(*job.Live)
+			if completed := live.Run(); completed != nil {
 				s.completed = append(s.completed, completed)
+				slices.SortFunc(s.completed, func(a, b *job.Completed) int {
+					if a.ID < b.ID {
+						return -1
+					}
+					if a.ID == b.ID {
+						return 0
+					}
+					return 1
+				})
 			}
-			if !yield(Cycle{Num: s.cycler.Cycle(), Job: lj.Job}) {
+			if !yield(Cycle{Num: s.cycler.Cycle(), Job: live.Job}) {
 				break
 			}
 		}

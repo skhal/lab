@@ -14,8 +14,8 @@ trace:
   6 run 1 for 2 cycles
 
 stats:
-  2  Response: 1   Turnaround: 6   Wait: 3  
   1  Response: 0   Turnaround: 8   Wait: 3  
+  2  Response: 1   Turnaround: 6   Wait: 3  
 
 average:
      Response: 0   Turnaround: 7   Wait: 3  
