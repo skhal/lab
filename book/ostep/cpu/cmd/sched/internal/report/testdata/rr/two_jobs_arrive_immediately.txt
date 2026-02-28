@@ -5,17 +5,17 @@ jobs:
   2 arrival: 0 duration: 3
 
 trace:
-  0 run 1 for 1 cycle
-  1 run 2 for 1 cycle
-  2 run 1 for 1 cycle
-  3 run 2 for 1 cycle
-  4 run 1 for 1 cycle
-  5 run 2 for 1 cycle
-  6 run 1 for 2 cycles
+  0 run 1 for 1 cycle 
+  1 run 2 for 1 cycle 
+  2 run 1 for 1 cycle 
+  3 run 2 for 1 cycle 
+  4 run 1 for 1 cycle 
+  5 run 2 for 1 cycle [done]
+  6 run 1 for 2 cycles 
 
 stats:
-  1  Response: 0   Turnaround: 8   Wait: 3  
-  2  Response: 1   Turnaround: 6   Wait: 3  
+  1  Response: 0   Turnaround: 8   Wait: 3   [done]
+  2  Response: 1   Turnaround: 6   Wait: 3   [done]
 
 average:
      Response: 0   Turnaround: 7   Wait: 3  

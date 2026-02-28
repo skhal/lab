@@ -86,5 +86,6 @@ func (j *Live) complete() *Completed {
 		Job:   j.Job,
 		Stats: stats(),
 	}
+	cj.Job.Done = true
 	return cj
 }

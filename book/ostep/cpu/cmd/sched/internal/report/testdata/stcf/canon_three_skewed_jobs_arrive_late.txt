@@ -6,15 +6,15 @@ jobs:
   3 arrival: 10 duration: 10
 
 trace:
-  0 run 1 for 10 cycles
-  10 run 2 for 10 cycles
-  20 run 3 for 10 cycles
-  30 run 1 for 90 cycles
+  0 run 1 for 10 cycles 
+  10 run 2 for 10 cycles 
+  20 run 3 for 10 cycles 
+  30 run 1 for 90 cycles 
 
 stats:
-  1  Response: 0   Turnaround: 120 Wait: 20 
-  2  Response: 0   Turnaround: 10  Wait: 0  
-  3  Response: 10  Turnaround: 20  Wait: 10 
+  1  Response: 0   Turnaround: 120 Wait: 20  [done]
+  2  Response: 0   Turnaround: 10  Wait: 0   [done]
+  3  Response: 10  Turnaround: 20  Wait: 10  [done]
 
 average:
      Response: 3   Turnaround: 50  Wait: 10 

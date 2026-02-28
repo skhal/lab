@@ -62,6 +62,26 @@ type Cycle struct {
 
 // Run executes the simulator.
 func (s *Simulator) Run() iter.Seq[Cycle] {
+	run := func(live *job.Live) Cycle {
+		cycle := Cycle{
+			Num: s.cycler.Cycle(),
+			Job: live.Job,
+		}
+		if completed := live.Run(); completed != nil {
+			cycle.Job.Done = true
+			s.completed = append(s.completed, completed)
+			slices.SortFunc(s.completed, func(a, b *job.Completed) int {
+				if a.ID < b.ID {
+					return -1
+				}
+				if a.ID == b.ID {
+					return 0
+				}
+				return 1
+			})
+		}
+		return cycle
+	}
 	return func(yield func(Cycle) bool) {
 		for ; ; s.cycler.Next() {
 			s.addJobs()
@@ -72,20 +92,7 @@ func (s *Simulator) Run() iter.Seq[Cycle] {
 				}
 				continue
 			}
-			live := item.(*job.Live)
-			if completed := live.Run(); completed != nil {
-				s.completed = append(s.completed, completed)
-				slices.SortFunc(s.completed, func(a, b *job.Completed) int {
-					if a.ID < b.ID {
-						return -1
-					}
-					if a.ID == b.ID {
-						return 0
-					}
-					return 1
-				})
-			}
-			if !yield(Cycle{Num: s.cycler.Cycle(), Job: live.Job}) {
+			if c := run(item.(*job.Live)); !yield(c) {
 				break
 			}
 		}

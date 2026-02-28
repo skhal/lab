@@ -6,42 +6,42 @@ jobs:
   3 arrival: 10 duration: 10
 
 trace:
-  0 run 1 for 10 cycles
-  10 run 2 for 1 cycle
-  11 run 3 for 1 cycle
-  12 run 1 for 1 cycle
-  13 run 2 for 1 cycle
-  14 run 3 for 1 cycle
-  15 run 1 for 1 cycle
-  16 run 2 for 1 cycle
-  17 run 3 for 1 cycle
-  18 run 1 for 1 cycle
-  19 run 2 for 1 cycle
-  20 run 3 for 1 cycle
-  21 run 1 for 1 cycle
-  22 run 2 for 1 cycle
-  23 run 3 for 1 cycle
-  24 run 1 for 1 cycle
-  25 run 2 for 1 cycle
-  26 run 3 for 1 cycle
-  27 run 1 for 1 cycle
-  28 run 2 for 1 cycle
-  29 run 3 for 1 cycle
-  30 run 1 for 1 cycle
-  31 run 2 for 1 cycle
-  32 run 3 for 1 cycle
-  33 run 1 for 1 cycle
-  34 run 2 for 1 cycle
-  35 run 3 for 1 cycle
-  36 run 1 for 1 cycle
-  37 run 2 for 1 cycle
-  38 run 3 for 1 cycle
-  39 run 1 for 81 cycles
+  0 run 1 for 10 cycles 
+  10 run 2 for 1 cycle 
+  11 run 3 for 1 cycle 
+  12 run 1 for 1 cycle 
+  13 run 2 for 1 cycle 
+  14 run 3 for 1 cycle 
+  15 run 1 for 1 cycle 
+  16 run 2 for 1 cycle 
+  17 run 3 for 1 cycle 
+  18 run 1 for 1 cycle 
+  19 run 2 for 1 cycle 
+  20 run 3 for 1 cycle 
+  21 run 1 for 1 cycle 
+  22 run 2 for 1 cycle 
+  23 run 3 for 1 cycle 
+  24 run 1 for 1 cycle 
+  25 run 2 for 1 cycle 
+  26 run 3 for 1 cycle 
+  27 run 1 for 1 cycle 
+  28 run 2 for 1 cycle 
+  29 run 3 for 1 cycle 
+  30 run 1 for 1 cycle 
+  31 run 2 for 1 cycle 
+  32 run 3 for 1 cycle 
+  33 run 1 for 1 cycle 
+  34 run 2 for 1 cycle 
+  35 run 3 for 1 cycle 
+  36 run 1 for 1 cycle 
+  37 run 2 for 1 cycle [done]
+  38 run 3 for 1 cycle [done]
+  39 run 1 for 81 cycles 
 
 stats:
-  1  Response: 0   Turnaround: 120 Wait: 20 
-  2  Response: 0   Turnaround: 28  Wait: 18 
-  3  Response: 1   Turnaround: 29  Wait: 19 
+  1  Response: 0   Turnaround: 120 Wait: 20  [done]
+  2  Response: 0   Turnaround: 28  Wait: 18  [done]
+  3  Response: 1   Turnaround: 29  Wait: 19  [done]
 
 average:
      Response: 0   Turnaround: 59  Wait: 19 

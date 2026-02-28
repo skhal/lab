@@ -24,7 +24,7 @@ trace:
 
 stats:
 {{- range .Sim.CompletedJobs}}
-  {{.ID | printf "%-2d"}} {{template "stats" .Stats}}
+  {{.ID | printf "%-2d"}} {{template "stats" .Stats}} {{if .Done}}[done]{{end}}
 {{- end}}
 
 average:
@@ -48,7 +48,7 @@ Response: {{.Response | printf "%-3d" }} Turnaround: {{.Turnaround | printf "%-3
 {{- end -}}
 
 {{- define "trace" -}}
-{{.Start}} run {{.Job.ID}} for {{.Cycles}} {{if eq .Cycles 1}}cycle{{else}}cycles{{end}}
+{{.Start}} run {{.Job.ID}} for {{.Cycles}} {{if eq .Cycles 1}}cycle{{else}}cycles{{end}} {{if .Job.Done}}[done]{{end}}
 {{- end -}}
 
 {{- if .Jobs -}}

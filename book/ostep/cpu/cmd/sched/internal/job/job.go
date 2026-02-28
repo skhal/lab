@@ -11,6 +11,9 @@ type Job struct {
 	// ID is a unique job identifier.
 	ID int
 
-	// Spec is the job's configuration
+	// Spec is the job's configuration.
 	Spec Spec
+
+	// Done is set to true if the job completed.
+	Done bool
 }
