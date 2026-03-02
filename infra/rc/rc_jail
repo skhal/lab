@@ -5,13 +5,14 @@
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 
-# Manage jail(8) VNET via exec hooks.
+# rc.jail implements some of the jail.exec hooks to help with VNET management.
+# It automates epair(4) management.
 #
-# Example
+# SYNOPSIS
+#
 #   # file: /etc/jail.conf.d/foo.conf:
-#   # A jail with a single network epair.
 #   foo {
-#     $id = "101";
+#     $id = "12";
 #     $bridge0 = "bridge0";
 #     $bridge0ip = "${bridge0}:10.0.1.${id}/24";
 #     vnet;
@@ -19,32 +20,26 @@
 #     exec.created  = "/bin/sh /usr/local/etc/rc.jail created ${name} ${bridge0ip}"
 #     exec.poststop = "/bin/sh /usr/local/etc/rc.jail poststop ${name} ${bridge0}"
 #   }
-#   # file: /etc/jail.conf.d/bar.conf:
-#   # A jail with two network epairs, each connected to a separate bridge.
-#   bar {
-#     $id = "101";
-#     $bridge0 = "bridge0";
-#     $bridge0ip = "${bridge0}:10.0.1.${id}/24";
-#     $bridge1 = "bridge1";
-#     $bridge1ip = "${bridge0}:10.0.2.${id}/24";
-#     vnet;
-#     exec.prestart = "/bin/sh /usr/local/etc/rc.jail prestart ${name} ${bridge0} ${bridge1}"
-#     exec.created  = "/bin/sh /usr/local/etc/rc.jail created ${name} ${bridge0ip} ${bridge1ip}"
-#     exec.poststop = "/bin/sh /usr/local/etc/rc.jail poststop ${name} ${bridge0} ${bridge1}"
-#   }
 #
-# Description
-# `rc.jail` manages jail's epair(4) connection to the bridge(4) in the host and
-# jailed environments via jail(8) exec-hooks:
-#   * exec.prestart: create next logical epair(4) and attach it to the
+# DESCRIPTION
+#
+# rc.jail creates a new random epair(4) for every jail, connects it to the
+# specified bridge(4) on the host, and enjails the b-side of the epair(4)
+# using jail(8) exec-hooks.
+#
+# Startup sequence:
+#   - exec.prestart: create next logical epair(4) and attach it to the
 #     bridge(4).
-#   * exec.created: move the jail's side of the epair(4) to the jail(8) and
+#   - exec.created: enjail the b-side of newly created epair(4) and
 #     assign it the IP address.
-#   * exec.poststop: disconnect jail's epair(4) from the bridge(4) and remove
+#
+# Shutdown sequence:
+#   - exec.poststop: disconnect jail's epair(4) from the bridge(4) and remove
 #     it from the host environment.
 #
-# `rc.jail` keeps track of the running jail's epair(4) in /var/run/jail/ folder,
-# in ${jail_name}.${bridge} file.
+# FILES
+#
+#   /var/run/jail/${jname}_${bridge}  stores jail epair(4) name
 
 # keep-sorted start
 readonly CAT_CMD=/bin/cat
