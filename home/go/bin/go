@@ -9,14 +9,25 @@ set -e
 
 : ${PAGER:=/usr/bin/less -s}
 
+go_cmd=$(/usr/bin/which go)
+if [ "${go_cmd}" = "$0" ]; then
+  cat <<eof >&2
+cant' find Go installation
+
+Found go command (/usr/bin/which -a go), first match wins:
+$(/usr/bin/which -a go)
+eof
+  exit 1
+fi
+
 case "$1" in
   doc | help)
     if ! [ -t 1 ]; then
       break
     fi
-    exec go "$@" | $PAGER
+    eval exec "${go_cmd}" "$@" | $PAGER
     exit
     ;;
 esac
 
-exec go "$@"
+eval exec "${go_cmd}" "$@"
