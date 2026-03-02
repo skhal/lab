@@ -77,14 +77,18 @@ exec_prestart() {
 #
 # Arguments:
 #   $1 : jail name
-#   $* : colon-separated bridge name and ip
+#   $* : colon-separated network spec bridge:ip
 exec_created() {
   local jid=${1:?'exec_created: missing jail name'}
   shift 1
-  local bridge_and_ip bridge ip epair epair_b descr
-  for bridge_and_ip; do
-    bridge=${bridge_and_ip%%:*}
-    ip=${bridge_and_ip#*:}
+  local spec bridge ip epair epair_b descr
+  for spec; do
+    read bridge ip <<-eof
+$(
+      IFS=':'
+      echo ${spec}
+    )
+eof
     epair="$(read_epair ${jid} ${bridge})"
     epair_b=${epair}b
     # Enjail the b-side of epair(4). Once enjailed, the jail is responsible
