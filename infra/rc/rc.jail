@@ -42,7 +42,6 @@
 #   /var/run/jail/${jname}_${bridge}  stores jail epair(4) name
 
 # keep-sorted start
-readonly CAT_CMD=/bin/cat
 readonly IFCONFIG_CMD=/sbin/ifconfig
 readonly MKDIR_CMD=/bin/mkdir
 readonly RM_CMD=/bin/rm
@@ -159,7 +158,9 @@ read_epair() {
     echo "read_epair: runtime file ${jail_epair_file} does not exist" >&2
     return 1
   fi
-  ${CAT_CMD} ${jail_epair_file}
+  local epair
+  read epair <${jail_epair_file}
+  echo "${epair}"
 }
 
 # clean_epair cleans up the jail runtime file.
