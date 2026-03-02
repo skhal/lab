@@ -14,4 +14,4 @@
 Applications
 
 - [process-run](./cmd/process-run/): schedule processes on a single CPU.
-- [scheduler](./cmd/scheduler/): schedule jobs with different policies
+- [sched](./cmd/sched/): schedule jobs with different policies
