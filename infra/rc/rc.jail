@@ -58,17 +58,16 @@ readonly JAIL_RUN_PATH=/var/run/jail
 #
 # It stores the epair(4) identifier in the jail runtime file for every bridge.
 exec_prestart() {
-  local jail_name=${1:?'exec_prestart: missing jail name'}
-
+  local jid=${1:?'exec_prestart: missing jail name'}
   shift 1
-  local jail_bridge jail_epair_a jail_epair jail_epair_descr
-  for jail_bridge; do
-    jail_epair_a=$(${IFCONFIG_CMD} epair create)
-    jail_epair=${jail_epair_a%a}
-    write_epair ${jail_name} ${jail_bridge} ${jail_epair}
-    jail_epair_descr=jail:${jail_name}:${jail_bridge}
-    ${IFCONFIG_CMD} ${jail_epair_a} up descr ${jail_epair_descr}
-    ${IFCONFIG_CMD} ${jail_bridge} addm ${jail_epair_a} up
+  local bridge epair_a epair descr
+  for bridge; do
+    epair_a=$(${IFCONFIG_CMD} epair create)
+    epair=${epair_a%a}
+    write_epair ${jid} ${bridge} ${epair}
+    descr=jail:${jid}:${bridge}
+    ${IFCONFIG_CMD} ${epair_a} up descr ${descr}
+    ${IFCONFIG_CMD} ${bridge} addm ${epair_a} up
   done
 }
 
@@ -80,20 +79,19 @@ exec_prestart() {
 #   $1 : jail name
 #   $* : colon-separated bridge name and ip
 exec_created() {
-  local jail_name=${1:?'exec_created: missing jail name'}
-
+  local jid=${1:?'exec_created: missing jail name'}
   shift 1
-  local jail_bridge_and_ip jail_bridge jail_ip jail_epair jail_epair_b jail_epair_descr
-  for jail_bridge_and_ip; do
-    jail_bridge=${jail_bridge_and_ip%%:*}
-    jail_ip=${jail_bridge_and_ip#*:}
-    jail_epair="$(read_epair ${jail_name} ${jail_bridge})"
-    jail_epair_b=${jail_epair}b
-    # Move the b-side of epair(4) inside the jail. All operations on the b-side
-    # must run from inside the jail after this completes.
-    ${IFCONFIG_CMD} ${jail_epair_b} vnet ${jail_name}
-    jail_epair_descr=jail:${jail_name}:${jail_bridge}
-    ${IFCONFIG_CMD} -j ${jail_name} ${jail_epair_b} ${jail_ip} up descr ${jail_epair_descr}
+  local bridge_and_ip bridge ip epair epair_b descr
+  for bridge_and_ip; do
+    bridge=${bridge_and_ip%%:*}
+    ip=${bridge_and_ip#*:}
+    epair="$(read_epair ${jid} ${bridge})"
+    epair_b=${epair}b
+    # Enjail the b-side of epair(4). Once enjailed, the jail is responsible
+    # for the b-side configuration, i.e., run ifconfig(8) from inside the jail.
+    ${IFCONFIG_CMD} ${epair_b} vnet ${jid}
+    descr=jail:${jid}:${bridge}
+    ${IFCONFIG_CMD} -j ${jid} ${epair_b} ${ip} up descr ${descr}
   done
 }
 
@@ -106,16 +104,15 @@ exec_created() {
 #
 # It cleans the jail runtime file for every bridge.
 exec_poststop() {
-  local jail_name=${1:?'exec_poststop: missing jail name'}
-
+  local jid=${1:?'exec_poststop: missing jail name'}
   shift 1
-  local jail_bridge jail_epair jail_epair_a
-  for jail_bridge; do
-    jail_epair=$(read_epair ${jail_name} ${jail_bridge})
-    jail_epair_a=${jail_epair}a
-    ${IFCONFIG_CMD} ${jail_bridge} deletem ${jail_epair_a}
-    ${IFCONFIG_CMD} ${jail_epair_a} destroy
-    clean_epair ${jail_name} ${jail_bridge}
+  local bridge epair epair_a
+  for bridge; do
+    epair=$(read_epair ${jid} ${bridge})
+    epair_a=${epair}a
+    ${IFCONFIG_CMD} ${bridge} deletem ${epair_a}
+    ${IFCONFIG_CMD} ${epair_a} destroy
+    clean_epair ${jid} ${bridge}
   done
 }
 
@@ -128,17 +125,16 @@ exec_poststop() {
 #
 # It creates the jail runtime path if one does not exist.
 write_epair() {
-  local jail_name=${1:?'write_epair: missing jail name'}
-  local jail_bridge=${2:?'write_epair: missing jail bridge'}
-  local jail_epair=${3:?'write_epair: missing jail epair'}
-
-  local jail_epair_file
-  jail_epair_file=$(get_epair_file ${jail_name} ${jail_bridge})
-  local jail_epair_file_path=${jail_epair_file%/*}
-  if ! [ -d ${jail_epair_file_path} ]; then
-    ${MKDIR_CMD} ${jail_epair_file_path}
+  local jid=${1:?'write_epair: missing jail name'}
+  local bridge=${2:?'write_epair: missing jail bridge'}
+  local epair=${3:?'write_epair: missing jail epair'}
+  local fname
+  fname=$(get_epair_file ${jid} ${bridge})
+  local fpath=${fname%/*}
+  if ! [ -d ${fpath} ]; then
+    ${MKDIR_CMD} ${fpath}
   fi
-  echo ${jail_epair} >${jail_epair_file}
+  echo ${epair} >${fname}
 }
 
 # read_epair reads the epair(4) identifier from the jail runtime file.
@@ -149,17 +145,16 @@ write_epair() {
 #
 # It returns 1 if the jail runtime file does not exist.
 read_epair() {
-  local jail_name=${1:?'read_epair: missing jail name'}
-  local jail_bridge=${2:?'read_epair: missing jail bridge'}
-
-  local jail_epair_file
-  jail_epair_file=$(get_epair_file ${jail_name} ${jail_bridge})
-  if ! [ -f ${jail_epair_file} ]; then
-    echo "read_epair: runtime file ${jail_epair_file} does not exist" >&2
+  local jid=${1:?'read_epair: missing jail name'}
+  local bridge=${2:?'read_epair: missing jail bridge'}
+  local fname
+  fname=$(get_epair_file ${jid} ${bridge})
+  if ! [ -f ${fname} ]; then
+    echo "read_epair: runtime file ${fname} does not exist" >&2
     return 1
   fi
   local epair
-  read epair <${jail_epair_file}
+  read epair <${fname}
   echo "${epair}"
 }
 
@@ -169,12 +164,11 @@ read_epair() {
 #   $1 : jail name
 #   $2 : bridge name
 clean_epair() {
-  local jail_name=${1:?'clean_epair: missing jail name'}
-  local jail_bridge=${2:?'clean_epair: missing jail bridge'}
-
-  local jail_epair_file=$(get_epair_file ${jail_name} ${jail_bridge})
-  if [ -f ${jail_epair_file} ]; then
-    ${RM_CMD} ${jail_epair_file}
+  local jid=${1:?'clean_epair: missing jail name'}
+  local bridge=${2:?'clean_epair: missing jail bridge'}
+  local fname=$(get_epair_file ${jid} ${bridge})
+  if [ -f ${fname} ]; then
+    ${RM_CMD} ${fname}
   fi
 }
 
@@ -186,10 +180,9 @@ clean_epair() {
 #
 # The jail runtime file is in JAIL_RUN_PATH.
 get_epair_file() {
-  local jail_name=${1:?'get_epair_file: missing jail name'}
-  local jail_bridge=${2:?'get_epair_file: missing jail bridge'}
-
-  echo ${JAIL_RUN_PATH}/${jail_name}_${jail_bridge}
+  local jid=${1:?'get_epair_file: missing jail name'}
+  local bridge=${2:?'get_epair_file: missing jail bridge'}
+  echo ${JAIL_RUN_PATH}/${jid}_${bridge}
 }
 
 # main runs jail(4) exec hooks.
@@ -202,7 +195,6 @@ get_epair_file() {
 main() {
   local hook=${1:?'main: missing hook'}
   shift 1
-
   case ${hook} in
     prestart | created | poststop) ;;
     *)
