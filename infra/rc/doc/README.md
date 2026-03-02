@@ -5,17 +5,14 @@
   license that can be found in the LICENSE file.
 -->
 
-NAME
-====
+# NAME
 
 **rc** -- resource configuration `rc(8)`
 
-DESCRIPTION
-===========
+# DESCRIPTION
 
 It is a collection of various posts about FreeBSD resource configuration system, `rc(8)`.
 
-SEE ALSO
-========
+# SEE ALSO
 
--	[Services in `rcorder(8)`](./rcorder.md)
+- [Services in `rcorder(8)`](./rcorder.md)
