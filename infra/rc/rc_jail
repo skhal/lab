@@ -51,7 +51,7 @@ readonly RM_CMD=/bin/rm
 
 readonly JAIL_RUN_PATH=/var/run/jail
 
-# jail_exec_prestart creates an epair(4) for every bridge and connects it to
+# exec_prestart creates an epair(4) for every bridge and connects it to
 # that bridge, resultin in N epairs for N bridges.
 #
 # Arguments:
@@ -59,37 +59,37 @@ readonly JAIL_RUN_PATH=/var/run/jail
 #   $* : bridge name
 #
 # It stores the epair(4) identifier in the jail runtime file for every bridge.
-jail_exec_prestart() {
-  local jail_name=${1:?'jail_exec_prestart: missing jail name'}
+exec_prestart() {
+  local jail_name=${1:?'exec_prestart: missing jail name'}
 
   shift 1
   local jail_bridge jail_epair_a jail_epair jail_epair_descr
   for jail_bridge; do
     jail_epair_a=$(${IFCONFIG_CMD} epair create)
     jail_epair=${jail_epair_a%a}
-    jail_write_epair ${jail_name} ${jail_bridge} ${jail_epair}
+    write_epair ${jail_name} ${jail_bridge} ${jail_epair}
     jail_epair_descr=jail:${jail_name}:${jail_bridge}
     ${IFCONFIG_CMD} ${jail_epair_a} up descr ${jail_epair_descr}
     ${IFCONFIG_CMD} ${jail_bridge} addm ${jail_epair_a} up
   done
 }
 
-# jail_exec_created moves the epair(4) for every bridge to the jail(8) and
+# exec_created moves the epair(4) for every bridge to the jail(8) and
 # assigns the IP address in the jailed environment. It loads jail's epair(4)
 # from the jail runtime file for a given bridge.
 #
 # Arguments:
 #   $1 : jail name
 #   $* : colon-separated bridge name and ip
-jail_exec_created() {
-  local jail_name=${1:?'jail_exec_created: missing jail name'}
+exec_created() {
+  local jail_name=${1:?'exec_created: missing jail name'}
 
   shift 1
   local jail_bridge_and_ip jail_bridge jail_ip jail_epair jail_epair_b jail_epair_descr
   for jail_bridge_and_ip; do
     jail_bridge=${jail_bridge_and_ip%%:*}
     jail_ip=${jail_bridge_and_ip#*:}
-    jail_epair="$(jail_read_epair ${jail_name} ${jail_bridge})"
+    jail_epair="$(read_epair ${jail_name} ${jail_bridge})"
     jail_epair_b=${jail_epair}b
     # Move the b-side of epair(4) inside the jail. All operations on the b-side
     # must run from inside the jail after this completes.
@@ -99,7 +99,7 @@ jail_exec_created() {
   done
 }
 
-# jail_exec_poststop disconnects the epair(4) from corresponding bridge and
+# exec_poststop disconnects the epair(4) from corresponding bridge and
 # removes the disconnected epair(4) from the host environment.
 #
 # Arguments:
@@ -107,21 +107,21 @@ jail_exec_created() {
 #   $* : bridge name
 #
 # It cleans the jail runtime file for every bridge.
-jail_exec_poststop() {
-  local jail_name=${1:?'jail_exec_poststop: missing jail name'}
+exec_poststop() {
+  local jail_name=${1:?'exec_poststop: missing jail name'}
 
   shift 1
   local jail_bridge jail_epair jail_epair_a
   for jail_bridge; do
-    jail_epair=$(jail_read_epair ${jail_name} ${jail_bridge})
+    jail_epair=$(read_epair ${jail_name} ${jail_bridge})
     jail_epair_a=${jail_epair}a
     ${IFCONFIG_CMD} ${jail_bridge} deletem ${jail_epair_a}
     ${IFCONFIG_CMD} ${jail_epair_a} destroy
-    jail_clean_epair ${jail_name} ${jail_bridge}
+    clean_epair ${jail_name} ${jail_bridge}
   done
 }
 
-# jail_write_epair writes the epair(4) identifier to the jail runtime file.
+# write_epair writes the epair(4) identifier to the jail runtime file.
 #
 # Arguments:
 #   $1 : jail name
@@ -129,13 +129,13 @@ jail_exec_poststop() {
 #   $3 : epair
 #
 # It creates the jail runtime path if one does not exist.
-jail_write_epair() {
-  local jail_name=${1:?'jail_write_epair: missing jail name'}
-  local jail_bridge=${2:?'jail_write_epair: missing jail bridge'}
-  local jail_epair=${3:?'jail_write_epair: missing jail epair'}
+write_epair() {
+  local jail_name=${1:?'write_epair: missing jail name'}
+  local jail_bridge=${2:?'write_epair: missing jail bridge'}
+  local jail_epair=${3:?'write_epair: missing jail epair'}
 
   local jail_epair_file
-  jail_epair_file=$(jail_get_epair_file ${jail_name} ${jail_bridge})
+  jail_epair_file=$(get_epair_file ${jail_name} ${jail_bridge})
   local jail_epair_file_path=${jail_epair_file%/*}
   if ! [ -d ${jail_epair_file_path} ]; then
     ${MKDIR_CMD} ${jail_epair_file_path}
@@ -143,51 +143,51 @@ jail_write_epair() {
   echo ${jail_epair} >${jail_epair_file}
 }
 
-# jail_read_epair reads the epair(4) identifier from the jail runtime file.
+# read_epair reads the epair(4) identifier from the jail runtime file.
 
 # Arguments:
 #   $1 : jail name
 #   $2 : bridge name
 #
 # It returns 1 if the jail runtime file does not exist.
-jail_read_epair() {
-  local jail_name=${1:?'jail_read_epair: missing jail name'}
-  local jail_bridge=${2:?'jail_read_epair: missing jail bridge'}
+read_epair() {
+  local jail_name=${1:?'read_epair: missing jail name'}
+  local jail_bridge=${2:?'read_epair: missing jail bridge'}
 
   local jail_epair_file
-  jail_epair_file=$(jail_get_epair_file ${jail_name} ${jail_bridge})
+  jail_epair_file=$(get_epair_file ${jail_name} ${jail_bridge})
   if ! [ -f ${jail_epair_file} ]; then
-    echo "jail_read_epair: runtime file ${jail_epair_file} does not exist" >&2
+    echo "read_epair: runtime file ${jail_epair_file} does not exist" >&2
     return 1
   fi
   ${CAT_CMD} ${jail_epair_file}
 }
 
-# jail_clean_epair cleans up the jail runtime file.
+# clean_epair cleans up the jail runtime file.
 #
 # Arguments:
 #   $1 : jail name
 #   $2 : bridge name
-jail_clean_epair() {
-  local jail_name=${1:?'jail_clean_epair: missing jail name'}
-  local jail_bridge=${2:?'jail_clean_epair: missing jail bridge'}
+clean_epair() {
+  local jail_name=${1:?'clean_epair: missing jail name'}
+  local jail_bridge=${2:?'clean_epair: missing jail bridge'}
 
-  local jail_epair_file=$(jail_get_epair_file ${jail_name} ${jail_bridge})
+  local jail_epair_file=$(get_epair_file ${jail_name} ${jail_bridge})
   if [ -f ${jail_epair_file} ]; then
     ${RM_CMD} ${jail_epair_file}
   fi
 }
 
-# jail_get_epair_file builds the jail runtime file name.
+# get_epair_file builds the jail runtime file name.
 #
 # Arguments:
 #   $1 : jail name
 #   $2 : bridge name
 #
 # The jail runtime file is in JAIL_RUN_PATH.
-jail_get_epair_file() {
-  local jail_name=${1:?'jail_get_epair_file: missing jail name'}
-  local jail_bridge=${2:?'jail_get_epair_file: missing jail bridge'}
+get_epair_file() {
+  local jail_name=${1:?'get_epair_file: missing jail name'}
+  local jail_bridge=${2:?'get_epair_file: missing jail bridge'}
 
   echo ${JAIL_RUN_PATH}/${jail_name}_${jail_bridge}
 }
@@ -210,7 +210,7 @@ main() {
       return 1
       ;;
   esac
-  local hook_func=jail_exec_${hook}
+  local hook_func=exec_${hook}
   ${hook_func} "$@"
 }
 
