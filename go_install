@@ -5,12 +5,13 @@
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 
+set -x
 set -e
 
 # keep-sorted start
 readonly CACHE_PATH=${HOME}/.cache/go_install
 readonly GO_ROOT_PREFIX=/usr/local
-readonly GO_VERSION=${GO_VERSION:-1.25.5}
+readonly GO_VERSION=${GO_VERSION:-1.26.0}
 readonly LOG_PATH=go_install.log # relative to TMPDIR
 # keep-sorted end
 
