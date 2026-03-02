@@ -11,11 +11,44 @@
 
 # DESCRIPTION
 
+**TL;DR** create a thin jail with Alpine Linux jail without FreeBSD jailed
+environment.
+
 ```console
-# zfs clone zroot/usr/jail/15.0@skel zroot/usr/jail/alpine
-# cat /etc/jail.conf.d/alpine.conf
+# zfs create zroot/usr/jail/alpine
+# fetch -o /tmp https://dl-cdn.alpinelinux.org/alpine/latest-stable/releases/x86_64/alpine-minirootfs-3.23.3-x86_64.tar.gz
+# tar -C /usr/jail/alpine -xzf /tmp/alpine-minirootfs-3.23.3-x86_64.tar.gz
+```
+
+Configure:
+
+```console
+# echo 'nameserver 10.0.0.2' >/usr/jail/alpine/etc/resolv.conf
+# echo "auto lo" > /usr/jail/alpine/etc/network/interfaces
+# chroot /usr/jail/alpine env PS1='alpine # ' /bin/sh
+alpine # apk update
+alpine # apk upgrade
+alpine # apk add openrc
+alpine # mkdir /run/openrc
+alpine # touch /run/openrc/softlevel
+```
+
+Initialize passwords:
+
+```console
+# cd /usr/jail/alpine/etc/
+# echo 'root::0:0::0:0:Charlie &:/root:/bin/sh' > master.passwd
+# pwd_mkdb -d . -p master.passwd
+```
+
+Create a jail configuration:
+
+```console
+% cat /etc/jail.conf.d/alpine.conf
 alpine {
   $id = "13";
+
+  $gateway = "10.0.0.1";
 
   $bridge1 = "bridge1";
   $bridge1_ip = "${bridge1}:10.0.0.${id}/24";
@@ -40,101 +73,63 @@ alpine {
   allow.mount.tmpfs;
   allow.mount;
   allow.raw_sockets;
-  devfs_ruleset = 5;
-  enforce_statfs = 1;
-  mount.devfs;
   # keep-sorted end
+
+  mount += "devfs     $path/dev     devfs     rw 0 0";
+  mount += "fdescfs   $path/dev/fd  fdescfs   rw,linrdlnk 0 0";
+  mount += "linprocfs $path/proc    linprocfs rw 0 0";
+  mount += "linsysfs  $path/sys     linsysfs  rw 0 0";
+  mount += "tmpfs     $path/dev/shm tmpfs     rw,size=1g,mode=1777 0 0";
+  mount.devfs;
+  devfs_ruleset = 5;
+
+  enforce_statfs = 1;
 
   exec.clean;
   exec.consolelog = "/var/log/jail_${name}.log";
 
   exec.prestart = "/bin/sh /usr/local/etc/rc.jail prestart ${name} ${bridges}";
   exec.created  = "/bin/sh /usr/local/etc/rc.jail created ${name} ${bridgeips}";
-  exec.start    = "/bin/sh /etc/rc";
+  exec.created += "/sbin/route -j ${name} add default ${gateway}";
+  exec.start    = "/sbin/openrc";
 
-  exec.stop     = "/bin/sh /etc/rc.shutdown";
+  persist;
+
+  exec.stop     = "/sbin/openrc shutdown";
   exec.poststop = "/bin/sh /usr/local/etc/rc.jail poststop ${name} ${bridges}";
 }
 ```
 
-Verify the jail works and has network access:
+Start the jail and verify it works:
 
 ```console
-% doas service jail start alpine
-% jls -j alpine
-   JID  IP Address      Hostname                      Path
-     7                  alpine.lab.net                /usr/jail/alpine
-% doas jexec alpine netstat -4r
-Routing tables
-
-Internet:
-Destination        Gateway            Flags         Netif Expire
-default            10.0.0.1           UGS         epair7b
-10.0.0.0/24        link#33            U           epair7b
-10.0.0.13          link#34            UHS             lo0
-localhost          link#34            UH              lo0
-% doas jexec alpine drill -Q alpinelinux.org
-213.219.36.190
+% doas ifconfig -j alpine -ag epair
+epair8b: flags=1008843<UP,BROADCAST,RUNNING,SIMPLEX,MULTICAST,LOWER_UP> metric 0 mtu 1500
+	description: jail:alpine:bridge1
+	options=60000b<RXCSUM,TXCSUM,VLAN_MTU,RXCSUM_IPV6,TXCSUM_IPV6>
+	ether 58:9c:fc:10:f6:4a
+	inet 10.0.0.13 netmask 0xffffff00 broadcast 10.0.0.255
+	groups: epair
+	media: Ethernet 10Gbase-T (10Gbase-T <full-duplex>)
+	status: active
+	nd6 options=29<PERFORMNUD,IFDISABLED,AUTO_LINKLOCAL>
+op@nuc:~ % doas route -j alpine get 0
+   route to: default
+destination: default
+       mask: default
+    gateway: 10.0.0.1
+        fib: 0
+  interface: epair8b
+      flags: <UP,GATEWAY,DONE,STATIC>
+ recvpipe  sendpipe  ssthresh  rtt,msec    mtu        weight    expire
+       0         0         0         0      1500         1         0
 % doas jexec alpine ping -c 1 alpinelinux.org
 PING alpinelinux.org (213.219.36.190): 56 data bytes
-64 bytes from 213.219.36.190: icmp_seq=0 ttl=44 time=107.647 ms
-
---- alpinelinux.org ping statistics ---
-1 packets transmitted, 1 packets received, 0.0% packet loss
-round-trip min/avg/max/stddev = 107.647/107.647/107.647/0.000 ms
-```
-
-Install Alpine environment (as of 20 Feb '26, 3.23.3 has broken BusyBox and
-`apk upgrade` fails - use 3.22.x instead):
-
-```console
-% doas jexec alpine su -
-root@alpine:~ # mkdir -vp /compat/alpine
-/compat
-/compat/alpine
-root@alpine:~ # fetch -o /tmp https://dl-cdn.alpinelinux.org/alpine/v3.22/releases/x86_64/alpine-minirootfs-3.22.3-x86_64.tar.gz
-alpine-minirootfs-3.22.3-x86_64.tar.gz           3626 kB 9921 kBps    00s
-root@alpine:~ # tar -C /compat/alpine -xzf /tmp/alpine-minirootfs-3.22.3-x86_64.tar.gz
-```
-
-If we try to run any of the alpine binaries, they'll fail with high probability
-because the jail does not mount a number of virtual filesystems for Linux
-compatibility layer.
-
-Shutdown the jail and make following changes:
-
-```console
-% diff -u /etc/jail.conf.d/alpine.conf{.orig,}
---- /etc/jail.conf.d/alpine.conf.orig	2026-02-20 14:15:13.011356000 -0600
-+++ /etc/jail.conf.d/alpine.conf	2026-02-20 14:16:58.289166000 -0600
-@@ -29,6 +29,14 @@
-   mount.devfs;
-   # keep-sorted end
-
-+  # keep-sorted start
-+  mount += "devfs     $path/compat/alpine/dev     devfs     rw 0 0";
-+  mount += "fdescfs   $path/compat/alpine/dev/fd  fdescfs   rw,linrdlnk 0 0";
-+  mount += "linprocfs $path/compat/alpine/proc    linprocfs rw 0 0";
-+  mount += "linsysfs  $path/compat/alpine/sys     linsysfs  rw 0 0";
-+  mount += "tmpfs     $path/compat/alpine/dev/shm tmpfs     rw,size=1g,mode=1777 0 0";
-+  # keep-sorted end
-+
-   exec.clean;
-   exec.consolelog = "/var/log/jail_${name}.log";
-```
-
-Verify it works:
-
-```console
-% doas jexec alpine chroot /compat/alpine su -
-alpine:~# echo 'nameserver 10.0.0.2' > /etc/resolv.conf
-alpine:~# ping -c 1 alpinelinux.org
-PING alpinelinux.org (213.219.36.190): 56 data bytes
-64 bytes from 213.219.36.190: seq=0 ttl=44 time=106.767 ms
+64 bytes from 213.219.36.190: seq=0 ttl=44 time=108.967 ms
 
 --- alpinelinux.org ping statistics ---
 1 packets transmitted, 1 packets received, 0% packet loss
-round-trip min/avg/max = 106.767/106.767/106.767 ms
+round-trip min/avg/max = 108.967/108.967/108.967 ms
 ```
 
 ## Install Bazel
@@ -143,5 +138,6 @@ round-trip min/avg/max = 106.767/106.767/106.767 ms
 # apk update
 # apk upgrade
 # echo "https://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories
-# apk install bazel8
+# apk update
+# apk add bazel8
 ```
