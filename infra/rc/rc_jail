@@ -44,7 +44,6 @@
 # keep-sorted start
 readonly CAT_CMD=/bin/cat
 readonly IFCONFIG_CMD=/sbin/ifconfig
-readonly JEXEC_CMD=/usr/sbin/jexec
 readonly MKDIR_CMD=/bin/mkdir
 readonly RM_CMD=/bin/rm
 # keep-sorted end
@@ -95,7 +94,7 @@ exec_created() {
     # must run from inside the jail after this completes.
     ${IFCONFIG_CMD} ${jail_epair_b} vnet ${jail_name}
     jail_epair_descr=jail:${jail_name}:${jail_bridge}
-    ${JEXEC_CMD} ${jail_name} ${IFCONFIG_CMD} ${jail_epair_b} ${jail_ip} up descr ${jail_epair_descr}
+    ${IFCONFIG_CMD} -j ${jail_name} ${jail_epair_b} ${jail_ip} up descr ${jail_epair_descr}
   done
 }
 
