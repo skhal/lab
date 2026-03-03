@@ -132,6 +132,157 @@ PING alpinelinux.org (213.219.36.190): 56 data bytes
 round-trip min/avg/max = 108.967/108.967/108.967 ms
 ```
 
+## Basics
+
+```console
+# apk add shadow shadow-doc tcsh tcsh-doc
+# chsh -s /bin/tcsh root
+# apk add mandoc mandoc-apropos less less-doc
+# apk add patch patch-doc
+# apk add drill
+# apk add neovim
+```
+
+Many tools will have man(1) pages available in `foo-doc` package, e.g.:
+
+```console
+# apk add wget-doc
+```
+
+## Certs
+
+Copy CA certificate to the jail:
+
+```console
+# cp /usr/jail/ssl/usr/local/share/certs/ca.crt /usr/jail/alpine/usr/local/share/ca-certificates/
+# chroot /usr/jail/alpine env PS1='alpine # ' /bin/sh
+alpine # sha256sum /etc/ssl/certs/ca-certificates.crt
+766392c21c0baf5fa722cb309dc576b89d9fb3323dd32aa45a939dd575db6d1c  /etc/ssl/certs/ca-certificates.crt
+alpine # update-ca-certificates
+alpine # sha256sum /etc/ssl/certs/ca-certificates.crt
+0e1052087075015f8e2ea0eab440de1a90f60c48cc76408d8c8e15f30263cca6  /etc/ssl/certs/ca-certificates.crt
+```
+
+## LDAP Client
+
+```console
+# apk add openldap-clients
+# cd /tmp
+# wget https://raw.githubusercontent.com/skhal/lab/refs/heads/main/infra/doc/ldap/client/openldap_ldap.conf.diff
+# patch -lb -i /tmp/openldap_ldap.conf.diff /etc/openldap/ldap.conf
+```
+
+```console
+# apk add nss-pam-ldapd nss-pam-ldapd-doc nss-pam-ldapd-openrc
+# diff /etc/nslcd.conf{.orig,}
+--- /etc/nslcd.conf.orig
++++ /etc/nslcd.conf
+@@ -15,14 +15,14 @@
+ #uri ldaps://127.0.0.1/
+ #uri ldapi://%2fvar%2frun%2fldapi_sock/
+ # Note: %2f encodes the '/' used as directory separator
+-uri ldap://127.0.0.1/
++uri ldap://ldap.lab.net/
+
+ # The LDAP version to use (defaults to 3
+ # if supported by client library)
+ #ldap_version 3
+
+ # The distinguished name of the search base.
+-base dc=example,dc=com
++base dc=lab,dc=net
+
+ # The distinguished name to bind to the server with.
+ # Optional: default is to bind anonymously.
+@@ -59,12 +59,12 @@
+ #idle_timelimit 3600
+
+ # Use StartTLS without verifying the server certificate.
+-#ssl start_tls
+-#tls_reqcert never
++ssl start_tls
++tls_reqcert allow
+
+ # CA certificates for server certificate verification
+ #tls_cacertdir /etc/ssl/certs
+-#tls_cacertfile /etc/ssl/ca.cert
++tls_cacertfile /etc/ssl/certs/ca-certificates.crt
+
+ # Seed the PRNG if /dev/urandom is not provided
+ #tls_randfile /var/run/egd-pool
+# rc-update add nslcd
+```
+
+Add user folder mounts:
+
+```console
+# mkdir /home/op /home/skhalatyan
+```
+
+Add mount points for user home folders in Alpine jail configuration.
+
+```console
+# apk add openssh-server-pam
+# addgroup -S sshd
+# adduser -H -S -s /sbin/nologin -G sshd sshd
+# diff /etc/ssh/sshd_config{.orig,}
+--- /etc/ssh/sshd_config.orig
++++ /etc/ssh/sshd_config
+@@ -85,7 +85,7 @@
+ # If you just want the PAM account and session checks to run without
+ # PAM authentication, then enable this but set PasswordAuthentication
+ # and KbdInteractiveAuthentication to 'no'.
+-#UsePAM no
++UsePAM yes
+
+ #AllowAgentForwarding yes
+ # Feel free to re-enable these if your use case requires them.
+# diff /etc/init.d/sshd{.orig,}
+--- /etc/init.d/sshd.orig
++++ /etc/init.d/sshd
+@@ -12,7 +12,7 @@
+ : "${cfgfile:=${SSHD_CONFIG:-"${SSHD_CONFDIR:-"/etc/ssh"}/sshd_config"}}"
+
+ pidfile="${SSHD_PIDFILE:-"/run/$RC_SVCNAME.pid"}"
+-command="${SSHD_BINARY:-"/usr/sbin/sshd"}"
++command="${SSHD_BINARY:-"/usr/sbin/sshd.pam"}"
+ command_args="${command_args:-${SSHD_OPTS:-}}"
+
+ required_files="$cfgfile"
+```
+
+Start the service with:
+
+```console
+# rc-service sshd start
+# rc-service sshd status
+ * status: started
+```
+
+It is hard to debug because none of the Linux networking tools work in this
+setup - they can't access network stack:
+
+```console
+# busybox netstat -tuln
+Active Internet connections (only servers)
+Proto Recv-Q Send-Q Local Address           Foreign Address         State
+netstat: /proc/net/tcp: No such file or directory
+netstat: /proc/net/tcp6: No such file or directory
+netstat: /proc/net/udp: No such file or directory
+netstat: /proc/net/udp6: No such file or directory
+# apk add iproute2
+# ss -tln
+Cannot open netlink socket: Protocol not supported
+State     Recv-Q     Send-Q         Local Address:Port         Peer Address:Port
+```
+
+None of the tools generate logs except apk:
+
+```console
+# ls /var/log
+apk.log
+```
+
 ## Install Bazel
 
 ```console
