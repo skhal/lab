@@ -5,7 +5,7 @@
 
 // Fork shows how to start a new process.
 //
-// Output (non-deterministic order after the first line):
+// Output (non-deterministic order after first line):
 // 10292 prepare for fork
 // 10292 forked a child 10432
 // 10292 done
@@ -23,7 +23,7 @@ int main() {
   printf("%d prepare for fork\n", getpid());
   switch (pid = fork()) {
     case -1:  // error
-      err(EX_OSERR, "fork %d", getpid());
+      err(EX_OSERR, "fork %d\n", getpid());
       break;
     case 0:  // child
       printf("%d in child\n", getpid());

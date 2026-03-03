@@ -2,12 +2,13 @@
 #
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
-#
+
 # Flavor: FreeBSD
 
-${.CURDIR:T}: main.c
+${.CURDIR:T}: main.c .NOTMAIN
 	@echo ".. build ${.TARGET}" \
-		&& cc -o ${.TARGET} ${.ALLSRC}
+		&& /usr/local/bin/clang21 -o ${.TARGET} ${.ALLSRC}
 
 run: ${.CURDIR:T} .PHONY
-	./${.CURDIR:T}
+	@echo ".. run ${.CURDIR:T}" \
+		&& ./${.CURDIR:T}
