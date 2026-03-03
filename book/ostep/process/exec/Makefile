@@ -2,15 +2,13 @@
 #
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
-#
+
 # Flavor: FreeBSD
 
-TARGET=/tmp/ostep-process-${.CURDIR:T}
-
-${TARGET}: main.c
+${.CURDIR:T}: main.c .NOTMAIN
 	@echo ".. build ${.TARGET}" \
-		&& cc -o ${.TARGET} ${.ALLSRC}
+		&& /usr/local/bin/clang21 -o ${.TARGET} ${.ALLSRC}
 
-run: ${TARGET} .PHONY
-	@echo ".. run ${.ALLSRC}" \
-		&& ${.ALLSRC}
+run: ${.CURDIR:T} .PHONY
+	@echo ".. run ${.CURDIR:T}" \
+		&& ./${.CURDIR:T}
