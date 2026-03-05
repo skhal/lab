@@ -1,0 +1,47 @@
+// Copyright 2026 Samvel Khalatyan. All rights reserved.
+//
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
+package slices_test
+
+import (
+	"slices"
+	"strconv"
+	"testing"
+
+	"github.com/google/go-cmp/cmp"
+	goslices "github.com/skhal/lab/go/slices"
+)
+
+func TestMapFunc(t *testing.T) {
+	mapfn := strconv.Itoa
+	tests := []struct {
+		name string
+		s    []int
+		want []string
+	}{
+		{
+			name: "empty",
+		},
+		{
+			name: "one item",
+			s:    []int{1},
+			want: []string{"1"},
+		},
+		{
+			name: "two items",
+			s:    []int{1, 2},
+			want: []string{"1", "2"},
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			got := slices.Collect(goslices.MapFunc(slices.Values(tc.s), mapfn))
+
+			if diff := cmp.Diff(tc.want, got); diff != "" {
+				t.Errorf("MapFunc() mismatch (-want +got):\n%s", diff)
+			}
+		})
+	}
+}
