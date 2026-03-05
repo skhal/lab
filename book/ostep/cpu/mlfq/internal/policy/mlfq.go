@@ -84,8 +84,17 @@ func (pol *mlfq) update() {
 		return
 	}
 	pol.last.cycles++
-	if pol.last.cycles == pol.spec.Allotment {
+	switch pol.last.cycles {
+	case pol.last.proc.Spec().CPUCycles:
+		pol.remove(pol.last)
+	case pol.spec.Allotment:
 		pol.deprioritize(pol.last)
+	}
+}
+
+func (pol *mlfq) remove(p *process) {
+	if x := pol.queues[p.qid].Pop(); x.(*process) != p {
+		panic(fmt.Errorf("remove: got %v, want %v", x.(*process), p))
 	}
 }
 
@@ -94,9 +103,7 @@ func (pol *mlfq) deprioritize(p *process) {
 		// already lowest proiority
 		return
 	}
-	if x := pol.queues[p.qid].Pop(); x.(*process) != p {
-		panic(fmt.Errorf("deprioritize: got %v, want %v", x.(*process), p))
-	}
+	pol.remove(p)
 	pol.addToQueue(p.qid+1, p.proc)
 }
 

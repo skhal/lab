@@ -5,20 +5,29 @@
 
 package proc
 
+import "github.com/skhal/lab/book/ostep/cpu/mlfq/internal/cpu"
+
 var lastID = 0
 
 // Process is a process in the system.
 type Process struct {
 	id   int
 	spec *Spec
+
+	state *state
+}
+
+type state struct {
+	cycles cpu.Cycle
 }
 
 // New creates a process with unique ID.
 func New(s *Spec) *Process {
 	lastID++
 	return &Process{
-		id:   lastID,
-		spec: s,
+		id:    lastID,
+		spec:  s,
+		state: new(state),
 	}
 }
 
@@ -29,7 +38,12 @@ func (p *Process) ID() int {
 
 // Run executes the process for one CPU cycle.
 func (p *Process) Run() {
-	// TODO(github.com/skhal/lab/issues/174): implement
+	p.state.cycles++
+}
+
+// Cycles returns the number of completed CPU cycles.
+func (p *Process) Cycles() cpu.Cycle {
+	return p.state.cycles
 }
 
 // Spec gives access to the process's specification.

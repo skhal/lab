@@ -74,9 +74,12 @@ func (dr *driver) Drive() iter.Seq[Cycle] {
 }
 
 func (dr *driver) next() bool {
+	if len(dr.completed) == len(dr.processes) {
+		return false
+	}
 	dr.schedule()
 	dr.run()
-	return len(dr.completed) != len(dr.processes)
+	return true
 }
 
 func (dr *driver) schedule() {
@@ -99,6 +102,8 @@ func (dr *driver) run() {
 	}
 	p := x.(*proc.Process)
 	p.Run()
-	// TODO(github.com/skhal/lab/issues/174): handle process if completed
+	if p.Cycles() == cpu.Cycle(p.Spec().CPUCycles) {
+		dr.completed = append(dr.completed, p)
+	}
 	dr.cycle.Proc = p
 }
