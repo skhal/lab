@@ -21,6 +21,11 @@ const abortCycle = 10
 type Cycle struct {
 	// ID is the cycle identification.
 	ID cpu.Cycle
+
+	// Proc is a process run in a given cycle. It might be nil if no process was
+	// scheduled, e.g., a process didn't arrive in the system yet and CPU sits
+	// idle.
+	Proc *proc.Process
 }
 
 // Policy is a scheduler interface used by simulator.
@@ -55,12 +60,14 @@ type driver struct {
 	completed []*proc.Process
 
 	pending int // index of the next pending process
+
+	cycle Cycle
 }
 
 // Drive runs simulation and returns a sequence of CPU cycles.
 func (dr *driver) Drive() iter.Seq[Cycle] {
 	return func(yield func(Cycle) bool) {
-		for dr.schedule() && yield(dr.cycle()) {
+		for dr.next() && yield(dr.cycle) {
 			dr.cpu.Next()
 			if dr.cpu.Cycle() == abortCycle {
 				break
@@ -69,7 +76,13 @@ func (dr *driver) Drive() iter.Seq[Cycle] {
 	}
 }
 
-func (dr *driver) schedule() bool {
+func (dr *driver) next() bool {
+	dr.schedule()
+	dr.run()
+	return len(dr.completed) != len(dr.processes)
+}
+
+func (dr *driver) schedule() {
 	for _, proc := range dr.processes[dr.pending:] {
 		if proc.Spec().Arrive != int(dr.cpu.Cycle()) {
 			break
@@ -77,18 +90,18 @@ func (dr *driver) schedule() bool {
 		dr.pol.Add(proc)
 		dr.pending++
 	}
-	return false
 }
 
-func (dr *driver) cycle() (cl Cycle) {
-	defer func() {
-		cl.ID = dr.cpu.Cycle()
-	}()
+func (dr *driver) run() {
+	dr.cycle = Cycle{
+		ID: dr.cpu.Cycle(),
+	}
 	p := dr.pol.Process()
 	if p == nil {
 		return
 	}
-	p.(*proc.Process).Run()
+	proc := p.(*proc.Process)
+	proc.Run()
 	// TODO(github.com/skhal/lab/issues/174): handle process if completed
-	return
+	dr.cycle.Proc = proc
 }

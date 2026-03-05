@@ -14,7 +14,7 @@ allotment:{{.Allotment}} queues:{{.NumQueues}} boost:{{.BoostCycles}}
 {{- end -}}
 
 {{- define "step" -}}
-{{.Cycle}}
+{{.ID}} {{if .Proc}}{{.Proc.ID}}{{else}}-{{end}}
 {{- end -}}
 
 policy:
