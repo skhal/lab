@@ -1,0 +1,31 @@
+{{- /*
+  Copyright 2026 Samvel Khalatyan. All rights reserved.
+
+  Use of this source code is governed by a BSD-style
+  license that can be found in the LICENSE file.
+*/ -}}
+
+{{- define "policy" -}}
+allotment:{{.Allotment}} queues:{{.NumQueues}} boost:{{.BoostCycles}}
+{{- end -}}
+
+{{- define "process" -}}
+{{.ID}} arrive:{{.Spec.Arrive}} cpu:{{.Spec.CPUCycles}}
+{{- end -}}
+
+{{- define "step" -}}
+{{.Cycle}}
+{{- end -}}
+
+policy:
+  {{template "policy" .Policy}}
+
+processes:
+{{- range .Processes}}
+  {{template "process" . }}
+{{- end}}
+
+trace:
+{{- range .Trace}}
+  {{template "step" . }}
+{{- end}}
