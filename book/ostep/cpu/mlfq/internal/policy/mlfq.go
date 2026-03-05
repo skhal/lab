@@ -5,7 +5,10 @@
 
 package policy
 
-import "github.com/skhal/lab/book/ostep/cpu/mlfq/internal/cpu"
+import (
+	"github.com/skhal/lab/book/ostep/cpu/mlfq/internal/cpu"
+	"github.com/skhal/lab/book/ostep/cpu/mlfq/internal/queue"
+)
 
 // Cycler is a CPU clock that gives access to current cycle.
 type Cycler interface {
@@ -15,10 +18,14 @@ type Cycler interface {
 
 // New creates a MLFQ policy.
 func New(spec Spec, c Cycler) *mlfq {
+	queues := make([]*queue.RoundRobin, spec.NumQueues)
+	for i := range spec.NumQueues {
+		queues[i] = new(queue.RoundRobin)
+	}
 	return &mlfq{
 		clk:    c,
 		spec:   spec,
-		queues: make([][]Process, spec.NumQueues),
+		queues: queues,
 	}
 }
 
@@ -35,13 +42,13 @@ type Process any
 type mlfq struct {
 	clk    Cycler
 	spec   Spec
-	queues [][]Process
+	queues []*queue.RoundRobin
 	proc   Process // last run job
 }
 
 // Add introduces a process to the scheduler.
 func (pol *mlfq) Add(j Process) {
-	pol.queues[0] = append(pol.queues[0], j)
+	pol.queues[0].Append(j)
 }
 
 // Next picks up next process to run. It returns true if such process exists,
