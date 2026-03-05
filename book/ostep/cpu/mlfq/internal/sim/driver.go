@@ -65,7 +65,6 @@ type driver struct {
 func (dr *driver) Drive() iter.Seq[Cycle] {
 	return func(yield func(Cycle) bool) {
 		for dr.next() && yield(dr.cycle) {
-			dr.cpu.Next()
 			if dr.cpu.Cycle() == abortCycle {
 				break
 			}
@@ -78,6 +77,7 @@ func (dr *driver) next() bool {
 		return false
 	}
 	dr.schedule()
+	dr.cpu.Next()
 	dr.run()
 	return true
 }
