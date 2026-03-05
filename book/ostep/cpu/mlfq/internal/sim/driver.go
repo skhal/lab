@@ -35,10 +35,7 @@ type Policy interface {
 
 	// Next schedules a process to run. It ruturns true if scheduling succeeded,
 	// else false.
-	Next() bool
-
-	// Process gives access to the selected process to run.
-	Process() policy.Process
+	Next() policy.Process
 }
 
 // Run drives processes pp with MLFQ policy using policy specifications pol.
@@ -96,12 +93,12 @@ func (dr *driver) run() {
 	dr.cycle = Cycle{
 		ID: dr.cpu.Cycle(),
 	}
-	p := dr.pol.Process()
-	if p == nil {
+	x := dr.pol.Next()
+	if x == nil {
 		return
 	}
-	proc := p.(*proc.Process)
-	proc.Run()
+	p := x.(*proc.Process)
+	p.Run()
 	// TODO(github.com/skhal/lab/issues/174): handle process if completed
-	dr.cycle.Proc = proc
+	dr.cycle.Proc = p
 }
