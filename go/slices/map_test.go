@@ -6,12 +6,11 @@
 package slices_test
 
 import (
-	"slices"
 	"strconv"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	goslices "github.com/skhal/lab/go/slices"
+	"github.com/skhal/lab/go/slices"
 )
 
 func TestMapFunc(t *testing.T) {
@@ -22,7 +21,12 @@ func TestMapFunc(t *testing.T) {
 		want []string
 	}{
 		{
+			name: "nil",
+		},
+		{
 			name: "empty",
+			s:    []int{},
+			want: []string{},
 		},
 		{
 			name: "one item",
@@ -37,7 +41,7 @@ func TestMapFunc(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			got := slices.Collect(goslices.MapFunc(slices.Values(tc.s), mapfn))
+			got := slices.MapFunc(tc.s, mapfn)
 
 			if diff := cmp.Diff(tc.want, got); diff != "" {
 				t.Errorf("MapFunc() mismatch (-want +got):\n%s", diff)

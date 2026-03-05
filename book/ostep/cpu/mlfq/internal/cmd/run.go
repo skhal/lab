@@ -35,7 +35,7 @@ var (
 	}
 )
 
-// Run parses flags and runs simulation.
+// Run initializeds the command with default flags and executes it.
 func Run(args []string) error {
 	cmd := &command{
 		policy:    defaultPolicy,
@@ -49,20 +49,20 @@ type command struct {
 	processes []*proc.Spec
 }
 
-// Run executes the command.
+// Run parses the flags, runs the simulation, and generates a report.
 func (cmd *command) Run(args []string) error {
 	if err := cmd.parseFlags(args); err != nil {
 		return err
 	}
-	pp, trace := cmd.run()
-	return cmd.report(pp, trace)
+	procs, trace := cmd.run()
+	return cmd.report(procs, trace)
 }
 
 func (cmd *command) run() ([]*proc.Process, iter.Seq[sim.Cycle]) {
 	slices.SortFunc(cmd.processes, func(a, b *proc.Spec) int {
 		return cmp.Compare(a.Arrive, b.Arrive)
 	})
-	pp := slices.Collect(goslices.MapFunc(slices.Values(cmd.processes), proc.New))
+	pp := goslices.MapFunc(cmd.processes, proc.New)
 	clk := new(cpu.Clock)
 	return pp, sim.Run(clk, policy.New(cmd.policy, clk), pp)
 }
@@ -73,7 +73,7 @@ func (cmd *command) report(pp []*proc.Process, cc iter.Seq[sim.Cycle]) error {
 	}
 	data := report.Data{
 		Policy:    cmd.policy,
-		Processes: slices.Collect(goslices.MapFunc(slices.Values(pp), mapfn)),
+		Processes: goslices.MapFunc(pp, mapfn),
 		Trace:     cc,
 	}
 	return report.Step(os.Stdout, data)
