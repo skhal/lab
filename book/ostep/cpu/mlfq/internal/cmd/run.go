@@ -62,9 +62,10 @@ func (cmd *command) run() ([]*proc.Process, iter.Seq[sim.Cycle]) {
 	slices.SortFunc(cmd.processes, func(a, b *proc.Spec) int {
 		return cmp.Compare(a.Arrive, b.Arrive)
 	})
-	pp := goslices.MapFunc(cmd.processes, proc.New)
 	clk := new(cpu.Clock)
-	return pp, sim.Run(clk, policy.New(cmd.policy, clk), pp)
+	pol := policy.New(cmd.policy, clk)
+	procs := goslices.MapFunc(cmd.processes, proc.New)
+	return procs, sim.Run(clk, pol, procs)
 }
 
 func (cmd *command) report(pp []*proc.Process, cc iter.Seq[sim.Cycle]) error {

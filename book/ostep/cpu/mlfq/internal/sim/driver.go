@@ -13,7 +13,7 @@ import (
 	"github.com/skhal/lab/book/ostep/cpu/mlfq/internal/proc"
 )
 
-// Cycle is a single cycle.
+// Cycle is a single CPU cycle.
 type Cycle struct {
 	// ID is the cycle identification.
 	ID cpu.Cycle
@@ -34,11 +34,11 @@ type Policy interface {
 
 // Run drives processes pp with MLFQ policy using policy specifications pol.
 // It returns a sequence of CPU cycles.
-func Run(clk *cpu.Clock, pol Policy, pp []*proc.Process) iter.Seq[Cycle] {
+func Run(clk *cpu.Clock, pol Policy, procs []*proc.Process) iter.Seq[Cycle] {
 	d := &driver{
 		cpu:       clk,
 		pol:       pol,
-		processes: pp,
+		processes: procs,
 	}
 	return d.Drive()
 }
@@ -63,8 +63,13 @@ func (dr *driver) Drive() iter.Seq[Cycle] {
 }
 
 func (dr *driver) schedule() bool {
-	// TODO(github.com/skhal/lab/issues/174): schedule pending processes with
-	// matching Spec.Arrive cycle.
+	for _, proc := range dr.processes[dr.pending:] {
+		if proc.Spec().Arrive != int(dr.cpu.Cycle()) {
+			break
+		}
+		dr.pol.Add(proc)
+		dr.pending++
+	}
 	return false
 }
 
