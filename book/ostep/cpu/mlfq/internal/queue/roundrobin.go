@@ -62,13 +62,23 @@ var ErrEmpty = errors.New("empty queue")
 //		rr.Pop()		 // 3
 //		rr.Pop()		 // 4
 type RoundRobin struct {
-	items []any
-	next  int // index of the next item
+	items  []any
+	next   int  // index of the next item
+	looped bool // true if next looped
 }
 
 // Append adds an item to the end of the queue.
 func (q *RoundRobin) Append(v any) {
 	q.items = append(q.items, v)
+	if q.next == 0 && q.looped {
+		// the index looped, make new element next
+		q.unloop()
+	}
+}
+
+func (q *RoundRobin) unloop() {
+	q.next = len(q.items) - 1
+	q.looped = false
 }
 
 // Len returns the length of the queue.
@@ -82,9 +92,17 @@ func (q *RoundRobin) Next() any {
 	if len(q.items) == 0 {
 		panic(ErrEmpty)
 	}
-	v := q.items[q.next%len(q.items)]
+	v := q.items[q.next]
 	q.next++
+	if q.next == len(q.items) {
+		q.loop()
+	}
 	return v
+}
+
+func (q *RoundRobin) loop() {
+	q.next = 0
+	q.looped = true
 }
 
 // Pop removes last retrieved element from the queue and decreases iterator to
@@ -92,24 +110,24 @@ func (q *RoundRobin) Next() any {
 // iterator reaches the beginning of the queue. It panics with [ErrEmpty] if
 // the queue is empty.
 func (q *RoundRobin) Pop() any {
-	if q.next == 0 {
-		if len(q.items) == 0 {
-			panic(ErrEmpty)
+	if len(q.items) == 0 {
+		panic(ErrEmpty)
+	}
+	switch q.next {
+	case 0:
+		if q.looped {
+			// unwrap, want to pop the last element
+			q.unloop()
 		}
-		q.next = 1
+	default:
+		q.next--
 	}
-	idx := (q.next - 1) % len(q.items)
-	v := q.items[idx]
-	// avoid copy for the last element
-	if sz := len(q.items); idx == sz-1 {
-		q.items = q.items[:idx]
-	} else {
-		// optimize the code for production: avoid copy on every pop, instead let
-		// the slice grow and copy when some threshold (allocated vs actual size)
-		// is passed.
-		copy(q.items[idx:], q.items[idx+1:])
-		q.items = q.items[:sz-1]
+	// q.next points to the element to be removed
+	v := q.items[q.next]
+	copy(q.items[q.next:], q.items[q.next+1:])
+	q.items = q.items[:len(q.items)-1]
+	if len(q.items) > 0 && q.next == len(q.items) {
+		q.loop()
 	}
-	q.next--
 	return v
 }

@@ -359,6 +359,16 @@ func TestRoundRobin_Pop_with_next(t *testing.T) {
 			want: []int{2, 1},
 		},
 		{
+			name:  "two items three next",
+			items: []int{1, 2},
+			calls: func(rr *queue.RoundRobin) {
+				rr.Next()
+				rr.Next()
+				rr.Next()
+			},
+			want: []int{1, 2},
+		},
+		{
 			name:  "three items one next",
 			items: []int{1, 2, 3},
 			calls: func(rr *queue.RoundRobin) {
@@ -374,6 +384,27 @@ func TestRoundRobin_Pop_with_next(t *testing.T) {
 				rr.Next()
 			},
 			want: []int{2, 1, 3},
+		},
+		{
+			name:  "three items three next",
+			items: []int{1, 2, 3},
+			calls: func(rr *queue.RoundRobin) {
+				rr.Next()
+				rr.Next()
+				rr.Next()
+			},
+			want: []int{3, 2, 1},
+		},
+		{
+			name:  "three items four next",
+			items: []int{1, 2, 3},
+			calls: func(rr *queue.RoundRobin) {
+				rr.Next()
+				rr.Next()
+				rr.Next()
+				rr.Next()
+			},
+			want: []int{1, 3, 2},
 		},
 	}
 	for _, tc := range tests {
