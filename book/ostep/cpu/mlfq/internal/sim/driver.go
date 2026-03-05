@@ -13,10 +13,6 @@ import (
 	"github.com/skhal/lab/book/ostep/cpu/mlfq/internal/proc"
 )
 
-// abortCycle aborts the simulator.
-// TODO(github.com/skhal/lab/issues/174): remove when mlfq is implemented
-const abortCycle = 10
-
 // Cycle is a single CPU cycle.
 type Cycle struct {
 	// ID is the cycle identification.
@@ -65,9 +61,7 @@ type driver struct {
 func (dr *driver) Drive() iter.Seq[Cycle] {
 	return func(yield func(Cycle) bool) {
 		for dr.next() && yield(dr.cycle) {
-			if dr.cpu.Cycle() == abortCycle {
-				break
-			}
+			continue
 		}
 	}
 }
