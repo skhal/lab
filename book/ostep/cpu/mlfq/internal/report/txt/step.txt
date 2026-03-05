@@ -14,7 +14,9 @@ allotment:{{.Allotment}} queues:{{.NumQueues}} boost:{{.BoostCycles}}
 {{- end -}}
 
 {{- define "step" -}}
-{{.ID}} {{if .Proc}}run {{.Proc.ID}}{{else}}-{{end}}
+{{.ID}} {{if .Proc}}run {{.Proc.ID}}
+  {{- if .Proc.Done}} [done]{{end}}
+  {{- else}}-{{end}}
 {{- end -}}
 
 policy:

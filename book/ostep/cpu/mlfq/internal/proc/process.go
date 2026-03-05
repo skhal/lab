@@ -41,6 +41,11 @@ func (p *Process) Run() {
 	p.state.cycles++
 }
 
+// Done reports whether the process completed.
+func (p *Process) Done() bool {
+	return p.state.cycles == cpu.Cycle(p.spec.CPUCycles)
+}
+
 // Cycles returns the number of completed CPU cycles.
 func (p *Process) Cycles() cpu.Cycle {
 	return p.state.cycles

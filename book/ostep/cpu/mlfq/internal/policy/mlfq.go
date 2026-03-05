@@ -39,6 +39,9 @@ type Process interface {
 
 	// Spec returns process specification.
 	Spec() proc.Spec
+
+	// Done returns true if the process completed, else false.
+	Done() bool
 }
 
 // mlfq implements Multilevel Feedback Queue scheduling policy. It uses the
@@ -84,16 +87,19 @@ func (pol *mlfq) update() {
 		return
 	}
 	pol.last.cycles++
-	switch pol.last.cycles {
-	case pol.last.proc.Spec().CPUCycles:
+	if pol.last.proc.Done() {
 		pol.remove(pol.last)
-	case pol.spec.Allotment:
+		return
+	}
+	if pol.last.cycles == pol.spec.Allotment {
 		pol.deprioritize(pol.last)
 	}
 }
 
 func (pol *mlfq) remove(p *process) {
-	if x := pol.queues[p.qid].Pop(); x.(*process) != p {
+	if x := pol.queues[p.qid].Pop(); x == nil {
+		panic(fmt.Errorf("remove: failed to pop %v", p))
+	} else if x.(*process) != p {
 		panic(fmt.Errorf("remove: got %v, want %v", x.(*process), p))
 	}
 }
