@@ -30,8 +30,8 @@ var (
 	}
 	defaultProcesses = []*proc.Spec{
 		{CPUCycles: 10},
-		{Arrive: 1, CPUCycles: 10},
-		{Arrive: 2, CPUCycles: 10},
+		{Arrive: 1, CPUCycles: 8},
+		{Arrive: 2, CPUCycles: 5},
 	}
 )
 
