@@ -71,15 +71,18 @@ func (pol *mlfq) addToQueue(q int, p Process) {
 	})
 }
 
+// Priority is the process priority.
+type Priority int
+
 // Next picks up next process to run. It returns true if such process exists,
 // else false.
-func (pol *mlfq) Next() Process {
+func (pol *mlfq) Next() (Process, Priority) {
 	pol.update()
 	pol.last = pol.next()
 	if pol.last == nil {
-		return nil
+		return nil, 0
 	}
-	return pol.last.proc
+	return pol.last.proc, Priority(pol.last.qid)
 }
 
 func (pol *mlfq) update() {

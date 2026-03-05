@@ -22,6 +22,9 @@ type Cycle struct {
 	// scheduled, e.g., a process didn't arrive in the system yet and CPU sits
 	// idle.
 	Proc *proc.Process
+
+	// Priority is the process priority.
+	Priority policy.Priority
 }
 
 // Policy is a scheduler interface used by simulator.
@@ -31,7 +34,7 @@ type Policy interface {
 
 	// Next schedules a process to run. It ruturns true if scheduling succeeded,
 	// else false.
-	Next() policy.Process
+	Next() (policy.Process, policy.Priority)
 }
 
 // Run drives processes pp with MLFQ policy using policy specifications pol.
@@ -90,7 +93,7 @@ func (dr *driver) run() {
 	dr.cycle = Cycle{
 		ID: dr.cpu.Cycle(),
 	}
-	x := dr.pol.Next()
+	x, pri := dr.pol.Next()
 	if x == nil {
 		return
 	}
@@ -100,4 +103,5 @@ func (dr *driver) run() {
 		dr.completed = append(dr.completed, p)
 	}
 	dr.cycle.Proc = p
+	dr.cycle.Priority = pri
 }

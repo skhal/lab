@@ -11,6 +11,7 @@ import (
 	"iter"
 	"text/template"
 
+	"github.com/skhal/lab/book/ostep/cpu/mlfq/internal/cpu"
 	"github.com/skhal/lab/book/ostep/cpu/mlfq/internal/policy"
 	"github.com/skhal/lab/book/ostep/cpu/mlfq/internal/proc"
 	"github.com/skhal/lab/book/ostep/cpu/mlfq/internal/sim"
@@ -41,6 +42,9 @@ type Process interface {
 
 	// Spec returns process's configuration.
 	Spec() proc.Spec
+
+	// Cycles return the number of completed CPU cycles.
+	Cycles() cpu.Cycle
 }
 
 // Step generates a report with every cycle printed out.

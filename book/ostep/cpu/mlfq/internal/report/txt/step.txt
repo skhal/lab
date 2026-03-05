@@ -14,7 +14,7 @@ allotment:{{.Allotment}} queues:{{.NumQueues}} boost:{{.BoostCycles}}
 {{- end -}}
 
 {{- define "step" -}}
-{{.ID}} {{if .Proc}}run {{.Proc.ID}}
+{{.ID}} {{if .Proc}}run {{.Proc.ID}} cpu {{.Proc.Cycles}} pri {{.Priority}}
   {{- if .Proc.Done}} [done]{{end}}
   {{- else}}-{{end}}
 {{- end -}}
