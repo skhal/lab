@@ -99,7 +99,7 @@ func (dr *driver) run() {
 	}
 	p := x.(*proc.Process)
 	p.Run()
-	if p.Cycles() == cpu.Cycle(p.Spec().CPUCycles) {
+	if p.Done() {
 		dr.completed = append(dr.completed, p)
 	}
 	dr.cycle.Proc = p
