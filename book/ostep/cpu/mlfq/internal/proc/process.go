@@ -7,6 +7,7 @@ package proc
 
 import (
 	"fmt"
+	"sync"
 
 	"github.com/skhal/lab/book/ostep/cpu/mlfq/internal/cpu"
 )
@@ -22,6 +23,9 @@ type Process struct {
 }
 
 type state struct {
+	once   sync.Once
+	arrive cpu.Cycle
+
 	cycles cpu.Cycle
 }
 
@@ -38,6 +42,13 @@ func New(s *Spec) *Process {
 // ID returns process's identifier.
 func (p *Process) ID() int {
 	return p.id
+}
+
+// Arrive marks the process arrive to the system.
+func (p *Process) Arrive(c cpu.Cycle) {
+	p.state.once.Do(func() {
+		p.state.arrive = c
+	})
 }
 
 // Run executes the process for one CPU cycle.
