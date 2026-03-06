@@ -5,7 +5,11 @@
 
 package proc
 
-import "github.com/skhal/lab/book/ostep/cpu/mlfq/internal/cpu"
+import (
+	"fmt"
+
+	"github.com/skhal/lab/book/ostep/cpu/mlfq/internal/cpu"
+)
 
 var lastID = 0
 
@@ -54,4 +58,9 @@ func (p *Process) Cycles() cpu.Cycle {
 // Spec gives access to the process's specification.
 func (p *Process) Spec() Spec {
 	return p.spec
+}
+
+// String implements [fmt.Stringer] interface.
+func (p *Process) String() string {
+	return fmt.Sprintf("pid:%d", p.id)
 }
