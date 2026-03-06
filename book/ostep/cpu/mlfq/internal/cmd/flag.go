@@ -62,6 +62,10 @@ func (tt tokens) mustParseInt(idx int, name string) int {
 	return n
 }
 
+func (tt tokens) mustParseCycle(idx int, name string) cpu.Cycle {
+	return cpu.Cycle(tt.mustParseInt(idx, name))
+}
+
 // Set implements [flag.Value] interface. It sets the policy specification from
 // the flag value s.
 func (fg *PolicySpecFlag) Set(s string) (err error) {
@@ -85,9 +89,9 @@ func (fg *PolicySpecFlag) Set(s string) (err error) {
 		idxBoostCycles = 2
 	)
 	tt := tokens(strings.Split(s, specFieldSeparator))
-	fg.spec.Allotment = cpu.Cycle(tt.mustParseInt(idxAllotment, "allotment"))
+	fg.spec.Allotment = tt.mustParseCycle(idxAllotment, "allotment")
 	fg.spec.Priorities = tt.mustParseInt(idxPriorities, "priorities")
-	fg.spec.BoostCycles = cpu.Cycle(tt.mustParseInt(idxBoostCycles, "boost cycles"))
+	fg.spec.BoostCycles = tt.mustParseCycle(idxBoostCycles, "boost cycles")
 	return nil
 }
 
@@ -191,10 +195,10 @@ func (fg *ProcSpecFlag) Set(s string) (err error) {
 		idxIOCycles         = 3
 	)
 	tt := tokens(strings.Split(s, specFieldSeparator))
-	fg.spec.Arrive = cpu.Cycle(tt.mustParseInt(idxArrive, "arrive"))
-	fg.spec.CPUCycles = cpu.Cycle(tt.mustParseInt(idxCPUCycles, "cpu cycles"))
-	fg.spec.IOAfterCPUCycles = cpu.Cycle(tt.mustParseInt(idxIOAfterCPUCycles, "io after cpu cycles"))
-	fg.spec.IOCycles = cpu.Cycle(tt.mustParseInt(idxIOCycles, "io cycles"))
+	fg.spec.Arrive = tt.mustParseCycle(idxArrive, "arrive")
+	fg.spec.CPUCycles = tt.mustParseCycle(idxCPUCycles, "cpu cycles")
+	fg.spec.IOAfterCPUCycles = tt.mustParseCycle(idxIOAfterCPUCycles, "io after cpu cycles")
+	fg.spec.IOCycles = tt.mustParseCycle(idxIOCycles, "io cycles")
 	return
 }
 
