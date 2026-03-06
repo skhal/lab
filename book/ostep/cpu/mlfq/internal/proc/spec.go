@@ -5,7 +5,26 @@
 
 package proc
 
-import "github.com/skhal/lab/book/ostep/cpu/mlfq/internal/cpu"
+import (
+	"errors"
+
+	"github.com/skhal/lab/book/ostep/cpu/mlfq/internal/cpu"
+)
+
+var (
+	// ErrSpecArrive means [Spec.Arrive] is negative.
+	ErrSpecArrive = errors.New("invalid arrive")
+
+	// ErrSpecCPUCycles means [Spec.CPUCycles] is non-positive.
+	ErrSpecCPUCycles = errors.New("invalid cpu cycles")
+
+	// ErrSpecIOAfterCPUCycles means [Spec.IOAfterCPUCycles] is negative.
+	ErrSpecIOAfterCPUCycles = errors.New("invalid io after cpu cycles")
+
+	// ErrSpecIOCycles means [Spec.IOAfterCPUCycles] is set but [Spec.IOCycles]
+	// is non-positive.
+	ErrSpecIOCycles = errors.New("invalid io cycles")
+)
 
 // Spec is a process configuration.
 type Spec struct {
@@ -21,4 +40,28 @@ type Spec struct {
 
 	// IOCycles is the number of cycles the IO runs.
 	IOCycles cpu.Cycle
+}
+
+// Validate ensures that [Spec] has values are:
+//
+// - Arrive: not negative.
+// - CPUCycles: positive
+// - IOAfterCPUCycles: not negative.
+// - IOCycles: positive when IOAfterCPUCycles is positive.
+func (s *Spec) Validate() error {
+	if s.Arrive < 0 {
+		return ErrSpecArrive
+	}
+	if s.CPUCycles < 1 {
+		return ErrSpecCPUCycles
+	}
+	if s.IOAfterCPUCycles < 0 {
+		return ErrSpecIOAfterCPUCycles
+	}
+	if s.IOAfterCPUCycles > 0 {
+		if s.IOCycles < 1 {
+			return ErrSpecIOCycles
+		}
+	}
+	return nil
 }

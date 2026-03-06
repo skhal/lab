@@ -8,6 +8,7 @@ package cmd
 import (
 	"cmp"
 	"flag"
+	"fmt"
 	"iter"
 	"os"
 	"path/filepath"
@@ -97,6 +98,10 @@ func (cmd *command) parseFlags(args []string) error {
 	if err := cmd.policy.Validate(); err != nil {
 		return err
 	}
-	// TODO(github.com/skhal/lab/issues/179): validate processes flag
+	for i, spec := range cmd.processes {
+		if err := spec.Validate(); err != nil {
+			return fmt.Errorf("spec %d: %w", i, err)
+		}
+	}
 	return nil
 }
