@@ -12,7 +12,7 @@ var lastID = 0
 // Process is a process in the system.
 type Process struct {
 	id   int
-	spec *Spec
+	spec Spec
 
 	state *state
 }
@@ -26,7 +26,7 @@ func New(s *Spec) *Process {
 	lastID++
 	return &Process{
 		id:    lastID,
-		spec:  s,
+		spec:  *s,
 		state: new(state),
 	}
 }
@@ -53,5 +53,5 @@ func (p *Process) Cycles() cpu.Cycle {
 
 // Spec gives access to the process's specification.
 func (p *Process) Spec() Spec {
-	return *p.spec
+	return p.spec
 }
