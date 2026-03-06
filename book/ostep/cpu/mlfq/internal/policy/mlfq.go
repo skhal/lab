@@ -132,7 +132,7 @@ func (pol *mlfq) next() *process {
 type process struct {
 	proc   Process
 	qid    int
-	cycles int
+	cycles cpu.Cycle
 }
 
 // String implements [fmt.Stringer] interface.
