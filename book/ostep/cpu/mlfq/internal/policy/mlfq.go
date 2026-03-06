@@ -9,7 +9,6 @@ import (
 	"fmt"
 
 	"github.com/skhal/lab/book/ostep/cpu/mlfq/internal/cpu"
-	"github.com/skhal/lab/book/ostep/cpu/mlfq/internal/proc"
 	"github.com/skhal/lab/book/ostep/cpu/mlfq/internal/queue"
 )
 
@@ -34,12 +33,6 @@ func New(spec Spec, c Cycler) *mlfq {
 
 // Process is a Process interface, used by MLFQ policy.
 type Process interface {
-	// ID returns process identifier.
-	ID() int
-
-	// Spec returns process specification.
-	Spec() proc.Spec
-
 	// Done returns true if the process completed, else false.
 	Done() bool
 }
@@ -137,5 +130,5 @@ type process struct {
 
 // String implements [fmt.Stringer] interface.
 func (p *process) String() string {
-	return fmt.Sprintf("pid:%d qid:%d cycles:%d %v", p.proc.ID(), p.prio, p.cycles, p.proc.Spec())
+	return fmt.Sprintf("%s qid:%d cycles:%d", p.proc, p.prio, p.cycles)
 }
