@@ -20,7 +20,10 @@ import (
 var (
 	//go:embed txt
 	efs   embed.FS
-	tmpls = template.Must(template.New("templates").ParseFS(efs, "txt/*.txt"))
+	fnmap = template.FuncMap{
+		"AvgStat": avgStat,
+	}
+	tmpls = template.Must(template.New("templates").Funcs(fnmap).ParseFS(efs, "txt/*.txt"))
 )
 
 // Data is the report input.
@@ -45,9 +48,32 @@ type Process interface {
 
 	// Cycles return the number of completed CPU cycles.
 	Cycles() cpu.Cycle
+
+	// Stat calculate process metrics.
+	Stat() proc.Stat
 }
 
 // Step generates a report with every cycle printed out.
 func Step(w io.Writer, d Data) error {
 	return tmpls.ExecuteTemplate(w, "step.txt", d)
+}
+
+func avgStat(pp []Process) proc.Stat {
+	if len(pp) == 0 {
+		return proc.Stat{}
+	}
+	s := proc.Stat{}
+	for _, p := range pp {
+		ps := p.Stat()
+		s.Response += ps.Response
+		s.Turnaround += ps.Turnaround
+		s.Wait += ps.Wait
+	}
+	avg := func(n cpu.Cycle) cpu.Cycle {
+		return cpu.Cycle(int(n) / len(pp))
+	}
+	s.Response = avg(s.Response)
+	s.Turnaround = avg(s.Turnaround)
+	s.Wait = avg(s.Wait)
+	return s
 }

@@ -42,3 +42,8 @@ stats:
 {{- range .Processes}}
   {{.ID}} {{template "stat" .Stat}}
 {{- end}}
+
+average:
+{{- with $avgStat := .Processes | AvgStat}}
+    {{template "stat" $avgStat}}
+{{- end}}
