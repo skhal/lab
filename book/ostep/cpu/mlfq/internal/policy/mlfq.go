@@ -64,10 +64,10 @@ func (pol *mlfq) Add(p Process) {
 	pol.addToQueue(0, p)
 }
 
-func (pol *mlfq) addToQueue(q int, p Process) {
-	pol.queues[q].Append(&process{
-		proc:     p,
-		priority: q,
+func (pol *mlfq) addToQueue(prio Priority, p Process) {
+	pol.queues[prio].Append(&process{
+		proc: p,
+		prio: prio,
 	})
 }
 
@@ -84,7 +84,7 @@ func (pol *mlfq) Next() (Process, Priority) {
 	if pol.last == nil {
 		return nil, 0
 	}
-	return pol.last.proc, Priority(pol.last.priority)
+	return pol.last.proc, Priority(pol.last.prio)
 }
 
 func (pol *mlfq) update() {
@@ -102,7 +102,7 @@ func (pol *mlfq) update() {
 }
 
 func (pol *mlfq) remove(p *process) {
-	if x := pol.queues[p.priority].Pop(); x == nil {
+	if x := pol.queues[p.prio].Pop(); x == nil {
 		panic(fmt.Errorf("remove: failed to pop %v", p))
 	} else if x.(*process) != p {
 		panic(fmt.Errorf("remove: got %v, want %v", x.(*process), p))
@@ -110,12 +110,12 @@ func (pol *mlfq) remove(p *process) {
 }
 
 func (pol *mlfq) deprioritize(p *process) {
-	if p.priority+1 == len(pol.queues) {
+	if int(p.prio+1) == len(pol.queues) {
 		// already lowest proiority
 		return
 	}
 	pol.remove(p)
-	pol.addToQueue(p.priority+1, p.proc)
+	pol.addToQueue(p.prio+1, p.proc)
 }
 
 func (pol *mlfq) next() *process {
@@ -130,12 +130,12 @@ func (pol *mlfq) next() *process {
 }
 
 type process struct {
-	proc     Process
-	priority int
-	cycles   cpu.Cycle
+	proc   Process
+	prio   Priority
+	cycles cpu.Cycle
 }
 
 // String implements [fmt.Stringer] interface.
 func (p *process) String() string {
-	return fmt.Sprintf("pid:%d qid:%d cycles:%d %v", p.proc.ID(), p.priority, p.cycles, p.proc.Spec())
+	return fmt.Sprintf("pid:%d qid:%d cycles:%d %v", p.proc.ID(), p.prio, p.cycles, p.proc.Spec())
 }
