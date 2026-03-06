@@ -21,6 +21,10 @@
   {{- else}}-{{end}}
 {{- end -}}
 
+{{- define "stat" -}}
+response: {{.Response}} turnaround: {{.Turnaround}} wait: {{.Wait}}
+{{- end -}}
+
 policy:
   {{template "policy" .Policy}}
 
@@ -32,4 +36,9 @@ processes:
 trace:
 {{- range .Trace}}
   {{template "step" . }}
+{{- end}}
+
+stats:
+{{- range .Processes}}
+  {{.ID}} {{template "stat" .Stat}}
 {{- end}}

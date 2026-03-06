@@ -14,27 +14,47 @@ import (
 
 var lastID = 0
 
+// Cycler is the cpu.Clock interface used by [Process].
+type Cycler interface {
+	// Cycles returns current cpu.Cycle.
+	Cycle() cpu.Cycle
+}
+
 // Process is a process in the system.
 type Process struct {
 	id   int
 	spec Spec
 
+	clk   Cycler
 	state *state
 }
 
 type state struct {
-	once   sync.Once
-	arrive cpu.Cycle
+	arrive struct {
+		once  sync.Once
+		cycle cpu.Cycle
+	}
+
+	firstRun struct {
+		once  sync.Once
+		cycle cpu.Cycle
+	}
+
+	complete struct {
+		once  sync.Once
+		cycle cpu.Cycle
+	}
 
 	cycles cpu.Cycle
 }
 
 // New creates a process with unique ID.
-func New(s *Spec) *Process {
+func New(s *Spec, clk Cycler) *Process {
 	lastID++
 	return &Process{
 		id:    lastID,
 		spec:  *s,
+		clk:   clk,
 		state: new(state),
 	}
 }
@@ -45,15 +65,23 @@ func (p *Process) ID() int {
 }
 
 // Arrive marks the process arrive to the system.
-func (p *Process) Arrive(c cpu.Cycle) {
-	p.state.once.Do(func() {
-		p.state.arrive = c
+func (p *Process) Arrive() {
+	p.state.arrive.once.Do(func() {
+		p.state.arrive.cycle = p.clk.Cycle()
 	})
 }
 
 // Run executes the process for one CPU cycle.
 func (p *Process) Run() {
+	p.state.firstRun.once.Do(func() {
+		p.state.firstRun.cycle = p.clk.Cycle()
+	})
 	p.state.cycles++
+	if p.Done() {
+		p.state.complete.once.Do(func() {
+			p.state.complete.cycle = p.clk.Cycle()
+		})
+	}
 }
 
 // Done reports whether the process completed.
@@ -69,6 +97,29 @@ func (p *Process) Cycles() cpu.Cycle {
 // Spec gives access to the process's specification.
 func (p *Process) Spec() Spec {
 	return p.spec
+}
+
+// Stat holds process metrics in cpu.Cycle units.
+type Stat struct {
+	// Response is the time between the process arrives and runs for the first
+	// time.
+	Response cpu.Cycle
+
+	// Turnaround is the time between the process arrives and completes.
+	Turnaround cpu.Cycle
+
+	// Wait is the time the process spends not running on CPU.
+	Wait cpu.Cycle
+}
+
+// Stat calculates process metrics.
+func (p *Process) Stat() Stat {
+	st := Stat{
+		Response:   p.state.firstRun.cycle - p.state.arrive.cycle,
+		Turnaround: p.state.complete.cycle - p.state.arrive.cycle,
+	}
+	st.Wait = st.Turnaround - p.state.cycles
+	return st
 }
 
 // String implements [fmt.Stringer] interface.

@@ -65,7 +65,10 @@ func (cmd *command) run() ([]*proc.Process, iter.Seq[sim.Cycle]) {
 	})
 	clk := new(cpu.Clock)
 	pol := policy.New(cmd.policy, clk)
-	procs := goslices.MapFunc(cmd.processes, proc.New)
+	mapfn := func(s *proc.Spec) *proc.Process {
+		return proc.New(s, clk)
+	}
+	procs := goslices.MapFunc(cmd.processes, mapfn)
 	return procs, sim.Run(clk, pol, procs)
 }
 

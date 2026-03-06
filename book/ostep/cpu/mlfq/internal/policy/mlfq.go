@@ -34,7 +34,7 @@ func New(spec Spec, c Cycler) *mlfq {
 // Process is a Process interface, used by MLFQ policy.
 type Process interface {
 	// Arrive marks the process arrive to the system.
-	Arrive(c cpu.Cycle)
+	Arrive()
 
 	// Done returns true if the process completed, else false.
 	Done() bool
@@ -57,7 +57,7 @@ type mlfq struct {
 
 // Add injects the new process to the highest priority queue.
 func (pol *mlfq) Add(p Process) {
-	p.Arrive(pol.clk.Cycle())
+	p.Arrive()
 	pol.addToQueue(0, p)
 }
 
