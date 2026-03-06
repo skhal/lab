@@ -87,7 +87,9 @@ func (cmd *command) parseFlags(args []string) error {
 	if err := fs.Parse(args[1:]); err != nil {
 		return err
 	}
-	// TODO(github.com/skhal/lab/issues/178): validate policy flag
+	if err := cmd.policy.Validate(); err != nil {
+		return err
+	}
 	// TODO(github.com/skhal/lab/issues/179): validate processes flag
 	return nil
 }
