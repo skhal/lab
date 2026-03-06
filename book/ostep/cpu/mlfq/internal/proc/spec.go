@@ -5,18 +5,20 @@
 
 package proc
 
+import "github.com/skhal/lab/book/ostep/cpu/mlfq/internal/cpu"
+
 // Spec is a process configuration.
 type Spec struct {
 	// Arrive is the cycle when the process should appear in the system.
-	Arrive int
+	Arrive cpu.Cycle
 
 	// CPUCycles is the number of CPU cycles the process takes to comlpete.
-	CPUCycles int
+	CPUCycles cpu.Cycle
 
 	// IOAfterCPUCycles is the number of CPU cycles that must run to issue an IO.
 	// Zero value means no IO is issued.
-	IOAfterCPUCycles int
+	IOAfterCPUCycles cpu.Cycle
 
 	// IOCycles is the number of cycles the IO runs.
-	IOCycles int
+	IOCycles cpu.Cycle
 }

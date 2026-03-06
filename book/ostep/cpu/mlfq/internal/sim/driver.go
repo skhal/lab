@@ -81,7 +81,7 @@ func (dr *driver) next() bool {
 
 func (dr *driver) schedule() {
 	for _, proc := range dr.processes[dr.pending:] {
-		if proc.Spec().Arrive != int(dr.cpu.Cycle()) {
+		if proc.Spec().Arrive != dr.cpu.Cycle() {
 			break
 		}
 		dr.pol.Add(proc)
