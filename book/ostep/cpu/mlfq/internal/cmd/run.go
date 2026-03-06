@@ -82,7 +82,14 @@ func (cmd *command) report(pp []*proc.Process, cc iter.Seq[sim.Cycle]) error {
 
 func (cmd *command) parseFlags(args []string) error {
 	fs := flag.NewFlagSet(filepath.Base(args[0]), flag.ExitOnError)
-	// TODO(github.com/skhal/lab/issues/178): register policy flag
+	type valueHelper interface {
+		flag.Value
+		Usage() string
+	}
+	registerVar := func(val valueHelper, name string) {
+		fs.Var(val, name, val.Usage())
+	}
+	registerVar(&PolicySpecFlag{&cmd.policy}, "policy")
 	// TODO(github.com/skhal/lab/issues/179): register processes flag
 	if err := fs.Parse(args[1:]); err != nil {
 		return err
