@@ -18,6 +18,10 @@ github.com/bazelbuild/bazel-watcher/cmd/ibazel@v0.28.0
 github.com/bazelbuild/buildtools/buildifier@latest
 github.com/bazelbuild/buildtools/buildozer@latest
 github.com/go-delve/delve/cmd/dlv@v1.26.0 -ldflags '-extldflags -lkvm'
+github.com/google/codesearch/cmd/cgrep@b34f2a0c5ce12be3c9dc28038640afece6bee523
+github.com/google/codesearch/cmd/cindex@b34f2a0c5ce12be3c9dc28038640afece6bee523
+github.com/google/codesearch/cmd/csearch@b34f2a0c5ce12be3c9dc28038640afece6bee523
+github.com/google/codesearch/cmd/csweb@b34f2a0c5ce12be3c9dc28038640afece6bee523
 github.com/google/keep-sorted@v0.7.1
 github.com/google/yamlfmt/cmd/yamlfmt@v0.21.0
 github.com/jstemmer/gotags@latest
