@@ -20,8 +20,8 @@ type Cycler interface {
 
 // New creates a MLFQ policy.
 func New(spec Spec, c Cycler) *mlfq {
-	queues := make([]*queue.RoundRobin, spec.NumQueues)
-	for i := range spec.NumQueues {
+	queues := make([]*queue.RoundRobin, spec.Priorities)
+	for i := range spec.Priorities {
 		queues[i] = new(queue.RoundRobin)
 	}
 	return &mlfq{

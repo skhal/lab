@@ -6,7 +6,9 @@
 */ -}}
 
 {{- define "policy" -}}
-allotment:{{.Allotment}} queues:{{.NumQueues}} boost:{{.BoostCycles}}
+  allotment   {{.Allotment}}
+  priorities  {{.Priorities}}
+  boost       {{.BoostCycles}}
 {{- end -}}
 
 {{- define "process" -}}

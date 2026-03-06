@@ -25,7 +25,7 @@ import (
 var (
 	defaultPolicy = policy.Spec{
 		Allotment:   2,
-		NumQueues:   3,
+		Priorities:  3,
 		BoostCycles: 10,
 	}
 	defaultProcesses = []*proc.Spec{

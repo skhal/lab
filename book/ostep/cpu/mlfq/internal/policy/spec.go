@@ -13,8 +13,8 @@ type Spec struct {
 	// gets de-prioritized.
 	Allotment cpu.Cycle
 
-	// NumQueues is the number of priority queues in MLFQ policy.
-	NumQueues int
+	// Priorities is the number of priority queues in MLFQ policy.
+	Priorities int
 
 	// BoostCycles is the number of cycles a process needs to spend in the lowest
 	// priority before it's priority is reset to the highest priority.
