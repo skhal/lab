@@ -90,8 +90,8 @@ func (cmd *command) parseFlags(args []string) error {
 	registerVar := func(val valueHelper, name string) {
 		fs.Var(val, name, val.Usage())
 	}
-	registerVar(&PolicySpecFlag{&cmd.policy}, "policy")
-	// TODO(github.com/skhal/lab/issues/179): register processes flag
+	registerVar(NewPolicySpecFlag(&cmd.policy), "policy")
+	registerVar(NewProcSpecListFlag(&cmd.processes), "proc")
 	if err := fs.Parse(args[1:]); err != nil {
 		return err
 	}
