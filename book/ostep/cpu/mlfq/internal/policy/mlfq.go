@@ -26,8 +26,8 @@ func New(spec Spec, c Cycler) *mlfq {
 		queues[i] = new(queue.RoundRobin)
 	}
 	return &mlfq{
-		clk:    c,
 		spec:   spec,
+		clk:    c,
 		queues: queues,
 	}
 }
@@ -47,19 +47,19 @@ type Process interface {
 // mlfq implements Multilevel Feedback Queue scheduling policy. It uses the
 // following rules:
 //
-//  1. Add new jobs to the top-priority queue
-//  2. Round-robin jobs from the highest priority non-empty queue
-//  3. Decrease job priority if it used allotted CPU time share
+//  1. Add new processes to the top-priority queue
+//  2. Round-robin processes from the highest priority non-empty queue
+//  3. Decrease process priority if it used allotted CPU time share
 //  4. Reset priorities once in a while
 type mlfq struct {
-	clk    Cycler
-	spec   Spec
-	queues []*queue.RoundRobin
+	spec Spec
 
-	last *process // last run job
+	clk    Cycler
+	queues []*queue.RoundRobin
+	last   *process // last run process
 }
 
-// Add introduces a process to the scheduler.
+// Add injects the new process to the highest priority queue.
 func (pol *mlfq) Add(p Process) {
 	pol.addToQueue(0, p)
 }
@@ -74,8 +74,10 @@ func (pol *mlfq) addToQueue(q int, p Process) {
 // Priority is the process priority.
 type Priority int
 
-// Next picks up next process to run. It returns true if such process exists,
-// else false.
+// Next picks up next process to run and returns it along with process's
+// priority. It returns a nil process and undefined priority if the scheduler
+// can't pick up the next process, e.g. there are no processes available to the
+// scheduler.
 func (pol *mlfq) Next() (Process, Priority) {
 	pol.update()
 	pol.last = pol.next()

@@ -52,10 +52,10 @@ type driver struct {
 	cpu *cpu.Clock
 	pol Policy
 
+	// processes are all processes in the system: pending, running, or completed.
 	processes []*proc.Process
-	completed []*proc.Process
-
-	pending int // index of the next pending process
+	pending   int             // index of the next pending process
+	completed []*proc.Process // completed processes
 
 	cycle Cycle
 }
