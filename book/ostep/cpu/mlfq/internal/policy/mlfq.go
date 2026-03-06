@@ -88,7 +88,7 @@ func (pol *mlfq) update() {
 	switch {
 	case pol.last.proc.Done():
 		pol.remove(pol.last)
-	case pol.last.cycles == pol.spec.Allotment:
+	case pol.last.atAllotment(pol.spec.Allotment):
 		pol.deprioritize(pol.last)
 	}
 }
@@ -125,6 +125,10 @@ type process struct {
 	proc   Process
 	prio   Priority
 	cycles cpu.Cycle
+}
+
+func (p *process) atAllotment(allotment cpu.Cycle) bool {
+	return p.cycles == allotment
 }
 
 // String implements [fmt.Stringer] interface.
