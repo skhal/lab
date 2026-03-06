@@ -85,11 +85,10 @@ func (pol *mlfq) update() {
 		return
 	}
 	pol.last.cycles++
-	if pol.last.proc.Done() {
+	switch {
+	case pol.last.proc.Done():
 		pol.remove(pol.last)
-		return
-	}
-	if pol.last.cycles == pol.spec.Allotment {
+	case pol.last.cycles == pol.spec.Allotment:
 		pol.deprioritize(pol.last)
 	}
 }
