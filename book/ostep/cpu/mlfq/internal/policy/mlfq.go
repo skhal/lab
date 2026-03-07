@@ -7,10 +7,13 @@ package policy
 
 import (
 	"fmt"
+	"iter"
 
 	"github.com/skhal/lab/book/ostep/cpu/mlfq/internal/cpu"
 	"github.com/skhal/lab/book/ostep/cpu/mlfq/internal/queue"
 )
+
+const maxPriority = Priority(0)
 
 // Cycler is a CPU clock that gives access to current cycle.
 type Cycler interface {
@@ -58,7 +61,7 @@ type mlfq struct {
 // Add injects the new process to the highest priority queue.
 func (pol *mlfq) Add(p Process) {
 	p.Arrive()
-	pol.addToQueue(0, p)
+	pol.addToQueue(maxPriority, p)
 }
 
 func (pol *mlfq) addToQueue(prio Priority, p Process) {
@@ -95,6 +98,13 @@ func (pol *mlfq) update() {
 	case pol.last.atAllotment(pol.spec.Allotment):
 		pol.deprioritize(pol.last)
 	}
+	if pol.canBoost() {
+		pol.boost()
+	}
+}
+
+func (pol *mlfq) canBoost() bool {
+	return pol.clk.Cycle()%pol.spec.BoostCycles == 0
 }
 
 func (pol *mlfq) remove(p *process) {
@@ -112,6 +122,50 @@ func (pol *mlfq) deprioritize(p *process) {
 	}
 	pol.remove(p)
 	pol.addToQueue(p.prio+1, p.proc)
+}
+
+func (pol *mlfq) boost() {
+	// Move processes from lower priorities to the highest priority queue.
+	// Therefore exclude highest priority queue.
+	// Process lowest priority queues first to give these processes a change
+	// to run first.
+	for q := range reverse(pol.queues[1:]) {
+		pol.prioritize(q)
+	}
+}
+
+func reverse(qq []*queue.RoundRobin) iter.Seq[*queue.RoundRobin] {
+	return func(yield func(*queue.RoundRobin) bool) {
+		for i := len(qq) - 1; i >= 0; i-- {
+			if !yield(qq[i]) {
+				break
+			}
+		}
+	}
+}
+
+func (pol *mlfq) prioritize(q *queue.RoundRobin) {
+	for p := range drain(q) {
+		pol.addToQueue(maxPriority, p)
+	}
+}
+
+func drain(q *queue.RoundRobin) iter.Seq[Process] {
+	return func(yield func(Process) bool) {
+		for q.Len() != 0 {
+			x := q.Pop()
+			if x == nil {
+				panic(fmt.Errorf("failed to pop"))
+			}
+			p, ok := x.(*process)
+			if !ok {
+				panic(fmt.Errorf("pop returned non-process: %v", x))
+			}
+			if !yield(p.proc) {
+				break
+			}
+		}
+	}
 }
 
 func (pol *mlfq) next() *process {
