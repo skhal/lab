@@ -30,6 +30,7 @@ type ReadFileFunc func(string) ([]byte, error)
 
 // Config passes ReadFileFunc.
 type Config struct {
+	// ReadFileFn reads file content.
 	ReadFileFn ReadFileFunc
 }
 
@@ -47,7 +48,7 @@ func Run(ctx context.Context, cfg *Config, files ...string) error {
 	return nil
 }
 
-var nosubmitRe = regexp.MustCompile(`(?i)(?://|#|")\s+DO NOT SUBMIT(?:: .*)?$`)
+var nosubmitRe = regexp.MustCompile(`(?i)^((//|#|")\s+)?DO NOT SUBMIT(: .*)?$`)
 
 // Check checks if bytes b include "DO NOT SUBMIT" comment.
 func Check(b []byte) bool {

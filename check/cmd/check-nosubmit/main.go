@@ -3,9 +3,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-/*
-Check-nosubmit checks for presence of "DO NOT SUBMIT" comment.
-*/
+// Check-nosubmit checks for presence of "DO NOT SUBMIT" comment.
 package main
 
 import (

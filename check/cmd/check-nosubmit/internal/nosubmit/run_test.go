@@ -64,6 +64,22 @@ test data
 `,
 			want: true,
 		},
+		{
+			name: "raw nosubmit",
+			data: `
+test data
+DO NOT SUBMIT
+`,
+			want: true,
+		},
+		{
+			name: "raw nosubmit with comment",
+			data: `
+test data
+DO NOT SUBMIT: description
+`,
+			want: true,
+		},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
