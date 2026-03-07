@@ -12,14 +12,14 @@ import (
 )
 
 var (
-	// ErrAllotment means [Spec.Allotment] field has non-positive value.
-	ErrAllotment = errors.New("invalid allotment")
+	// ErrSpecAllotment means [Spec.Allotment] field has non-positive value.
+	ErrSpecAllotment = errors.New("invalid allotment")
 
-	// ErrPriorities means [Spec.Priorities] field has non-positive value.
-	ErrPriorities = errors.New("invalid priorities")
+	// ErrSpecPriorities means [Spec.Priorities] field has non-positive value.
+	ErrSpecPriorities = errors.New("invalid priorities")
 
-	// ErrBoostCycles means [Spec.BoostCycles] field has non-positive value.
-	ErrBoostCycles = errors.New("invalid boost cycles")
+	// ErrSpecBoostCycles means [Spec.BoostCycles] field has non-positive value.
+	ErrSpecBoostCycles = errors.New("invalid boost cycles")
 )
 
 // Spec is the MLFQ policy configuration.
@@ -40,13 +40,13 @@ type Spec struct {
 // returns an error for the first invalid field if any else nil.
 func (s *Spec) Validate() error {
 	if s.Allotment < 1 {
-		return ErrAllotment
+		return ErrSpecAllotment
 	}
 	if s.Priorities < 1 {
-		return ErrPriorities
+		return ErrSpecPriorities
 	}
 	if s.BoostCycles < 1 {
-		return ErrBoostCycles
+		return ErrSpecBoostCycles
 	}
 	return nil
 }

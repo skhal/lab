@@ -20,37 +20,37 @@ func TestSpec_Validate(t *testing.T) {
 	}{
 		{
 			name:    "zero value",
-			wantErr: policy.ErrAllotment,
+			wantErr: policy.ErrSpecAllotment,
 		},
 		{
 			name:    "negative allotment",
 			spec:    policy.Spec{Allotment: -1},
-			wantErr: policy.ErrAllotment,
+			wantErr: policy.ErrSpecAllotment,
 		},
 		{
 			name:    "zero allotment",
 			spec:    policy.Spec{Allotment: 0},
-			wantErr: policy.ErrAllotment,
+			wantErr: policy.ErrSpecAllotment,
 		},
 		{
 			name:    "negative priorities",
 			spec:    policy.Spec{Allotment: 1, Priorities: -1},
-			wantErr: policy.ErrPriorities,
+			wantErr: policy.ErrSpecPriorities,
 		},
 		{
 			name:    "zero priorities",
 			spec:    policy.Spec{Allotment: 1, Priorities: 0},
-			wantErr: policy.ErrPriorities,
+			wantErr: policy.ErrSpecPriorities,
 		},
 		{
 			name:    "negative boost cycles",
 			spec:    policy.Spec{Allotment: 1, Priorities: 1, BoostCycles: -1},
-			wantErr: policy.ErrBoostCycles,
+			wantErr: policy.ErrSpecBoostCycles,
 		},
 		{
 			name:    "zero boost cycles",
 			spec:    policy.Spec{Allotment: 1, Priorities: 1, BoostCycles: 0},
-			wantErr: policy.ErrBoostCycles,
+			wantErr: policy.ErrSpecBoostCycles,
 		},
 		{
 			name: "valid",
