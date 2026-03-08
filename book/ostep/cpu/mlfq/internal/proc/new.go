@@ -11,9 +11,8 @@ var lastID = 0
 func New(s *Spec, clk Cycler) (*Process, *Control) {
 	lastID++
 	p := &Process{
-		id:    lastID,
-		spec:  *s,
-		state: new(state),
+		id:   lastID,
+		spec: *s,
 	}
 	c := &Control{
 		Process: p,

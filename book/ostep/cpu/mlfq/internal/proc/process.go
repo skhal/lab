@@ -16,10 +16,6 @@ type Process struct {
 	id   int
 	spec Spec
 
-	state *state
-}
-
-type state struct {
 	arrive struct {
 		set   bool
 		cycle cpu.Cycle
@@ -40,12 +36,12 @@ type state struct {
 
 // Cycles returns the number of completed CPU cycles.
 func (p *Process) Cycles() cpu.Cycle {
-	return p.state.cycles
+	return p.cycles
 }
 
 // Done reports whether the process completed.
 func (p *Process) Done() bool {
-	return p.state.cycles == cpu.Cycle(p.spec.CPUCycles)
+	return p.cycles == cpu.Cycle(p.spec.CPUCycles)
 }
 
 // ID returns process's identifier.
@@ -74,10 +70,10 @@ type Stat struct {
 // Stat calculates process metrics.
 func (p *Process) Stat() Stat {
 	st := Stat{
-		Response:   p.state.firstRun.cycle - p.state.arrive.cycle,
-		Turnaround: p.state.complete.cycle - p.state.arrive.cycle,
+		Response:   p.firstRun.cycle - p.arrive.cycle,
+		Turnaround: p.complete.cycle - p.arrive.cycle,
 	}
-	st.Wait = st.Turnaround - p.state.cycles
+	st.Wait = st.Turnaround - p.cycles
 	return st
 }
 

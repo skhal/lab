@@ -21,24 +21,24 @@ type Control struct {
 
 // Arrive marks the process arrive to the system.
 func (ctl *Control) Arrive() {
-	if ctl.state.arrive.set {
+	if ctl.arrive.set {
 		return
 	}
-	ctl.state.arrive.set = true
-	ctl.state.arrive.cycle = ctl.clk.Cycle()
+	ctl.arrive.set = true
+	ctl.arrive.cycle = ctl.clk.Cycle()
 }
 
 // Run executes the process for one CPU cycle.
 func (ctl *Control) Run() {
-	if !ctl.state.firstRun.set {
-		ctl.state.firstRun.set = true
-		ctl.state.firstRun.cycle = ctl.clk.Cycle()
+	if !ctl.firstRun.set {
+		ctl.firstRun.set = true
+		ctl.firstRun.cycle = ctl.clk.Cycle()
 	}
-	ctl.state.cycles++
+	ctl.cycles++
 	if ctl.Done() {
-		if !ctl.state.complete.set {
-			ctl.state.complete.set = true
-			ctl.state.complete.cycle = ctl.clk.Cycle()
+		if !ctl.complete.set {
+			ctl.complete.set = true
+			ctl.complete.cycle = ctl.clk.Cycle()
 		}
 	}
 }
