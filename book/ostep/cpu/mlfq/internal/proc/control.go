@@ -24,6 +24,7 @@ func (ctl *Control) Arrive() {
 	if ctl.arrive.set {
 		return
 	}
+	ctl.state = StateReady
 	ctl.arrive.set = true
 	ctl.arrive.cycle = ctl.clk.Cycle()
 }
@@ -34,8 +35,10 @@ func (ctl *Control) Run() {
 		ctl.firstRun.set = true
 		ctl.firstRun.cycle = ctl.clk.Cycle()
 	}
+	ctl.state = StateRunning
 	ctl.cycles++
-	if ctl.Done() {
+	if ctl.cycles == ctl.spec.CPUCycles {
+		ctl.state = StateZombie
 		if !ctl.complete.set {
 			ctl.complete.set = true
 			ctl.complete.cycle = ctl.clk.Cycle()

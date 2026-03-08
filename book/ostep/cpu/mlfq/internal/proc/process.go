@@ -32,6 +32,8 @@ type Process struct {
 	}
 
 	cycles cpu.Cycle
+
+	state State
 }
 
 // Cycles returns the number of completed CPU cycles.
@@ -41,7 +43,7 @@ func (p *Process) Cycles() cpu.Cycle {
 
 // Done reports whether the process completed.
 func (p *Process) Done() bool {
-	return p.cycles == cpu.Cycle(p.spec.CPUCycles)
+	return p.state == StateZombie
 }
 
 // ID returns process's identifier.
@@ -75,6 +77,11 @@ func (p *Process) Stat() Stat {
 	}
 	st.Wait = st.Turnaround - p.cycles
 	return st
+}
+
+// State returns current process state.
+func (p *Process) State() State {
+	return p.state
 }
 
 // String implements [fmt.Stringer] interface.
