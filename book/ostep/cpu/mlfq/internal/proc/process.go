@@ -12,20 +12,11 @@ import (
 	"github.com/skhal/lab/book/ostep/cpu/mlfq/internal/cpu"
 )
 
-var lastID = 0
-
-// Cycler is the cpu.Clock interface used by [Process].
-type Cycler interface {
-	// Cycles returns current cpu.Cycle.
-	Cycle() cpu.Cycle
-}
-
 // Process is a process in the system.
 type Process struct {
 	id   int
 	spec Spec
 
-	clk   Cycler
 	state *state
 }
 
@@ -48,40 +39,9 @@ type state struct {
 	cycles cpu.Cycle
 }
 
-// New creates a process with unique ID.
-func New(s *Spec, clk Cycler) *Process {
-	lastID++
-	return &Process{
-		id:    lastID,
-		spec:  *s,
-		clk:   clk,
-		state: new(state),
-	}
-}
-
-// ID returns process's identifier.
-func (p *Process) ID() int {
-	return p.id
-}
-
-// Arrive marks the process arrive to the system.
-func (p *Process) Arrive() {
-	p.state.arrive.once.Do(func() {
-		p.state.arrive.cycle = p.clk.Cycle()
-	})
-}
-
-// Run executes the process for one CPU cycle.
-func (p *Process) Run() {
-	p.state.firstRun.once.Do(func() {
-		p.state.firstRun.cycle = p.clk.Cycle()
-	})
-	p.state.cycles++
-	if p.Done() {
-		p.state.complete.once.Do(func() {
-			p.state.complete.cycle = p.clk.Cycle()
-		})
-	}
+// Cycles returns the number of completed CPU cycles.
+func (p *Process) Cycles() cpu.Cycle {
+	return p.state.cycles
 }
 
 // Done reports whether the process completed.
@@ -89,9 +49,9 @@ func (p *Process) Done() bool {
 	return p.state.cycles == cpu.Cycle(p.spec.CPUCycles)
 }
 
-// Cycles returns the number of completed CPU cycles.
-func (p *Process) Cycles() cpu.Cycle {
-	return p.state.cycles
+// ID returns process's identifier.
+func (p *Process) ID() int {
+	return p.id
 }
 
 // Spec gives access to the process's specification.

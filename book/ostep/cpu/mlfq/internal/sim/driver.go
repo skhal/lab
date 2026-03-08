@@ -39,13 +39,22 @@ type Policy interface {
 
 // Run drives processes pp with MLFQ policy using policy specifications pol.
 // It returns a sequence of CPU cycles.
-func Run(clk *cpu.Clock, pol Policy, procs []*proc.Process) iter.Seq[Cycle] {
+func Run(clk *cpu.Clock, pol Policy, specs []*proc.Spec) ([]*proc.Process, iter.Seq[Cycle]) {
+	var (
+		pp   = make([]*proc.Process, 0, len(specs))
+		ctls = make([]*proc.Control, 0, len(specs))
+	)
+	for _, spec := range specs {
+		p, c := proc.New(spec, clk)
+		pp = append(pp, p)
+		ctls = append(ctls, c)
+	}
 	d := &driver{
 		cpu:       clk,
 		pol:       pol,
-		processes: procs,
+		processes: ctls,
 	}
-	return d.Drive()
+	return pp, d.Drive()
 }
 
 type driver struct {
@@ -53,9 +62,9 @@ type driver struct {
 	pol Policy
 
 	// processes are all processes in the system: pending, running, or completed.
-	processes []*proc.Process
-	pending   int             // index of the next pending process
-	completed []*proc.Process // completed processes
+	processes []*proc.Control
+	pending   int // index of the next pending process
+	completed int
 
 	cycle Cycle
 }
@@ -70,7 +79,7 @@ func (dr *driver) Drive() iter.Seq[Cycle] {
 }
 
 func (dr *driver) next() bool {
-	if len(dr.completed) == len(dr.processes) {
+	if dr.completed == len(dr.processes) {
 		return false
 	}
 	dr.schedule()
@@ -97,11 +106,11 @@ func (dr *driver) run() {
 	if x == nil {
 		return
 	}
-	p := x.(*proc.Process)
+	p := x.(*proc.Control)
 	p.Run()
 	if p.Done() {
-		dr.completed = append(dr.completed, p)
+		dr.completed++
 	}
-	dr.cycle.Proc = p
+	dr.cycle.Proc = p.Process
 	dr.cycle.Priority = pri
 }
