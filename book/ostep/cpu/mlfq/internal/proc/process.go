@@ -7,7 +7,6 @@ package proc
 
 import (
 	"fmt"
-	"sync"
 
 	"github.com/skhal/lab/book/ostep/cpu/mlfq/internal/cpu"
 )
@@ -22,17 +21,17 @@ type Process struct {
 
 type state struct {
 	arrive struct {
-		once  sync.Once
+		set   bool
 		cycle cpu.Cycle
 	}
 
 	firstRun struct {
-		once  sync.Once
+		set   bool
 		cycle cpu.Cycle
 	}
 
 	complete struct {
-		once  sync.Once
+		set   bool
 		cycle cpu.Cycle
 	}
 
