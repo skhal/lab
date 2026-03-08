@@ -13,34 +13,15 @@ import (
 	"github.com/skhal/lab/book/ostep/cpu/mlfq/internal/queue"
 )
 
+// Priority is the process priority.
+type Priority int
+
 const maxPriority = Priority(0)
 
 // Cycler is a CPU clock that gives access to current cycle.
 type Cycler interface {
 	// Cycle returns current CPU cycle.
 	Cycle() cpu.Cycle
-}
-
-// New creates a MLFQ policy.
-func New(spec Spec, c Cycler) *mlfq {
-	queues := make([]*queue.RoundRobin, spec.Priorities)
-	for i := range spec.Priorities {
-		queues[i] = new(queue.RoundRobin)
-	}
-	return &mlfq{
-		spec:   spec,
-		clk:    c,
-		queues: queues,
-	}
-}
-
-// Process is a Process interface, used by MLFQ policy.
-type Process interface {
-	// Arrive marks the process arrive to the system.
-	Arrive()
-
-	// Done returns true if the process completed, else false.
-	Done() bool
 }
 
 // mlfq implements Multilevel Feedback Queue scheduling policy. It uses the
@@ -58,6 +39,19 @@ type mlfq struct {
 	last   *process // last run process
 }
 
+// New creates a MLFQ policy.
+func New(spec Spec, c Cycler) *mlfq {
+	queues := make([]*queue.RoundRobin, spec.Priorities)
+	for i := range spec.Priorities {
+		queues[i] = new(queue.RoundRobin)
+	}
+	return &mlfq{
+		spec:   spec,
+		clk:    c,
+		queues: queues,
+	}
+}
+
 // Add injects the new process to the highest priority queue.
 func (pol *mlfq) Add(p Process) {
 	p.Arrive()
@@ -70,9 +64,6 @@ func (pol *mlfq) addToQueue(prio Priority, p Process) {
 		prio: prio,
 	})
 }
-
-// Priority is the process priority.
-type Priority int
 
 // Next picks up next process to run and returns it along with process's
 // priority. It returns a nil process and undefined priority if the scheduler
@@ -177,19 +168,4 @@ func (pol *mlfq) next() *process {
 		return v.(*process)
 	}
 	return nil
-}
-
-type process struct {
-	proc   Process
-	prio   Priority
-	cycles cpu.Cycle
-}
-
-func (p *process) atAllotment(allotment cpu.Cycle) bool {
-	return p.cycles == allotment
-}
-
-// String implements [fmt.Stringer] interface.
-func (p *process) String() string {
-	return fmt.Sprintf("%s qid:%d cycles:%d", p.proc, p.prio, p.cycles)
 }
