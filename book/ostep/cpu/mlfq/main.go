@@ -7,7 +7,7 @@
 //
 // SYNOPSIS
 //
-//	mlfq
+//	mlfq [-abort num] [-policy pol] [-proc spec[,:spec]]
 package main
 
 import (
