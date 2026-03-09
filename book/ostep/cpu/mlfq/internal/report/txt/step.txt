@@ -13,6 +13,8 @@
 
 {{- define "process" -}}
 {{.ID}} arrive:{{.Spec.Arrive}} cpu:{{.Spec.CPUCycles}}
+  {{- if ne .Spec.IOAfterCPUCycles 0}} io:{{.Spec.IOCycles}} after:{{.Spec.IOAfterCPUCycles}}
+  {{- end}}
 {{- end -}}
 
 {{- define "step" -}}
