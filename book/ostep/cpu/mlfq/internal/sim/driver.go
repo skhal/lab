@@ -6,12 +6,15 @@
 package sim
 
 import (
+	"fmt"
 	"iter"
 
 	"github.com/skhal/lab/book/ostep/cpu/mlfq/internal/cpu"
 	"github.com/skhal/lab/book/ostep/cpu/mlfq/internal/policy"
 	"github.com/skhal/lab/book/ostep/cpu/mlfq/internal/proc"
 )
+
+var abortCycle cpu.Cycle = 1000
 
 // Cycle is a single CPU cycle.
 type Cycle struct {
@@ -79,6 +82,9 @@ func (dr *driver) Drive() iter.Seq[Cycle] {
 }
 
 func (dr *driver) next() bool {
+	if clk := dr.cpu.Cycle(); clk == abortCycle {
+		panic(fmt.Errorf("clk %d: abort", clk))
+	}
 	if dr.completed == len(dr.processes) {
 		return false
 	}
