@@ -16,6 +16,9 @@ type Process interface {
 	// Arrive marks the process arrive to the system.
 	Arrive()
 
+	// Blocked returns true if the process is blocked, else false.
+	Blocked() bool
+
 	// Done returns true if the process completed, else false.
 	Done() bool
 }

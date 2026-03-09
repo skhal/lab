@@ -36,6 +36,11 @@ type Process struct {
 	state State
 }
 
+// Blocked checks whether the process state is [StateBlocked].
+func (p *Process) Blocked() bool {
+	return p.state == StateBlocked
+}
+
 // Cycles returns the number of completed CPU cycles.
 func (p *Process) Cycles() cpu.Cycle {
 	return p.cycles
@@ -86,5 +91,5 @@ func (p *Process) State() State {
 
 // String implements [fmt.Stringer] interface.
 func (p *Process) String() string {
-	return fmt.Sprintf("pid:%d", p.id)
+	return fmt.Sprintf("pid:%d [%s]", p.id, p.state)
 }

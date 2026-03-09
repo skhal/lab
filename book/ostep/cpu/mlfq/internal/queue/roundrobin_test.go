@@ -216,6 +216,62 @@ func TestRoundRobin_Next_panic(t *testing.T) {
 	}
 }
 
+func TestRoundRobin_NextFunc(t *testing.T) {
+	tests := []struct {
+		name   string
+		items  []int
+		f      func(any) bool
+		want   int
+		wantOk bool
+	}{
+		{
+			name:   "one item hit",
+			items:  []int{1},
+			f:      func(x any) bool { return x.(int) == 1 },
+			want:   1,
+			wantOk: true,
+		},
+		{
+			name:  "one item miss",
+			items: []int{1},
+			f:     func(any) bool { return false },
+		},
+		{
+			name:   "two items hit first",
+			items:  []int{1, 2},
+			f:      func(x any) bool { return x.(int) == 1 },
+			want:   1,
+			wantOk: true,
+		},
+		{
+			name:   "two items hit second",
+			items:  []int{1, 2},
+			f:      func(x any) bool { return x.(int) == 2 },
+			want:   2,
+			wantOk: true,
+		},
+		{
+			name:  "two items miss",
+			items: []int{1, 2},
+			f:     func(any) bool { return false },
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			rr := newRoundRobin(t, tc.items)
+
+			got, ok := rr.NextFunc(tc.f)
+
+			if ok != tc.wantOk {
+				t.Errorf("NextFunc() = _, %v; want %v", ok, tc.wantOk)
+			}
+			if n := got.(int); n != tc.want {
+				t.Errorf("NextFunc() = %d, _; want %d", got, tc.want)
+			}
+		})
+	}
+}
+
 func TestRoundRobin_Pop(t *testing.T) {
 	tests := []struct {
 		name     string

@@ -5,7 +5,10 @@
 
 package queue
 
-import "errors"
+import (
+	"errors"
+	"reflect"
+)
 
 // ErrEmpty means the queue is empty.
 var ErrEmpty = errors.New("empty queue")
@@ -98,6 +101,23 @@ func (q *RoundRobin) Next() any {
 		q.loop()
 	}
 	return v
+}
+
+// NextFunc returns then next item from the queue that passes predicate f.
+// It includes a boolean ok-flag to indicate whether such item was found. If
+// no next item was found, it returns zero value for the items in the queue
+// and false for ok.
+func (q *RoundRobin) NextFunc(f func(any) bool) (any, bool) {
+	start := q.next
+	for {
+		if v := q.Next(); f(v) {
+			return v, true
+		}
+		if start == q.next {
+			break
+		}
+	}
+	return reflect.Zero(reflect.ValueOf(q.items[0]).Type()).Interface(), false
 }
 
 func (q *RoundRobin) loop() {

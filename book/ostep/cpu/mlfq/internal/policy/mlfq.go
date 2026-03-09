@@ -164,7 +164,13 @@ func (pol *mlfq) next() *process {
 		if q.Len() == 0 {
 			continue
 		}
-		v := q.Next()
+		v, ok := q.NextFunc(func(x any) bool {
+			p := x.(*process)
+			return !p.proc.Blocked()
+		})
+		if !ok {
+			continue
+		}
 		return v.(*process)
 	}
 	return nil

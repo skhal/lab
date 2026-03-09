@@ -19,6 +19,7 @@
 
 {{- define "step" -}}
 {{.ID}} {{if .Proc}}run {{.Proc.ID}} cpu {{.Proc.Cycles}} pri {{.Priority}}
+  {{- if .Proc.Blocked}} [block]{{end}}
   {{- if .Proc.Done}} [done]{{end}}
   {{- else}}-{{end}}
 {{- end -}}
