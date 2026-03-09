@@ -23,7 +23,10 @@ import (
 	goslices "github.com/skhal/lab/go/slices"
 )
 
+const minAbortCycle = 10
+
 var (
+	defaultAbort  = cpu.Cycle(100)
 	defaultPolicy = policy.Spec{
 		Allotment:   2,
 		Priorities:  3,
@@ -39,6 +42,7 @@ var (
 // Run initializeds the command with default flags and executes it.
 func Run(args []string) error {
 	cmd := &command{
+		abort:     defaultAbort,
 		policy:    defaultPolicy,
 		processes: defaultProcesses,
 	}
@@ -46,6 +50,7 @@ func Run(args []string) error {
 }
 
 type command struct {
+	abort     cpu.Cycle
 	policy    policy.Spec
 	processes []*proc.Spec
 }
@@ -65,7 +70,7 @@ func (cmd *command) run() ([]*proc.Process, iter.Seq[sim.Cycle]) {
 	})
 	clk := new(cpu.Clock)
 	pol := policy.New(cmd.policy, clk)
-	return sim.Run(clk, pol, cmd.processes)
+	return sim.Run(clk, pol, cmd.processes, sim.WithAbort(cmd.abort))
 }
 
 func (cmd *command) report(pp []*proc.Process, cc iter.Seq[sim.Cycle]) error {
@@ -89,10 +94,14 @@ func (cmd *command) parseFlags(args []string) error {
 	registerVar := func(val valueHelper, name string) {
 		fs.Var(val, name, val.Usage())
 	}
+	registerVar(NewCycleFlag(&cmd.abort), "abort")
 	registerVar(NewPolicySpecFlag(&cmd.policy), "policy")
 	registerVar(NewProcSpecListFlag(&cmd.processes), "proc")
 	if err := fs.Parse(args[1:]); err != nil {
 		return err
+	}
+	if cmd.abort < minAbortCycle {
+		return fmt.Errorf("abort cycle is below min %d", minAbortCycle)
 	}
 	if err := cmd.policy.Validate(); err != nil {
 		return err

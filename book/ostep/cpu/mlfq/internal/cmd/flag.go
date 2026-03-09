@@ -45,7 +45,7 @@ func NewPolicySpecFlag(spec *policy.Spec) *PolicySpecFlag {
 }
 
 // Usage returns a flag description line.
-func (fg PolicySpecFlag) Usage() string {
+func (fg *PolicySpecFlag) Usage() string {
 	return "policy spec as colon-separated numbers allotment:priorities:boost-cycles"
 }
 
@@ -159,7 +159,7 @@ func (fg *ProcSpecListFlag) String() string {
 
 // Usage returns a flag description line.
 func (fg *ProcSpecListFlag) Usage() string {
-	return "process spec list as comma separated processor specs, each are a colon-separated numbers arrive:cpu-cycles:io-after-cpu-cycles:io-cycles"
+	return "process spec list as comma separated processor specs.\neach spec is a colon-separated list of numbers:\narrive:cpu-cycles:io-after-cpu-cycles:io-cycles"
 }
 
 // ProcSpecFlag is a flag for [proc.Spec].
@@ -230,4 +230,42 @@ func trimRightZero(nn []int) []int {
 		i = 1
 	}
 	return nn[:i]
+}
+
+// CycleFlag is a flag to set a CPU cycle.
+type CycleFlag struct {
+	c *cpu.Cycle
+}
+
+// NewCycleFlag creates a CPU cycle flag for a cycle value.
+func NewCycleFlag(c *cpu.Cycle) *CycleFlag {
+	return &CycleFlag{c}
+}
+
+// Set implements [flag.Value] interface. It sets the CPU cycle that should
+// be non-negative.
+func (fg *CycleFlag) Set(s string) error {
+	n, err := strconv.Atoi(s)
+	if err != nil {
+		return err
+	}
+	if n < 0 {
+		return fmt.Errorf("negative CPU cycle")
+	}
+	*fg.c = cpu.Cycle(n)
+	return nil
+}
+
+// String implements [flag.Value] interface. It prints [policy.Spec] in flag
+// parsable format.
+func (fg *CycleFlag) String() string {
+	if fg.c == nil {
+		return ""
+	}
+	return strconv.Itoa(int(*fg.c))
+}
+
+// Usage returns a flag description line.
+func (fg *CycleFlag) Usage() string {
+	return "abort cycle"
 }

@@ -16,8 +16,6 @@ import (
 	"github.com/skhal/lab/book/ostep/cpu/mlfq/internal/proc"
 )
 
-var abortCycle cpu.Cycle = 1000
-
 // Cycle is a single CPU cycle.
 type Cycle struct {
 	// ID is the cycle identification.
@@ -42,9 +40,19 @@ type Policy interface {
 	Next() (policy.Process, policy.Priority)
 }
 
+// RunOpt is a simulator option.
+type RunOpt func(*driver)
+
+// WithAbort sets the abort cycle for simulation.
+func WithAbort(c cpu.Cycle) RunOpt {
+	return func(d *driver) {
+		d.abort = c
+	}
+}
+
 // Run drives processes pp with MLFQ policy using policy specifications pol.
 // It returns a sequence of CPU cycles.
-func Run(clk *cpu.Clock, pol Policy, specs []*proc.Spec) ([]*proc.Process, iter.Seq[Cycle]) {
+func Run(clk *cpu.Clock, pol Policy, specs []*proc.Spec, opts ...RunOpt) ([]*proc.Process, iter.Seq[Cycle]) {
 	var (
 		pp   = make([]*proc.Process, 0, len(specs))
 		ctls = make([]*proc.Control, 0, len(specs))
@@ -59,11 +67,16 @@ func Run(clk *cpu.Clock, pol Policy, specs []*proc.Spec) ([]*proc.Process, iter.
 		pol:       pol,
 		processes: ctls,
 	}
+	for _, opt := range opts {
+		opt(d)
+	}
 	return pp, d.Drive()
 }
 
 type driver struct {
-	cpu *cpu.Clock
+	cpu   *cpu.Clock
+	abort cpu.Cycle
+
 	pol Policy
 
 	// processes are all processes in the system: pending, running, or completed.
@@ -109,7 +122,7 @@ func (dr *driver) Drive() iter.Seq[Cycle] {
 }
 
 func (dr *driver) next() bool {
-	if clk := dr.cpu.Cycle(); clk == abortCycle {
+	if clk := dr.cpu.Cycle(); clk == dr.abort {
 		panic(fmt.Errorf("clk %d: abort", clk))
 	}
 	if dr.completed == len(dr.processes) {
