@@ -14,4 +14,6 @@
 Applications
 
 - [process-run](./cmd/process-run/): schedule processes on a single CPU.
-- [sched](./cmd/sched/): schedule jobs with different policies
+- [sched](./cmd/sched/): schedule jobs with different policies.
+- [mlfq](./mlfq/): Multilayer Feedback Queue policy.
+- [lottery](./lottery/): tickets lottery random policy.
