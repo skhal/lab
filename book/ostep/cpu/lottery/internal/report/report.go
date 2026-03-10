@@ -12,7 +12,7 @@ import (
 	"text/template"
 
 	"github.com/skhal/lab/book/ostep/cpu/lottery/internal/job"
-	"github.com/skhal/lab/book/ostep/cpu/lottery/internal/sim"
+	"github.com/skhal/lab/book/ostep/cpu/lottery/internal/trace"
 )
 
 var (
@@ -23,8 +23,8 @@ var (
 
 // Data holds report input parameters.
 type Data struct {
-	Jobs   []*job.J            // jobs in the system
-	Cycles iter.Seq[sim.Cycle] // cycles trace
+	Jobs  []*job.J                   // jobs in the system
+	Trace iter.Seq[trace.CycleBlock] // cycles trace
 }
 
 // Generate creates and writes a report to w using d input parameters. It

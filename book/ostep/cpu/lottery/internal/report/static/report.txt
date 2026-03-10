@@ -11,7 +11,7 @@ jobs:
 {{- end}}
 
 trace:
-{{- range .Cycles}}
+{{- range .Trace}}
   {{.}}
   {{- if .Job.Done}} [done]{{end}}
 {{- end}}

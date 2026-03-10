@@ -14,6 +14,7 @@ import (
 	"github.com/skhal/lab/book/ostep/cpu/lottery/internal/job"
 	"github.com/skhal/lab/book/ostep/cpu/lottery/internal/report"
 	"github.com/skhal/lab/book/ostep/cpu/lottery/internal/sim"
+	"github.com/skhal/lab/book/ostep/cpu/lottery/internal/trace"
 )
 
 var defaultJobSpec = []*job.Spec{
@@ -39,8 +40,8 @@ func (cmd *command) Run() error {
 	}
 	jobs, cycles := sim.Run(cmd.jobSpecs)
 	rd := report.Data{
-		Jobs:   jobs,
-		Cycles: cycles,
+		Jobs:  jobs,
+		Trace: trace.Run(cycles),
 	}
 	return report.Generate(os.Stdout, rd)
 }
