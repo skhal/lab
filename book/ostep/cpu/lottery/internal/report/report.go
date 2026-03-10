@@ -8,9 +8,11 @@ package report
 import (
 	"embed"
 	"io"
+	"iter"
 	"text/template"
 
 	"github.com/skhal/lab/book/ostep/cpu/lottery/internal/job"
+	"github.com/skhal/lab/book/ostep/cpu/lottery/internal/sim"
 )
 
 var (
@@ -21,7 +23,8 @@ var (
 
 // Data holds report input parameters.
 type Data struct {
-	Jobs []*job.J // jobs in the system
+	Jobs   []*job.J            // jobs in the system
+	Cycles iter.Seq[sim.Cycle] // cycles trace
 }
 
 // Generate creates and writes a report to w using d input parameters. It

@@ -13,16 +13,27 @@ var lastid int
 type J struct {
 	id   int
 	spec Spec
+
+	done bool
 }
 
 // New creates a job with unique identifier with provided specification.
-func New(s *Spec) *J {
+func New(s *Spec) (*J, *Control) {
 	lastid++
-	return &J{
+	j := &J{
 		id:   lastid,
 		spec: *s,
 	}
+	return j, &Control{J: j}
 }
+
+// Done reports whether the job completed running.
+func (j *J) Done() bool {
+	return j.done
+}
+
+// Spec returns job specification.
+func (j *J) Spec() Spec { return j.spec }
 
 // String implements [fmt.Stringer] interface.
 func (j *J) String() string {

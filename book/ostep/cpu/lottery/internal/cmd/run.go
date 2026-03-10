@@ -37,9 +37,10 @@ func (cmd *command) Run() error {
 	if err := cmd.parseFlags(); err != nil {
 		return err
 	}
-	jobs := sim.Run(cmd.jobSpecs)
+	jobs, cycles := sim.Run(cmd.jobSpecs)
 	rd := report.Data{
-		Jobs: jobs,
+		Jobs:   jobs,
+		Cycles: cycles,
 	}
 	return report.Generate(os.Stdout, rd)
 }

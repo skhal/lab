@@ -9,3 +9,9 @@ jobs:
 {{- range .Jobs}}
   {{.}}
 {{- end}}
+
+trace:
+{{- range .Cycles}}
+  {{.}}
+  {{- if .Job.Done}} [done]{{end}}
+{{- end}}
