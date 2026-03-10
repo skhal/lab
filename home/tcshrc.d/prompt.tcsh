@@ -20,3 +20,10 @@ unset os_
 # -- VI(1) PROMPT MODE
 bindkey -v
 bindkey '^R' i-search-back
+
+alias precmd '\\
+  set rc_ = $?; \\
+  if ( ${rc_} != 0 ) \\
+    echo [rc: ${rc_}]; \\
+  unset rc_; \\
+  '
