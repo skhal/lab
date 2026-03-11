@@ -3,14 +3,24 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-/*
-Check-issue verifies that git commit message includes an issue.
-
-Use it as a commit-msg git-hook(1). Supported formats are:
-- `Issue #123`
-- `NO_ISSUE`
-- `NO_ISSUE: description`
-*/
+// Check-issue verifies that a git-commit(1) message includes a reference to
+// an issue or explicitly states that the commit is not associated with any
+// issue.
+//
+// The issue reference is case insensitive and can be in one of the following
+// forms:
+//
+//	NO_ISSUE
+//	NO_ISSUE: description
+//	Issue #123
+//	Fix #123
+//	Close #123
+//
+// The issue number can also include the owher and repo, e.g. `owner/repo#123`.
+//
+// SYNOPSIS
+//
+//	check-issue .git/COMMIT_EDITMSG
 package main
 
 import (
