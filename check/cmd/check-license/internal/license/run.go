@@ -26,9 +26,7 @@ func Run(files []string, fix bool, holder string) error {
 		defer cancel()
 		var wg sync.WaitGroup
 		for _, f := range files {
-			wg.Add(1)
-			go func(ctx context.Context, f string) {
-				defer wg.Done()
+			wg.Go(func() {
 				err := check(f, fix, holder)
 				if errors.Is(err, ErrBinaryFile) {
 					fmt.Fprintln(os.Stderr, err, ": skip")
@@ -38,7 +36,7 @@ func Run(files []string, fix bool, holder string) error {
 					case <-ctx.Done():
 					}
 				}
-			}(ctx, f)
+			})
 		}
 		wg.Wait()
 	}()
