@@ -6,29 +6,24 @@
 package issue
 
 import (
-	"bufio"
 	"bytes"
 	"errors"
 	"os"
 	"regexp"
 )
 
-var (
-	// ErrCheck indicates general error in the check.
-	ErrCheck = errors.New("check error")
+// ErrNoIssue means missing issue reference.
+var ErrNoIssue = errors.New("missing issue")
 
-	// ErrNoIssue indicates missing issue
-	ErrNoIssue = errors.New("missing issue")
-)
-
-// Run executes the check. It is expected that the check will run as a
-// commit-msg git-hook(1). Therefore there should be a single file, else it
-// returns an error.
+// Run verifies that the files has an issue reference.
 func Run(files []string) error {
-	if len(files) != 1 {
-		return ErrCheck
+	var ee []error
+	for _, f := range files {
+		if err := run(f); err != nil {
+			ee = append(ee, err)
+		}
 	}
-	return run(files[0])
+	return errors.Join(ee...)
 }
 
 func run(file string) error {
@@ -41,8 +36,10 @@ func run(file string) error {
 
 var (
 	reNoIssue = regexp.MustCompile(`^(?i)no_issue(?:: .*)?$`)
-	reIssue   = regexp.MustCompile(`^(?i)(?:issue|close|fix) (?:\w+/\w+)?#\d+$`)
+	reIssue   = regexp.MustCompile(`^(?i)(?:close|fix|issue) (?:\w+/\w+)?#\d+$`)
 )
+
+const eol = "\n"
 
 // Check verifies that the buffer b has an valid issue reference. A valid issue
 // reference (ignore case) is separate on the line and has one of the forms:
@@ -59,15 +56,21 @@ var (
 //	Issue #123
 //	Close user/repo#123
 func Check(b []byte) error {
-	s := bufio.NewScanner(bytes.NewReader(b))
-	for s.Scan() {
-		line := s.Text()
-		if reNoIssue.MatchString(line) {
-			return nil
-		}
-		if reIssue.MatchString(line) {
+	for ln := range bytes.Lines(b) {
+		ln = bytes.TrimRight(ln, eol)
+		if validate(ln) {
 			return nil
 		}
 	}
 	return ErrNoIssue
+}
+
+func validate(b []byte) bool {
+	if reNoIssue.Match(b) {
+		return true
+	}
+	if reIssue.Match(b) {
+		return true
+	}
+	return false
 }
