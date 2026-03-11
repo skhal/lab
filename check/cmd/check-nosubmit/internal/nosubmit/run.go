@@ -16,7 +16,6 @@ package nosubmit
 import (
 	"bufio"
 	"bytes"
-	"context"
 	"errors"
 	"iter"
 	"regexp"
@@ -35,7 +34,7 @@ type Config struct {
 }
 
 // Run checks whether any of the files include "DO NOT SUBMIT" comment.
-func Run(ctx context.Context, cfg *Config, files ...string) error {
+func Run(cfg *Config, files ...string) error {
 	for _, f := range files {
 		data, err := cfg.ReadFileFn(f)
 		if err != nil {

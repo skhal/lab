@@ -6,7 +6,6 @@
 package nosubmit_test
 
 import (
-	"context"
 	"fmt"
 	"testing"
 
@@ -23,11 +22,10 @@ func ExampleRun() {
 		`
 		return []byte(s), nil
 	}
-	ctx := context.Background()
 	cfg := &nosubmit.Config{
 		ReadFileFn: readFileFn,
 	}
-	if err := nosubmit.Run(ctx, cfg, "foo.txt"); err != nil {
+	if err := nosubmit.Run(cfg, "foo.txt"); err != nil {
 		fmt.Println(err)
 		return
 	}
