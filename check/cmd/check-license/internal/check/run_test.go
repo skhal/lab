@@ -3,13 +3,13 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package license_test
+package check_test
 
 import (
 	"errors"
 	"testing"
 
-	"github.com/skhal/lab/check/cmd/check-license/internal/license"
+	"github.com/skhal/lab/check/cmd/check-license/internal/check"
 )
 
 func TestRun(t *testing.T) {
@@ -20,7 +20,7 @@ func TestRun(t *testing.T) {
 	}{
 		{
 			name: "empty",
-			want: license.ErrNotFound,
+			want: check.ErrNotFound,
 		},
 		{
 			name: "valid c style",
@@ -87,7 +87,7 @@ func TestRun(t *testing.T) {
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 			`,
-			want: license.ErrInvalid,
+			want: check.ErrInvalid,
 		},
 		{
 			name: "missing author",
@@ -97,7 +97,7 @@ func TestRun(t *testing.T) {
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 			`,
-			want: license.ErrInvalid,
+			want: check.ErrInvalid,
 		},
 		{
 			name: "mixed comment prefix",
@@ -107,15 +107,15 @@ func TestRun(t *testing.T) {
 " Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 			`,
-			want: license.ErrInvalid,
+			want: check.ErrInvalid,
 		},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			err := license.Check([]byte(tc.data))
+			err := check.Run([]byte(tc.data))
 
 			if !errors.Is(err, tc.want) {
-				t.Errorf("license.Run() unexpected error: %v; want %v", err, tc.want)
+				t.Errorf("Run() unexpected error: %v; want %v", err, tc.want)
 				t.Logf("data:\n%s", tc.data)
 			}
 		})

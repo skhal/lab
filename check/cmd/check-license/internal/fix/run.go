@@ -3,7 +3,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package license
+package fix
 
 import (
 	"bytes"
@@ -12,20 +12,22 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/skhal/lab/check/cmd/check-license/internal/license"
 )
 
-// Add generates a license with current date and holder, and injets it into text
+// Run generates a license with current date and holder, and injets it into text
 // block b. It uses filename extension to detect comment syntax for license,
 // defaulting to shell if the extension misses.
-func Add(b []byte, filename, holder string) ([]byte, error) {
-	lic, err := genLicenseBlock(LicenseData{
+func Run(file string, b []byte, holder string) ([]byte, error) {
+	lic, err := license.Generate(license.Data{
 		Year:   strconv.FormatInt(int64(time.Now().Year()), 10),
 		Holder: holder,
 	})
 	if err != nil {
 		return nil, err
 	}
-	ins, err := newInserter(filename)
+	ins, err := newInserter(file)
 	if err != nil {
 		return nil, err
 	}
@@ -79,8 +81,8 @@ var (
 	// keep-sorted end
 )
 
-func newInserter(filename string) (*inserter, error) {
-	switch filepath.Ext(filename) {
+func newInserter(file string) (*inserter, error) {
+	switch filepath.Ext(file) {
 	// keep-sorted start
 	case "", ".sh": // no extension: default to shell
 		return &insShell, nil
@@ -96,7 +98,7 @@ func newInserter(filename string) (*inserter, error) {
 		return &insVim, nil
 		// keep-sorted end
 	}
-	base := filepath.Base(filename)
+	base := filepath.Base(file)
 	switch base {
 	case ".gitignore":
 		return &insShellNoSplit, nil
@@ -105,8 +107,10 @@ func newInserter(filename string) (*inserter, error) {
 	case strings.HasPrefix(base, ".bazel"), strings.HasPrefix(base, ".clang"):
 		return &insShellNoSplit, nil
 	}
-	return nil, fmt.Errorf("%s: unsupported file type", filename)
+	return nil, fmt.Errorf("%s: unsupported file type", file)
 }
+
+const eol = '\n'
 
 // Insert injects a licence block lic into a data block b.
 func (ins *inserter) Insert(b []byte, lic []byte) ([]byte, error) {

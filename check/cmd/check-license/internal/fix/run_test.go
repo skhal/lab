@@ -3,17 +3,17 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package license_test
+package fix_test
 
 import (
 	"errors"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/skhal/lab/check/cmd/check-license/internal/license"
+	"github.com/skhal/lab/check/cmd/check-license/internal/fix"
 )
 
-func TestAdd_empty(t *testing.T) {
+func TestRun_empty(t *testing.T) {
 	wantC := `// Copyright 2026 Tester. All rights reserved.
 //
 // Use of this source code is governed by a BSD-style
@@ -69,19 +69,19 @@ func TestAdd_empty(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.filename, func(t *testing.T) {
-			got, err := license.Add([]byte(nil), tc.filename, tc.holder)
+			got, err := fix.Run(tc.filename, []byte(nil), tc.holder)
 
 			if !errors.Is(err, tc.wantErr) {
-				t.Errorf("Add() got unexpected error %v; want %v", err, tc.wantErr)
+				t.Errorf("Run() got unexpected error %v; want %v", err, tc.wantErr)
 			}
 			if diff := cmp.Diff(tc.want, string(got)); diff != "" {
-				t.Errorf("Add() mismatch (-want,+got):\n%s", diff)
+				t.Errorf("Run() mismatch (-want,+got):\n%s", diff)
 			}
 		})
 	}
 }
 
-func TestAdd_non_empty(t *testing.T) {
+func TestRun_non_empty(t *testing.T) {
 	wantC := `// Copyright 2026 Tester. All rights reserved.
 //
 // Use of this source code is governed by a BSD-style
@@ -148,19 +148,19 @@ test
 	}
 	for _, tc := range tests {
 		t.Run(tc.filename, func(t *testing.T) {
-			got, err := license.Add([]byte(tc.data), tc.filename, tc.holder)
+			got, err := fix.Run(tc.filename, []byte(tc.data), tc.holder)
 
 			if !errors.Is(err, tc.wantErr) {
-				t.Errorf("Add() got unexpected error %v; want %v", err, tc.wantErr)
+				t.Errorf("Run() got unexpected error %v; want %v", err, tc.wantErr)
 			}
 			if diff := cmp.Diff(tc.want, string(got)); diff != "" {
-				t.Errorf("Add() mismatch (-want,+got):\n%s", diff)
+				t.Errorf("Run() mismatch (-want,+got):\n%s", diff)
 			}
 		})
 	}
 }
 
-func TestAdd_header(t *testing.T) {
+func TestRun_header(t *testing.T) {
 	tests := []struct {
 		name     string
 		data     string
@@ -271,13 +271,13 @@ test
 	}
 	for _, tc := range tests {
 		t.Run(tc.filename, func(t *testing.T) {
-			got, err := license.Add([]byte(tc.data), tc.filename, tc.holder)
+			got, err := fix.Run(tc.filename, []byte(tc.data), tc.holder)
 
 			if !errors.Is(err, tc.wantErr) {
-				t.Errorf("Add() got unexpected error %v; want %v", err, tc.wantErr)
+				t.Errorf("Run() got unexpected error %v; want %v", err, tc.wantErr)
 			}
 			if diff := cmp.Diff(tc.want, string(got)); diff != "" {
-				t.Errorf("Add() mismatch (-want,+got):\n%s", diff)
+				t.Errorf("Run() mismatch (-want,+got):\n%s", diff)
 			}
 		})
 	}

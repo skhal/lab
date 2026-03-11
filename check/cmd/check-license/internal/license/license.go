@@ -18,13 +18,14 @@ var (
 	licenseTmpls = template.Must(template.New("licenses").ParseFS(embedFS, "data/license_*.txt"))
 )
 
-// LicenseData is input to the license template.
-type LicenseData struct {
+// Data is input to the license template.
+type Data struct {
 	Year   string // Year in the license block.
 	Holder string // Holder in the license block.
 }
 
-func genLicenseBlock(data LicenseData) ([]byte, error) {
+// Generate creates a license block.
+func Generate(data Data) ([]byte, error) {
 	var b bytes.Buffer
 	if err := licenseTmpls.ExecuteTemplate(&b, "license_bsd.txt", data); err != nil {
 		return nil, err

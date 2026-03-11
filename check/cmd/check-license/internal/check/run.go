@@ -3,20 +3,22 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package license
+package check
 
 import (
 	"bytes"
 	"errors"
 	"regexp"
+
+	"github.com/skhal/lab/check/cmd/check-license/internal/license"
 )
 
 var lineRx = regexp.MustCompile(`^([\t ]*(/[/\*]|[#"]|--)?) Copyright`)
 
 const eol = '\n'
 
-// Check verifies that the buffer buf includes a license block.
-func Check(buf []byte) (err error) {
+// Run verifies that the buffer buf includes a license block.
+func Run(buf []byte) (err error) {
 	ln := 1
 	defer func() {
 		if errors.Is(err, ErrInvalid) {
@@ -56,7 +58,7 @@ func match(buf []byte) (ok bool, err error) {
 }
 
 func compileBlockRx(prefix []byte) (*regexp.Regexp, error) {
-	b, err := genLicenseBlock(LicenseData{
+	b, err := license.Generate(license.Data{
 		Year:   `\d{4}`,
 		Holder: `\w+( \w+)?`,
 	})
