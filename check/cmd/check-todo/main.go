@@ -11,7 +11,6 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"os"
 
@@ -19,10 +18,8 @@ import (
 )
 
 func main() {
-	if err := todo.Run(os.Args[1:]...); err != nil {
-		if !errors.Is(err, todo.ErrCheck) {
-			fmt.Fprintln(os.Stderr, err)
-		}
+	if err := todo.Run(os.Args[1:]); err != nil {
+		fmt.Println(err)
 		os.Exit(1)
 	}
 }

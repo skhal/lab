@@ -7,17 +7,12 @@
 package todo
 
 import (
-	"bufio"
 	"bytes"
 	"errors"
 	"fmt"
-	"iter"
 	"os"
 	"regexp"
 )
-
-// ErrCheck indicates an error in the input.
-var ErrCheck = errors.New("check error")
 
 var (
 	todoPrefix = regexp.MustCompile(`(?i)(?://|#|")\s+\btodo\b.*`)
@@ -28,97 +23,81 @@ var (
 	nocheckRegexp = regexp.MustCompile(`^(?://|#|") check-todo off(?:: .*)?$`)
 )
 
-// ReadFileFunc reads file and returns data or error.
-type ReadFileFunc func(string) ([]byte, error)
-
-// Run validates todo-lines in files.
-func Run(files ...string) (err error) {
-	chk := NewChecker(os.ReadFile)
-	for _, file := range files {
-		if err := chk.Check(file); err != nil {
-			return err
+// Run checks todo-comments in files. It collects found errors from files and
+// reports an error with all found violations if any.
+func Run(files []string) (err error) {
+	var ee []error
+	for _, f := range files {
+		if err := run(f); err != nil {
+			ee = append(ee, err)
 		}
 	}
-	if !chk.HasViolations() {
-		return nil
-	}
-	chk.Visit(func(v *Violation) { fmt.Println(v) })
-	return ErrCheck
+	return errors.Join(ee...)
 }
 
-// Checker implements todo-line validation logic.
-type Checker struct {
-	readFileFn ReadFileFunc
-	vv         []*Violation
-}
-
-// NewChecker creates a Checker.
-func NewChecker(f ReadFileFunc) *Checker {
-	return &Checker{
-		readFileFn: f,
-	}
-}
-
-// HasViolations reports whether violations were found.
-func (chk *Checker) HasViolations() bool {
-	return len(chk.vv) != 0
-}
-
-// Check validates file. It reutns an error if reading the file fails. Checker
-// keeps track of found violations. Use (*Checker).HasViolations() to check
-// for findings and (*linter).Visit() to access violations.
-func (chk *Checker) Check(file string) error {
-	data, err := chk.readFileFn(file)
+func run(file string) error {
+	b, err := os.ReadFile(file)
 	if err != nil {
 		return err
 	}
-	for v := range findViolations(data) {
-		v.File = file
-		chk.vv = append(chk.vv, v)
-	}
-	return nil
+	return NewChecker(file).Check(b)
 }
 
-// Visit calls fn for every found violation.
-func (chk *Checker) Visit(fn func(v *Violation)) {
-	for _, v := range chk.vv {
-		fn(v)
-	}
+// Checker checks todo-comments in the file.
+type Checker struct {
+	file string
 }
 
-func findViolations(data []byte) iter.Seq[*Violation] {
-	return func(yield func(*Violation) bool) {
-		s := bufio.NewScanner(bytes.NewBuffer(data))
-		for row := 1; s.Scan(); row += 1 {
-			line := s.Text()
-			if nocheckRegexp.MatchString(line) {
-				break
-			}
-			if !todoPrefix.MatchString(line) {
-				continue
-			}
-			if todoRegexp.MatchString(line) {
-				continue
-			}
-			v := &Violation{
-				Row:  row,
-				Line: line,
-			}
-			if !yield(v) {
-				break
-			}
+// NewChecker creates a file checker.
+func NewChecker(file string) *Checker {
+	return &Checker{file}
+}
+
+const eol = "\n"
+
+// Check validates todo-comments in b.
+func (ch *Checker) Check(b []byte) error {
+	var ee []error
+	var line int
+	for lb := range bytes.Lines(b) {
+		line++
+		lb = bytes.TrimRight(lb, eol)
+		if nocheckRegexp.Match(lb) {
+			break
 		}
+		if !todoPrefix.Match(lb) {
+			continue
+		}
+		if todoRegexp.Match(lb) {
+			continue
+		}
+		ee = append(ee, &TodoError{
+			File: ch.file,
+			Line: line,
+			Text: string(lb),
+		})
 	}
+	return errors.Join(ee...)
 }
 
-// Violation holds invalid line and its location in the file.
-type Violation struct {
+// TodoError contains a reference to the invalid todo-comment in the file. It
+// holds the file name, line number, and the line content.
+type TodoError struct {
 	File string // file name
-	Row  int    // line number
-	Line string // line text
+	Line int    // line number
+	Text string // line text
 }
 
-// String implements fmt.Stringer interface.
-func (v *Violation) String() string {
-	return fmt.Sprintf("%s:%d %s", v.File, v.Row, v.Line)
+// Error implements [builtin.error] interface.
+func (e *TodoError) Error() string {
+	return fmt.Sprintf("%s:%d %s", e.File, e.Line, e.Text)
+}
+
+// Is implements interface for [errors.Is].
+func (e *TodoError) Is(target error) bool {
+	x, ok := target.(*TodoError)
+	if !ok {
+		return false
+	}
+	return *e == *x
 }

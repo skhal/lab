@@ -11,108 +11,67 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/google/go-cmp/cmp"
 	"github.com/skhal/lab/check/cmd/check-todo/internal/todo"
 )
 
-var TestErr = errors.New("test error")
-
 func TestChecker(t *testing.T) {
 	tests := []struct {
-		name           string
-		readFileFn     todo.ReadFileFunc
-		file           string
-		wantErr        error
-		wantViolations []*todo.Violation
+		name    string
+		file    string
+		s       string
+		wantErr error
 	}{
 		{
-			name:       "error reading file",
-			readFileFn: func(string) ([]byte, error) { return nil, TestErr },
-			file:       "test.txt",
-			wantErr:    TestErr,
-		},
-		{
 			name: "empty data",
-			readFileFn: func(string) ([]byte, error) {
-				return []byte(``), nil
-			},
-			file: "test.txt",
+			file: "test",
 		},
 		{
-			name: "no violations",
-			readFileFn: func(string) ([]byte, error) {
-				return []byte(`// TODO(github.com/foo/bar/issues/123): test`), nil
-			},
-			file: "test.txt",
+			name: "valid",
+			file: "test",
+			s:    "// TODO(github.com/foo/bar/issues/123): test",
 		},
 		{
-			name: "missing issue",
-			readFileFn: func(string) ([]byte, error) {
-				return []byte(`// TODO(): test`), nil
-			},
-			file: "test.txt",
-			wantViolations: []*todo.Violation{
-				makeViolation("test.txt", 1, `// TODO(): test`),
+			name: "no issue",
+			file: "test",
+			s:    "// TODO(): test",
+			wantErr: &todo.TodoError{
+				File: "test",
+				Line: 1,
+				Text: "// TODO(): test",
 			},
 		},
 		{
-			name: "missing description",
-			readFileFn: func(string) ([]byte, error) {
-				return []byte(`// TODO(github.com/foo/bar/issues/123)`), nil
-			},
-			file: "test.txt",
-			wantViolations: []*todo.Violation{
-				makeViolation("test.txt", 1, `// TODO(github.com/foo/bar/issues/123)`),
+			name: "no description",
+			file: "test",
+			s:    "// TODO(github.com/foo/bar/issues/123)",
+			wantErr: &todo.TodoError{
+				File: "test",
+				Line: 1,
+				Text: "// TODO(github.com/foo/bar/issues/123)",
 			},
 		},
 		{
-			name: "multiple violations",
-			readFileFn: func(string) ([]byte, error) {
-				return []byte(`// TODO(github.com/foo/bar/issues/123)
+			name: "no lint",
+			file: "test",
+			s: `
+// check-todo off
+no issue
 // TODO(): test
-				`), nil
-			},
-			file: "test.txt",
-			wantViolations: []*todo.Violation{
-				makeViolation("test.txt", 1, `// TODO(github.com/foo/bar/issues/123)`),
-				makeViolation("test.txt", 2, `// TODO(): test`),
-			},
-		},
-		{
-			name: "disable lint on multiple violations",
-			readFileFn: func(string) ([]byte, error) {
-				return []byte(`// check-todo off
+no description
 // TODO(github.com/foo/bar/issues/123)
-// TODO(): test
-				`), nil
-			},
-			file: "test.txt",
+`,
 		},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			var got []*todo.Violation
-			checker := todo.NewChecker(tc.readFileFn)
+			ch := todo.NewChecker(tc.file)
 
-			err := checker.Check(tc.file)
-			checker.Visit(func(v *todo.Violation) {
-				got = append(got, v)
-			})
+			err := ch.Check([]byte(tc.s))
 
 			if !errors.Is(err, tc.wantErr) {
-				t.Errorf("(*todo.Checker).Check(%q) = %v; want %v", tc.file, err, tc.wantErr)
-			}
-			if diff := cmp.Diff(tc.wantViolations, got); diff != "" {
-				t.Errorf("(*todo.Checker).Visit(%q) mismatch violations (-want, +got):\n%s", tc.file, diff)
+				t.Errorf("Check() error mismatch.\ngot: %v\nwant: %v", err, tc.wantErr)
+				t.Logf("\nfile: %q\ndata:\n%s", tc.file, tc.s)
 			}
 		})
-	}
-}
-
-func makeViolation(f string, row int, s string) *todo.Violation {
-	return &todo.Violation{
-		File: f,
-		Row:  row,
-		Line: s,
 	}
 }
