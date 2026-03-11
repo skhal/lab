@@ -43,14 +43,14 @@ func (cmd *command) Run() error {
 
 func (cmd *command) parseFlags() error {
 	fs := flag.NewFlagSet(filepath.Base(os.Args[0]), flag.ExitOnError)
-	fs.BoolVar(&cmd.fix, "fix", cmd.fix, "insert license if missing")
+	fs.BoolVar(&cmd.fix, "fix", cmd.fix, "insert license if missing, requires -holder if set")
 	fs.StringVar(&cmd.holder, "holder", cmd.holder, "license holder name")
 	if err := fs.Parse(os.Args[1:]); err != nil {
 		return err
 	}
 	cmd.files = fs.Args()
 	if cmd.fix && cmd.holder == "" {
-		return fmt.Errorf("%w: missing -holder with -fix", ErrFlags)
+		return fmt.Errorf("%w: -fix requires -holder", ErrFlags)
 	}
 	return nil
 }
