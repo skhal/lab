@@ -7,32 +7,15 @@
 package main
 
 import (
-	"bytes"
-	"flag"
 	"fmt"
 	"os"
 
-	"github.com/skhal/lab/check/cmd/check-license/internal/license"
+	"github.com/skhal/lab/check/cmd/check-license/internal/cmd"
 )
 
-func init() {
-	flag.Usage = func() {
-		header := func() string {
-			buf := new(bytes.Buffer)
-			fmt.Fprintf(buf, "Usage: %s file [file ...]\n", flag.CommandLine.Name())
-			return buf.String()
-		}
-		fmt.Fprint(flag.CommandLine.Output(), header())
-		flag.PrintDefaults()
-	}
-}
-
 func main() {
-	opts := new(license.RunOptions)
-	opts.RegisterFlags(flag.CommandLine)
-	flag.Parse()
-	if err := license.Run(flag.Args(), opts); err != nil {
-		fmt.Fprintln(os.Stderr, err)
+	if err := cmd.Run(); err != nil {
+		fmt.Println(err)
 		os.Exit(1)
 	}
 }

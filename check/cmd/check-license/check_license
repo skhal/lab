@@ -4,8 +4,8 @@
 #
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
-#
-# check_license is a pre-commit hook to checks license in the staged files.
+
+# Check_license is a pre-commit hook to checks license in the staged files.
 # It and inserts a license (-fix) if not found with holder equal to the
 # user.name from git-config(1).
 #

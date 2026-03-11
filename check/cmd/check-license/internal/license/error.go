@@ -17,9 +17,6 @@ var (
 	// ErrInvalid indicates invalid license.
 	ErrInvalid = errors.New("invalid license")
 
-	// ErrFlags indicates error with input flags.
-	ErrFlags = errors.New("invalid flags")
-
 	// ErrBinaryFile indicates the file is binary
 	ErrBinaryFile = errors.New("binary file")
 )
