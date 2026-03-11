@@ -11,6 +11,8 @@ import (
 	"path/filepath"
 	"slices"
 	"strings"
+
+	goslices "github.com/skhal/lab/go/slices"
 )
 
 // ErrTest indicates an error in running go tests.
@@ -25,12 +27,14 @@ func Run(files []string) (err error) {
 	if len(packages) == 0 {
 		return
 	}
-	tester := NewTester()
-	for _, p := range packages {
+	packages = goslices.MapFunc(packages, func(p string) string {
 		// Gotest is a pre-commit check. Git reports changed files with respect
 		// to the work tree, without leading "./". `go test` expects local packages
 		// to start with "./".
-		p = filepath.FromSlash("./" + filepath.Clean(p))
+		return filepath.FromSlash("./" + filepath.Clean(p))
+	})
+	tester := NewTester()
+	for _, p := range packages {
 		if err = tester.Test(p); err != nil {
 			return
 		}
