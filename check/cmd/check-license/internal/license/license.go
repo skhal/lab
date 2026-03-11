@@ -3,7 +3,6 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Package license provides checker and fixer for license pre-commit check.
 package license
 
 import (
@@ -13,12 +12,12 @@ import (
 )
 
 var (
-	//go:embed data
-	embedFS      embed.FS
-	licenseTmpls = template.Must(template.New("licenses").ParseFS(embedFS, "data/license_*.txt"))
+	//go:embed static
+	efs  embed.FS
+	tmpl = template.Must(template.New("licenses").ParseFS(efs, "static/*.txt"))
 )
 
-// Data is input to the license template.
+// Data is the input to the license template.
 type Data struct {
 	Year   string // Year in the license block.
 	Holder string // Holder in the license block.
@@ -27,7 +26,7 @@ type Data struct {
 // Generate creates a license block.
 func Generate(data Data) ([]byte, error) {
 	var b bytes.Buffer
-	if err := licenseTmpls.ExecuteTemplate(&b, "license_bsd.txt", data); err != nil {
+	if err := tmpl.ExecuteTemplate(&b, "bsd.txt", data); err != nil {
 		return nil, err
 	}
 	return b.Bytes(), nil
