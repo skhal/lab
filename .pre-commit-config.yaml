@@ -45,11 +45,12 @@ repos:
     args: ["-mode=diff", "-lint=warn"]
   - id: check-go-test
     name: "Run go tests"
-    entry: check-go-test
+    entry: env CHECKGOTESTPARALLEL=yes check-go-test
     language: system
     types_or: [go]
     pass_filenames: true
     exclude: "nvim/plugin/lab-skeleton/share/new.*$"
+    verbose: true
   - id: check-godoc
     name: "Go documentation"
     entry: check-godoc
