@@ -17,8 +17,52 @@ import (
 
 var runTimeout = 100 * time.Millisecond
 
-// Run checks that every file in files has a license.
-func Run(files []string, fix bool, holder string) error {
+// Run checks copyright block in the files. It returns an error with a list of
+// files that miss or have invalid license.
+func Run(files []string) error {
+	return run(files, new(noopFixer))
+}
+
+// Fix checks copyright blocks in the files and fixes the files if the block
+// is missing.
+func Fix(files []string, holder string) error {
+	return run(files, &copyrightFixer{holder: holder})
+}
+
+type fixer interface {
+	Fix(file string, b []byte) error
+}
+
+type noopFixer struct{}
+
+// Fix returns an error about missing copyright.
+func (fx *noopFixer) Fix(file string, _ []byte) error {
+	return fmt.Errorf("%s: %w", file, ErrNotFound)
+}
+
+type copyrightFixer struct {
+	holder string
+}
+
+// Fix adds a copyright block to the file content.
+func (fx *copyrightFixer) Fix(file string, data []byte) error {
+	data, err := Add(data, file, fx.holder)
+	if err != nil {
+		return fmt.Errorf("%s: %w", file, err)
+	}
+	info, err := os.Stat(file)
+	if err != nil {
+		return err
+	}
+	err = os.WriteFile(file, data, info.Mode())
+	if err != nil {
+		return err
+	}
+	// use error to indicate the file change
+	return fmt.Errorf("%s: fixed file", file)
+}
+
+func run(files []string, fx fixer) error {
 	errch := make(chan error)
 	go func() {
 		defer close(errch)
@@ -27,7 +71,7 @@ func Run(files []string, fix bool, holder string) error {
 		var wg sync.WaitGroup
 		for _, f := range files {
 			wg.Go(func() {
-				switch err := check(f, fix, holder); {
+				switch err := check(f, fx); {
 				case errors.Is(err, ErrBinaryFile):
 					// skip
 				case err != nil:
@@ -47,7 +91,7 @@ func Run(files []string, fix bool, holder string) error {
 	return errors.Join(ee...)
 }
 
-func check(file string, fix bool, holder string) error {
+func check(file string, fx fixer) error {
 	data, err := os.ReadFile(file)
 	if err != nil {
 		return err
@@ -57,8 +101,8 @@ func check(file string, fix bool, holder string) error {
 	}
 	err = Check(data)
 	if err != nil {
-		if fix && errors.Is(err, ErrNotFound) {
-			return runFix(file, data, holder)
+		if errors.Is(err, ErrNotFound) {
+			return fx.Fix(file, data)
 		}
 		return fmt.Errorf("%s: %w", file, err)
 	}
@@ -69,21 +113,4 @@ const nullByte = 0
 
 func isBinary(b []byte) bool {
 	return bytes.IndexByte(b, nullByte) != -1
-}
-
-func runFix(file string, data []byte, holder string) error {
-	data, err := Add(data, file, holder)
-	if err != nil {
-		return fmt.Errorf("%s: %w", file, err)
-	}
-	info, err := os.Stat(file)
-	if err != nil {
-		return err
-	}
-	err = os.WriteFile(file, data, info.Mode())
-	if err != nil {
-		return err
-	}
-	// use error to indicate the file change
-	return fmt.Errorf("%s: fixed file", file)
 }

@@ -35,7 +35,10 @@ func (cmd *command) Run() error {
 	if err := cmd.parseFlags(); err != nil {
 		return err
 	}
-	return license.Run(cmd.files, cmd.fix, cmd.holder)
+	if cmd.fix {
+		return license.Fix(cmd.files, cmd.holder)
+	}
+	return license.Run(cmd.files)
 }
 
 func (cmd *command) parseFlags() error {
