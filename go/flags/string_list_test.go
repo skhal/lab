@@ -16,9 +16,9 @@ import (
 )
 
 func ExampleStringList() {
-	var tags flags.StringList
+	var tags []string
 	fs := flag.NewFlagSet("demo", flag.ContinueOnError)
-	fs.Var(&tags, "tag", "comma separated tags")
+	fs.Var(flags.NewStringList(&tags), "tag", "comma separated tags")
 	err := fs.Parse([]string{"-tag", "1", "-tag", "2,3", "-tag", ",,4"})
 	if err != nil {
 		fmt.Println(err)
@@ -71,50 +71,18 @@ func TestStringList_Set(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			var flag flags.StringList
+			var got []string
+			sl := flags.NewStringList(&got)
 
 			for _, str := range tc.strings {
-				err := flag.Set(str)
+				err := sl.Set(str)
 				if err != nil {
-					t.Fatalf("flags.StringList().Set(%q) = %v; want no error", str, err)
+					t.Fatalf("Set(%q) = %v; want no error", str, err)
 				}
 			}
 
-			if diff := cmp.Diff(tc.want, flag.Get(), cmpopts.EquateEmpty()); diff != "" {
-				t.Errorf("flags.StringList(%q).Get() mismatch (-want, +got):\n%s", tc.strings, diff)
-			}
-		})
-	}
-}
-
-func TestStringList_Get(t *testing.T) {
-	tests := []struct {
-		name    string
-		strings []string
-		want    []string
-	}{
-		{
-			name: "empty",
-		},
-		{
-			name:    "one item",
-			strings: []string{"one"},
-			want:    []string{"one"},
-		},
-		{
-			name:    "two items",
-			strings: []string{"one", "two"},
-			want:    []string{"one", "two"},
-		},
-	}
-	for _, tc := range tests {
-		t.Run(tc.name, func(t *testing.T) {
-			flag := flags.StringList(tc.strings)
-
-			got := flag.Get()
-
 			if diff := cmp.Diff(tc.want, got, cmpopts.EquateEmpty()); diff != "" {
-				t.Errorf("flags.StringList(%q).Get() mismatch (-want, +got):\n%s", tc.strings, diff)
+				t.Errorf("Set() mismatch (-want, +got):\n%s", diff)
 			}
 		})
 	}
@@ -128,28 +96,26 @@ func TestStringList_String(t *testing.T) {
 	}{
 		{
 			name: "empty",
-			want: "[]",
 		},
 		{
 			name:    "one item",
 			strings: []string{"one"},
-			want:    "[one]",
+			want:    "one",
 		},
 		{
 			name:    "two items",
 			strings: []string{"one", "two"},
-			want:    "[one two]",
+			want:    "one,two",
 		},
 	}
 	for _, tc := range tests {
-		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
-			flag := flags.StringList(tc.strings)
+			sl := flags.NewStringList(&tc.strings)
 
-			got := flag.String()
+			got := sl.String()
 
 			if got != tc.want {
-				t.Errorf("flags.StringList(%s).String() = %q; want %q", tc.strings, got, tc.want)
+				t.Errorf("String() = %q; want %q", got, tc.want)
 			}
 		})
 	}

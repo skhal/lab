@@ -6,36 +6,51 @@
 package flags
 
 import (
-	"fmt"
 	"strings"
 )
 
-const separator = ","
+const listSeparator = ","
 
-// StringList implements a list of strings flag. It accumulates non-empty values
-// after trimming spaces from every use of the flag. Use comma to separate
-// multiple values in a single flag.
-type StringList []string
+// StringList is a flag of comma-separated non-empty strings. It trims spaces
+// and skips empty values. The flag wraps a slice of strings, where values
+// are to be put.
+//
+// The wrapped slice might be non-empty, which is to be used for default value.
+// If the flag is present, [StringList] overwrites the default value.
+type StringList struct {
+	s   *[]string
+	set bool
+}
 
-// Set implemnets flag.Value interface.
-func (f *StringList) Set(value string) error {
-	tokens := strings.Split(value, separator)
-	for _, token := range tokens {
-		token = strings.TrimSpace(token)
-		if token == "" {
+// NewStringList creates a [StringList] flag.
+func NewStringList(s *[]string) *StringList {
+	return &StringList{s: s}
+}
+
+// Set implements [flag.Value] interface.
+func (sl *StringList) Set(value string) error {
+	for v := range strings.SplitSeq(value, listSeparator) {
+		v = strings.TrimSpace(v)
+		if v == "" {
 			continue
 		}
-		*f = append(*f, token)
+		sl.add(v)
 	}
 	return nil
 }
 
-// Get implements flag.Getter interface.
-func (f *StringList) Get() any {
-	return []string(*f)
+func (sl *StringList) add(s string) {
+	if !sl.set {
+		sl.set = true
+		*sl.s = nil
+	}
+	*sl.s = append(*sl.s, s)
 }
 
-// String implemnets flag.Value interface.
-func (f *StringList) String() string {
-	return fmt.Sprint([]string(*f))
+// String implements [flag.Value] interface.
+func (sl *StringList) String() string {
+	if sl.s == nil {
+		return ""
+	}
+	return strings.Join(*sl.s, listSeparator)
 }

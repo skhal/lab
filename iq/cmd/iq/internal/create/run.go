@@ -17,16 +17,19 @@ import (
 	"github.com/skhal/lab/iq/cmd/iq/internal/registry"
 )
 
+// Config is the run command configuration parameters.
 type Config struct {
-	Description string
-	Tags        flags.StringList
+	Description string   // question description
+	Tags        []string // question tags
 }
 
+// RegisterFlags registers configuration fields with a flag set.
 func (cfg *Config) RegisterFlags(fs *flag.FlagSet) {
 	fs.StringVar(&cfg.Description, "d", "", "one-line description")
-	fs.Var(&cfg.Tags, "t", "list of tags")
+	fs.Var(flags.NewStringList(&cfg.Tags), "t", "list of tags")
 }
 
+// Run executes the command.
 func Run(cfg *Config, reg *registry.R) error {
 	if cfg.Description == "" {
 		return errors.New("missing description")
