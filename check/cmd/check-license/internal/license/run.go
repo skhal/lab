@@ -27,10 +27,10 @@ func Run(files []string, fix bool, holder string) error {
 		var wg sync.WaitGroup
 		for _, f := range files {
 			wg.Go(func() {
-				err := check(f, fix, holder)
-				if errors.Is(err, ErrBinaryFile) {
-					fmt.Fprintln(os.Stderr, err, ": skip")
-				} else if err != nil {
+				switch err := check(f, fix, holder); {
+				case errors.Is(err, ErrBinaryFile):
+					// skip
+				case err != nil:
 					select {
 					case errch <- err:
 					case <-ctx.Done():
