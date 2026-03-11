@@ -6,12 +6,28 @@
 package flags_test
 
 import (
+	"flag"
+	"fmt"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/skhal/lab/go/flags"
 )
+
+func ExampleStringList() {
+	var tags flags.StringList
+	fs := flag.NewFlagSet("demo", flag.ContinueOnError)
+	fs.Var(&tags, "tag", "comma separated tags")
+	err := fs.Parse([]string{"-tag", "1", "-tag", "2,3", "-tag", ",,4"})
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Println(tags)
+	// Output:
+	// [1 2 3 4]
+}
 
 func TestStringList_Set(t *testing.T) {
 	tests := []struct {
