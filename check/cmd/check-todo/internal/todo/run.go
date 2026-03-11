@@ -15,12 +15,9 @@ import (
 )
 
 var (
-	todoPrefix = regexp.MustCompile(`(?i)(?://|#|")\s+\btodo\b.*`)
-	todoRegexp = regexp.MustCompile(`TODO\(github.com/\w+/\w+/issues/\d+\):\s.+$`)
-)
-
-var (
-	nocheckRegexp = regexp.MustCompile(`^(?://|#|") check-todo off(?:: .*)?$`)
+	reNoLint = regexp.MustCompile(`^(?://|#|") check-todo off(?:: .*)?$`)
+	rePrefix = regexp.MustCompile(`(?i)(?://|#|")\s+\btodo\b.*`)
+	reTodo   = regexp.MustCompile(`TODO\(github.com/\w+/\w+/issues/\d+\):\s.+$`)
 )
 
 // Run checks todo-comments in files. It collects found errors from files and
@@ -62,13 +59,13 @@ func (ch *Checker) Check(b []byte) error {
 	for lb := range bytes.Lines(b) {
 		line++
 		lb = bytes.TrimRight(lb, eol)
-		if nocheckRegexp.Match(lb) {
+		if reNoLint.Match(lb) {
 			break
 		}
-		if !todoPrefix.Match(lb) {
+		if !rePrefix.Match(lb) {
 			continue
 		}
-		if todoRegexp.Match(lb) {
+		if reTodo.Match(lb) {
 			continue
 		}
 		ee = append(ee, &TodoError{
