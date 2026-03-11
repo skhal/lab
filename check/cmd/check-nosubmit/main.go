@@ -8,7 +8,6 @@ package main
 
 import (
 	"context"
-	"flag"
 	"fmt"
 	"os"
 
@@ -20,8 +19,7 @@ func main() {
 	cfg := &nosubmit.Config{
 		ReadFileFn: os.ReadFile,
 	}
-	flag.Parse()
-	if err := nosubmit.Run(ctx, cfg, flag.Args()...); err != nil {
+	if err := nosubmit.Run(ctx, cfg, os.Args[1:]...); err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
