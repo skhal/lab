@@ -6,12 +6,20 @@
 package slices_test
 
 import (
+	"fmt"
 	"strconv"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/skhal/lab/go/slices"
 )
+
+func ExampleMapFunc() {
+	nn := slices.MapFunc([]int{1, 2, 3}, func(n int) int { return n * 2 })
+	fmt.Println(nn)
+	// Output:
+	// [2 4 6]
+}
 
 func TestMapFunc(t *testing.T) {
 	mapfn := strconv.Itoa
