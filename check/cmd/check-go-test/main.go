@@ -3,18 +3,15 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-/*
-Gotest runs `go test` on package for Go files.
-
-Synopsis:
-
-	check-go-test file [file ...]
-*/
+// Check-go-test runs `go test` on package for Go files.
+//
+// SYNOPSIS
+//
+//	check-go-test file [file ...]
 package main
 
 import (
 	"errors"
-	"flag"
 	"fmt"
 	"os"
 
@@ -22,8 +19,7 @@ import (
 )
 
 func main() {
-	flag.Parse()
-	if err := check.Run(flag.Args()...); err != nil {
+	if err := check.Run(os.Args[1:]); err != nil {
 		if !errors.Is(err, check.ErrTest) {
 			fmt.Fprintln(os.Stderr, err)
 		}

@@ -17,7 +17,7 @@ import (
 var ErrTest = errors.New("test error")
 
 // Run runs `go test` on packages for listed files.
-func Run(files ...string) (err error) {
+func Run(files []string) (err error) {
 	packages := slices.Collect(Unique(Paths(FilterFunc(slices.Values(files), IsGoFile))))
 	packages = slices.DeleteFunc(packages, func(p string) bool {
 		return strings.Contains(p, "/testdata/")
