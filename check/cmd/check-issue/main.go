@@ -14,7 +14,6 @@ Use it as a commit-msg git-hook(1). Supported formats are:
 package main
 
 import (
-	"flag"
 	"fmt"
 	"os"
 
@@ -22,9 +21,8 @@ import (
 )
 
 func main() {
-	flag.Parse()
 	cfg := issue.NewConfig()
-	if err := issue.Run(cfg, flag.Args()); err != nil {
+	if err := issue.Run(cfg, os.Args[1:]); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
