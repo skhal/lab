@@ -3,9 +3,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-/*
-Check-copyright verifies that the file includes a copyright statement.
-*/
+// Check-license verifies that the file includes a copyright statement.
 package main
 
 import (
