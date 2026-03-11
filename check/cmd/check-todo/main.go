@@ -3,18 +3,15 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-/*
-Lint-todo validates todo-comments.
-
-Synopsis:
-
-	check-todo file [file ...]
-*/
+// Check-todo validates todo-comments.
+//
+// SYNOPSIS
+//
+//	check-todo file [file ...]
 package main
 
 import (
 	"errors"
-	"flag"
 	"fmt"
 	"os"
 
@@ -22,9 +19,8 @@ import (
 )
 
 func main() {
-	flag.Parse()
 	cfg := todo.NewConfig()
-	if err := todo.Run(cfg, flag.Args()...); err != nil {
+	if err := todo.Run(cfg, os.Args[1:]...); err != nil {
 		if !errors.Is(err, todo.ErrCheck) {
 			fmt.Fprintln(os.Stderr, err)
 		}
