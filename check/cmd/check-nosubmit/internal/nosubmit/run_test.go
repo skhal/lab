@@ -6,32 +6,10 @@
 package nosubmit_test
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/skhal/lab/check/cmd/check-nosubmit/internal/nosubmit"
 )
-
-func ExampleRun() {
-	readFileFn := func(f string) ([]byte, error) {
-		if f != "foo.txt" {
-			return nil, fmt.Errorf("error opening file %s", f)
-		}
-		s := `
-// DO NOT SUBMIT: work in progress
-		`
-		return []byte(s), nil
-	}
-	cfg := &nosubmit.Config{
-		ReadFileFn: readFileFn,
-	}
-	if err := nosubmit.Run(cfg, "foo.txt"); err != nil {
-		fmt.Println(err)
-		return
-	}
-	// Output:
-	// check error
-}
 
 func TestHasNoSubmit(t *testing.T) {
 	tests := []struct {
@@ -84,7 +62,7 @@ DO NOT SUBMIT: description
 			got := nosubmit.Check([]byte(tc.data))
 
 			if tc.want != got {
-				t.Errorf("nosubmit.Check(...) = %v; want %v", got, tc.want)
+				t.Errorf("Check() = %v; want %v", got, tc.want)
 				t.Logf("data:\n%s", tc.data)
 			}
 		})

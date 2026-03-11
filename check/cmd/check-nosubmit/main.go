@@ -14,10 +14,7 @@ import (
 )
 
 func main() {
-	cfg := &nosubmit.Config{
-		ReadFileFn: os.ReadFile,
-	}
-	if err := nosubmit.Run(cfg, os.Args[1:]...); err != nil {
+	if err := nosubmit.Run(os.Args[1:]...); err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}

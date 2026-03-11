@@ -18,31 +18,30 @@ import (
 	"bytes"
 	"errors"
 	"iter"
+	"os"
 	"regexp"
 )
 
 // ErrCheck indicates presence of "DO NO SUBMIT" comment.
 var ErrCheck = errors.New("check error")
 
-// ReadFileFunc reads file and returns contents or error.
-type ReadFileFunc func(string) ([]byte, error)
-
-// Config passes ReadFileFunc.
-type Config struct {
-	// ReadFileFn reads file content.
-	ReadFileFn ReadFileFunc
-}
-
 // Run checks whether any of the files include "DO NOT SUBMIT" comment.
-func Run(cfg *Config, files ...string) error {
+func Run(files ...string) error {
 	for _, f := range files {
-		data, err := cfg.ReadFileFn(f)
-		if err != nil {
+		if err := run(f); err != nil {
 			return err
 		}
-		if Check(data) {
-			return ErrCheck
-		}
+	}
+	return nil
+}
+
+func run(file string) error {
+	data, err := os.ReadFile(file)
+	if err != nil {
+		return err
+	}
+	if Check(data) {
+		return ErrCheck
 	}
 	return nil
 }
