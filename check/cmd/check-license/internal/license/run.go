@@ -16,40 +16,6 @@ import (
 	"time"
 )
 
-var (
-	// ErrNotFound indicates missing license.
-	ErrNotFound = errors.New("missing license")
-
-	// ErrInvalid indicates invalid license.
-	ErrInvalid = errors.New("invalid license")
-
-	// ErrFlags indicates error with input flags.
-	ErrFlags = errors.New("invalid flags")
-
-	// ErrBinaryFile indicates the file is binary
-	ErrBinaryFile = errors.New("binary file")
-)
-
-// InvalidError is [ErrInvalid] with line number where copyright was found.
-type InvalidError struct {
-	line int
-}
-
-// NewInvalidError returns a new InvalidError for provided line number.
-func NewInvalidError(line int) *InvalidError {
-	return &InvalidError{
-		line: line,
-	}
-}
-
-func (e *InvalidError) Error() string {
-	return fmt.Sprintf("L%d: %s", e.line, ErrInvalid)
-}
-
-func (e *InvalidError) Is(target error) bool {
-	return target == ErrInvalid
-}
-
 // RunOptions customize the license check.
 type RunOptions struct {
 	Fix    bool   // fix license if missing
