@@ -7,119 +7,159 @@ package issue_test
 
 import (
 	"errors"
-	"fmt"
 	"testing"
 
 	"github.com/skhal/lab/check/cmd/check-issue/internal/issue"
 )
 
-func ExampleRun() {
-	readFileFn := func(f string) ([]byte, error) {
-		data := `
-Issue #123
-`
-		return []byte(data), nil
-	}
-	cfg := &issue.Config{
-		ReadFileFn: readFileFn,
-	}
-	if err := issue.Run(cfg, []string{"foo.txt"}); err != nil {
-		fmt.Println(err)
-		return
-	}
-	// Output:
-}
-
 var TestErr = errors.New("test error")
 
 func TestCheck(t *testing.T) {
 	tests := []struct {
-		name       string
-		readFileFn issue.ReadFileFunc
-		file       string
-		wantErr    error
+		name    string
+		s       string
+		wantErr error
 	}{
 		{
-			name:       "error readinf eil",
-			readFileFn: func(string) ([]byte, error) { return nil, TestErr },
-			file:       "test.txt",
-			wantErr:    TestErr,
+			name:    "empty",
+			wantErr: issue.ErrNoIssue,
 		},
 		{
-			name: "missing issue",
-			readFileFn: func(string) ([]byte, error) {
-				return []byte(`Test commit`), nil
-			},
-			file:    "test.txt",
+			name:    "no tag",
+			s:       "Test data",
 			wantErr: issue.ErrNoIssue,
 		},
 		{
 			name: "no issue tag",
-			readFileFn: func(string) ([]byte, error) {
-				return []byte(`NO_ISSUE`), nil
-			},
-			file: "test.txt",
+			s:    "NO_ISSUE",
+		},
+		{
+			// can't mix the issue with other text on the line
+			name:    "no issue tag with prefix",
+			s:       "prefx NO_ISSUE",
+			wantErr: issue.ErrNoIssue,
+		},
+		{
+			// can't mix the issue with other text on the line
+			name:    "no issue tag with suffix",
+			s:       "NO_ISSUE suffix",
+			wantErr: issue.ErrNoIssue,
 		},
 		{
 			name: "no issue tag with description",
-			readFileFn: func(string) ([]byte, error) {
-				return []byte(`NO_ISSUE: N/A`), nil
-			},
-			file: "test.txt",
+			s:    "NO_ISSUE: N/A",
 		},
 		{
-			name: "issue local",
-			readFileFn: func(string) ([]byte, error) {
-				return []byte(`Issue #123`), nil
-			},
-			file: "test.txt",
+			// can't mix the issue with other text on the line
+			name:    "no issue tag with description and prefix",
+			s:       "prefix NO_ISSUE: N/A",
+			wantErr: issue.ErrNoIssue,
 		},
 		{
-			name: "issue other owher",
-			readFileFn: func(string) ([]byte, error) {
-				return []byte(`Issue owner/repo#123`), nil
-			},
-			file: "test.txt",
+			name: "local issue",
+			s:    "Issue #123",
 		},
 		{
-			name: "close local",
-			readFileFn: func(string) ([]byte, error) {
-				return []byte(`Close #123`), nil
-			},
-			file: "test.txt",
+			// can't mix the issue with other text on the line
+			name:    "local issue with prefix",
+			s:       "prefix Issue #123",
+			wantErr: issue.ErrNoIssue,
 		},
 		{
-			name: "close other owher",
-			readFileFn: func(string) ([]byte, error) {
-				return []byte(`Close owner/repo#123`), nil
-			},
-			file: "test.txt",
+			// can't mix the issue with other text on the line
+			name:    "local issue with suffix",
+			s:       "Issue #123 suffix",
+			wantErr: issue.ErrNoIssue,
 		},
 		{
-			name: "fix local",
-			readFileFn: func(string) ([]byte, error) {
-				return []byte(`Fix #123`), nil
-			},
-			file: "test.txt",
+			name: "close local issue",
+			s:    "Close #123",
 		},
 		{
-			name: "fix other owher",
-			readFileFn: func(string) ([]byte, error) {
-				return []byte(`Fix owner/repo#123`), nil
-			},
-			file: "test.txt",
+			// can't mix the issue with other text on the line
+			name:    "close local issue with prefix",
+			s:       "prefix Close #123",
+			wantErr: issue.ErrNoIssue,
+		},
+		{
+			// can't mix the issue with other text on the line
+			name:    "close local issue with suffix",
+			s:       "Close #123 suffix",
+			wantErr: issue.ErrNoIssue,
+		},
+		{
+			name: "fix local issue",
+			s:    "Fix #123",
+		},
+		{
+			// can't mix the issue with other text on the line
+			name:    "fix local issue with prefix",
+			s:       "prefix Fix #123",
+			wantErr: issue.ErrNoIssue,
+		},
+		{
+			// can't mix the issue with other text on the line
+			name:    "fix local issue with suffix",
+			s:       "Fix #123 suffix",
+			wantErr: issue.ErrNoIssue,
+		},
+
+		{
+			name: "remote issue",
+			s:    "Issue owner/repo#123",
+		},
+		{
+			// can't mix the issue with other text on the line
+			name:    "remote issue with prefix",
+			s:       "prefix Issue owner/repo#123",
+			wantErr: issue.ErrNoIssue,
+		},
+		{
+			// can't mix the issue with other text on the line
+			name:    "remote issue with suffix",
+			s:       "Issue owner/repo#123 suffix",
+			wantErr: issue.ErrNoIssue,
+		},
+		{
+			name: "close remote issue",
+			s:    "Close owner/repo#123",
+		},
+		{
+			// can't mix the issue with other text on the line
+			name:    "close remote issue with prefix",
+			s:       "prefix Close owner/repo#123",
+			wantErr: issue.ErrNoIssue,
+		},
+		{
+			// can't mix the issue with other text on the line
+			name:    "close remote issue with suffix",
+			s:       "Close owner/repo#123 suffix",
+			wantErr: issue.ErrNoIssue,
+		},
+		{
+			name: "fix remote issue",
+			s:    "Fix owner/repo#123",
+		},
+		{
+			// can't mix the issue with other text on the line
+			name:    "fix remote issue with prefix",
+			s:       "prefix Fix owner/repo#123",
+			wantErr: issue.ErrNoIssue,
+		},
+		{
+			// can't mix the issue with other text on the line
+			name:    "fix remote issue with suffix",
+			s:       "Fix owner/repo#123 suffix",
+			wantErr: issue.ErrNoIssue,
 		},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			cfg := &issue.Config{
-				ReadFileFn: tc.readFileFn,
-			}
-
-			err := issue.Check(cfg, tc.file)
+			err := issue.Check([]byte(tc.s))
 
 			if !errors.Is(err, tc.wantErr) {
-				t.Errorf("issue.Check(_, %q) = %v; want error %v", tc.file, err, tc.wantErr)
+				t.Errorf("Check() = %v; want %v", err, tc.wantErr)
+				t.Logf("data:\n%s", tc.s)
 			}
 		})
 	}

@@ -21,58 +21,51 @@ var (
 	ErrNoIssue = errors.New("missing issue")
 )
 
-// ReadFileFunc is used to read file.
-type ReadFileFunc func(string) ([]byte, error)
-
-// Config configures the check.
-type Config struct {
-	// ReadFileFn reads file.
-	ReadFileFn ReadFileFunc
-}
-
-// NewConfig creates a new configuration with os.ReadFile function.
-func NewConfig() *Config {
-	return &Config{
-		ReadFileFn: os.ReadFile,
-	}
-}
-
 // Run executes the check. It is expected that the check will run as a
 // commit-msg git-hook(1). Therefore there should be a single file, else it
 // returns an error.
-func Run(cfg *Config, files []string) error {
+func Run(files []string) error {
 	if len(files) != 1 {
 		return ErrCheck
 	}
-	return Check(cfg, files[0])
+	return run(files[0])
 }
 
-var (
-	noissueRegexp = regexp.MustCompile(`^(?i)no_issue(?:: .*)?$`)
-	// lint = keyword [ ":" ] issue .
-	// keyword = close | closes | closed | fix | fixes | fised | resolve | resolves | resolved .
-	// issue = [ owner "/" repo ] "#" number .
-	// ref: https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/using-keywords-in-issues-and-pull-requests
-	//
-	// Enforce sub-set of possible options:
-	// - keyword: issue, close, fix
-	// - issue: local or remote
-	issueRegexp = regexp.MustCompile(`^(?i)(?:issue|close|fix) (?:\w+/\w+)?#\d+$`)
-)
-
-// Check validates the file with commit message.
-func Check(cfg *Config, file string) error {
-	data, err := cfg.ReadFileFn(file)
+func run(file string) error {
+	b, err := os.ReadFile(file)
 	if err != nil {
 		return err
 	}
-	s := bufio.NewScanner(bytes.NewReader(data))
+	return Check(b)
+}
+
+var (
+	reNoIssue = regexp.MustCompile(`^(?i)no_issue(?:: .*)?$`)
+	reIssue   = regexp.MustCompile(`^(?i)(?:issue|close|fix) (?:\w+/\w+)?#\d+$`)
+)
+
+// Check verifies that the buffer b has an valid issue reference. A valid issue
+// reference (ignore case) is separate on the line and has one of the forms:
+//
+//	no_issue
+//	verb reference
+//
+// where verb is one of `issue`, `close`, `fix` and reference is either `#123`
+// or `owner/repo#123`.
+//
+// Examples:
+//
+//	NO_ISSUE
+//	Issue #123
+//	Close user/repo#123
+func Check(b []byte) error {
+	s := bufio.NewScanner(bytes.NewReader(b))
 	for s.Scan() {
 		line := s.Text()
-		if noissueRegexp.MatchString(line) {
+		if reNoIssue.MatchString(line) {
 			return nil
 		}
-		if issueRegexp.MatchString(line) {
+		if reIssue.MatchString(line) {
 			return nil
 		}
 	}

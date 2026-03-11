@@ -21,8 +21,7 @@ import (
 )
 
 func main() {
-	cfg := issue.NewConfig()
-	if err := issue.Run(cfg, os.Args[1:]); err != nil {
+	if err := issue.Run(os.Args[1:]); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
