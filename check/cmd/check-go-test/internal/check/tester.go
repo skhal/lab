@@ -25,7 +25,7 @@ import (
 // EventID identifies an Event. It includes the Event's package and test names.
 type EventID string
 
-// Even is a single item output by Go test command. It is either a build or
+// Event is a single item output by Go test command. It is either a build or
 // test event.
 type Event struct {
 	BuildEvent *build.Event    // building output (go help buildjson)
@@ -60,9 +60,19 @@ func NewTester() *Tester {
 // Test runs `go test` on a single package and collects test output, grouped
 // by test id. It keeps track of failed tests.
 func (t *Tester) Test(pkg string) error {
+	return t.test([]string{pkg})
+}
+
+// TestAll runs a single `go test` for the packages.
+func (t *Tester) TestAll(pkgs []string) error {
+	return t.test(pkgs)
+}
+
+func (t *Tester) test(pkgs []string) error {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-	cmd := exec.CommandContext(ctx, "go", "test", "-json", "-vet=all", pkg)
+	args := append([]string{"test", "-json", "-vet=all"}, pkgs...)
+	cmd := exec.CommandContext(ctx, "go", args...)
 	cmd.Stderr = os.Stderr
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {

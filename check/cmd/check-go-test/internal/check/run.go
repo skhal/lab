@@ -8,12 +8,15 @@ package check
 import (
 	"errors"
 	"fmt"
+	"os"
 	"path/filepath"
 	"slices"
 	"strings"
 
 	goslices "github.com/skhal/lab/go/slices"
 )
+
+const envCheckGotestParallel = "CHECKGOTESTPARALLEL"
 
 // ErrTest indicates an error in running go tests.
 var ErrTest = errors.New("test error")
@@ -34,9 +37,17 @@ func Run(files []string) (err error) {
 		return filepath.FromSlash("./" + filepath.Clean(p))
 	})
 	tester := NewTester()
-	for _, p := range packages {
-		if err = tester.Test(p); err != nil {
+	switch strings.ToLower(os.Getenv(envCheckGotestParallel)) {
+	case "yes":
+		fmt.Fprintln(os.Stderr, "run parallel go test")
+		if err = tester.TestAll(packages); err != nil {
 			return
+		}
+	default:
+		for _, p := range packages {
+			if err = tester.Test(p); err != nil {
+				return
+			}
 		}
 	}
 	tester.VisitFails(func(f *FailedTest) {
