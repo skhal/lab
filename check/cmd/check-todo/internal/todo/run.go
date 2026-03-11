@@ -31,23 +31,9 @@ var (
 // ReadFileFunc reads file and returns data or error.
 type ReadFileFunc func(string) ([]byte, error)
 
-// Config holds parameters for todo-linter.
-type Config struct {
-	// ReadFileFn reads file contents.
-	ReadFileFn ReadFileFunc
-}
-
-// NewConfig constructructs a default configuration with os.ReadFile to read
-// files.
-func NewConfig() *Config {
-	return &Config{
-		ReadFileFn: os.ReadFile,
-	}
-}
-
 // Run validates todo-lines in files.
-func Run(cfg *Config, files ...string) (err error) {
-	chk := NewChecker(cfg.ReadFileFn)
+func Run(files ...string) (err error) {
+	chk := NewChecker(os.ReadFile)
 	for _, file := range files {
 		if err := chk.Check(file); err != nil {
 			return err
@@ -127,9 +113,9 @@ func findViolations(data []byte) iter.Seq[*Violation] {
 
 // Violation holds invalid line and its location in the file.
 type Violation struct {
-	File string
-	Row  int
-	Line string
+	File string // file name
+	Row  int    // line number
+	Line string // line text
 }
 
 // String implements fmt.Stringer interface.

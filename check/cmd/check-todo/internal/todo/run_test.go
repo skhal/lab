@@ -9,35 +9,11 @@ package todo_test
 
 import (
 	"errors"
-	"fmt"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/skhal/lab/check/cmd/check-todo/internal/todo"
 )
-
-func ExampleRun() {
-	readFileFn := func(f string) ([]byte, error) {
-		if f != "foo.txt" {
-			return nil, fmt.Errorf("error opening file %s", f)
-		}
-		data := `
-// TODO(github.com/foo/bar/issues/123): valid item
-// TODO(): invalid item - missing github issue
-`
-		return []byte(data), nil
-	}
-	cfg := &todo.Config{
-		ReadFileFn: readFileFn,
-	}
-	if err := todo.Run(cfg, "foo.txt"); err != nil {
-		fmt.Println(err)
-		return
-	}
-	// Output:
-	// foo.txt:3 // TODO(): invalid item - missing github issue
-	// check error
-}
 
 var TestErr = errors.New("test error")
 

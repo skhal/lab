@@ -19,8 +19,7 @@ import (
 )
 
 func main() {
-	cfg := todo.NewConfig()
-	if err := todo.Run(cfg, os.Args[1:]...); err != nil {
+	if err := todo.Run(os.Args[1:]...); err != nil {
 		if !errors.Is(err, todo.ErrCheck) {
 			fmt.Fprintln(os.Stderr, err)
 		}
