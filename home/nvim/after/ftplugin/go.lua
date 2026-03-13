@@ -215,6 +215,7 @@ function LocationTree:Items()
 end
 
 local LocationList = {
+	indentation = "  ",
 	indent = {
 		kind = {
 			-- keep-sorted start
@@ -268,7 +269,7 @@ function LocationList.rename(opt)
 	end
 	opt.text = ("%s %s"):format(kind, name)
 	if LocationList.indent.kind[opt.kind] then
-		opt.text = " " .. opt.text
+		opt.text = LocationList.indentation .. opt.text
 	end
 	return opt
 end
