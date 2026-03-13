@@ -96,3 +96,64 @@ local RelatedFile = {
 vim.keymap.set("n", "<localleader>rd", RelatedFile.doc, { buffer = true })
 vim.keymap.set("n", "<localleader>rs", RelatedFile.source, { buffer = true })
 vim.keymap.set("n", "<localleader>rt", RelatedFile.test, { buffer = true })
+
+local LocationList = {
+	renames = {
+		kind = {
+			-- keep-sorted start
+			Constant = "D",
+			Field = "F",
+			Function = "F",
+			Method = "M",
+			Struct = "S",
+			Variable = "V",
+			-- keep-sorted end
+		},
+	},
+}
+
+function LocationList.on_list(opts)
+	opts.title = "Document symbols"
+	opts.items = vim.iter(opts.items)
+		:map(function(o)
+			return LocationList.rename(o)
+		end)
+		:totable()
+	opts.quickfixtextfunc = LocationList.quickfixtextfunc
+	vim.fn.setloclist(0, {}, " ", opts)
+	vim.cmd.lopen()
+end
+
+-- rename replaces the "[Kind]" prefix in the location list items text with
+-- abbreviated kind letter from [LocationList.renames.kind].
+function LocationList.rename(opt)
+	local kind, ident = opt.text:match("^%[(%w+)%] ([^%s]*)$")
+	if not kind then
+		return opt
+	end
+	local kindChar = LocationList.renames.kind[kind] or kind
+	opt.text = ("%s %s"):format(kindChar, ident)
+	return opt
+end
+
+-- quickfixtextfunc shows only item text in the location list window.
+function LocationList.quickfixtextfunc(opts)
+	local formatted = {}
+	local items = vim.fn.getloclist(opts.winid, { id = opts.id, items = 0 }).items
+	for i = opts.start_idx, opts.end_idx do
+		local v = items[i]
+		table.insert(formatted, v.text)
+	end
+	return formatted
+end
+
+vim.api.nvim_create_autocmd("LspAttach", {
+	callback = function(_)
+		vim.keymap.set("n", "gO", function()
+			vim.lsp.buf.document_symbol({
+				on_list = LocationList.on_list,
+				loclist = true,
+			})
+		end, { buffer = true })
+	end,
+})
