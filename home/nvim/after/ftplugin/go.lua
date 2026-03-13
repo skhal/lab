@@ -127,12 +127,12 @@ end
 -- rename replaces the "[Kind]" prefix in the location list items text with
 -- abbreviated kind letter from [LocationList.renames.kind].
 function LocationList.rename(opt)
-	local kind, ident = opt.text:match("^%[(%w+)%] ([^%s]*)$")
-	if not kind then
+	local ident = opt.text:match("^%[%w+%] ([^%s]*)$")
+	if not ident then
 		return opt
 	end
-	local kindChar = LocationList.renames.kind[kind] or kind
-	opt.text = ("%s %s"):format(kindChar, ident)
+	local kind = LocationList.renames.kind[opt.kind] or opt.kind
+	opt.text = ("%s %s"):format(kind, ident)
 	return opt
 end
 
