@@ -227,6 +227,7 @@ local LocationList = {
 	renames = {
 		kind = {
 			-- keep-sorted start
+			Class = "T",
 			Constant = "D",
 			Field = "F",
 			Function = "F",
