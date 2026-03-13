@@ -57,7 +57,7 @@ local function select_test(file)
 	select_and_edit(file, files)
 end
 
-local M = {
+local RelatedFile = {
 	doc = function()
 		local f = vim.fn.expand("%")
 		if f:find("doc.go$") then
@@ -93,6 +93,6 @@ local M = {
 	end,
 }
 
-vim.keymap.set("n", "<localleader>rd", M.doc, { buffer = true })
-vim.keymap.set("n", "<localleader>rs", M.source, { buffer = true })
-vim.keymap.set("n", "<localleader>rt", M.test, { buffer = true })
+vim.keymap.set("n", "<localleader>rd", RelatedFile.doc, { buffer = true })
+vim.keymap.set("n", "<localleader>rs", RelatedFile.source, { buffer = true })
+vim.keymap.set("n", "<localleader>rt", RelatedFile.test, { buffer = true })
