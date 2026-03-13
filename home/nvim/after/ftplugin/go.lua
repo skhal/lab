@@ -136,7 +136,6 @@ end
 -- items under structures, in the order of declaration. Everything else goes
 -- into the items list.
 function LocationTree:Add(item)
-	item.ident = item.text:gsub("^%[%w+%] ", "")
 	if item.kind == "Struct" then
 		self:addStruct(item)
 	elseif item.kind == "Field" then
@@ -249,6 +248,7 @@ end
 function LocationList.group(items)
 	local lt = LocationTree:new()
 	for _, item in ipairs(items) do
+		item.ident = item.text:gsub("^%[%w+%] ", "")
 		lt:Add(item)
 	end
 	return vim.iter(lt:Items())
@@ -261,12 +261,12 @@ end
 -- rename replaces the "[Kind]" prefix in the location list items text with
 -- abbreviated kind letter from [LocationList.renames.kind].
 function LocationList.rename(opt)
-	local ident = opt.text:match("^%[%w+%] ([^%s]*)$")
-	if not ident then
-		return opt
-	end
 	local kind = LocationList.renames.kind[opt.kind] or opt.kind
-	opt.text = ("%s %s"):format(kind, ident)
+	local name = opt.ident
+	if opt.kind == "Method" then
+		name = name:gsub("^%(%*?(%w+)%)%.", "")
+	end
+	opt.text = ("%s %s"):format(kind, name)
 	if LocationList.indent.kind[opt.kind] then
 		opt.text = " " .. opt.text
 	end
