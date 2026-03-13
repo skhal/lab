@@ -98,6 +98,14 @@ vim.keymap.set("n", "<localleader>rs", RelatedFile.source, { buffer = true })
 vim.keymap.set("n", "<localleader>rt", RelatedFile.test, { buffer = true })
 
 local LocationList = {
+	indent = {
+		kind = {
+			-- keep-sorted start
+			Field = true,
+			Method = true,
+			-- keep-sorted end
+		},
+	},
 	renames = {
 		kind = {
 			-- keep-sorted start
@@ -133,6 +141,9 @@ function LocationList.rename(opt)
 	end
 	local kind = LocationList.renames.kind[opt.kind] or opt.kind
 	opt.text = ("%s %s"):format(kind, ident)
+	if LocationList.indent.kind[opt.kind] then
+		opt.text = " " .. opt.text
+	end
 	return opt
 end
 
