@@ -249,6 +249,7 @@ function LocationTree:Items()
 end
 
 local LocationList = {
+	namespace = vim.api.nvim_create_namespace("go-loclist"),
 	indentation = "  ",
 	indent = {
 		kind = {
@@ -278,7 +279,7 @@ function LocationList.on_list(opts)
 	opts.title = "Document symbols"
 	opts.items = LocationList.group(opts.items)
 	opts.quickfixtextfunc = LocationList.quickfixtextfunc
-	vim.fn.setloclist(0, {}, " ", opts)
+	vim.fn.setloclist(opts.winid, {}, " ", opts)
 	vim.cmd.lopen()
 end
 
@@ -312,13 +313,39 @@ end
 
 -- quickfixtextfunc shows only item text in the location list window.
 function LocationList.quickfixtextfunc(opts)
-	local formatted = {}
-	local items = vim.fn.getloclist(opts.winid, { id = opts.id, items = 0 }).items
-	for i = opts.start_idx, opts.end_idx do
-		local v = items[i]
-		table.insert(formatted, v.text)
+	local loclist = vim.fn.getloclist(opts.winid, { id = opts.id, items = 0, qfbufnr = 1 })
+	if opts.start_idx == 1 then
+		vim.api.nvim_buf_clear_namespace(loclist.qfbufnr, LocationList.namespace, 0, -1)
 	end
+	local formatted = {}
+	for i = opts.start_idx, opts.end_idx do
+		local item = loclist.items[i]
+		table.insert(formatted, item.text)
+	end
+	vim.schedule(function()
+		LocationList.highlight(loclist.qfbufnr)
+	end)
 	return formatted
+end
+
+function LocationList.highlight(bufnr)
+	vim.api.nvim_buf_call(bufnr, function()
+		vim.cmd([[
+			syn clear
+
+			syn match		qfTop			/^\w \l\w\+/
+			syn match		qfTopExp	/^\w \u\w\+/
+
+			syn match		qfSub			/^\s\+\w \l\w\+/
+			syn match		qfSubExp	/^\s\+\w \u\w\+/
+
+			hi def link qfTop	Comment
+			hi def link qfSub	Comment
+
+			hi def link qfTopExp Normal
+			hi def link qfSubExp Normal
+		]])
+	end)
 end
 
 vim.api.nvim_create_autocmd("LspAttach", {
