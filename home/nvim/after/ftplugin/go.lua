@@ -97,16 +97,6 @@ vim.keymap.set("n", "<localleader>rd", RelatedFile.doc, { buffer = true })
 vim.keymap.set("n", "<localleader>rs", RelatedFile.source, { buffer = true })
 vim.keymap.set("n", "<localleader>rt", RelatedFile.test, { buffer = true })
 
--- receiverType extracts structure name from the identifier. It is the
--- receiver type in case of a method identifier, or the identifier.
-local function receiverType(ident)
-	local name = ident:match("^%(%*?(%w+)%)")
-	if name ~= nil then
-		return name
-	end
-	error(("failed to get the receiver type: %s"):format(ident))
-end
-
 -- LocationTree is a hierarchy of location items with structure fields and
 -- methods stored in a structure block. It helps group methods by structure
 -- type in method declaration order, see [LocationTree.Add].
@@ -114,9 +104,20 @@ local LocationTree = {}
 
 function LocationTree:new()
 	local o = {
-		items = {}, -- top-level location items except fields and methods
-		structs = {}, -- a map of struct type to a table with fields and methods
-		lastStructName = nil, -- last structure type for fields
+		-- items is a list of top-level location items excluding fields and methods.
+		items = {},
+
+		-- structs is a map of struct type name to the fields and methods.
+		-- LocationTree uses it to group methods by receiver.
+		structs = {},
+
+		-- interfaces is a map of interface type name to the methods. LocationTree
+		-- uses it to group interface methods by interface.
+		interfaces = {},
+
+		-- last structure or interface type name.
+		lastName = nil,
+
 		-- pending is a list of structure types that had a method declaration but
 		-- no structure definition yet. The following code is a valid Go code
 		-- with method declared before the receiver type:
@@ -138,6 +139,8 @@ end
 function LocationTree:Add(item)
 	if item.kind == "Struct" then
 		self:addStruct(item)
+	elseif item.kind == "Interface" then
+		self:addInterface(item)
 	elseif item.kind == "Field" then
 		self:addField(item)
 		return
@@ -157,7 +160,17 @@ function LocationTree:addStruct(item)
 	else
 		self:registerStruct(item.ident)
 	end
-	self.lastStructName = item.ident
+	self.lastName = item.ident
+end
+
+-- addInterface registers an interface to receive methods. It stores the
+-- interface type name in [self.lastName] to add interface methods, which do
+-- not have a receiver and come right after the interface type declaration.
+function LocationTree:addInterface(item)
+	self.interfaces[item.ident] = {
+		methods = {},
+	}
+	self.lastName = item.ident
 end
 
 function LocationTree:registerStruct(name)
@@ -171,20 +184,35 @@ end
 
 -- addField attaches a field to the structure.
 function LocationTree:addField(item)
-	table.insert(self.structs[self.lastStructName].fields, item)
+	table.insert(self.structs[self.lastName].fields, item)
 end
 
 -- addMethod attaches a method to the receiver type. Keep in mind that a method
 -- can be declared before the receiver. Is so, addMethod marks the structure
 -- "pending".
 function LocationTree:addMethod(item)
-	local name = receiverType(item.ident)
+	local name = item.ident:match("^%(%*?(%w+)%)")
+	if name ~= nil then
+		self:addStructMethod(item, name)
+	else
+		self:addInterfaceMethod(item)
+	end
+end
+
+-- addStructMethod adds a method item to the structure type name.
+function LocationTree:addStructMethod(item, name)
 	local struct = self.structs[name]
 	if not struct then
 		struct = self:registerStruct(name)
 		self.pending[name] = true
 	end
 	table.insert(struct.methods, item)
+end
+
+-- addInterfaceMethod adds a method to the the interface type [self.lastName].
+function LocationTree:addInterfaceMethod(item)
+	local interface = self.interfaces[self.lastName]
+	table.insert(interface.methods, item)
 end
 
 -- Items flattens the items list with every structure expanded with field and
@@ -199,6 +227,12 @@ function LocationTree:Items()
 				table.insert(items, f)
 			end
 			for _, m in ipairs(struct.methods) do
+				table.insert(items, m)
+			end
+		elseif v.kind == "Interface" then
+			table.insert(items, v)
+			local interface = self.interfaces[v.ident]
+			for _, m in ipairs(interface.methods) do
 				table.insert(items, m)
 			end
 		else
@@ -231,6 +265,7 @@ local LocationList = {
 			Constant = "D",
 			Field = "F",
 			Function = "F",
+			Interface = "I",
 			Method = "M",
 			Struct = "S",
 			Variable = "V",
