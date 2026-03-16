@@ -137,7 +137,9 @@ end
 -- items under structures, in the order of declaration. Everything else goes
 -- into the items list.
 function LocationTree:Add(item)
-	if item.kind == "Struct" then
+	if item.kind == "Class" or item.kind == "Struct" then
+		-- LSP distinguishes between named type (class) and type structure (struct).
+		-- Treat named type like a structure without fields.
 		self:addStruct(item)
 	elseif item.kind == "Interface" then
 		self:addInterface(item)
@@ -220,7 +222,7 @@ end
 function LocationTree:Items()
 	local items = {}
 	for _, v in ipairs(self.items) do
-		if v.kind == "Struct" then
+		if v.kind == "Class" or v.kind == "Struct" then
 			table.insert(items, v)
 			local struct = self.structs[v.ident]
 			for _, f in ipairs(struct.fields) do
