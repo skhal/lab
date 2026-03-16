@@ -129,20 +129,16 @@ function LocationTree:new()
 		pending = {},
 
 		adders = {
-			-- keep-sorted start
-			Class = LocationTree.addStruct,
-			Field = LocationTree.addField,
-			Interface = LocationTree.addInterface,
-			Method = LocationTree.addMethod,
-			Struct = LocationTree.addStruct,
-			-- keep-sorted end
-		},
-
-		skip_insert = {
-			-- keep-sorted start
-			Field = true,
-			Method = true,
-			-- keep-sorted end
+			default = LocationTree.addItem,
+			kind = {
+				-- keep-sorted start
+				Class = LocationTree.addStruct,
+				Field = LocationTree.addField,
+				Interface = LocationTree.addInterface,
+				Method = LocationTree.addMethod,
+				Struct = LocationTree.addStruct,
+				-- keep-sorted end
+			},
 		},
 	}
 	setmetatable(o, self)
@@ -154,13 +150,11 @@ end
 -- items under structures, in the order of declaration. Everything else goes
 -- into the items list.
 function LocationTree:Add(item)
-	local add = self.adders[item.kind]
-	if add ~= nil then
-		add(self, item)
-	end
-	if self.skip_insert[item.kind] or false then
-		return
-	end
+	local add = self.adders.kind[item.kind] or self.adders.default
+	add(self, item)
+end
+
+function LocationTree:addItem(item)
 	table.insert(self.items, item)
 end
 
@@ -168,6 +162,7 @@ end
 -- that the structure may already exist if method declarations precede type
 -- declaration.
 function LocationTree:addStruct(item)
+	table.insert(self.items, item)
 	if self.structs[item.ident] then
 		self.pending[item.ident] = nil
 	else
@@ -180,6 +175,7 @@ end
 -- interface type name in [self.lastName] to add interface methods, which do
 -- not have a receiver and come right after the interface type declaration.
 function LocationTree:addInterface(item)
+	table.insert(self.items, item)
 	self.interfaces[item.ident] = {
 		methods = {},
 	}
@@ -236,11 +232,14 @@ function LocationItemsCollector:new(lt)
 		items = {},
 
 		collectors = {
-			-- keep-sorted start
-			Class = LocationItemsCollector.collectStruct,
-			Interface = LocationItemsCollector.collectInterface,
-			Struct = LocationItemsCollector.collectStruct,
-			-- keep-sorted end
+			default = LocationItemsCollector.collectItem,
+			kind = {
+				-- keep-sorted start
+				Class = LocationItemsCollector.collectStruct,
+				Interface = LocationItemsCollector.collectInterface,
+				Struct = LocationItemsCollector.collectStruct,
+				-- keep-sorted end
+			},
 		},
 	}
 	setmetatable(o, self)
@@ -251,7 +250,7 @@ end
 function LocationItemsCollector:Collect()
 	self.items = {}
 	for _, item in ipairs(self.loctree.items) do
-		local c = self.collectors[item.kind] or LocationItemsCollector.collectItem
+		local c = self.collectors.kind[item.kind] or self.collectors.default
 		c(self, item)
 	end
 	self:collectPending()
