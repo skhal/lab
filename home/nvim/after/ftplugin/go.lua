@@ -335,11 +335,11 @@ function LocationList.highlight(bufnr)
 		vim.cmd([[
 			syn clear
 
-			syn match		qfTop			/^\w \l\w\+/
-			syn match		qfTopExp	/^\w \u\w\+/
+			syn match		qfTop			/^\w \l\w*$/
+			syn match		qfTopExp	/^\w \u\w*$/
 
-			syn match		qfSub			/^\s\+\w \l\w\+/
-			syn match		qfSubExp	/^\s\+\w \u\w\+/
+			syn match		qfSub			/^\s\+\w \l\w*$/
+			syn match		qfSubExp	/^\s\+\w \u\w*$/
 
 			hi def link qfTop	Comment
 			hi def link qfSub	Comment
