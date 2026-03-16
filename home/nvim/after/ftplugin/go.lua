@@ -228,37 +228,73 @@ function LocationTree:addInterfaceMethod(item)
 	table.insert(interface.methods, item)
 end
 
+local LocationItemsCollector = {}
+
+function LocationItemsCollector:new(lt)
+	local o = {
+		loctree = lt,
+		items = {},
+
+		collectors = {
+			-- keep-sorted start
+			Class = LocationItemsCollector.collectStruct,
+			Interface = LocationItemsCollector.collectInterface,
+			Struct = LocationItemsCollector.collectStruct,
+			-- keep-sorted end
+		},
+	}
+	setmetatable(o, self)
+	self.__index = self
+	return o
+end
+
+function LocationItemsCollector:Collect()
+	self.items = {}
+	for _, item in ipairs(self.loctree.items) do
+		local c = self.collectors[item.kind] or LocationItemsCollector.collectItem
+		c(self, item)
+	end
+	self:collectPending()
+	return self.items
+end
+
+function LocationItemsCollector:collectItem(item)
+	table.insert(self.items, item)
+end
+
+function LocationItemsCollector:collectStruct(item)
+	table.insert(self.items, item)
+	local struct = self.loctree.structs[item.ident]
+	for _, f in ipairs(struct.fields) do
+		table.insert(self.items, f)
+	end
+	for _, m in ipairs(struct.methods) do
+		table.insert(self.items, m)
+	end
+end
+
+function LocationItemsCollector:collectInterface(item)
+	table.insert(self.items, item)
+	local interface = self.loctree.interfaces[item.ident]
+	for _, m in ipairs(interface.methods) do
+		table.insert(self.items, m)
+	end
+end
+
+function LocationItemsCollector:collectPending()
+	for _, name in ipairs(self.loctree.pending) do
+		local struct = self.loctree.structs[name]
+		for _, m in ipairs(struct.methods) do
+			table.insert(self.items, m)
+		end
+	end
+end
+
 -- Items flattens the items list with every structure expanded with field and
 -- then methods. Any pending structures, go to the end of the location list.
 function LocationTree:Items()
-	local items = {}
-	for _, v in ipairs(self.items) do
-		if v.kind == "Class" or v.kind == "Struct" then
-			table.insert(items, v)
-			local struct = self.structs[v.ident]
-			for _, f in ipairs(struct.fields) do
-				table.insert(items, f)
-			end
-			for _, m in ipairs(struct.methods) do
-				table.insert(items, m)
-			end
-		elseif v.kind == "Interface" then
-			table.insert(items, v)
-			local interface = self.interfaces[v.ident]
-			for _, m in ipairs(interface.methods) do
-				table.insert(items, m)
-			end
-		else
-			table.insert(items, v)
-		end
-	end
-	for _, name in ipairs(self.pending) do
-		local struct = self.structs[name]
-		for _, m in ipairs(struct.methods) do
-			table.insert(items, m)
-		end
-	end
-	return items
+	local collector = LocationItemsCollector:new(self)
+	return collector:Collect()
 end
 
 local LocationList = {
