@@ -127,6 +127,23 @@ function LocationTree:new()
 		--	...
 		--	type Foo struct {}
 		pending = {},
+
+		adders = {
+			-- keep-sorted start
+			Class = LocationTree.addStruct,
+			Field = LocationTree.addField,
+			Interface = LocationTree.addInterface,
+			Method = LocationTree.addMethod,
+			Struct = LocationTree.addStruct,
+			-- keep-sorted end
+		},
+
+		skip_insert = {
+			-- keep-sorted start
+			Field = true,
+			Method = true,
+			-- keep-sorted end
+		},
 	}
 	setmetatable(o, self)
 	self.__index = self
@@ -137,17 +154,11 @@ end
 -- items under structures, in the order of declaration. Everything else goes
 -- into the items list.
 function LocationTree:Add(item)
-	if item.kind == "Class" or item.kind == "Struct" then
-		-- LSP distinguishes between named type (class) and type structure (struct).
-		-- Treat named type like a structure without fields.
-		self:addStruct(item)
-	elseif item.kind == "Interface" then
-		self:addInterface(item)
-	elseif item.kind == "Field" then
-		self:addField(item)
-		return
-	elseif item.kind == "Method" then
-		self:addMethod(item)
+	local add = self.adders[item.kind]
+	if add ~= nil then
+		add(self, item)
+	end
+	if self.skip_insert[item.kind] or false then
 		return
 	end
 	table.insert(self.items, item)
