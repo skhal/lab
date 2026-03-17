@@ -5,26 +5,25 @@
   license that can be found in the LICENSE file.
 -->
 
-Name
-====
+# Name
 
 **ostep** - operating systems three easy pieces
 
-Description
-===========
+# Description
 
 Virtualization
 
--	[CPU](./cpu/)
--	[Processes](./process/)
+- [CPU](./cpu/)
+- [Processes](./process/)
+- [Memory](./mem/)
 
 Text
 
--	[Site](https://ostep.org)
--	[Homework](https://pages.cs.wisc.edu/~remzi/OSTEP/Homework/homework.html)
+- [Site](https://ostep.org)
+- [Homework](https://pages.cs.wisc.edu/~remzi/OSTEP/Homework/homework.html)
 
 Source code:
 
--	[Code](https://github.com/remzi-arpacidusseau/ostep-code)
--	[Homework](https://github.com/remzi-arpacidusseau/ostep-homework/)
--	[Projects](https://github.com/remzi-arpacidusseau/ostep-projects)
+- [Code](https://github.com/remzi-arpacidusseau/ostep-code)
+- [Homework](https://github.com/remzi-arpacidusseau/ostep-homework/)
+- [Projects](https://github.com/remzi-arpacidusseau/ostep-projects)
