@@ -24,6 +24,6 @@ bindkey '^R' i-search-back
 alias precmd '\\
   set rc_ = $?; \\
   if ( ${rc_} != 0 ) \\
-    echo [rc: ${rc_}]; \\
+    printf "[\033[;31mrc: ${rc_}\033[0m]\n"; \\
   unset rc_; \\
   '
