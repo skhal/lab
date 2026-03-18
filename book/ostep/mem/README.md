@@ -12,3 +12,5 @@
 # DESCRIPTION
 
 - [Layout](./layout/): print address of the code block, stack, and heap.
+- [Address Translation](./translate/): map between virtual and physical
+  address space.
