@@ -21,7 +21,7 @@ type Address int
 // String prints address in hex and dec forms. It implements [fmt.Stringer]
 // interface.
 func (a Address) String() string {
-	return fmt.Sprintf("0x%-4x (%4d)", int(a), a)
+	return fmt.Sprintf("0x%x (%d)", int(a), a)
 }
 
 type translator struct {

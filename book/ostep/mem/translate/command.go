@@ -64,16 +64,31 @@ func (c *command) parseFlags() error {
 }
 
 func (c *command) run() error {
-	t := newTranslator(Address(c.base), Address(c.bounds))
-	for virt := range c.genAddress() {
-		phys, err := t.Translate(virt)
-		if err != nil {
-			fmt.Printf("virt: %s %v\n", virt, err)
-			continue
-		}
-		fmt.Printf("virt: %s phys: %s\n", virt, phys)
+	d := ReportData{
+		Base:             Address(c.base),
+		Bounds:           c.bounds,
+		VirtAddressSpace: c.virtAddressSpace,
+
+		Frames: c.genFrames(),
 	}
-	return nil
+	return Report(os.Stdout, d)
+}
+
+func (c *command) genFrames() iter.Seq[Frame] {
+	return func(yield func(Frame) bool) {
+		t := newTranslator(Address(c.base), Address(c.bounds))
+		for v := range c.genAddress() {
+			p, err := t.Translate(v)
+			f := Frame{
+				Virt: v,
+				Phys: p,
+				Err:  err,
+			}
+			if !yield(f) {
+				break
+			}
+		}
+	}
 }
 
 func (c *command) genAddress() iter.Seq[Address] {
