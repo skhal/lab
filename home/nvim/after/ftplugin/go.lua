@@ -9,6 +9,10 @@ vim.bo.expandtab = false
 -- keep-sorted end
 
 local function select_and_edit(file, files)
+	if #files == 1 then
+		vim.cmd.edit(files[1])
+		return
+	end
 	vim.ui.select(files, {
 		prompt = "Select file from " .. vim.fs.dirname(file) .. ":",
 		format_item = function(item)
