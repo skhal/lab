@@ -34,6 +34,11 @@ const A = 1`,
 const A = 1`,
 		},
 		{
+			name: "exported with line comment",
+			code: `package test
+const A = 1 // comment`,
+		},
+		{
 			name: "not exported no comment",
 			code: `package test
 const a = 1`,
@@ -43,6 +48,11 @@ const a = 1`,
 			code: `package test
 // comment
 const a = 1`,
+		},
+		{
+			name: "not exported with line comment",
+			code: `package test
+const a = 1 // comment`,
 		},
 		{
 			name: "multi export no comment",
@@ -95,6 +105,13 @@ const (
 )`,
 		},
 		{
+			name: "group one line comment",
+			code: `package test
+const (
+  A = 1 // comment
+)`,
+		},
+		{
 			name: "group no comment",
 			code: `package test
 const (
@@ -131,6 +148,14 @@ const (
 	A = 1
 	// comment
 	B = 1
+)`,
+		},
+		{
+			name: "group each line comment",
+			code: `package test
+const (
+	A = 1 // comment
+	B = 1 // comment
 )`,
 		},
 	}

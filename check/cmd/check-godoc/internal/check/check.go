@@ -99,11 +99,15 @@ func checkGenDeclConstValueSpec(fs *token.FileSet, decl *ast.GenDecl) error {
 			if !n.IsExported() {
 				continue
 			}
-			if s.Doc != nil && len(s.Names) == 1 {
-				continue
-			}
-			if decl.Doc != nil && len(decl.Specs) == 1 && len(s.Names) == 1 {
-				continue
+			if len(s.Names) == 1 {
+				switch {
+				case s.Doc != nil:
+					continue
+				case s.Comment != nil:
+					continue
+				case decl.Doc != nil && len(decl.Specs) == 1:
+					continue
+				}
 			}
 			ee = append(ee, newErrNoDoc(fs, n, kindConst))
 		}
