@@ -6,12 +6,12 @@
 package main
 
 import (
-	"errors"
 	"flag"
 	"os"
 	"path/filepath"
 
 	"github.com/skhal/lab/book/ostep/mem/segment/internal/mem"
+	"github.com/skhal/lab/book/ostep/mem/segment/internal/report"
 	"github.com/skhal/lab/go/flags"
 )
 
@@ -33,7 +33,10 @@ func (cmd *command) Run() error {
 	if err := cmd.parseFlags(); err != nil {
 		return err
 	}
-	return errors.New("not implemented")
+	d := report.Data{
+		Segments: cmd.segments,
+	}
+	return report.Generate(os.Stdout, d)
 }
 
 func (cmd *command) parseFlags() error {
