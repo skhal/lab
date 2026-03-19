@@ -105,9 +105,26 @@ local registrations = {
 				if opts.file:find("main.go$") ~= nil or is_command(opts.file) then
 					return "main"
 				end
+				local go_list = function(file)
+					if vim.fn.executable("go") ~= 1 then
+						return
+					end
+					local abspath = vim.fs.abspath(file)
+					local dirname = vim.fs.dirname(abspath)
+					local cmd = { "go", "list", "-f", "{{.Name}}", dirname }
+					local proc = vim.system(cmd, { text = true }):wait()
+					if proc.code ~= 0 then
+						return
+					end
+					return vim.fn.trim(proc.stdout)
+				end
+				local pkg = go_list(opts.file)
+				if pkg ~= nil then
+					return pkg
+				end
 				local abspath = vim.fs.abspath(opts.file)
 				local dirname = vim.fs.dirname(abspath)
-				local pkg = vim.fs.basename(dirname)
+				pkg = vim.fs.basename(dirname)
 				return pkg
 			end,
 		},
