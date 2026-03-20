@@ -6,10 +6,23 @@
 */ -}}
 
 {{- define "segment" -}}
-base: {{.Base | KB}}KB	bounds: {{.Bounds | KB}}KB
+base: {{.Base.KB}}KB bounds: {{.Bounds.KB}}KB dir: {{.Direction}} virt-base: {{.VirtBase.KB}}KB
+{{- end -}}
+
+{{- define "translation" -}}
+virt: {{.Virtual.B}} (SEG{{.Virtual.Segment}})
+  {{- if .Error}} {{.Error}}
+  {{- else}} phys: {{.Physical}}
+  {{- end}}
 {{- end -}}
 
 configuration:
-{{- range .Segments }}
-  {{template "segment" .}}
+  virtual address bounds: {{.VirtAddrBounds.KB}}KB
+{{- range $idx, $seg := .Segments }}
+  SEG{{$idx}} {{template "segment" $seg }}
+{{- end}}
+
+translations:
+{{- range .Translations}}
+  {{template "translation" .}}
 {{- end}}

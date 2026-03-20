@@ -14,3 +14,5 @@
 - [Layout](./layout/): print address of the code block, stack, and heap.
 - [Address Translation](./translate/): map between virtual and physical
   address space.
+- [Segmented Address Translation](./segment/): address translation with support
+  for memory segments in the virtual address space.

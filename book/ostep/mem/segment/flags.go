@@ -14,74 +14,24 @@ import (
 	"github.com/skhal/lab/go/slices"
 )
 
-const (
-	segmentListFlagSeparator = ","
-	segmentFlagSeparator     = ":"
-)
+const segmentFlagSeparator = ":"
 
-type segmentListFlag struct {
-	segments *[]mem.Segment
-	set      bool
-}
-
-func newSegmentListFlag(v *[]mem.Segment) *segmentListFlag {
-	return &segmentListFlag{
-		segments: v,
-	}
-}
-
-// Set parses a comma-separated list of segments. It discards default value
-// if the flag is set.
-func (fl *segmentListFlag) Set(s string) error {
-	for i, s := range strings.Split(s, segmentListFlagSeparator) {
-		var seg mem.Segment
-		if err := (segmentFlag{&seg}).Set(s); err != nil {
-			return fmt.Errorf("segment %d: %v", i, err)
-		}
-		fl.add(seg)
-	}
-	return nil
-}
-
-func (fl *segmentListFlag) add(seg mem.Segment) {
-	if !fl.set {
-		fl.set = true
-		*fl.segments = []mem.Segment{seg}
-		return
-	}
-	*fl.segments = append(*fl.segments, seg)
-}
-
-// String returns a string representations of the segment list flag, that is a
-// comma separate list of segments.
-func (fl segmentListFlag) String() string {
-	if fl.segments == nil {
-		return ""
-	}
-	items := make([]string, len(*fl.segments))
-	for i, segm := range *fl.segments {
-		items[i] = segmentFlag{&segm}.String()
-	}
-	return strings.Join(items, segmentListFlagSeparator)
-}
-
-// Validate check that every segment in the list flag is correct according to
-// [segmentFlag.Validate].
-func (fl segmentListFlag) Validate() error {
-	for i, segm := range *fl.segments {
-		if err := (segmentFlag{&segm}).Validate(); err != nil {
-			return fmt.Errorf("segment %d: %v", i, err)
-		}
-	}
-	return nil
-}
-
+// segmentFlag sets [mem.Segment.Base] and [mem.Segment.Bounds] fields from
+// a flag. The flag format is <base>:<bounds>. Each number is in KB.
 type segmentFlag struct {
-	segment *mem.Segment
+	segment   *mem.Segment
+	maxBounds mem.B
+}
+
+func newSegmentFlag(s *mem.Segment, maxBounds mem.B) *segmentFlag {
+	return &segmentFlag{
+		segment:   s,
+		maxBounds: maxBounds,
+	}
 }
 
 // Set parses segment flag into segment base and bounds fields. The flag is a
-// colon-separate list of segment specification: "base:bounds".
+// colon-separate list of segment specification: <base>:<bounds>.
 func (fl segmentFlag) Set(s string) (err error) {
 	defer func() {
 		x := recover()
@@ -90,7 +40,7 @@ func (fl segmentFlag) Set(s string) (err error) {
 		}
 		e, ok := x.(error)
 		if !ok {
-			return
+			panic(e)
 		}
 		err = e
 	}()
@@ -102,11 +52,12 @@ func (fl segmentFlag) Set(s string) (err error) {
 	if len(splits) != 2 {
 		return fmt.Errorf("invalid format, want base:bounds")
 	}
-	var seg mem.Segment
 	tt := tokens(splits)
-	seg.Base = mem.Address(tt.mustAtoi(idxBase, "base")) * mem.KB
-	seg.Bounds = mem.Address(tt.mustAtoi(idxBounds, "bounds")) * mem.KB
-	*fl.segment = seg
+	base := mem.B(tt.mustAtoi(idxBase, "base")) * mem.KB
+	bounds := mem.B(tt.mustAtoi(idxBounds, "bounds")) * mem.KB
+	fl.segment.Base = base
+	fl.segment.Bounds = bounds
+	// do not change segment direction or virtual address space offset
 	return nil
 }
 
@@ -122,11 +73,14 @@ func (tt tokens) mustAtoi(idx int, name string) int {
 
 // String returns a string representation of the segment flag in KB.
 func (fl segmentFlag) String() string {
-	nn := []mem.Address{
-		fl.segment.Base / mem.KB,
-		fl.segment.Bounds / mem.KB,
+	if fl.segment == nil {
+		return ""
 	}
-	mapfn := func(a mem.Address) string {
+	nn := []mem.B{
+		fl.segment.Base.KB(),
+		fl.segment.Bounds.KB(),
+	}
+	mapfn := func(a mem.B) string {
 		return strconv.Itoa(int(a))
 	}
 	return strings.Join(slices.MapFunc(nn, mapfn), segmentFlagSeparator)
@@ -140,8 +94,47 @@ func (fl segmentFlag) Validate() error {
 	if fl.segment.Base < 0 {
 		return fmt.Errorf("negative base")
 	}
-	if fl.segment.Bounds < 1 {
-		return fmt.Errorf("non-positive bounds")
+	return newAddrBoundsFlag(&fl.segment.Bounds, 0, fl.maxBounds).Validate()
+}
+
+// addBoundsFlag sets address space bounds. It validates bounds to be
+// within range [min,max].
+type addBoundsFlag struct {
+	bounds *mem.B
+	min    mem.B
+	max    mem.B
+}
+
+func newAddrBoundsFlag(b *mem.B, min, max mem.B) *addBoundsFlag {
+	return &addBoundsFlag{
+		bounds: b,
+		min:    min,
+		max:    max,
+	}
+}
+
+// Set converts the bounds flag from KB to B value.
+func (fl addBoundsFlag) Set(s string) error {
+	n, err := strconv.Atoi(s)
+	if err != nil {
+		return err
+	}
+	*fl.bounds = mem.B(n) * mem.KB
+	return nil
+}
+
+// String returns bounds in KB.
+func (fl addBoundsFlag) String() string {
+	if fl.bounds == nil {
+		return ""
+	}
+	return strconv.Itoa(int(fl.bounds.KB()))
+}
+
+// Validate ensures that virtual address bounds are within rage of [min, max].
+func (fl addBoundsFlag) Validate() error {
+	if *fl.bounds < fl.min || *fl.bounds > fl.max {
+		return fmt.Errorf("out of bounds [%d,%d]", fl.min, fl.max)
 	}
 	return nil
 }

@@ -9,6 +9,7 @@ package report
 import (
 	"embed"
 	"io"
+	"iter"
 	"text/template"
 
 	"github.com/skhal/lab/book/ostep/mem/segment/internal/mem"
@@ -16,18 +17,24 @@ import (
 
 var (
 	//go:embed static
-	efs   embed.FS
-	fnmap = template.FuncMap{
-		"KB": func(a mem.Address) int {
-			return int(a / mem.KB)
-		},
-	}
-	tmpl = template.Must(template.New("report").Funcs(fnmap).ParseFS(efs, "static/*.txt"))
+	efs  embed.FS
+	tmpl = template.Must(template.New("report").ParseFS(efs, "static/*.txt"))
 )
 
 // Data contains report parameters.
 type Data struct {
-	Segments []mem.Segment // address segments.
+	VirtAddrBounds mem.B                 // size of the virtual address space
+	Segments       []*mem.Segment        // virtual address segments
+	Translations   iter.Seq[Translation] // virtual to physical address translations
+}
+
+// Translation is a single virtual to physical address translation. It returns
+// non-nil error if the translation failed, that can be accessed through
+// Error().
+type Translation interface {
+	Virtual() mem.Address  // virtual address
+	Physical() mem.Address // physical address
+	Error() error          // non-nil error if the translation failed
 }
 
 // Generate writes a report to w using data from d.
