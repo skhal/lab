@@ -10,25 +10,20 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/skhal/lab/book/ostep/mem/allocator/internal/heap"
 	"github.com/skhal/lab/book/ostep/mem/allocator/internal/report"
 	"github.com/skhal/lab/go/flags"
 )
 
-type heap struct {
-	base int
-	size int
-}
-
 type command struct {
-	heap heap
+	heapBase int
+	heapSize int
 }
 
 func newCommand() *command {
 	return &command{
-		heap: heap{
-			base: 1000,
-			size: 1000,
-		},
+		heapBase: 1000,
+		heapSize: 1000,
 	}
 }
 
@@ -43,16 +38,30 @@ func (cmd *command) Run() error {
 
 func (cmd *command) parseFlags() error {
 	fs := flags.NewFlagSet(filepath.Base(os.Args[0]), flag.ExitOnError)
-	fs.Var(newBoundedIntFlag(&cmd.heap.base, 0, 10000), "base", "heap base address")
-	fs.Var(newBoundedIntFlag(&cmd.heap.size, 100, 10000), "size", "heab size")
+	fs.Var(newBoundedIntFlag(&cmd.heapBase, 0, 10000), "base", "heap base address")
+	fs.Var(newBoundedIntFlag(&cmd.heapSize, 100, 10000), "size", "heab size")
 	return fs.ParseAndValidate(os.Args[1:])
 }
 
 func (cmd *command) run() error {
+	h := heap.New(cmd.heapBase, cmd.heapSize)
 	return report.Generate(os.Stdout, report.Data{
 		Heap: report.Heap{
-			Base: cmd.heap.base,
-			Size: cmd.heap.size,
+			Base: cmd.heapBase,
+			Size: cmd.heapSize,
+			Free: freeBlocks(h),
 		},
 	})
+}
+
+func freeBlocks(h *heap.Heap) []report.Block {
+	var bb []report.Block
+	h.WalkFreeSpace(func(sz, addr int) bool {
+		bb = append(bb, report.Block{
+			Size: sz,
+			Addr: addr,
+		})
+		return true
+	})
+	return bb
 }

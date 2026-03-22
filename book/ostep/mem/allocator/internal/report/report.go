@@ -19,8 +19,15 @@ type Data struct {
 
 // Heap is the heap configuration.
 type Heap struct {
-	Base int // address where the heap starts.
-	Size int // size of the heap.
+	Base int     // address where the heap starts.
+	Size int     // size of the heap.
+	Free []Block // free blocks
+}
+
+// Block is a continuous address space.
+type Block struct {
+	Size int // block size
+	Addr int // block address
 }
 
 // Generate writes a report to w using data d. It returns an error if it fails
@@ -31,9 +38,18 @@ func Generate(w io.Writer, d Data) error {
 
 var tmpl = template.Must(template.New("report").Parse(`
 {{- define "heap" -}}
-base: {{.Base}} size: {{.Size}}
+base: {{.Base}} size: {{.Size}} {{template "free" .Free}}
+{{- end -}}
+
+{{- define "free" -}}
+free[{{len .}}]
+  {{- range .}} {{template "block" .}}{{end}}
+{{- end -}}
+
+{{- define "block" -}}
+{{ .Size}}:{{.Addr}}
 {{- end -}}
 
 configuration:
-  Heap {{template "heap" .Heap}}
+  {{template "heap" .Heap}}
 `))

@@ -9,6 +9,12 @@
 // SYNOPSIS
 //
 //	allocator [-base num] [-bounds num]
+//
+// EXAMPLE
+//
+//	% allocator -base 1024 -size 2048
+//	configuration:
+//	  base: 1024 size: 2048 free[1] 2044:1028
 package main
 
 import (
