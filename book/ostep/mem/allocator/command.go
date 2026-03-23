@@ -44,7 +44,10 @@ func (cmd *command) parseFlags() error {
 }
 
 func (cmd *command) run() error {
-	h := heap.New(cmd.heapBase, cmd.heapSize)
+	h, err := heap.New(cmd.heapBase, cmd.heapSize)
+	if err != nil {
+		return err
+	}
 	return report.Generate(os.Stdout, report.Data{
 		Heap: report.Heap{
 			Base: cmd.heapBase,

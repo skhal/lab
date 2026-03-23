@@ -8,24 +8,53 @@ package heap
 
 import (
 	"encoding/binary"
+	"fmt"
 	"unsafe"
 )
 
+// MaxSize is the maximum heap size supported by this implementation. The value
+// is a derivative of the block metadata size.
+const MaxSize = int(sizeMask)
+
+const headerSize = int(unsafe.Sizeof(uint16(0)))
+
+type blockStatus uint16
+
+const (
+	// use iota for more status bits
+	statusAllocated blockStatus = 1 << (16 - 1 - iota)
+
+	// block status should logically AND (merge) all statuses
+	statusMask blockStatus = statusAllocated
+	sizeMask               = ^statusMask
+)
+
+// header holds block metadata.
 type header struct {
-	size uint16 // max 64KB
+	allocated bool
+	size      int
 }
 
 // Write writes header in encoded form to the buffer.
 func (h *header) Write(b []byte) {
-	binary.NativeEndian.PutUint16(b, h.size)
+	d := uint16(h.size & int(sizeMask))
+	if h.allocated {
+		d &= uint16(statusAllocated)
+	}
+	binary.NativeEndian.PutUint16(b, d)
 }
 
 // Read reads and decodes the header from the buffer.
 func (h *header) Read(b []byte) {
-	h.size = binary.NativeEndian.Uint16(b)
+	d := binary.NativeEndian.Uint16(b)
+	switch blockStatus(d) & statusMask {
+	case statusAllocated:
+		h.allocated = true
+	default:
+		h.allocated = false
+	}
+	h.size = int(d & uint16(sizeMask))
 }
-
-const headerSize = int(unsafe.Sizeof(header{}))
 
 // Heap is a continuous address space, ready for memory allocations. It
 // consists of a single free block, taking the entire heap.
@@ -40,21 +69,24 @@ type Heap struct {
 // New creates a heap address space of size at base address, with a single
 // free block. The amount of available free space is equal to size minus the
 // header size, used to store meta-information.
-func New(base, size int) *Heap {
+func New(base, size int) (*Heap, error) {
+	if size > MaxSize {
+		return nil, fmt.Errorf("unsupported heap size %d, max %d", size, MaxSize)
+	}
 	h := &Heap{
 		base:  base,
 		size:  size,
 		arena: make([]byte, size),
 	}
 	h.free = makeFree(h.arena)
-	return h
+	return h, nil
 }
 
 // makeFree initialized a block b as a free space. It write a header and
 // returns offset where data buffer begins.
 func makeFree(b []byte) int {
 	h := header{
-		size: uint16(len(b) - headerSize),
+		size: len(b) - headerSize,
 	}
 	h.Write(b)
 	return headerSize
@@ -64,9 +96,9 @@ func makeFree(b []byte) int {
 // the heap.
 func (h *Heap) WalkFreeSpace(f func(sz, addr int) bool) {
 	var hdr header
-	for i := h.free; i < h.size; i += int(hdr.size) {
+	for i := h.free; i < h.size; i += hdr.size {
 		hdr.Read(h.arena[i-headerSize:])
-		if !f(int(hdr.size), h.base+i) {
+		if !f(hdr.size, h.base+i) {
 			break
 		}
 	}
