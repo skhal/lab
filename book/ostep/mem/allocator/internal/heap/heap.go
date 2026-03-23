@@ -7,54 +7,24 @@
 package heap
 
 import (
-	"encoding/binary"
+	"errors"
 	"fmt"
-	"unsafe"
 )
 
-// MaxSize is the maximum heap size supported by this implementation. The value
-// is a derivative of the block metadata size.
+var (
+	// ErrAddress mean passed address is invalid.
+	ErrAddress = errors.New("invalid address")
+
+	// ErrNoMemory means heap has insufficient memory to accommodate malloc().
+	ErrNoMemory = errors.New("insufficient memory")
+
+	// ErrSize means passed size is invalid.
+	ErrSize = errors.New("invalid size")
+)
+
+// MaxSize is the maximum supported heap size. It is a derivatie of the block
+// metadata size.
 const MaxSize = int(sizeMask)
-
-const headerSize = int(unsafe.Sizeof(uint16(0)))
-
-type blockStatus uint16
-
-const (
-	// use iota for more status bits
-	statusAllocated blockStatus = 1 << (16 - 1 - iota)
-
-	// block status should logically AND (merge) all statuses
-	statusMask blockStatus = statusAllocated
-	sizeMask               = ^statusMask
-)
-
-// header holds block metadata.
-type header struct {
-	allocated bool
-	size      int
-}
-
-// Write writes header in encoded form to the buffer.
-func (h *header) Write(b []byte) {
-	d := uint16(h.size & int(sizeMask))
-	if h.allocated {
-		d &= uint16(statusAllocated)
-	}
-	binary.NativeEndian.PutUint16(b, d)
-}
-
-// Read reads and decodes the header from the buffer.
-func (h *header) Read(b []byte) {
-	d := binary.NativeEndian.Uint16(b)
-	switch blockStatus(d) & statusMask {
-	case statusAllocated:
-		h.allocated = true
-	default:
-		h.allocated = false
-	}
-	h.size = int(d & uint16(sizeMask))
-}
 
 // Heap is a continuous address space, ready for memory allocations. It
 // consists of a single free block, taking the entire heap.
@@ -62,8 +32,7 @@ type Heap struct {
 	base int // base address of the heap
 	size int // heap size
 
-	arena []byte // a continuous block of memory available to heap
-	free  int    // address of the first free block inside data
+	arena []byte // a continuous block of memory available for heap
 }
 
 // New creates a heap address space of size at base address, with a single
@@ -73,32 +42,125 @@ func New(base, size int) (*Heap, error) {
 	if size > MaxSize {
 		return nil, fmt.Errorf("unsupported heap size %d, max %d", size, MaxSize)
 	}
-	h := &Heap{
+	arena := make([]byte, size)
+	h := Header{
+		Size: len(arena) - headerSize,
+	}
+	copy(arena[:headerSize], h.Marshal())
+	return &Heap{
 		base:  base,
 		size:  size,
-		arena: make([]byte, size),
-	}
-	h.free = makeFree(h.arena)
-	return h, nil
+		arena: arena,
+	}, nil
 }
 
-// makeFree initialized a block b as a free space. It write a header and
-// returns offset where data buffer begins.
-func makeFree(b []byte) int {
-	h := header{
-		size: len(b) - headerSize,
+// Malloc allocates memory of requested size and returns address to newly
+// allocated block. It returns zero address along with non-nil error if
+// allocation fails, e.g., not enough space.
+func (hp *Heap) Malloc(size int) (int, error) {
+	if size >= hp.size-headerSize {
+		return 0, fmt.Errorf("malloc(%d): %w", size, ErrNoMemory)
 	}
-	h.Write(b)
-	return headerSize
+	if size < 1 {
+		return 0, fmt.Errorf("malloc(%d): %w", size, ErrSize)
+	}
+	a, err := hp.malloc(size)
+	if err != nil {
+		return 0, fmt.Errorf("malloc(%d): %w", size, err)
+	}
+	return a + hp.base, nil
 }
 
-// WalkFreeSpace walks a function f through free blocks of address space in
+func (hp *Heap) malloc(size int) (addr int, err error) {
+	err = ErrNoMemory
+	hp.walk(func(h Header, a int) bool {
+		if h.Allocated {
+			// continue searching
+			return true
+		}
+		if h.Size < size {
+			// not enough space
+			return true
+		}
+		hp.split(a, h.Size, size)
+		addr = a
+		err = nil
+		return false
+	})
+	return
+}
+
+func (hp *Heap) split(addr int, size int, n int) {
+	h := Header{
+		Allocated: true,
+	}
+	takeAll := false
+	if size <= n+headerSize {
+		// not enough space to store header and 1+ bytes of free space
+		h.Size = size
+		takeAll = true
+	} else {
+		h.Size = n
+	}
+	copy(hp.arena[addr-headerSize:addr], h.Marshal())
+
+	if takeAll {
+		return
+	}
+
+	addr += n + headerSize
+	h = Header{
+		Size: size - n - headerSize,
+	}
+	copy(hp.arena[addr-headerSize:addr], h.Marshal())
+}
+
+// Free releases memory at previously allocated address addr. It returns an
+// errof if the address is invalid or memory is not allocated.
+func (hp *Heap) Free(addr int) error {
+	a := addr - hp.base
+	if a < headerSize {
+		return fmt.Errorf("free(%d): %w", addr, ErrAddress)
+	}
+	if a >= hp.size {
+		return fmt.Errorf("free(%d): %w", addr, ErrAddress)
+	}
+	if err := hp.free(a); err != nil {
+		return fmt.Errorf("free(%d): %w: %s", addr, ErrAddress, err)
+	}
+	return nil
+}
+
+func (hp *Heap) free(a int) error {
+	var h Header
+	h.Unmarshal(hp.arena[a-headerSize : a])
+	if !h.Allocated {
+		return fmt.Errorf("block is not allocated")
+	}
+	h.Allocated = false
+	copy(hp.arena[a-headerSize:a], h.Marshal())
+	return nil
+}
+
+// WalkFree walks a function f through free blocks of address space in
 // the heap.
-func (h *Heap) WalkFreeSpace(f func(sz, addr int) bool) {
-	var hdr header
-	for i := h.free; i < h.size; i += hdr.size {
-		hdr.Read(h.arena[i-headerSize:])
-		if !f(hdr.size, h.base+i) {
+func (hp *Heap) WalkFree(f func(sz, addr int) bool) {
+	hp.walk(func(hdr Header, a int) bool {
+		if hdr.Allocated {
+			return true
+		}
+		return f(hdr.Size, hp.base+a)
+	})
+}
+
+func (hp *Heap) walk(f func(h Header, addr int) bool) {
+	var hdr Header
+	for a := headerSize; a < hp.size; a += hdr.Size + headerSize {
+		hdr.Unmarshal(hp.arena[a-headerSize : a])
+		if hdr.Size == 0 {
+			panic(fmt.Sprintf("invalid header at %d: %v", a, hdr))
+		}
+		if !f(hdr, a) {
 			break
 		}
 	}

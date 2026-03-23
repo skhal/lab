@@ -7,6 +7,7 @@ package main
 
 import (
 	"flag"
+	"iter"
 	"os"
 	"path/filepath"
 
@@ -18,12 +19,14 @@ import (
 type command struct {
 	heapBase int
 	heapSize int
+	numOps   int
 }
 
 func newCommand() *command {
 	return &command{
 		heapBase: 1000,
 		heapSize: 1000,
+		numOps:   5,
 	}
 }
 
@@ -40,6 +43,7 @@ func (cmd *command) parseFlags() error {
 	fs := flags.NewFlagSet(filepath.Base(os.Args[0]), flag.ExitOnError)
 	fs.Var(newBoundedIntFlag(&cmd.heapBase, 0, 10000), "base", "heap base address")
 	fs.Var(newBoundedIntFlag(&cmd.heapSize, 100, 10000), "size", "heab size")
+	fs.Var(newBoundedIntFlag(&cmd.numOps, 5, 25), "n", "number of random operations")
 	return fs.ParseAndValidate(os.Args[1:])
 }
 
@@ -48,18 +52,20 @@ func (cmd *command) run() error {
 	if err != nil {
 		return err
 	}
+	sim := newSimulator(h, cmd.numOps)
 	return report.Generate(os.Stdout, report.Data{
 		Heap: report.Heap{
 			Base: cmd.heapBase,
 			Size: cmd.heapSize,
 			Free: freeBlocks(h),
 		},
+		Ops: trace(h, sim),
 	})
 }
 
 func freeBlocks(h *heap.Heap) []report.Block {
 	var bb []report.Block
-	h.WalkFreeSpace(func(sz, addr int) bool {
+	h.WalkFree(func(sz, addr int) bool {
 		bb = append(bb, report.Block{
 			Size: sz,
 			Addr: addr,
@@ -67,4 +73,21 @@ func freeBlocks(h *heap.Heap) []report.Block {
 		return true
 	})
 	return bb
+}
+
+func trace(h *heap.Heap, sim *simulator) iter.Seq[report.Operation] {
+	op := func() report.Operation {
+		o := sim.Op()
+		return report.Operation{
+			Name:      o.String(),
+			Err:       o.Run(),
+			Allocated: sim.Allocated(),
+			Free:      freeBlocks(h),
+		}
+	}
+	return func(yield func(report.Operation) bool) {
+		for sim.Next() && yield(op()) {
+			continue
+		}
+	}
 }
