@@ -11,7 +11,21 @@ import (
 	"unsafe"
 )
 
-const headerSize = int(unsafe.Sizeof(uint32(0)))
+type header struct {
+	size uint16 // max 64KB
+}
+
+// Write writes header in encoded form to the buffer.
+func (h *header) Write(b []byte) {
+	binary.NativeEndian.PutUint16(b, h.size)
+}
+
+// Read reads and decodes the header from the buffer.
+func (h *header) Read(b []byte) {
+	h.size = binary.NativeEndian.Uint16(b)
+}
+
+const headerSize = int(unsafe.Sizeof(header{}))
 
 // Heap is a continuous address space, ready for memory allocations. It
 // consists of a single free block, taking the entire heap.
@@ -38,19 +52,21 @@ func New(base, size int) *Heap {
 
 // makeFree initialized a block b as a free space. It write a header and
 // returns offset where data buffer begins.
-func makeFree(d []byte) int {
-	sz := len(d) - headerSize
-	binary.NativeEndian.PutUint32(d, uint32(sz))
+func makeFree(b []byte) int {
+	h := header{
+		size: uint16(len(b) - headerSize),
+	}
+	h.Write(b)
 	return headerSize
 }
 
 // WalkFreeSpace walks a function f through free blocks of address space in
 // the heap.
 func (h *Heap) WalkFreeSpace(f func(sz, addr int) bool) {
-	var size int
-	for i := h.free; i < h.size; i += size {
-		size = int(binary.NativeEndian.Uint32(h.arena[i-headerSize:]))
-		if !f(size, h.base+i) {
+	var hdr header
+	for i := h.free; i < h.size; i += int(hdr.size) {
+		hdr.Read(h.arena[i-headerSize:])
+		if !f(int(hdr.size), h.base+i) {
 			break
 		}
 	}
