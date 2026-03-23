@@ -32,7 +32,8 @@ type Heap struct {
 	base int // base address of the heap
 	size int // heap size
 
-	arena []byte // a continuous block of memory available for heap
+	enc encoder
+	dec decoder
 }
 
 // New creates a heap address space of size at base address, with a single
@@ -43,15 +44,15 @@ func New(base, size int) (*Heap, error) {
 		return nil, fmt.Errorf("unsupported heap size %d, max %d", size, MaxSize)
 	}
 	arena := make([]byte, size)
-	h := Header{
-		Size: len(arena) - headerSize,
+	hp := &Heap{
+		base: base,
+		size: size,
+		enc:  encoder(arena),
+		dec:  decoder(arena),
 	}
-	copy(arena[:headerSize], h.Marshal())
-	return &Heap{
-		base:  base,
-		size:  size,
-		arena: arena,
-	}, nil
+	h := Header{Size: size - headerSize}
+	hp.enc.Encode(&h, headerSize)
+	return hp, nil
 }
 
 // Malloc allocates memory of requested size and returns address to newly
@@ -73,7 +74,7 @@ func (hp *Heap) Malloc(size int) (int, error) {
 
 func (hp *Heap) malloc(size int) (addr int, err error) {
 	err = ErrNoMemory
-	hp.walk(func(h Header, a int) bool {
+	hp.walk(func(h *Header, a int) bool {
 		if h.Allocated {
 			// continue searching
 			return true
@@ -91,9 +92,8 @@ func (hp *Heap) malloc(size int) (addr int, err error) {
 }
 
 func (hp *Heap) split(addr int, size int, n int) {
-	h := Header{
-		Allocated: true,
-	}
+	h := Header{Allocated: true}
+
 	takeAll := false
 	if size <= n+headerSize {
 		// not enough space to store header and 1+ bytes of free space
@@ -102,17 +102,15 @@ func (hp *Heap) split(addr int, size int, n int) {
 	} else {
 		h.Size = n
 	}
-	copy(hp.arena[addr-headerSize:addr], h.Marshal())
+	hp.enc.Encode(&h, addr)
 
 	if takeAll {
 		return
 	}
 
-	addr += n + headerSize
-	h = Header{
-		Size: size - n - headerSize,
-	}
-	copy(hp.arena[addr-headerSize:addr], h.Marshal())
+	h.Allocated = false
+	h.Size = size - n - headerSize
+	hp.enc.Encode(&h, addr+n+headerSize)
 }
 
 // Free releases memory at previously allocated address addr. It returns an
@@ -133,19 +131,19 @@ func (hp *Heap) Free(addr int) error {
 
 func (hp *Heap) free(a int) error {
 	var h Header
-	h.Unmarshal(hp.arena[a-headerSize : a])
+	hp.dec.Decode(&h, a)
 	if !h.Allocated {
 		return fmt.Errorf("block is not allocated")
 	}
 	h.Allocated = false
-	copy(hp.arena[a-headerSize:a], h.Marshal())
+	hp.enc.Encode(&h, a)
 	return nil
 }
 
 // WalkFree walks a function f through free blocks of address space in
 // the heap.
 func (hp *Heap) WalkFree(f func(sz, addr int) bool) {
-	hp.walk(func(hdr Header, a int) bool {
+	hp.walk(func(hdr *Header, a int) bool {
 		if hdr.Allocated {
 			return true
 		}
@@ -153,14 +151,14 @@ func (hp *Heap) WalkFree(f func(sz, addr int) bool) {
 	})
 }
 
-func (hp *Heap) walk(f func(h Header, addr int) bool) {
-	var hdr Header
-	for a := headerSize; a < hp.size; a += hdr.Size + headerSize {
-		hdr.Unmarshal(hp.arena[a-headerSize : a])
-		if hdr.Size == 0 {
-			panic(fmt.Sprintf("invalid header at %d: %v", a, hdr))
+func (hp *Heap) walk(f func(h *Header, addr int) bool) {
+	var h Header
+	for a := headerSize; a < hp.size; a += h.Size + headerSize {
+		hp.dec.Decode(&h, a)
+		if h.Size == 0 {
+			panic(fmt.Sprintf("invalid header at %d: %v", a, h))
 		}
-		if !f(hdr, a) {
+		if !f(&h, a) {
 			break
 		}
 	}

@@ -48,3 +48,19 @@ func (h *Header) Unmarshal(b []byte) {
 	h.Allocated = st&statusAllocated == statusAllocated
 	h.Size = int(d & uint16(sizeMask))
 }
+
+// encoder is a buffer that can encode headers.
+type encoder []byte
+
+// Encode encodes the header to the buffer at a given address.
+func (e encoder) Encode(h *Header, a int) {
+	copy(e[a-headerSize:a], h.Marshal())
+}
+
+// decoder is a buffer that can decode headers.
+type decoder []byte
+
+// Decode decodes a header into h for a block starting at a.
+func (d decoder) Decode(h *Header, a int) {
+	h.Unmarshal(d[a-headerSize : a])
+}
