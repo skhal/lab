@@ -47,4 +47,7 @@ func (c *forwardCoalescer) Coalesce(ha *Header, a int) {
 func (c *forwardCoalescer) coalesce(dst, src *Header, a int) {
 	dst.Size = dst.Size + headerSize + src.Size
 	c.enc.Encode(dst, a)
+
+	f := Footer{Size: dst.Size}
+	c.enc.EncodeFooter(&f, a)
 }

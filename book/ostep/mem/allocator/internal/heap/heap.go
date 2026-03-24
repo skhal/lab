@@ -138,8 +138,9 @@ func (hp *Heap) split(addr int, size int, n int) {
 		return
 	}
 
-	h.Allocated = false
-	h.Size = size - n - headerSize
+	h = Header{
+		Size: size - n - headerSize,
+	}
 	hp.enc.Encode(&h, addr+n+headerSize)
 }
 
@@ -165,9 +166,22 @@ func (hp *Heap) free(a int) error {
 	if !h.Allocated {
 		return fmt.Errorf("block is not allocated")
 	}
+
 	h.Allocated = false
 	hp.enc.Encode(&h, a)
+
+	f := Footer{Size: h.Size}
+	hp.enc.EncodeFooter(&f, a)
+
+	if b := a + h.Size + headerSize; b < hp.size {
+		var hb Header
+		hp.dec.Decode(&hb, b)
+		hb.AllocatedPrev = true
+		hp.enc.Encode(&hb, b)
+	}
+
 	hp.coal.Coalesce(&h, a)
+
 	return nil
 }
 

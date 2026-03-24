@@ -10,7 +10,10 @@ import (
 	"unsafe"
 )
 
-const headerSize = int(unsafe.Sizeof(uint16(0)))
+const (
+	headerSize = int(unsafe.Sizeof(uint16(0)))
+	footerSize = int(unsafe.Sizeof(uint16(0)))
+)
 
 type blockStatus uint16
 
@@ -31,8 +34,8 @@ type Header struct {
 	Size          int  // block size
 }
 
-// Marshal encodes header to bytes. The returned slice of bytes is guaranteed
-// to be of headerSize length.
+// Marshal encodes the header to bytes. The returned slice of bytes is
+// guaranteed to be of headerSize length.
 func (h *Header) Marshal() []byte {
 	d := uint16(h.Size & int(sizeMask))
 	if h.Allocated {
@@ -55,6 +58,27 @@ func (h *Header) Unmarshal(b []byte) {
 	h.Size = int(d & uint16(sizeMask))
 }
 
+// Footer holds block metadata at the end of a free block.
+type Footer struct {
+	Size int // size of the free block
+}
+
+// Marshal encodes the footer to bytes. The returned slice is guaranteed to
+// have length equal to footerSize.
+func (f *Footer) Marshal() []byte {
+	d := uint16(f.Size & int(sizeMask))
+	b := make([]byte, footerSize)
+	binary.BigEndian.PutUint16(b, d)
+	return b
+}
+
+// Unmarshal decodes footer from bytes. The bytes slice must be footerSize
+// long.
+func (f *Footer) Unmarshal(b []byte) {
+	d := binary.BigEndian.Uint16(b)
+	f.Size = int(d & uint16(sizeMask))
+}
+
 // encoder is a buffer that can encode headers.
 type encoder []byte
 
@@ -63,10 +87,33 @@ func (e encoder) Encode(h *Header, a int) {
 	copy(e[a-headerSize:a], h.Marshal())
 }
 
+// EncodeFooter encodes footer f and writes it at the end of the free block
+// addressed at a.
+//
+//	 [header|payload|footer]
+//					 ^       ^
+//					 a       f (to be written)
+func (e encoder) EncodeFooter(f *Footer, a int) {
+	a += f.Size
+	copy(e[a-footerSize:a], f.Marshal())
+}
+
 // decoder is a buffer that can decode headers.
 type decoder []byte
 
 // Decode decodes a header into h for a block starting at a.
 func (d decoder) Decode(h *Header, a int) {
 	h.Unmarshal(d[a-headerSize : a])
+}
+
+// DecodePrevFooter decodes footer for the previous block of a block addressed
+// at a.
+//
+//		Block N-1               Block N
+//	 [header|payload|footer] [header|...]
+//									 ^               ^
+//									 f               a
+func (d decoder) DecodePrevFooter(f *Footer, a int) {
+	a -= headerSize
+	f.Unmarshal(d[a-footerSize : a])
 }

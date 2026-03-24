@@ -77,3 +77,59 @@ func TestHeader_Unmarshal(t *testing.T) {
 		})
 	}
 }
+
+func TestFooter_Marshal(t *testing.T) {
+	tests := []struct {
+		name string
+		f    heap.Footer
+		want []byte
+	}{
+		{
+			name: "zero value",
+			want: []byte{0x00, 0x00},
+		},
+		{
+			name: "non zero",
+			f:    heap.Footer{Size: 5},
+			want: []byte{0x00, 0x05},
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			got := tc.f.Marshal()
+
+			if diff := cmp.Diff(tc.want, got); diff != "" {
+				t.Errorf("Marshal() mismatch (-want +got):\n%s", diff)
+			}
+		})
+	}
+}
+
+func TestFooter_Unmarshal(t *testing.T) {
+	tests := []struct {
+		name string
+		data []byte
+		want heap.Footer
+	}{
+		{
+			name: "zero data",
+			data: []byte{0x00, 0x00},
+		},
+		{
+			name: "non zero data",
+			data: []byte{0x00, 0x05},
+			want: heap.Footer{Size: 5},
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			f := heap.Footer{}
+
+			f.Unmarshal(tc.data)
+
+			if diff := cmp.Diff(tc.want, f); diff != "" {
+				t.Errorf("Unmarshal() mismatch (-want +got):\n%s", diff)
+			}
+		})
+	}
+}
