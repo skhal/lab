@@ -104,3 +104,41 @@ func (fl *coalesceModeFlag) Validate() error {
 	}
 	return nil
 }
+
+type alignmentFlag struct {
+	n *int
+}
+
+func newAlignmentFlag(n *int) *alignmentFlag {
+	return &alignmentFlag{n}
+}
+
+// Set parses s as a number and stores it in the flag value.
+func (fl *alignmentFlag) Set(s string) error {
+	n, err := strconv.Atoi(s)
+	if err != nil {
+		return err
+	}
+	*fl.n = n
+	return nil
+}
+
+// String returns a string representation of the flag value.
+func (fl *alignmentFlag) String() string {
+	if fl.n == nil {
+		return ""
+	}
+	return strconv.Itoa(*fl.n)
+}
+
+// Validate checks that the alignment is either 1 (disabled) or a multiple of
+// two.
+func (fl *alignmentFlag) Validate() error {
+	switch {
+	case *fl.n == 1:
+	case *fl.n%2 == 0:
+	default:
+		return fmt.Errorf("alignment must be multiple of 2")
+	}
+	return nil
+}

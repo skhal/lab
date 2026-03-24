@@ -31,8 +31,9 @@ const (
 // Heap is a continuous address space, ready for memory allocations. It
 // consists of a single free block, taking the entire heap.
 type Heap struct {
-	base int // base address of the heap
-	size int // heap size
+	base      int // base address of the heap
+	size      int // heap size
+	alignment int
 
 	enc encoder
 	dec decoder
@@ -44,10 +45,11 @@ type coalescer interface {
 	Coalesce(*Header, int)
 }
 
-type option func(hp *Heap)
+// Option is a heap option.
+type Option func(hp *Heap)
 
 // WithCoalesce option sets the heap's free space coalesce mode.
-func WithCoalesce(mode CoalesceMode) option {
+func WithCoalesce(mode CoalesceMode) Option {
 	return func(hp *Heap) {
 		switch mode {
 		case CoalesceModeNoop:
@@ -67,10 +69,24 @@ func WithCoalesce(mode CoalesceMode) option {
 	}
 }
 
+// WithAlignment sets heap alignment. The alignment must be either 1 (no
+// alignment) or a multiple of 2.
+func WithAlignment(align int) Option {
+	switch {
+	case align == 1:
+	case align%2 == 0:
+	default:
+		panic(fmt.Errorf("use alignment that is multiple of 2"))
+	}
+	return func(hp *Heap) {
+		hp.alignment = align
+	}
+}
+
 // New creates a heap address space of size at base address, with a single
 // free block. The amount of available free space is equal to size minus the
 // header size, used to store meta-information.
-func New(base, size int, opts ...option) (*Heap, error) {
+func New(base, size int, opts ...Option) (*Heap, error) {
 	if size < MinSize {
 		return nil, fmt.Errorf("%w: heap size %d, min %d", ErrSize, size, MinSize)
 	}
@@ -79,11 +95,12 @@ func New(base, size int, opts ...option) (*Heap, error) {
 	}
 	arena := make([]byte, size)
 	hp := &Heap{
-		base: base,
-		size: size,
-		enc:  encoder(arena),
-		dec:  decoder(arena),
-		coal: &noopCoalescer{},
+		base:      base,
+		size:      size,
+		alignment: 1,
+		enc:       encoder(arena),
+		dec:       decoder(arena),
+		coal:      &noopCoalescer{},
 	}
 	hp.enc.Encode(&Header{Size: size - headerSize}, headerSize)
 	for _, opt := range opts {
@@ -96,6 +113,7 @@ func New(base, size int, opts ...option) (*Heap, error) {
 // allocated block. It returns zero address along with non-nil error if
 // allocation fails, e.g., not enough space.
 func (hp *Heap) Malloc(size int) (int, error) {
+	size = hp.align(size)
 	if size >= hp.size-headerSize {
 		return 0, fmt.Errorf("malloc(%d): %w", size, ErrNoMemory)
 	}
@@ -107,6 +125,15 @@ func (hp *Heap) Malloc(size int) (int, error) {
 		return 0, fmt.Errorf("malloc(%d): %w", size, err)
 	}
 	return a + hp.base, nil
+}
+
+func (hp *Heap) align(n int) int {
+	m := n % hp.alignment
+	if m == 0 {
+		return n
+	}
+	padding := hp.alignment - m
+	return n + padding
 }
 
 func (hp *Heap) malloc(size int) (int, error) {
