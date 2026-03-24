@@ -42,11 +42,11 @@ type coalescer interface {
 	Coalesce(*Header, int)
 }
 
-type option func(hp *Heap, arena []byte)
+type option func(hp *Heap)
 
 // WithCoalesce option sets the heap's free space coalesce mode.
 func WithCoalesce(mode CoalesceMode) option {
-	return func(hp *Heap, arena []byte) {
+	return func(hp *Heap) {
 		switch mode {
 		case CoalesceModeNoop:
 			hp.coal = &noopCoalescer{}
@@ -78,7 +78,7 @@ func New(base, size int, opts ...option) (*Heap, error) {
 		coal: &noopCoalescer{},
 	}
 	for _, opt := range opts {
-		opt(hp, arena)
+		opt(hp)
 	}
 	h := Header{Size: size - headerSize}
 	hp.enc.Encode(&h, headerSize)
