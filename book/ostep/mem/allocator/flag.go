@@ -7,7 +7,11 @@ package main
 
 import (
 	"errors"
+	"fmt"
+	"slices"
 	"strconv"
+
+	"github.com/skhal/lab/book/ostep/mem/allocator/internal/heap"
 )
 
 const emptyString = ""
@@ -53,6 +57,48 @@ func (fl *boundedIntFlag) Validate() error {
 	}
 	if *fl.n > fl.max {
 		return ErrFlagBounds
+	}
+	return nil
+}
+
+type coalesceModeFlag struct {
+	v *heap.CoalesceMode
+}
+
+func newCoalesceModeFlag(v *heap.CoalesceMode) *coalesceModeFlag {
+	return &coalesceModeFlag{v}
+}
+
+var coalesceModes = []heap.CoalesceMode{
+	heap.CoalesceModeNoop,
+	heap.CoalesceModeForward,
+}
+
+// Set parses the coalesce mode from the string and stores it in the flag
+// variable. It returns an error if the string does not match supported modes.
+func (fl *coalesceModeFlag) Set(s string) error {
+	for _, mode := range coalesceModes {
+		if mode.String() == s {
+			*fl.v = mode
+			return nil
+		}
+	}
+	return fmt.Errorf("unsupported mode - %s", s)
+}
+
+// String returns a string representation of the flag value.
+func (fl *coalesceModeFlag) String() string {
+	if fl.v == nil {
+		return ""
+	}
+	return fl.v.String()
+}
+
+// Validate checks that the coalesce mode is set to one of the supported
+// values.
+func (fl *coalesceModeFlag) Validate() error {
+	if !slices.Contains(coalesceModes, *fl.v) {
+		return fmt.Errorf("unsupported mode - %d", fl.v)
 	}
 	return nil
 }

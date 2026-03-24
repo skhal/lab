@@ -16,3 +16,4 @@
   address space.
 - [Segmented Address Translation](./segment/): address translation with support
   for memory segments in the virtual address space.
+- [Memory Allocator](./allocator/): malloc(3)-like memory allocator.

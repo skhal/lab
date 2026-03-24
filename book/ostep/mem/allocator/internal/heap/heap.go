@@ -34,12 +34,38 @@ type Heap struct {
 
 	enc encoder
 	dec decoder
+
+	coal coalescer
+}
+
+type coalescer interface {
+	Coalesce(*Header, int)
+}
+
+type option func(hp *Heap, arena []byte)
+
+// WithCoalesce option sets the heap's free space coalesce mode.
+func WithCoalesce(mode CoalesceMode) option {
+	return func(hp *Heap, arena []byte) {
+		switch mode {
+		case CoalesceModeNoop:
+			hp.coal = &noopCoalescer{}
+		case CoalesceModeForward:
+			hp.coal = &forwardCoalescer{
+				dec:    hp.dec,
+				enc:    hp.enc,
+				bounds: hp.size,
+			}
+		default:
+			panic(fmt.Errorf("unsupported coalesce mode - %s", mode))
+		}
+	}
 }
 
 // New creates a heap address space of size at base address, with a single
 // free block. The amount of available free space is equal to size minus the
 // header size, used to store meta-information.
-func New(base, size int) (*Heap, error) {
+func New(base, size int, opts ...option) (*Heap, error) {
 	if size > MaxSize {
 		return nil, fmt.Errorf("unsupported heap size %d, max %d", size, MaxSize)
 	}
@@ -49,6 +75,10 @@ func New(base, size int) (*Heap, error) {
 		size: size,
 		enc:  encoder(arena),
 		dec:  decoder(arena),
+		coal: &noopCoalescer{},
+	}
+	for _, opt := range opts {
+		opt(hp, arena)
 	}
 	h := Header{Size: size - headerSize}
 	hp.enc.Encode(&h, headerSize)
@@ -137,6 +167,7 @@ func (hp *Heap) free(a int) error {
 	}
 	h.Allocated = false
 	hp.enc.Encode(&h, a)
+	hp.coal.Coalesce(&h, a)
 	return nil
 }
 

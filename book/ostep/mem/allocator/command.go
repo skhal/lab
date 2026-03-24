@@ -20,6 +20,7 @@ type command struct {
 	heapBase int
 	heapSize int
 	numOps   int
+	coalMode heap.CoalesceMode
 }
 
 func newCommand() *command {
@@ -27,6 +28,7 @@ func newCommand() *command {
 		heapBase: 1000,
 		heapSize: 1000,
 		numOps:   5,
+		coalMode: heap.CoalesceModeNoop,
 	}
 }
 
@@ -44,20 +46,22 @@ func (cmd *command) parseFlags() error {
 	fs.Var(newBoundedIntFlag(&cmd.heapBase, 0, 10000), "base", "heap base address")
 	fs.Var(newBoundedIntFlag(&cmd.heapSize, 100, 10000), "size", "heab size")
 	fs.Var(newBoundedIntFlag(&cmd.numOps, 5, 25), "n", "number of random operations")
+	fs.Var(newCoalesceModeFlag(&cmd.coalMode), "c", "coalesce mode")
 	return fs.ParseAndValidate(os.Args[1:])
 }
 
 func (cmd *command) run() error {
-	h, err := heap.New(cmd.heapBase, cmd.heapSize)
+	h, err := heap.New(cmd.heapBase, cmd.heapSize, heap.WithCoalesce(cmd.coalMode))
 	if err != nil {
 		return err
 	}
 	sim := newSimulator(h, cmd.numOps)
 	return report.Generate(os.Stdout, report.Data{
 		Heap: report.Heap{
-			Base: cmd.heapBase,
-			Size: cmd.heapSize,
-			Free: freeBlocks(h),
+			Base:     cmd.heapBase,
+			Size:     cmd.heapSize,
+			CoalMode: cmd.coalMode.String(),
+			Free:     freeBlocks(h),
 		},
 		Ops: trace(h, sim),
 	})

@@ -21,9 +21,10 @@ type Data struct {
 
 // Heap is the heap configuration.
 type Heap struct {
-	Base int     // address where the heap starts.
-	Size int     // size of the heap.
-	Free []Block // free blocks
+	Base     int     // address where the heap starts.
+	Size     int     // size of the heap.
+	CoalMode string  // coalesce mode
+	Free     []Block // free blocks
 }
 
 // Block is a continuous address space.
@@ -49,7 +50,7 @@ func Generate(w io.Writer, d Data) error {
 
 var tmpl = template.Must(template.New("report").Parse(`
 {{- define "heap" -}}
-base: {{.Base}} size: {{.Size}}
+base: {{.Base}} size: {{.Size}} coalesce: {{.CoalMode}}
   {{template "free" .Free}}
 {{- end -}}
 
