@@ -61,39 +61,35 @@ func (cmd *command) run() error {
 			Base:     cmd.heapBase,
 			Size:     cmd.heapSize,
 			CoalMode: cmd.coalMode.String(),
-			Free:     func() []report.Block { _, free := blocks(h); return free }(),
+			Blocks:   blocks(h),
 		},
 		Ops: trace(h, sim),
 	})
 }
 
-func blocks(h *heap.Heap) (alloc, free []report.Block) {
+func blocks(h *heap.Heap) []report.Block {
+	var bb []report.Block
 	h.Walk(func(sz, addr int, fl heap.BlockFlags) {
 		b := report.Block{
 			Size:      sz,
 			Addr:      addr,
+			Alloc:     fl.Allocated,
 			AllocPrev: fl.AllocatedPrev,
 		}
-		if fl.Allocated {
-			alloc = append(alloc, b)
-		} else {
-			free = append(free, b)
-		}
+		bb = append(bb, b)
 	})
-	return
+	return bb
 }
 
 func trace(h *heap.Heap, sim *simulator) iter.Seq[report.Operation] {
 	op := func() report.Operation {
 		o := sim.Op()
 		err := o.Run()
-		allocated, free := blocks(h)
 		return report.Operation{
 			Name:      o.String(),
 			Err:       err,
 			Addresses: sim.Allocated(),
-			Allocated: allocated,
-			Free:      free,
+			Blocks:    blocks(h),
 		}
 	}
 	return func(yield func(report.Operation) bool) {

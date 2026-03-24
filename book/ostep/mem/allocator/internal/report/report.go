@@ -24,13 +24,14 @@ type Heap struct {
 	Base     int     // address where the heap starts.
 	Size     int     // size of the heap.
 	CoalMode string  // coalesce mode
-	Free     []Block // free blocks
+	Blocks   []Block // free blocks
 }
 
 // Block is a continuous address space.
 type Block struct {
 	Size      int  // block size
 	Addr      int  // block address
+	Alloc     bool // true if the block is allocated
 	AllocPrev bool // true if previous block is allocated
 }
 
@@ -40,8 +41,7 @@ type Operation struct {
 	Name      string  // operation name
 	Err       error   // error if any
 	Addresses []int   // allocated addresses
-	Allocated []Block // allocated blocks
-	Free      []Block // free blocks
+	Blocks    []Block // allocated blocks
 }
 
 // Generate writes a report to w using data d. It returns an error if it fails
@@ -53,7 +53,7 @@ func Generate(w io.Writer, d Data) error {
 var tmpl = template.Must(template.New("report").Parse(`
 {{- define "heap" -}}
 base: {{.Base}} size: {{.Size}} coalesce: {{.CoalMode}}
-  {{template "free" .Free}}
+  {{template "blocks" .Blocks}}
 {{- end -}}
 
 {{- define "addresses" -}}
@@ -61,13 +61,8 @@ base: {{.Base}} size: {{.Size}} coalesce: {{.CoalMode}}
   {{- range .}} {{.}}{{end}}
 {{- end -}}
 
-{{- define "allocated" -}}
-[{{len .}}] allocations
-  {{- range .}} {{template "block" .}}{{end}}
-{{- end -}}
-
-{{- define "free" -}}
-[{{len .}}] free blocks
+{{- define "blocks" -}}
+[{{len .}}] blocks
   {{- range .}} {{template "block" .}}{{end}}
 {{- end -}}
 
@@ -76,15 +71,15 @@ base: {{.Base}} size: {{.Size}} coalesce: {{.CoalMode}}
   {{- if .Err}} {{.Err}}
   {{- else}}
     {{template "addresses" .Addresses}}
-    {{template "allocated" .Allocated}}
-    {{template "free" .Free}}
+    {{template "blocks" .Blocks}}
   {{- end}}
 {{- end -}}
 
 {{- define "block" -}}
 {{ .Size}}:{{.Addr}}[
-  {{- if .AllocPrev}}P{{else}}-
-  {{- end}}]
+  {{- if .AllocPrev}}P{{else}}-{{end -}}
+  {{- if .Alloc}}A{{else}}F{{end -}}
+	]
 {{- end -}}
 
 configuration:
