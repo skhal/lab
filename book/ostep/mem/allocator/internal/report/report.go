@@ -29,8 +29,9 @@ type Heap struct {
 
 // Block is a continuous address space.
 type Block struct {
-	Size int // block size
-	Addr int // block address
+	Size      int  // block size
+	Addr      int  // block address
+	AllocPrev bool // true if previous block is allocated
 }
 
 // Operation allocates or frees memory. It includes heap state after the
@@ -38,7 +39,8 @@ type Block struct {
 type Operation struct {
 	Name      string  // operation name
 	Err       error   // error if any
-	Allocated []int   // allocated blocks
+	Addresses []int   // allocated addresses
+	Allocated []Block // allocated blocks
 	Free      []Block // free blocks
 }
 
@@ -54,27 +56,35 @@ base: {{.Base}} size: {{.Size}} coalesce: {{.CoalMode}}
   {{template "free" .Free}}
 {{- end -}}
 
-{{- define "free" -}}
-[{{len .}}] free blocks
-  {{- range .}} {{template "block" .}}{{end}}
+{{- define "addresses" -}}
+[{{len .}}] addresses
+  {{- range .}} {{.}}{{end}}
 {{- end -}}
 
 {{- define "allocated" -}}
 [{{len .}}] allocations
-  {{- range .}} {{.}}{{end}}
+  {{- range .}} {{template "block" .}}{{end}}
+{{- end -}}
+
+{{- define "free" -}}
+[{{len .}}] free blocks
+  {{- range .}} {{template "block" .}}{{end}}
 {{- end -}}
 
 {{- define "operation" -}}
 {{.Name}}
   {{- if .Err}} {{.Err}}
   {{- else}}
+    {{template "addresses" .Addresses}}
     {{template "allocated" .Allocated}}
     {{template "free" .Free}}
   {{- end}}
 {{- end -}}
 
 {{- define "block" -}}
-{{ .Size}}:{{.Addr}}
+{{ .Size}}:{{.Addr}}[
+  {{- if .AllocPrev}}P{{else}}-
+  {{- end}}]
 {{- end -}}
 
 configuration:

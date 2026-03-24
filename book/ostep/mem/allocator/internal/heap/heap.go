@@ -171,14 +171,21 @@ func (hp *Heap) free(a int) error {
 	return nil
 }
 
-// WalkFree walks a function f through free blocks of address space in
-// the heap.
-func (hp *Heap) WalkFree(f func(sz, addr int) bool) {
-	hp.walk(func(hdr *Header, a int) bool {
-		if hdr.Allocated {
-			return true
-		}
-		return f(hdr.Size, hp.base+a)
+// BlockFlags
+type BlockFlags struct {
+	Allocated     bool // true if the block is allocated
+	AllocatedPrev bool // true if the previous block is allocated
+}
+
+// Walk calls f for every block in the heap. Check block flags to distinguish
+// between free and allocated blocks.
+func (hp *Heap) Walk(f func(sz, addr int, fl BlockFlags)) {
+	hp.walk(func(h *Header, a int) bool {
+		f(h.Size, hp.base+a, BlockFlags{
+			Allocated:     h.Allocated,
+			AllocatedPrev: h.AllocatedPrev,
+		})
+		return true
 	})
 }
 

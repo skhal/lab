@@ -17,16 +17,18 @@ type blockStatus uint16
 const (
 	// use iota for more status bits
 	statusAllocated blockStatus = 1 << (16 - 1 - iota)
+	statusAllocatedPrev
 
 	// block status should logically AND (merge) all statuses
-	statusMask blockStatus = statusAllocated
+	statusMask blockStatus = statusAllocated | statusAllocatedPrev
 	sizeMask               = ^statusMask
 )
 
 // Header holds block metadata.
 type Header struct {
-	Allocated bool // tags block as allocated if true, else free
-	Size      int  // block size
+	Allocated     bool // tags block as allocated if true, else free
+	AllocatedPrev bool // tags blocks with previous one allocated
+	Size          int  // block size
 }
 
 // Marshal encodes header to bytes. The returned slice of bytes is guaranteed
@@ -35,6 +37,9 @@ func (h *Header) Marshal() []byte {
 	d := uint16(h.Size & int(sizeMask))
 	if h.Allocated {
 		d |= uint16(statusAllocated)
+	}
+	if h.AllocatedPrev {
+		d |= uint16(statusAllocatedPrev)
 	}
 	b := make([]byte, headerSize)
 	binary.BigEndian.PutUint16(b, d)
@@ -46,6 +51,7 @@ func (h *Header) Unmarshal(b []byte) {
 	d := binary.BigEndian.Uint16(b)
 	st := blockStatus(d) & statusMask
 	h.Allocated = st&statusAllocated == statusAllocated
+	h.AllocatedPrev = st&statusAllocatedPrev == statusAllocatedPrev
 	h.Size = int(d & uint16(sizeMask))
 }
 
