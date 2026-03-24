@@ -82,18 +82,16 @@ func (f *Footer) Unmarshal(b []byte) {
 // encoder is a buffer that can encode headers.
 type encoder []byte
 
-// Encode encodes the header to the buffer at a given address.
+// Encode encodes the header to the buffer at a given address. It adds a footer
+// for free blocks.
 func (e encoder) Encode(h *Header, a int) {
 	copy(e[a-headerSize:a], h.Marshal())
-}
-
-// EncodeFooter encodes footer f and writes it at the end of the free block
-// addressed at a.
-//
-//	 [header|payload|footer]
-//					 ^       ^
-//					 a       f (to be written)
-func (e encoder) EncodeFooter(f *Footer, a int) {
+	if h.Allocated {
+		return
+	}
+	f := Footer{
+		Size: h.Size,
+	}
 	a += f.Size
 	copy(e[a-footerSize:a], f.Marshal())
 }

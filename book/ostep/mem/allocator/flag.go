@@ -72,6 +72,7 @@ func newCoalesceModeFlag(v *heap.CoalesceMode) *coalesceModeFlag {
 var coalesceModes = []heap.CoalesceMode{
 	heap.CoalesceModeNoop,
 	heap.CoalesceModeForward,
+	heap.CoalesceModeBackward,
 }
 
 // Set parses the coalesce mode from the string and stores it in the flag

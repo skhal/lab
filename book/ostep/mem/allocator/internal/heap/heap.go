@@ -22,9 +22,10 @@ var (
 	ErrSize = errors.New("invalid size")
 )
 
-// MaxSize is the maximum supported heap size. It is a derivatie of the block
-// metadata size.
-const MaxSize = int(sizeMask)
+const (
+	MinSize = headerSize + footerSize + 1 // +1 for at lest 1B
+	MaxSize = int(sizeMask)               // max supported heap size
+)
 
 // Heap is a continuous address space, ready for memory allocations. It
 // consists of a single free block, taking the entire heap.
@@ -56,6 +57,11 @@ func WithCoalesce(mode CoalesceMode) option {
 				enc:    hp.enc,
 				bounds: hp.size,
 			}
+		case CoalesceModeBackward:
+			hp.coal = &backwardCoalescer{
+				dec: hp.dec,
+				enc: hp.enc,
+			}
 		default:
 			panic(fmt.Errorf("unsupported coalesce mode - %s", mode))
 		}
@@ -66,8 +72,11 @@ func WithCoalesce(mode CoalesceMode) option {
 // free block. The amount of available free space is equal to size minus the
 // header size, used to store meta-information.
 func New(base, size int, opts ...option) (*Heap, error) {
+	if size < MinSize {
+		return nil, fmt.Errorf("%w: heap size %d, min %d", ErrSize, size, MinSize)
+	}
 	if size > MaxSize {
-		return nil, fmt.Errorf("unsupported heap size %d, max %d", size, MaxSize)
+		return nil, fmt.Errorf("%w: heap size %d, max %d", ErrSize, size, MaxSize)
 	}
 	arena := make([]byte, size)
 	hp := &Heap{
@@ -77,11 +86,10 @@ func New(base, size int, opts ...option) (*Heap, error) {
 		dec:  decoder(arena),
 		coal: &noopCoalescer{},
 	}
+	hp.enc.Encode(&Header{Size: size - headerSize}, headerSize)
 	for _, opt := range opts {
 		opt(hp)
 	}
-	h := Header{Size: size - headerSize}
-	hp.enc.Encode(&h, headerSize)
 	return hp, nil
 }
 
@@ -113,7 +121,14 @@ func (hp *Heap) malloc(size int) (addr int, err error) {
 			// not enough space
 			return true
 		}
-		hp.split(a, h.Size, size)
+		switch {
+		case h.Size > size+headerSize:
+			hp.split(*h, a, size)
+		default:
+			// not enough space to split
+			h.Allocated = true
+			hp.enc.Encode(h, a)
+		}
 		addr = a
 		err = nil
 		return false
@@ -121,27 +136,20 @@ func (hp *Heap) malloc(size int) (addr int, err error) {
 	return
 }
 
-func (hp *Heap) split(addr int, size int, n int) {
-	h := Header{Allocated: true}
+func (hp *Heap) split(h Header, a int, size int) {
+	blockSize := h.Size
 
-	takeAll := false
-	if size <= n+headerSize {
-		// not enough space to store header and 1+ bytes of free space
-		h.Size = size
-		takeAll = true
-	} else {
-		h.Size = n
-	}
-	hp.enc.Encode(&h, addr)
+	h.Allocated = true
+	h.Size = size
+	hp.enc.Encode(&h, a)
 
-	if takeAll {
-		return
-	}
-
+	// free block
+	a += size + headerSize
 	h = Header{
-		Size: size - n - headerSize,
+		AllocatedPrev: true,
+		Size:          blockSize - size - headerSize,
 	}
-	hp.enc.Encode(&h, addr+n+headerSize)
+	hp.enc.Encode(&h, a)
 }
 
 // Free releases memory at previously allocated address addr. It returns an
@@ -170,13 +178,11 @@ func (hp *Heap) free(a int) error {
 	h.Allocated = false
 	hp.enc.Encode(&h, a)
 
-	f := Footer{Size: h.Size}
-	hp.enc.EncodeFooter(&f, a)
-
+	// remove AllocatedPrev from the header of the next block
 	if b := a + h.Size + headerSize; b < hp.size {
 		var hb Header
 		hp.dec.Decode(&hb, b)
-		hb.AllocatedPrev = true
+		hb.AllocatedPrev = false
 		hp.enc.Encode(&hb, b)
 	}
 

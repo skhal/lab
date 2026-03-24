@@ -13,8 +13,9 @@ type CoalesceMode int
 const (
 	_ CoalesceMode = iota
 
-	CoalesceModeNoop    // noop
-	CoalesceModeForward // forward
+	CoalesceModeNoop     // noop
+	CoalesceModeForward  // forward
+	CoalesceModeBackward // backward
 )
 
 type noopCoalescer struct{}
@@ -47,7 +48,34 @@ func (c *forwardCoalescer) Coalesce(ha *Header, a int) {
 func (c *forwardCoalescer) coalesce(dst, src *Header, a int) {
 	dst.Size = dst.Size + headerSize + src.Size
 	c.enc.Encode(dst, a)
+}
 
-	f := Footer{Size: dst.Size}
-	c.enc.EncodeFooter(&f, a)
+type backwardCoalescer struct {
+	dec decoder
+	enc encoder
+}
+
+// Coalesce merges consecutive free blocks moving backwards from the block at
+// address a.
+func (c *backwardCoalescer) Coalesce(h *Header, a int) {
+	for {
+		if h.AllocatedPrev {
+			break
+		}
+		if a-headerSize <= 0 {
+			// first block
+			break
+		}
+		var prevFooter Footer
+		c.dec.DecodePrevFooter(&prevFooter, a)
+		a -= headerSize + prevFooter.Size
+		var prevHeader Header
+		c.dec.Decode(&prevHeader, a)
+		c.coalesce(&prevHeader, h, a)
+	}
+}
+
+func (c *backwardCoalescer) coalesce(dst, src *Header, a int) {
+	dst.Size += headerSize + src.Size
+	c.enc.Encode(dst, a)
 }
