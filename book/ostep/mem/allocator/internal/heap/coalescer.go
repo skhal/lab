@@ -58,8 +58,9 @@ type backwardCoalescer struct {
 // Coalesce merges consecutive free blocks moving backwards from the block at
 // address a.
 func (c *backwardCoalescer) Coalesce(h *Header, a int) {
+	tmp := *h
 	for {
-		if h.AllocatedPrev {
+		if tmp.AllocatedPrev {
 			break
 		}
 		if a-headerSize <= 0 {
@@ -71,7 +72,8 @@ func (c *backwardCoalescer) Coalesce(h *Header, a int) {
 		a -= headerSize + prevFooter.Size
 		var prevHeader Header
 		c.dec.Decode(&prevHeader, a)
-		c.coalesce(&prevHeader, h, a)
+		c.coalesce(&prevHeader, &tmp, a)
+		tmp = prevHeader
 	}
 }
 
