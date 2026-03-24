@@ -9,6 +9,7 @@ package heap
 import (
 	"errors"
 	"fmt"
+	"iter"
 )
 
 var (
@@ -110,16 +111,15 @@ func (hp *Heap) Malloc(size int) (int, error) {
 	return a + hp.base, nil
 }
 
-func (hp *Heap) malloc(size int) (addr int, err error) {
-	err = ErrNoMemory
-	hp.walk(func(h *Header, a int) bool {
+func (hp *Heap) malloc(size int) (int, error) {
+	for a, h := range hp.blocks() {
 		if h.Allocated {
 			// continue searching
-			return true
+			continue
 		}
 		if h.Size < size {
 			// not enough space
-			return true
+			continue
 		}
 		switch {
 		case h.Size > size+headerSize:
@@ -129,11 +129,9 @@ func (hp *Heap) malloc(size int) (addr int, err error) {
 			h.Allocated = true
 			hp.enc.Encode(h, a)
 		}
-		addr = a
-		err = nil
-		return false
-	})
-	return
+		return a, nil
+	}
+	return 0, ErrNoMemory
 }
 
 func (hp *Heap) split(h Header, a int, size int) {
@@ -200,24 +198,25 @@ type BlockFlags struct {
 // Walk calls f for every block in the heap. Check block flags to distinguish
 // between free and allocated blocks.
 func (hp *Heap) Walk(f func(sz, addr int, fl BlockFlags)) {
-	hp.walk(func(h *Header, a int) bool {
+	for a, h := range hp.blocks() {
 		f(h.Size, hp.base+a, BlockFlags{
 			Allocated:     h.Allocated,
 			AllocatedPrev: h.AllocatedPrev,
 		})
-		return true
-	})
+	}
 }
 
-func (hp *Heap) walk(f func(h *Header, addr int) bool) {
-	var h Header
-	for a := headerSize; a < hp.size; a += h.Size + headerSize {
-		hp.dec.Decode(&h, a)
-		if h.Size == 0 {
-			panic(fmt.Sprintf("invalid header at %d: %v", a, h))
-		}
-		if !f(&h, a) {
-			break
+func (hp *Heap) blocks() iter.Seq2[int, *Header] {
+	return func(yield func(int, *Header) bool) {
+		var h Header
+		for a := headerSize; a < hp.size; a += h.Size + headerSize {
+			hp.dec.Decode(&h, a)
+			if h.Size == 0 {
+				panic(fmt.Sprintf("invalid header at %d: %v", a, h))
+			}
+			if !yield(a, &h) {
+				break
+			}
 		}
 	}
 }
