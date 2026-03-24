@@ -11,11 +11,12 @@ func _() {
 	_ = x[CoalesceModeNoop-1]
 	_ = x[CoalesceModeForward-2]
 	_ = x[CoalesceModeBackward-3]
+	_ = x[CoalesceModeBidirectional-4]
 }
 
-const _CoalesceMode_name = "noopforwardbackward"
+const _CoalesceMode_name = "noopforwardbackwardbidi"
 
-var _CoalesceMode_index = [...]uint8{0, 4, 11, 19}
+var _CoalesceMode_index = [...]uint8{0, 4, 11, 19, 23}
 
 func (i CoalesceMode) String() string {
 	idx := int(i) - 1

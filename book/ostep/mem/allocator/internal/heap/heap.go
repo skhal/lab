@@ -53,15 +53,13 @@ func WithCoalesce(mode CoalesceMode) option {
 		case CoalesceModeNoop:
 			hp.coal = &noopCoalescer{}
 		case CoalesceModeForward:
-			hp.coal = &forwardCoalescer{
-				dec:    hp.dec,
-				enc:    hp.enc,
-				bounds: hp.size,
-			}
+			hp.coal = newForwardCoalescer(hp)
 		case CoalesceModeBackward:
-			hp.coal = &backwardCoalescer{
-				dec: hp.dec,
-				enc: hp.enc,
+			hp.coal = newBackwardCoalescer(hp)
+		case CoalesceModeBidirectional:
+			hp.coal = &bidiCoalescer{
+				fwd: newForwardCoalescer(hp),
+				bwd: newBackwardCoalescer(hp),
 			}
 		default:
 			panic(fmt.Errorf("unsupported coalesce mode - %s", mode))

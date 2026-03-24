@@ -73,6 +73,7 @@ var coalesceModes = []heap.CoalesceMode{
 	heap.CoalesceModeNoop,
 	heap.CoalesceModeForward,
 	heap.CoalesceModeBackward,
+	heap.CoalesceModeBidirectional,
 }
 
 // Set parses the coalesce mode from the string and stores it in the flag

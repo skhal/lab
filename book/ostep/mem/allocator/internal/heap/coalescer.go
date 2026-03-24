@@ -13,9 +13,10 @@ type CoalesceMode int
 const (
 	_ CoalesceMode = iota
 
-	CoalesceModeNoop     // noop
-	CoalesceModeForward  // forward
-	CoalesceModeBackward // backward
+	CoalesceModeNoop          // noop
+	CoalesceModeForward       // forward
+	CoalesceModeBackward      // backward
+	CoalesceModeBidirectional // bidi
 )
 
 type noopCoalescer struct{}
@@ -29,10 +30,18 @@ type forwardCoalescer struct {
 	bounds int
 }
 
+func newForwardCoalescer(hp *Heap) *forwardCoalescer {
+	return &forwardCoalescer{
+		dec:    hp.dec,
+		enc:    hp.enc,
+		bounds: hp.size,
+	}
+}
+
 // Coalesce merges consecutive free blocks starting at a, moving forward.
-func (c *forwardCoalescer) Coalesce(ha *Header, a int) {
+func (c *forwardCoalescer) Coalesce(h *Header, a int) {
 	for {
-		b := a + ha.Size + headerSize
+		b := a + h.Size + headerSize
 		if b >= c.bounds {
 			break
 		}
@@ -41,7 +50,7 @@ func (c *forwardCoalescer) Coalesce(ha *Header, a int) {
 		if hb.Allocated {
 			break
 		}
-		c.coalesce(ha, &hb, a)
+		c.coalesce(h, &hb, a)
 	}
 }
 
@@ -53,6 +62,13 @@ func (c *forwardCoalescer) coalesce(dst, src *Header, a int) {
 type backwardCoalescer struct {
 	dec decoder
 	enc encoder
+}
+
+func newBackwardCoalescer(hp *Heap) *backwardCoalescer {
+	return &backwardCoalescer{
+		dec: hp.dec,
+		enc: hp.enc,
+	}
 }
 
 // Coalesce merges consecutive free blocks moving backwards from the block at
@@ -80,4 +96,15 @@ func (c *backwardCoalescer) Coalesce(h *Header, a int) {
 func (c *backwardCoalescer) coalesce(dst, src *Header, a int) {
 	dst.Size += headerSize + src.Size
 	c.enc.Encode(dst, a)
+}
+
+type bidiCoalescer struct {
+	fwd *forwardCoalescer
+	bwd *backwardCoalescer
+}
+
+// Coalesce merges consecutive free blocks moving forward and backward.
+func (c *bidiCoalescer) Coalesce(h *Header, a int) {
+	c.fwd.Coalesce(h, a)
+	c.bwd.Coalesce(h, a)
 }

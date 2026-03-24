@@ -39,26 +39,54 @@ Free() call to reduce fragmentation:
 
 - *forward*: only coalesce next blocks started from the released block.
 
+- *backward*: coalesce consecutive previous blocks staring from the released
+  block.
+
+- *bidi*: bidirectional coalesce of consecutive free blocks, moving forward
+  and backward.
+
 # EXAMPLE
 
 ```console
-% allocator -base 1024 -size 2048 -n 5 -c forward
+% allocator -base 1024 -size 2048 -n 5 -c bidi -n 15
 configuration:
-  base: 1024 size: 2048 coalesce: forward
-  [1] free blocks 2046:1026
+  base: 1024 size: 2048 coalesce: bidi
+  [1] blocks 2046:1026[-F]
 
 trace:
-  malloc(225)
-    [1] allocations 1026
-    [1] free blocks 1819:1253
-  malloc(326)
-    [2] allocations 1026 1253
-    [1] free blocks 1491:1581
+  malloc(1192)
+    [1] addresses 1026
+    [2] blocks 1192:1026[-A] 852:2220[PF]
+  malloc(171)
+    [2] addresses 1026 2220
+    [3] blocks 1192:1026[-A] 171:2220[PA] 679:2393[PF]
+  malloc(800) malloc(800): insufficient memory
+  malloc(1785) malloc(1785): insufficient memory
+  malloc(591)
+    [3] addresses 1026 2220 2393
+    [4] blocks 1192:1026[-A] 171:2220[PA] 591:2393[PA] 86:2986[PF]
+  malloc(1275) malloc(1275): insufficient memory
+  malloc(586) malloc(586): insufficient memory
   free(1026)
-    [1] allocations 1253
-    [2] free blocks 225:1026 1491:1581
-  malloc(1892) malloc(1892): insufficient memory
-  free(1253)
-    [0] allocations
-    [2] free blocks 225:1026 1819:1253
+    [2] addresses 2220 2393
+    [4] blocks 1192:1026[-F] 171:2220[-A] 591:2393[PA] 86:2986[PF]
+  malloc(1533) malloc(1533): insufficient memory
+  malloc(265)
+    [3] addresses 2220 2393 1026
+    [5] blocks 265:1026[-A] 925:1293[PF] 171:2220[-A] 591:2393[PA] 86:2986[PF]
+  malloc(920)
+    [4] addresses 2220 2393 1026 1293
+    [6] blocks 265:1026[-A] 920:1293[PA] 3:2215[PF] 171:2220[-A] 591:2393[PA] 86:2986[PF]
+  free(1026)
+    [3] addresses 2220 2393 1293
+    [6] blocks 265:1026[-F] 920:1293[-A] 3:2215[PF] 171:2220[-A] 591:2393[PA] 86:2986[PF]
+  free(2220)
+    [2] addresses 2393 1293
+    [5] blocks 265:1026[-F] 920:1293[-A] 176:2215[PF] 591:2393[-A] 86:2986[PF]
+  free(2393)
+    [1] addresses 1293
+    [3] blocks 265:1026[-F] 920:1293[-A] 857:2215[PF]
+  free(1293)
+    [0] addresses
+    [1] blocks 2046:1026[-F]
 ```
