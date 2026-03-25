@@ -23,6 +23,7 @@ type command struct {
 	numOps    int
 	coalMode  heap.CoalesceMode
 	allocMode heap.AllocateMode
+	ops       []string
 }
 
 func newCommand() *command {
@@ -53,6 +54,7 @@ func (cmd *command) parseFlags() error {
 	fs.Var(newBoundedIntFlag(&cmd.numOps, 5, 25), "n", "number of random operations")
 	fs.Var(newCoalesceModeFlag(&cmd.coalMode), "c", "coalesce mode")
 	fs.Var(newAllocateModeFlag(&cmd.allocMode), "alloc", "allocate mode")
+	fs.Var(newOperationListFlag(&cmd.ops), "ops", "list of operations: +N,-N")
 	return fs.ParseAndValidate(os.Args[1:])
 }
 
@@ -68,7 +70,11 @@ func (cmd *command) run() error {
 	if err != nil {
 		return err
 	}
-	sim := newSimulator(h, cmd.numOps)
+	var simOps []simulatorOption
+	if cmd.ops != nil {
+		simOps = append(simOps, WithOps(cmd.ops))
+	}
+	sim := newSimulator(h, cmd.numOps, simOps...)
 	return report.Generate(os.Stdout, report.Data{
 		Heap: report.Heap{
 			Base:      cmd.heapBase,

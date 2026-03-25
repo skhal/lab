@@ -8,6 +8,8 @@ package main
 import (
 	"fmt"
 	"math/rand/v2"
+	"strconv"
+	"strings"
 
 	"github.com/skhal/lab/book/ostep/mem/allocator/internal/heap"
 )
@@ -31,13 +33,29 @@ type simulator struct {
 
 	allocated []int     // allocated addresses
 	lastOp    operation // last generated operation
+
+	ops []string
 }
 
-func newSimulator(h *heap.Heap, num int) *simulator {
-	return &simulator{
+type simulatorOption func(*simulator)
+
+// WithOps configures simulator to replay operations.
+func WithOps(ops []string) simulatorOption {
+	return func(sim *simulator) {
+		sim.numToGen = len(ops)
+		sim.ops = ops
+	}
+}
+
+func newSimulator(h *heap.Heap, num int, opts ...simulatorOption) *simulator {
+	sim := &simulator{
 		heap:     h,
 		numToGen: num,
 	}
+	for _, opt := range opts {
+		opt(sim)
+	}
+	return sim
 }
 
 // Allocated returns a slice of allocated addresses.
@@ -53,27 +71,62 @@ func (sim *simulator) Next() bool {
 		return false
 	}
 	switch {
-	case len(sim.allocated) == 0:
-		// no allocated addresses available for free, malloc only.
-		sim.lastOp = sim.malloc()
+	case sim.ops != nil:
+		sim.lastOp = sim.replayOperation()
 	default:
-		sim.lastOp = sim.randOp()
+		sim.lastOp = sim.generateOperation()
 	}
 	sim.generated++
 	return true
 }
 
-func (sim *simulator) randOp() operation {
-	switch n := rand.IntN(ptsTotal); {
-	case n < ptsMalloc:
-		return sim.malloc()
+func (sim *simulator) replayOperation() operation {
+	op := sim.ops[sim.generated]
+	switch {
+	case strings.HasPrefix(op, "+"):
+		s := strings.TrimLeft(op, "+")
+		n, err := strconv.Atoi(s)
+		if err != nil {
+			panic(err)
+		}
+		return sim.malloc(n)
+	case strings.HasPrefix(op, "-"):
+		s := strings.TrimLeft(op, "-")
+		n, err := strconv.Atoi(s)
+		if err != nil {
+			panic(err)
+		}
+		return sim.free(n)
 	default:
-		return sim.free()
+		panic(fmt.Errorf("invalid operation %q", op))
 	}
 }
 
-func (sim *simulator) malloc() operation {
+func (sim *simulator) generateOperation() operation {
+	switch {
+	case len(sim.allocated) == 0:
+		// no allocated addresses available for free, malloc only.
+		return sim.randMalloc()
+	default:
+		return sim.randOp()
+	}
+}
+
+func (sim *simulator) randOp() operation {
+	switch n := rand.IntN(ptsTotal); {
+	case n < ptsMalloc:
+		return sim.randMalloc()
+	default:
+		return sim.randFree()
+	}
+}
+
+func (sim *simulator) randMalloc() operation {
 	sz := 1 + rand.IntN(mallocMaxSize) // +1 for at least one byte
+	return sim.malloc(sz)
+}
+
+func (sim *simulator) malloc(sz int) operation {
 	return mallocOperation{
 		size: sz,
 		runFunc: func() error {
@@ -87,9 +140,13 @@ func (sim *simulator) malloc() operation {
 	}
 }
 
-func (sim *simulator) free() operation {
+func (sim *simulator) randFree() operation {
 	i := rand.IntN(len(sim.allocated))
-	a := sim.allocated[i]
+	return sim.free(i)
+}
+
+func (sim *simulator) free(idx int) operation {
+	a := sim.allocated[idx]
 	return freeOperation{
 		addr: a,
 		runFunc: func() error {
@@ -102,11 +159,11 @@ func (sim *simulator) free() operation {
 				// this operation released the only allocated address, reset the
 				// allocations list.
 				sim.allocated = nil
-			case i == len(sim.allocated)-1:
+			case idx == len(sim.allocated)-1:
 				// released last allocation, truncate the allocations list.
-				sim.allocated = sim.allocated[:i]
+				sim.allocated = sim.allocated[:idx]
 			default:
-				copy(sim.allocated[i:], sim.allocated[i+1:])
+				copy(sim.allocated[idx:], sim.allocated[idx+1:])
 				sim.allocated = sim.allocated[:len(sim.allocated)-1]
 			}
 			return nil

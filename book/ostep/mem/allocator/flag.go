@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"slices"
 	"strconv"
+	"strings"
 
 	"github.com/skhal/lab/book/ostep/mem/allocator/internal/heap"
 )
@@ -181,6 +182,46 @@ func (fl *allocateModeFlag) String() string {
 func (fl *allocateModeFlag) Validate() error {
 	if !slices.Contains(allocateModes, *fl.v) {
 		return fmt.Errorf("unsupported mode - %d", fl.v)
+	}
+	return nil
+}
+
+type operationListFlag struct {
+	ops *[]string
+}
+
+func newOperationListFlag(ops *[]string) *operationListFlag {
+	return &operationListFlag{ops}
+}
+
+// Set parses s as a comma-separated list of strings and sets the flag value.
+func (fl *operationListFlag) Set(s string) error {
+	*fl.ops = append(*fl.ops, strings.Split(s, ",")...)
+	return nil
+}
+
+// String returns a string representation of the flag value.
+func (fl operationListFlag) String() string {
+	if fl.ops == nil {
+		return ""
+	}
+	return strings.Join(*fl.ops, ",")
+}
+
+// Validate checks that operations match "+num" malloc or "-num" free format.
+func (fl operationListFlag) Validate() error {
+	for i, op := range *fl.ops {
+		switch {
+		case strings.HasPrefix(op, "+"):
+		case strings.HasPrefix(op, "-"):
+		default:
+			return fmt.Errorf("operation %d has invalid prefix", i)
+		}
+		s := strings.TrimLeft(op, "+-")
+		_, err := strconv.Atoi(s)
+		if err != nil {
+			return fmt.Errorf("operation %d: %s", i, err)
+		}
 	}
 	return nil
 }
