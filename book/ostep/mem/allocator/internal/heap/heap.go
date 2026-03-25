@@ -38,7 +38,13 @@ type Heap struct {
 	enc encoder
 	dec decoder
 
+	sc scanner
+
 	coal coalescer
+}
+
+type scanner interface {
+	Scan() iter.Seq2[int, *Header]
 }
 
 type coalescer interface {
@@ -100,6 +106,7 @@ func New(base, size int, opts ...Option) (*Heap, error) {
 		alignment: 1,
 		enc:       encoder(arena),
 		dec:       decoder(arena),
+		sc:        newBlockScanner(decoder(arena), size),
 		coal:      &noopCoalescer{},
 	}
 	hp.enc.Encode(&Header{Size: size - headerSize}, headerSize)
@@ -137,7 +144,7 @@ func (hp *Heap) align(n int) int {
 }
 
 func (hp *Heap) malloc(size int) (int, error) {
-	for a, h := range hp.blocks() {
+	for a, h := range hp.sc.Scan() {
 		if h.Allocated {
 			// continue searching
 			continue
@@ -223,25 +230,10 @@ type BlockFlags struct {
 // Walk calls f for every block in the heap. Check block flags to distinguish
 // between free and allocated blocks.
 func (hp *Heap) Walk(f func(sz, addr int, fl BlockFlags)) {
-	for a, h := range hp.blocks() {
+	for a, h := range hp.sc.Scan() {
 		f(h.Size, hp.base+a, BlockFlags{
 			Allocated:     h.Allocated,
 			AllocatedPrev: h.AllocatedPrev,
 		})
-	}
-}
-
-func (hp *Heap) blocks() iter.Seq2[int, *Header] {
-	return func(yield func(int, *Header) bool) {
-		var h Header
-		for a := headerSize; a < hp.size; a += h.Size + headerSize {
-			hp.dec.Decode(&h, a)
-			if h.Size == 0 {
-				panic(fmt.Sprintf("invalid header at %d: %v", a, h))
-			}
-			if !yield(a, &h) {
-				break
-			}
-		}
 	}
 }

@@ -7,6 +7,8 @@ package heap
 
 import (
 	"encoding/binary"
+	"fmt"
+	"iter"
 	"unsafe"
 )
 
@@ -114,4 +116,29 @@ func (d decoder) Decode(h *Header, a int) {
 func (d decoder) DecodePrevFooter(f *Footer, a int) {
 	a -= headerSize
 	f.Unmarshal(d[a-footerSize : a])
+}
+
+type blockScanner struct {
+	dec decoder
+	end int
+}
+
+func newBlockScanner(dec decoder, end int) *blockScanner {
+	return &blockScanner{dec, end}
+}
+
+// Scan runs through blocks in the heap.
+func (bs *blockScanner) Scan() iter.Seq2[int, *Header] {
+	return func(yield func(int, *Header) bool) {
+		var h Header
+		for a := headerSize; a < bs.end; a += h.Size + headerSize {
+			bs.dec.Decode(&h, a)
+			if h.Size == 0 {
+				panic(fmt.Sprintf("invalid header at %d: %v", a, h))
+			}
+			if !yield(a, &h) {
+				break
+			}
+		}
+	}
 }
