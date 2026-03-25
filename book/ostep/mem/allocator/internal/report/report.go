@@ -15,8 +15,8 @@ import (
 
 // Data is the report input.
 type Data struct {
-	Heap Heap                // heap configuration
-	Ops  iter.Seq[Operation] // operations run by simulator
+	Heap  Heap            // heap configuration
+	Trace iter.Seq[Frame] // operations run by simulator
 }
 
 // Heap is the heap configuration.
@@ -36,13 +36,13 @@ type Block struct {
 	AllocPrev bool // true if previous block is allocated
 }
 
-// Operation allocates or frees memory. It includes heap state after the
-// operation runs, i.e., a list of allocated and free blocks.
-type Operation struct {
-	Name      string  // operation name
-	Err       error   // error if any
-	Addresses []int   // allocated addresses
-	Blocks    []Block // allocated blocks
+// Frame gives access to the last operation run, optional generated error,
+// and the state of the heap: allocated addresses and blocks.
+type Frame interface {
+	Operation() string // last operation name
+	Err() error        // error running the operation
+	Addresses() []int  // allocated addresses
+	Blocks() []Block   // allocated blocks
 }
 
 // Generate writes a report to w using data d. It returns an error if it fails
@@ -67,8 +67,8 @@ base: {{.Base}} size: {{.Size}} coalesce: {{.CoalMode}} allocate: {{.AllocMode}}
   {{- range .}} {{template "block" .}}{{end}}
 {{- end -}}
 
-{{- define "operation" -}}
-{{.Name}}
+{{- define "frame" -}}
+{{.Operation}}
   {{- if .Err}} {{.Err}}
   {{- else}}
     {{template "addresses" .Addresses}}
@@ -87,7 +87,7 @@ configuration:
   {{template "heap" .Heap}}
 
 trace:
-{{- range .Ops}}
-  {{template "operation" .}}
+{{- range .Trace}}
+  {{template "frame" .}}
 {{- end}}
 `))

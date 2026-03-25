@@ -83,7 +83,7 @@ func (cmd *command) run() error {
 			AllocMode: cmd.allocMode.String(),
 			Blocks:    blocks(h),
 		},
-		Ops: trace(h, sim),
+		Trace: runSimulation(h, sim),
 	})
 }
 
@@ -101,20 +101,46 @@ func blocks(h *heap.Heap) []report.Block {
 	return bb
 }
 
-func trace(h *heap.Heap, sim *simulator) iter.Seq[report.Operation] {
-	op := func() report.Operation {
+func runSimulation(h *heap.Heap, sim *simulator) iter.Seq[report.Frame] {
+	op := func() report.Frame {
 		o := sim.Op()
-		err := o.Run()
-		return report.Operation{
-			Name:      o.String(),
-			Err:       err,
-			Addresses: sim.Allocated(),
-			Blocks:    blocks(h),
+		return &trace{
+			name:   o.String(),
+			err:    o.Run(),
+			addrs:  sim.Allocated,
+			blocks: func() []report.Block { return blocks(h) },
 		}
 	}
-	return func(yield func(report.Operation) bool) {
+	return func(yield func(report.Frame) bool) {
 		for sim.Next() && yield(op()) {
 			continue
 		}
 	}
+}
+
+type trace struct {
+	name   string
+	err    error
+	addrs  func() []int
+	blocks func() []report.Block
+}
+
+// Operation returns the name of operation.
+func (tr *trace) Operation() string {
+	return tr.name
+}
+
+// Err return operation error, if any.
+func (tr *trace) Err() error {
+	return tr.err
+}
+
+// Addresses returns a list of allocated addresses.
+func (tr *trace) Addresses() []int {
+	return tr.addrs()
+}
+
+// Blocks returns a list of blocks in the heap.
+func (tr *trace) Blocks() []report.Block {
+	return tr.blocks()
 }
