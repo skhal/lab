@@ -38,9 +38,9 @@ type Heap struct {
 	enc encoder
 	dec decoder
 
-	sc scanner
-
-	coal coalescer
+	sc    scanner
+	coal  coalescer
+	alloc allocator
 }
 
 type scanner interface {
@@ -49,6 +49,10 @@ type scanner interface {
 
 type coalescer interface {
 	Coalesce(*Header, int)
+}
+
+type allocator interface {
+	Allocate(size int) (int, error)
 }
 
 // Option is a heap option.
@@ -108,6 +112,10 @@ func New(base, size int, opts ...Option) (*Heap, error) {
 		dec:       decoder(arena),
 		sc:        newBlockScanner(decoder(arena), size),
 		coal:      &noopCoalescer{},
+		alloc: &firstFitAllocator{
+			enc: encoder(arena),
+			s:   newBlockScanner(decoder(arena), size),
+		},
 	}
 	hp.enc.Encode(&Header{Size: size - headerSize}, headerSize)
 	for _, opt := range opts {
@@ -127,7 +135,7 @@ func (hp *Heap) Malloc(size int) (int, error) {
 	if size < 1 {
 		return 0, fmt.Errorf("malloc(%d): %w", size, ErrSize)
 	}
-	a, err := hp.malloc(size)
+	a, err := hp.alloc.Allocate(size)
 	if err != nil {
 		return 0, fmt.Errorf("malloc(%d): %w", size, err)
 	}
@@ -141,45 +149,6 @@ func (hp *Heap) align(n int) int {
 	}
 	padding := hp.alignment - m
 	return n + padding
-}
-
-func (hp *Heap) malloc(size int) (int, error) {
-	for a, h := range hp.sc.Scan() {
-		if h.Allocated {
-			// continue searching
-			continue
-		}
-		if h.Size < size {
-			// not enough space
-			continue
-		}
-		switch {
-		case h.Size > size+headerSize:
-			hp.split(*h, a, size)
-		default:
-			// not enough space to split
-			h.Allocated = true
-			hp.enc.Encode(h, a)
-		}
-		return a, nil
-	}
-	return 0, ErrNoMemory
-}
-
-func (hp *Heap) split(h Header, a int, size int) {
-	blockSize := h.Size
-
-	h.Allocated = true
-	h.Size = size
-	hp.enc.Encode(&h, a)
-
-	// free block
-	a += size + headerSize
-	h = Header{
-		AllocatedPrev: true,
-		Size:          blockSize - size - headerSize,
-	}
-	hp.enc.Encode(&h, a)
 }
 
 // Free releases memory at previously allocated address addr. It returns an
