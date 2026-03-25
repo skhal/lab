@@ -21,11 +21,11 @@ type Data struct {
 
 // Heap is the heap configuration.
 type Heap struct {
-	Base      int     // address where the heap starts.
-	Size      int     // size of the heap.
-	CoalMode  string  // coalesce mode
-	AllocMode string  // allocate mode
-	Blocks    []Block // free blocks
+	Base      int             // address where the heap starts.
+	Size      int             // size of the heap.
+	CoalMode  string          // coalesce mode
+	AllocMode string          // allocate mode
+	Blocks    iter.Seq[Block] // free blocks
 }
 
 // Block is a continuous address space.
@@ -39,10 +39,10 @@ type Block struct {
 // Frame gives access to the last operation run, optional generated error,
 // and the state of the heap: allocated addresses and blocks.
 type Frame interface {
-	Operation() string // last operation name
-	Err() error        // error running the operation
-	Addresses() []int  // allocated addresses
-	Blocks() []Block   // allocated blocks
+	Operation() string       // last operation name
+	Err() error              // error running the operation
+	Addresses() []int        // allocated addresses
+	Blocks() iter.Seq[Block] // allocated blocks
 }
 
 // Generate writes a report to w using data d. It returns an error if it fails
@@ -63,7 +63,7 @@ base: {{.Base}} size: {{.Size}} coalesce: {{.CoalMode}} allocate: {{.AllocMode}}
 {{- end -}}
 
 {{- define "blocks" -}}
-[{{len .}}] blocks
+[.] blocks
   {{- range .}} {{template "block" .}}{{end}}
 {{- end -}}
 

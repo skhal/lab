@@ -87,18 +87,24 @@ func (cmd *command) run() error {
 	})
 }
 
-func blocks(h *heap.Heap) []report.Block {
-	var bb []report.Block
-	h.Walk(func(sz, addr int, fl heap.BlockFlags) {
-		b := report.Block{
-			Size:      sz,
-			Addr:      addr,
-			Alloc:     fl.Allocated,
-			AllocPrev: fl.AllocatedPrev,
-		}
-		bb = append(bb, b)
-	})
-	return bb
+func blocks(h *heap.Heap) iter.Seq[report.Block] {
+	return func(yield func(report.Block) bool) {
+		var stop bool
+		h.Walk(func(sz, addr int, fl heap.BlockFlags) {
+			if stop {
+				return
+			}
+			b := report.Block{
+				Size:      sz,
+				Addr:      addr,
+				Alloc:     fl.Allocated,
+				AllocPrev: fl.AllocatedPrev,
+			}
+			if !yield(b) {
+				stop = true
+			}
+		})
+	}
 }
 
 func runSimulation(h *heap.Heap, sim *simulator) iter.Seq[report.Frame] {
@@ -108,7 +114,7 @@ func runSimulation(h *heap.Heap, sim *simulator) iter.Seq[report.Frame] {
 			name:   o.String(),
 			err:    o.Run(),
 			addrs:  sim.Allocated,
-			blocks: func() []report.Block { return blocks(h) },
+			blocks: func() iter.Seq[report.Block] { return blocks(h) },
 		}
 	}
 	return func(yield func(report.Frame) bool) {
@@ -122,7 +128,7 @@ type trace struct {
 	name   string
 	err    error
 	addrs  func() []int
-	blocks func() []report.Block
+	blocks func() iter.Seq[report.Block]
 }
 
 // Operation returns the name of operation.
@@ -141,6 +147,6 @@ func (tr *trace) Addresses() []int {
 }
 
 // Blocks returns a list of blocks in the heap.
-func (tr *trace) Blocks() []report.Block {
+func (tr *trace) Blocks() iter.Seq[report.Block] {
 	return tr.blocks()
 }
