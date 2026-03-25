@@ -79,6 +79,20 @@ func WithCoalesce(mode CoalesceMode) Option {
 	}
 }
 
+// WithAllocator option set the allocator, e.g. first fit, best fit, etc.
+func WithAllocator(mode AllocateMode) Option {
+	return func(hp *Heap) {
+		switch mode {
+		case AllocateModeBestFit:
+			hp.alloc = newBestFitAllocator(hp.sc, hp.enc)
+		case AllocateModeFirstFit:
+			hp.alloc = newFirstFitAllocator(hp.sc, hp.enc)
+		default:
+			panic(fmt.Errorf("unsupported allocate mode - %s", mode))
+		}
+	}
+}
+
 // WithAlignment sets heap alignment. The alignment must be either 1 (no
 // alignment) or a multiple of 2.
 func WithAlignment(align int) Option {
@@ -112,10 +126,7 @@ func New(base, size int, opts ...Option) (*Heap, error) {
 		dec:       decoder(arena),
 		sc:        newBlockScanner(decoder(arena), size),
 		coal:      &noopCoalescer{},
-		alloc: &firstFitAllocator{
-			enc: encoder(arena),
-			s:   newBlockScanner(decoder(arena), size),
-		},
+		alloc:     newFirstFitAllocator(newBlockScanner(decoder(arena), size), encoder(arena)),
 	}
 	hp.enc.Encode(&Header{Size: size - headerSize}, headerSize)
 	for _, opt := range opts {

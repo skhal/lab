@@ -22,6 +22,7 @@ type command struct {
 	alignment int
 	numOps    int
 	coalMode  heap.CoalesceMode
+	allocMode heap.AllocateMode
 }
 
 func newCommand() *command {
@@ -31,6 +32,7 @@ func newCommand() *command {
 		alignment: 1, // no alignment
 		numOps:    5,
 		coalMode:  heap.CoalesceModeNoop,
+		allocMode: heap.AllocateModeFirstFit,
 	}
 }
 
@@ -50,6 +52,7 @@ func (cmd *command) parseFlags() error {
 	fs.Var(newAlignmentFlag(&cmd.alignment), "align", "alignment, multiple of 2")
 	fs.Var(newBoundedIntFlag(&cmd.numOps, 5, 25), "n", "number of random operations")
 	fs.Var(newCoalesceModeFlag(&cmd.coalMode), "c", "coalesce mode")
+	fs.Var(newAllocateModeFlag(&cmd.allocMode), "alloc", "allocate mode")
 	return fs.ParseAndValidate(os.Args[1:])
 }
 
@@ -57,6 +60,7 @@ func (cmd *command) run() error {
 	opts := []heap.Option{
 		// keep-sorted start
 		heap.WithAlignment(cmd.alignment),
+		heap.WithAllocator(cmd.allocMode),
 		heap.WithCoalesce(cmd.coalMode),
 		// keep-sorted end
 	}
@@ -67,10 +71,11 @@ func (cmd *command) run() error {
 	sim := newSimulator(h, cmd.numOps)
 	return report.Generate(os.Stdout, report.Data{
 		Heap: report.Heap{
-			Base:     cmd.heapBase,
-			Size:     cmd.heapSize,
-			CoalMode: cmd.coalMode.String(),
-			Blocks:   blocks(h),
+			Base:      cmd.heapBase,
+			Size:      cmd.heapSize,
+			CoalMode:  cmd.coalMode.String(),
+			AllocMode: cmd.allocMode.String(),
+			Blocks:    blocks(h),
 		},
 		Ops: trace(h, sim),
 	})

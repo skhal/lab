@@ -142,3 +142,45 @@ func (fl *alignmentFlag) Validate() error {
 	}
 	return nil
 }
+
+type allocateModeFlag struct {
+	v *heap.AllocateMode
+}
+
+func newAllocateModeFlag(v *heap.AllocateMode) *allocateModeFlag {
+	return &allocateModeFlag{v}
+}
+
+var allocateModes = []heap.AllocateMode{
+	heap.AllocateModeFirstFit,
+	heap.AllocateModeBestFit,
+}
+
+// Set parses the allocate mode from the string and stores it in the flag
+// variable. It returns an error if the string does not match supported modes.
+func (fl *allocateModeFlag) Set(s string) error {
+	for _, mode := range allocateModes {
+		if mode.String() == s {
+			*fl.v = mode
+			return nil
+		}
+	}
+	return fmt.Errorf("unsupported mode - %s", s)
+}
+
+// String returns a string representation of the flag value.
+func (fl *allocateModeFlag) String() string {
+	if fl.v == nil {
+		return ""
+	}
+	return fl.v.String()
+}
+
+// Validate checks that the allocate mode is set to one of the supported
+// values.
+func (fl *allocateModeFlag) Validate() error {
+	if !slices.Contains(allocateModes, *fl.v) {
+		return fmt.Errorf("unsupported mode - %d", fl.v)
+	}
+	return nil
+}
