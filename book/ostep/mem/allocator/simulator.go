@@ -23,7 +23,7 @@ const (
 	ptsTotal = ptsMalloc + ptsFree
 )
 
-const mallocMaxSize = 2 << 10
+const mallocMaxSize = 1 << 10 // 1KB
 
 type simulator struct {
 	heap *heap.Heap
@@ -37,17 +37,17 @@ type simulator struct {
 	ops []string
 }
 
-type simulatorOption func(*simulator)
+type simOption func(*simulator)
 
 // WithOps configures simulator to replay operations.
-func WithOps(ops []string) simulatorOption {
+func WithOps(ops []string) simOption {
 	return func(sim *simulator) {
 		sim.numToGen = len(ops)
 		sim.ops = ops
 	}
 }
 
-func newSimulator(h *heap.Heap, num int, opts ...simulatorOption) *simulator {
+func newSimulator(h *heap.Heap, num int, opts ...simOption) *simulator {
 	sim := &simulator{
 		heap:     h,
 		numToGen: num,

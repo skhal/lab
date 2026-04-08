@@ -70,7 +70,7 @@ func (cmd *command) run() error {
 	if err != nil {
 		return err
 	}
-	var simOps []simulatorOption
+	var simOps []simOption
 	if cmd.ops != nil {
 		simOps = append(simOps, WithOps(cmd.ops))
 	}
