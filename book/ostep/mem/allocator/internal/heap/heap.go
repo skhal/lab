@@ -39,8 +39,8 @@ type Heap struct {
 	size      int // heap size
 	alignment int
 
-	enc encoder
-	dec decoder
+	enc Encoder
+	dec Decoder
 
 	sc    scanner
 	coal  coalescer
@@ -126,11 +126,11 @@ func New(base, size int, opts ...Option) (*Heap, error) {
 		base:      base,
 		size:      size,
 		alignment: 1,
-		enc:       encoder(arena),
-		dec:       decoder(arena),
-		sc:        newBlockScanner(decoder(arena), size),
+		enc:       Encoder(arena),
+		dec:       Decoder(arena),
+		sc:        newBlockScanner(Decoder(arena), size),
 		coal:      &noopCoalescer{},
-		alloc:     newFirstFitAllocator(newBlockScanner(decoder(arena), size), encoder(arena)),
+		alloc:     newFirstFitAllocator(newBlockScanner(Decoder(arena), size), Encoder(arena)),
 	}
 	hp.enc.Encode(&Header{Size: size - headerSize}, headerSize)
 	for _, opt := range opts {

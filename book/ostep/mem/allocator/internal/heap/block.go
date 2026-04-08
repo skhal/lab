@@ -81,12 +81,12 @@ func (f *Footer) Unmarshal(b []byte) {
 	f.Size = int(d & uint16(sizeMask))
 }
 
-// encoder is a buffer that can encode headers.
-type encoder []byte
+// Encoder is a buffer that can encode headers.
+type Encoder []byte
 
 // Encode encodes the header to the buffer at a given address. It adds a footer
 // for free blocks.
-func (e encoder) Encode(h *Header, a int) {
+func (e Encoder) Encode(h *Header, a int) {
 	copy(e[a-headerSize:a], h.Marshal())
 	if h.Allocated {
 		return
@@ -98,11 +98,11 @@ func (e encoder) Encode(h *Header, a int) {
 	copy(e[a-footerSize:a], f.Marshal())
 }
 
-// decoder is a buffer that can decode headers.
-type decoder []byte
+// Decoder is a buffer that can decode headers.
+type Decoder []byte
 
 // Decode decodes a header into h for a block starting at a.
-func (d decoder) Decode(h *Header, a int) {
+func (d Decoder) Decode(h *Header, a int) {
 	h.Unmarshal(d[a-headerSize : a])
 }
 
@@ -113,17 +113,17 @@ func (d decoder) Decode(h *Header, a int) {
 //	 [header|payload|footer] [header|...]
 //									 ^               ^
 //									 f               a
-func (d decoder) DecodePrevFooter(f *Footer, a int) {
+func (d Decoder) DecodePrevFooter(f *Footer, a int) {
 	a -= headerSize
 	f.Unmarshal(d[a-footerSize : a])
 }
 
 type blockScanner struct {
-	dec decoder
+	dec Decoder
 	end int
 }
 
-func newBlockScanner(dec decoder, end int) *blockScanner {
+func newBlockScanner(dec Decoder, end int) *blockScanner {
 	return &blockScanner{dec, end}
 }
 

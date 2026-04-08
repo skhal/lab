@@ -25,8 +25,8 @@ type noopCoalescer struct{}
 func (c *noopCoalescer) Coalesce(*Header, int) {}
 
 type forwardCoalescer struct {
-	dec    decoder
-	enc    encoder
+	dec    Decoder
+	enc    Encoder
 	bounds int
 }
 
@@ -60,8 +60,8 @@ func (c *forwardCoalescer) coalesce(dst, src *Header, a int) {
 }
 
 type backwardCoalescer struct {
-	dec decoder
-	enc encoder
+	dec Decoder
+	enc Encoder
 }
 
 func newBackwardCoalescer(hp *Heap) *backwardCoalescer {

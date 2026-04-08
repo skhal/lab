@@ -23,7 +23,7 @@ const (
 )
 
 type noopAllocator struct {
-	enc encoder
+	enc Encoder
 }
 
 func (al *noopAllocator) allocate(a int, h *Header, size int) {
@@ -59,7 +59,7 @@ type firstFitAllocator struct {
 	s scanner
 }
 
-func newFirstFitAllocator(s scanner, enc encoder) *firstFitAllocator {
+func newFirstFitAllocator(s scanner, enc Encoder) *firstFitAllocator {
 	return &firstFitAllocator{&noopAllocator{enc}, s}
 }
 
@@ -86,7 +86,7 @@ type bestFitAllocator struct {
 	s scanner
 }
 
-func newBestFitAllocator(s scanner, enc encoder) *bestFitAllocator {
+func newBestFitAllocator(s scanner, enc Encoder) *bestFitAllocator {
 	return &bestFitAllocator{&noopAllocator{enc}, s}
 }
 
