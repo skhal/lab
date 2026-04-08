@@ -3,7 +3,9 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package main
+// Package sim simulates client application working with the heap using
+// malloc(3) API: malloc() and free().
+package sim
 
 import (
 	"fmt"
@@ -25,7 +27,14 @@ const (
 
 const mallocMaxSize = 1 << 10 // 1KB
 
-type simulator struct {
+// Simulator runs malloc operations on the heap. The operation can be random:
+//
+//	s := sim.NewSimulator(h, num)
+//
+// or manually set:
+//
+//	s := sim.NewSimulator(h, 0, sim.WithOps([]string{"+10"})
+type Simulator struct {
 	heap *heap.Heap
 
 	numToGen  int // number of operations to generate
@@ -37,18 +46,24 @@ type simulator struct {
 	ops []string
 }
 
-type simOption func(*simulator)
+// Option modifies simulator configuration in some way, e.g., set manual
+// operations.
+type Option func(*Simulator)
 
 // WithOps configures simulator to replay operations.
-func WithOps(ops []string) simOption {
-	return func(sim *simulator) {
+func WithOps(ops []string) Option {
+	return func(sim *Simulator) {
 		sim.numToGen = len(ops)
 		sim.ops = ops
 	}
 }
 
-func newSimulator(h *heap.Heap, num int, opts ...simOption) *simulator {
-	sim := &simulator{
+// NewSimulator creates a heap simulator to generate num random operations. Use
+// WithOps to override random operations with a list of manual operation in the
+// form "op,op,..." where "op" is either "+N" to allocate a block of size N or
+// "-N" to free N-th currently available allocation.
+func NewSimulator(h *heap.Heap, num int, opts ...Option) *Simulator {
+	sim := &Simulator{
 		heap:     h,
 		numToGen: num,
 	}
@@ -59,13 +74,13 @@ func newSimulator(h *heap.Heap, num int, opts ...simOption) *simulator {
 }
 
 // Allocated returns a slice of allocated addresses.
-func (sim *simulator) Allocated() []int {
+func (sim *Simulator) Allocated() []int {
 	return sim.allocated
 }
 
 // Next generates [simulator.numToGen] random operations, one at a time. It
 // returns true if the operation was generated, else false.
-func (sim *simulator) Next() bool {
+func (sim *Simulator) Next() bool {
 	if sim.generated == sim.numToGen {
 		sim.lastOp = nil
 		return false
@@ -80,7 +95,7 @@ func (sim *simulator) Next() bool {
 	return true
 }
 
-func (sim *simulator) replayOperation() operation {
+func (sim *Simulator) replayOperation() operation {
 	op := sim.ops[sim.generated]
 	switch {
 	case strings.HasPrefix(op, "+"):
@@ -102,7 +117,7 @@ func (sim *simulator) replayOperation() operation {
 	}
 }
 
-func (sim *simulator) generateOperation() operation {
+func (sim *Simulator) generateOperation() operation {
 	switch {
 	case len(sim.allocated) == 0:
 		// no allocated addresses available for free, malloc only.
@@ -112,7 +127,7 @@ func (sim *simulator) generateOperation() operation {
 	}
 }
 
-func (sim *simulator) randOp() operation {
+func (sim *Simulator) randOp() operation {
 	switch n := rand.IntN(ptsTotal); {
 	case n < ptsMalloc:
 		return sim.randMalloc()
@@ -121,12 +136,12 @@ func (sim *simulator) randOp() operation {
 	}
 }
 
-func (sim *simulator) randMalloc() operation {
+func (sim *Simulator) randMalloc() operation {
 	sz := 1 + rand.IntN(mallocMaxSize) // +1 for at least one byte
 	return sim.malloc(sz)
 }
 
-func (sim *simulator) malloc(sz int) operation {
+func (sim *Simulator) malloc(sz int) operation {
 	return mallocOperation{
 		size: sz,
 		runFunc: func() error {
@@ -140,12 +155,12 @@ func (sim *simulator) malloc(sz int) operation {
 	}
 }
 
-func (sim *simulator) randFree() operation {
+func (sim *Simulator) randFree() operation {
 	i := rand.IntN(len(sim.allocated))
 	return sim.free(i)
 }
 
-func (sim *simulator) free(idx int) operation {
+func (sim *Simulator) free(idx int) operation {
 	a := sim.allocated[idx]
 	return freeOperation{
 		addr: a,
@@ -172,7 +187,7 @@ func (sim *simulator) free(idx int) operation {
 }
 
 // Op returns the last generated operation in Next().
-func (sim *simulator) Op() operation {
+func (sim *Simulator) Op() operation {
 	return sim.lastOp
 }
 

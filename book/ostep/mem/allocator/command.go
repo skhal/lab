@@ -13,6 +13,7 @@ import (
 
 	"github.com/skhal/lab/book/ostep/mem/allocator/internal/heap"
 	"github.com/skhal/lab/book/ostep/mem/allocator/internal/report"
+	"github.com/skhal/lab/book/ostep/mem/allocator/internal/sim"
 	"github.com/skhal/lab/go/flags"
 )
 
@@ -70,11 +71,11 @@ func (cmd *command) run() error {
 	if err != nil {
 		return err
 	}
-	var simOps []simOption
+	var simOps []sim.Option
 	if cmd.ops != nil {
-		simOps = append(simOps, WithOps(cmd.ops))
+		simOps = append(simOps, sim.WithOps(cmd.ops))
 	}
-	sim := newSimulator(h, cmd.numOps, simOps...)
+	sim := sim.NewSimulator(h, cmd.numOps, simOps...)
 	return report.Generate(os.Stdout, report.Data{
 		Heap: report.Heap{
 			Base:      cmd.heapBase,
@@ -107,7 +108,7 @@ func blocks(h *heap.Heap) iter.Seq[report.Block] {
 	}
 }
 
-func runSimulation(h *heap.Heap, sim *simulator) iter.Seq[report.Frame] {
+func runSimulation(h *heap.Heap, sim *sim.Simulator) iter.Seq[report.Frame] {
 	op := func() report.Frame {
 		o := sim.Op()
 		return &trace{
