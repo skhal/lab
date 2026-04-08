@@ -7,6 +7,12 @@
 vim.o.number = true
 -- keep-sorted end
 
+-- fix +q4D73 shown at Neovim startup.
+-- Ref: https://github.com/neovim/neovim/issues/28776
+local termfeatures = vim.g.termfeatures or {}
+termfeatures.osc52 = false
+vim.g.termfeatures = termfeatures
+
 vim.o.listchars = "eol:¬,extends:›,precedes:‹,space:░,tab:«–»,trail:•"
 vim.keymap.set({ "n" }, "<leader>l", "<esc>:set list!<cr>")
 
