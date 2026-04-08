@@ -19,18 +19,28 @@ func TestHeader_Marshal(t *testing.T) {
 		want []byte
 	}{
 		{
-			name: "empty",
+			name: "zero value",
 			want: []byte{0x00, 0x00},
 		},
 		{
-			name: "free not empty",
+			name: "free",
 			h:    heap.Header{Size: 5},
 			want: []byte{0x00, 0x05},
 		},
 		{
-			name: "allocated not empty",
+			name: "free with allocated prev",
+			h:    heap.Header{AllocatedPrev: true, Size: 5},
+			want: []byte{1 << 6, 0x05},
+		},
+		{
+			name: "allocated",
 			h:    heap.Header{Allocated: true, Size: 5},
 			want: []byte{1 << 7, 0x05},
+		},
+		{
+			name: "allocated with allocated prev",
+			h:    heap.Header{Allocated: true, AllocatedPrev: true, Size: 5},
+			want: []byte{1<<7 | 1<<6, 0x05},
 		},
 	}
 	for _, tc := range tests {
@@ -51,18 +61,28 @@ func TestHeader_Unmarshal(t *testing.T) {
 		want heap.Header
 	}{
 		{
-			name: "zero data",
+			name: "zero value",
 			data: []byte{0x00, 0x00},
 		},
 		{
-			name: "free not empty",
+			name: "free",
 			data: []byte{0x00, 0x05},
 			want: heap.Header{Size: 5},
 		},
 		{
-			name: "allocated not empty",
+			name: "free with allocated prev",
+			data: []byte{1 << 6, 0x05},
+			want: heap.Header{AllocatedPrev: true, Size: 5},
+		},
+		{
+			name: "allocated",
 			data: []byte{1 << 7, 0x05},
 			want: heap.Header{Allocated: true, Size: 5},
+		},
+		{
+			name: "allocated with allocated prev",
+			data: []byte{1<<7 | 1<<6, 0x05},
+			want: heap.Header{Allocated: true, AllocatedPrev: true, Size: 5},
 		},
 	}
 	for _, tc := range tests {
@@ -89,7 +109,7 @@ func TestFooter_Marshal(t *testing.T) {
 			want: []byte{0x00, 0x00},
 		},
 		{
-			name: "non zero",
+			name: "size 5",
 			f:    heap.Footer{Size: 5},
 			want: []byte{0x00, 0x05},
 		},
@@ -112,11 +132,11 @@ func TestFooter_Unmarshal(t *testing.T) {
 		want heap.Footer
 	}{
 		{
-			name: "zero data",
+			name: "zero value",
 			data: []byte{0x00, 0x00},
 		},
 		{
-			name: "non zero data",
+			name: "size 5",
 			data: []byte{0x00, 0x05},
 			want: heap.Footer{Size: 5},
 		},
