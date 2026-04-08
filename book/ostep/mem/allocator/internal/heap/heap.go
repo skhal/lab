@@ -13,7 +13,7 @@ import (
 )
 
 var (
-	// ErrAddress mean passed address is invalid.
+	// ErrAddress means passed address is invalid.
 	ErrAddress = errors.New("invalid address")
 
 	// ErrNoMemory means heap has insufficient memory to accommodate malloc().
@@ -24,8 +24,12 @@ var (
 )
 
 const (
+	// MinSize is the minimum supported heap size. It must be able to accommodate
+	// at least the header and footer of a free block.
 	MinSize = headerSize + footerSize + 1 // +1 for at lest 1B
-	MaxSize = int(sizeMask)               // max supported heap size
+
+	// MaxSize is the maximum supported heap size.
+	MaxSize = int(sizeMask)
 )
 
 // Heap is a continuous address space, ready for memory allocations. It
