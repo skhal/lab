@@ -14,16 +14,16 @@
 #
 # keep-sorted start
 github.com/Kunde21/markdownfmt/v3/cmd/markdownfmt@latest
-github.com/bazelbuild/bazel-watcher/cmd/ibazel@v0.28.0
+github.com/bazelbuild/bazel-watcher/cmd/ibazel@latest
 github.com/bazelbuild/buildtools/buildifier@latest
 github.com/bazelbuild/buildtools/buildozer@latest
-github.com/go-delve/delve/cmd/dlv@v1.26.0 -ldflags '-extldflags -lkvm'
+github.com/go-delve/delve/cmd/dlv@latest -ldflags '-extldflags -lkvm'
 github.com/google/codesearch/cmd/cgrep@b34f2a0c5ce12be3c9dc28038640afece6bee523
 github.com/google/codesearch/cmd/cindex@b34f2a0c5ce12be3c9dc28038640afece6bee523
 github.com/google/codesearch/cmd/csearch@b34f2a0c5ce12be3c9dc28038640afece6bee523
 github.com/google/codesearch/cmd/csweb@b34f2a0c5ce12be3c9dc28038640afece6bee523
 github.com/google/keep-sorted@latest
-github.com/google/yamlfmt/cmd/yamlfmt@v0.21.0
+github.com/google/yamlfmt/cmd/yamlfmt@latest
 github.com/jstemmer/gotags@latest
 github.com/protocolbuffers/txtpbfmt/cmd/txtpbfmt@latest
 github.com/skhal/lab/check/cmd/check-go-test@latest
@@ -44,6 +44,6 @@ golang.org/x/tools/cmd/present@latest
 golang.org/x/tools/cmd/stringer@latest
 golang.org/x/tools/gopls@latest
 google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
-google.golang.org/protobuf/cmd/protoc-gen-go@v1.36.11
-mvdan.cc/sh/v3/cmd/shfmt@v3.12.0
+google.golang.org/protobuf/cmd/protoc-gen-go@latest
+mvdan.cc/sh/v3/cmd/shfmt@latest
 # keep-sorted end
