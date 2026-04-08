@@ -75,7 +75,7 @@ func (al *firstFitAllocator) Allocate(size int) (int, error) {
 			// not enough space
 			continue
 		}
-		al.allocate(a, h, size)
+		al.allocate(a, &h, size)
 		return a, nil
 	}
 	return 0, ErrAllocator
@@ -106,10 +106,10 @@ func (al *bestFitAllocator) Allocate(size int) (int, error) {
 		}
 		switch {
 		case bestFit.h == nil:
-			bestFit.h = h
+			bestFit.h = &h
 			bestFit.a = a
 		case bestFit.h.Size > h.Size:
-			bestFit.h = h
+			bestFit.h = &h
 			bestFit.a = a
 		}
 	}

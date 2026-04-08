@@ -128,15 +128,15 @@ func newBlockScanner(dec Decoder, end int) *blockScanner {
 }
 
 // Scan runs through blocks in the heap.
-func (bs *blockScanner) Scan() iter.Seq2[int, *Header] {
-	return func(yield func(int, *Header) bool) {
+func (bs *blockScanner) Scan() iter.Seq2[int, Header] {
+	return func(yield func(int, Header) bool) {
 		var h Header
 		for a := headerSize; a < bs.end; a += h.Size + headerSize {
 			bs.dec.Decode(&h, a)
 			if h.Size == 0 {
 				panic(fmt.Sprintf("invalid header at %d: %v", a, h))
 			}
-			if !yield(a, &h) {
+			if !yield(a, h) {
 				break
 			}
 		}

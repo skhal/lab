@@ -48,7 +48,7 @@ type Heap struct {
 }
 
 type scanner interface {
-	Scan() iter.Seq2[int, *Header]
+	Scan() iter.Seq2[int, Header]
 }
 
 type coalescer interface {
