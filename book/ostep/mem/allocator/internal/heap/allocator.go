@@ -29,7 +29,7 @@ type noopAllocator struct {
 func (al *noopAllocator) allocate(a int, h *Header, size int) {
 	switch {
 	case h.Size > size+headerSize:
-		al.split(*h, a, size)
+		al.split(a, *h, size)
 	default:
 		// not enough space to split
 		h.Allocated = true
@@ -37,18 +37,22 @@ func (al *noopAllocator) allocate(a int, h *Header, size int) {
 	}
 }
 
-func (al *noopAllocator) split(h Header, a int, size int) {
-	blockSize := h.Size
+func (al *noopAllocator) split(a int, h Header, size int) {
+	al.allocateBlock(a, h, size)
+	offset := size + headerSize
+	al.freeBlock(a+offset, h.Size-offset)
+}
 
+func (al *noopAllocator) allocateBlock(a int, h Header, size int) {
 	h.Allocated = true
 	h.Size = size
 	al.enc.Encode(&h, a)
+}
 
-	// free block
-	a += size + headerSize
-	h = Header{
+func (al *noopAllocator) freeBlock(a, size int) {
+	h := Header{
 		AllocatedPrev: true,
-		Size:          blockSize - size - headerSize,
+		Size:          size,
 	}
 	al.enc.Encode(&h, a)
 }
