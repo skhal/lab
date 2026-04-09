@@ -21,10 +21,14 @@ import (
 type Simulator struct {
 	heap *heap.Heap
 
-	generator *generator
-	replayer  *replayer
+	operator operator
 
 	allocated []int // allocated addresses
+}
+
+type operator interface {
+	Next() bool
+	Op() operation
 }
 
 // Option modifies simulator configuration in some way, e.g., set manual
@@ -34,7 +38,7 @@ type Option func(*Simulator)
 // WithOps configures simulator to replay operations.
 func WithOps(ops []string) Option {
 	return func(sim *Simulator) {
-		sim.replayer = newReplayer(ops, sim.malloc, sim.free)
+		sim.operator = newReplayer(ops, sim.malloc, sim.free)
 	}
 }
 
@@ -46,11 +50,13 @@ func NewSimulator(h *heap.Heap, num int, opts ...Option) *Simulator {
 	sim := &Simulator{
 		heap: h,
 	}
-	sim.generator = newGenerator(num, sim.malloc, sim.free, func() int {
-		return len(sim.allocated)
-	})
 	for _, opt := range opts {
 		opt(sim)
+	}
+	if sim.operator == nil {
+		sim.operator = newGenerator(num, sim.malloc, sim.free, func() int {
+			return len(sim.allocated)
+		})
 	}
 	return sim
 }
@@ -63,10 +69,7 @@ func (sim *Simulator) Allocated() []int {
 // Next generates [simulator.numToGen] random operations, one at a time. It
 // returns true if the operation was generated, else false.
 func (sim *Simulator) Next() bool {
-	if sim.replayer != nil {
-		return sim.replayer.Next()
-	}
-	return sim.generator.Next()
+	return sim.operator.Next()
 }
 
 func (sim *Simulator) malloc(sz int) operation {
@@ -111,8 +114,5 @@ func (sim *Simulator) free(idx int) operation {
 
 // Op returns the last generated operation in Next().
 func (sim *Simulator) Op() operation {
-	if sim.replayer != nil {
-		return sim.replayer.Op()
-	}
-	return sim.generator.Op()
+	return sim.operator.Op()
 }
