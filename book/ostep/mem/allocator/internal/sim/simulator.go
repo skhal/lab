@@ -23,7 +23,7 @@ type Simulator struct {
 
 	operator operator
 
-	allocated []int // allocated addresses
+	allocations []int // allocated addresses
 }
 
 type operator interface {
@@ -55,7 +55,7 @@ func NewSimulator(h *heap.Heap, num int, opts ...Option) *Simulator {
 	}
 	if sim.operator == nil {
 		sim.operator = newGenerator(num, sim.malloc, sim.free, func() int {
-			return len(sim.allocated)
+			return len(sim.allocations)
 		})
 	}
 	return sim
@@ -63,7 +63,7 @@ func NewSimulator(h *heap.Heap, num int, opts ...Option) *Simulator {
 
 // Allocated returns a slice of allocated addresses.
 func (sim *Simulator) Allocated() []int {
-	return sim.allocated
+	return sim.allocations
 }
 
 // Next generates [simulator.numToGen] random operations, one at a time. It
@@ -80,14 +80,14 @@ func (sim *Simulator) malloc(sz int) operation {
 			if err != nil {
 				return err
 			}
-			sim.allocated = append(sim.allocated, a)
+			sim.allocations = append(sim.allocations, a)
 			return nil
 		},
 	}
 }
 
 func (sim *Simulator) free(idx int) operation {
-	a := sim.allocated[idx]
+	a := sim.allocations[idx]
 	return freeOperation{
 		addr: a,
 		runFunc: func() error {
@@ -96,16 +96,16 @@ func (sim *Simulator) free(idx int) operation {
 				return err
 			}
 			switch {
-			case len(sim.allocated) == 1:
+			case len(sim.allocations) == 1:
 				// this operation released the only allocated address, reset the
 				// allocations list.
-				sim.allocated = nil
-			case idx == len(sim.allocated)-1:
+				sim.allocations = nil
+			case idx == len(sim.allocations)-1:
 				// released last allocation, truncate the allocations list.
-				sim.allocated = sim.allocated[:idx]
+				sim.allocations = sim.allocations[:idx]
 			default:
-				copy(sim.allocated[idx:], sim.allocated[idx+1:])
-				sim.allocated = sim.allocated[:len(sim.allocated)-1]
+				copy(sim.allocations[idx:], sim.allocations[idx+1:])
+				sim.allocations = sim.allocations[:len(sim.allocations)-1]
 			}
 			return nil
 		},

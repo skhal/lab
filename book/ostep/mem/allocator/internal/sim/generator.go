@@ -22,17 +22,17 @@ type generator struct {
 	ops int
 	op  operation
 
-	malloc   OpFunc
-	free     OpFunc
-	allocLen func() int
+	malloc      OpFunc
+	free        OpFunc
+	allocations func() int
 }
 
-func newGenerator(n int, malloc, free OpFunc, allocLen func() int) *generator {
+func newGenerator(n int, malloc, free OpFunc, allocations func() int) *generator {
 	return &generator{
-		ops:      n,
-		malloc:   malloc,
-		free:     free,
-		allocLen: allocLen,
+		ops:         n,
+		malloc:      malloc,
+		free:        free,
+		allocations: allocations,
 	}
 }
 
@@ -48,31 +48,25 @@ func (gen *generator) Next() bool {
 }
 
 func (gen *generator) next() operation {
-	switch {
-	case gen.allocLen() == 0:
+	if gen.allocations() == 0 {
 		// no allocated addresses available for free, malloc only.
-		return gen.randMalloc()
-	default:
-		return gen.randOp()
+		return gen.nextMalloc()
 	}
-}
-
-func (gen *generator) randOp() operation {
 	switch n := rand.IntN(ptsTotal); {
 	case n < ptsMalloc:
-		return gen.randMalloc()
+		return gen.nextMalloc()
 	default:
-		return gen.randFree()
+		return gen.nextFree()
 	}
 }
 
-func (gen *generator) randMalloc() operation {
+func (gen *generator) nextMalloc() operation {
 	sz := 1 + rand.IntN(mallocMaxSize) // +1 for at least one byte
 	return gen.malloc(sz)
 }
 
-func (gen *generator) randFree() operation {
-	i := rand.IntN(gen.allocLen())
+func (gen *generator) nextFree() operation {
+	i := rand.IntN(gen.allocations())
 	return gen.free(i)
 }
 
