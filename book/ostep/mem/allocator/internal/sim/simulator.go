@@ -10,8 +10,6 @@ package sim
 import (
 	"fmt"
 	"math/rand/v2"
-	"strconv"
-	"strings"
 
 	"github.com/skhal/lab/book/ostep/mem/allocator/internal/heap"
 )
@@ -43,7 +41,7 @@ type Simulator struct {
 	allocated []int     // allocated addresses
 	lastOp    operation // last generated operation
 
-	ops []string
+	replayer *replayer
 }
 
 // Option modifies simulator configuration in some way, e.g., set manual
@@ -54,7 +52,7 @@ type Option func(*Simulator)
 func WithOps(ops []string) Option {
 	return func(sim *Simulator) {
 		sim.numToGen = len(ops)
-		sim.ops = ops
+		sim.replayer = newReplayer(ops, sim.malloc, sim.free)
 	}
 }
 
@@ -86,35 +84,13 @@ func (sim *Simulator) Next() bool {
 		return false
 	}
 	switch {
-	case sim.ops != nil:
-		sim.lastOp = sim.replayOperation()
+	case sim.replayer != nil:
+		return sim.replayer.Next()
 	default:
 		sim.lastOp = sim.generateOperation()
 	}
 	sim.generated++
 	return true
-}
-
-func (sim *Simulator) replayOperation() operation {
-	op := sim.ops[sim.generated]
-	switch {
-	case strings.HasPrefix(op, "+"):
-		s := strings.TrimLeft(op, "+")
-		n, err := strconv.Atoi(s)
-		if err != nil {
-			panic(err)
-		}
-		return sim.malloc(n)
-	case strings.HasPrefix(op, "-"):
-		s := strings.TrimLeft(op, "-")
-		n, err := strconv.Atoi(s)
-		if err != nil {
-			panic(err)
-		}
-		return sim.free(n)
-	default:
-		panic(fmt.Errorf("invalid operation %q", op))
-	}
 }
 
 func (sim *Simulator) generateOperation() operation {
@@ -188,6 +164,9 @@ func (sim *Simulator) free(idx int) operation {
 
 // Op returns the last generated operation in Next().
 func (sim *Simulator) Op() operation {
+	if sim.replayer != nil {
+		return sim.replayer.Op()
+	}
 	return sim.lastOp
 }
 
