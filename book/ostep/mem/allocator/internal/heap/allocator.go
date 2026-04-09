@@ -71,16 +71,13 @@ func newFirstFitAllocator(s scanner, enc Encoder) *firstFitAllocator {
 // allocated and free blocks, and returns address of the former one.
 func (al *firstFitAllocator) Allocate(size int) (int, error) {
 	for a, h := range al.s.Scan() {
-		if h.Allocated {
-			// continue searching
-			continue
+		switch {
+		case h.Allocated: // continue searching
+		case h.Size < size: // not enough space
+		default:
+			al.allocate(a, &h, size)
+			return a, nil
 		}
-		if h.Size < size {
-			// not enough space
-			continue
-		}
-		al.allocate(a, &h, size)
-		return a, nil
 	}
 	return 0, ErrAllocator
 }
@@ -102,17 +99,13 @@ func (al *bestFitAllocator) Allocate(size int) (int, error) {
 		a int
 	}
 	for a, h := range al.s.Scan() {
-		if h.Allocated {
-			continue
-		}
-		if h.Size < size {
-			continue
-		}
 		switch {
+		case h.Allocated: // continue searching
+		case h.Size < size: // not enough space
 		case bestFit.h == nil:
 			bestFit.h = &h
 			bestFit.a = a
-		case bestFit.h.Size > h.Size:
+		case h.Size < bestFit.h.Size:
 			bestFit.h = &h
 			bestFit.a = a
 		}
