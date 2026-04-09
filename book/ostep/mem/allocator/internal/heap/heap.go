@@ -42,7 +42,7 @@ type Heap struct {
 	enc Encoder
 	dec Decoder
 
-	sc    scanner
+	scan  scanner
 	coal  coalescer
 	alloc allocator
 }
@@ -88,9 +88,9 @@ func WithAllocator(mode AllocateMode) Option {
 	return func(hp *Heap) {
 		switch mode {
 		case AllocateModeBestFit:
-			hp.alloc = newBestFitAllocator(hp.sc, hp.enc)
+			hp.alloc = newBestFitAllocator(hp.scan, hp.enc)
 		case AllocateModeFirstFit:
-			hp.alloc = newFirstFitAllocator(hp.sc, hp.enc)
+			hp.alloc = newFirstFitAllocator(hp.scan, hp.enc)
 		default:
 			panic(fmt.Errorf("unsupported allocate mode - %s", mode))
 		}
@@ -128,7 +128,7 @@ func New(base, size int, opts ...Option) (*Heap, error) {
 		alignment: 1,
 		enc:       Encoder(arena),
 		dec:       Decoder(arena),
-		sc:        newBlockScanner(Decoder(arena), size),
+		scan:      newBlockScanner(Decoder(arena), size),
 		coal:      &noopCoalescer{},
 		alloc:     newFirstFitAllocator(newBlockScanner(Decoder(arena), size), Encoder(arena)),
 	}
@@ -214,7 +214,7 @@ type BlockFlags struct {
 // Walk calls f for every block in the heap. Check block flags to distinguish
 // between free and allocated blocks.
 func (hp *Heap) Walk(f func(sz, addr int, fl BlockFlags)) {
-	for a, h := range hp.sc.Scan() {
+	for a, h := range hp.scan.Scan() {
 		f(h.Size, hp.base+a, BlockFlags{
 			Allocated:     h.Allocated,
 			AllocatedPrev: h.AllocatedPrev,
