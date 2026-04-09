@@ -9,7 +9,6 @@ package sim
 
 import (
 	"fmt"
-	"math/rand/v2"
 
 	"github.com/skhal/lab/book/ostep/mem/allocator/internal/heap"
 )
@@ -35,13 +34,10 @@ const mallocMaxSize = 1 << 10 // 1KB
 type Simulator struct {
 	heap *heap.Heap
 
-	numToGen  int // number of operations to generate
-	generated int // generated number of operations
+	generator *generator
+	replayer  *replayer
 
-	allocated []int     // allocated addresses
-	lastOp    operation // last generated operation
-
-	replayer *replayer
+	allocated []int // allocated addresses
 }
 
 // Option modifies simulator configuration in some way, e.g., set manual
@@ -51,7 +47,6 @@ type Option func(*Simulator)
 // WithOps configures simulator to replay operations.
 func WithOps(ops []string) Option {
 	return func(sim *Simulator) {
-		sim.numToGen = len(ops)
 		sim.replayer = newReplayer(ops, sim.malloc, sim.free)
 	}
 }
@@ -62,9 +57,11 @@ func WithOps(ops []string) Option {
 // "-N" to free N-th currently available allocation.
 func NewSimulator(h *heap.Heap, num int, opts ...Option) *Simulator {
 	sim := &Simulator{
-		heap:     h,
-		numToGen: num,
+		heap: h,
 	}
+	sim.generator = newGenerator(num, sim.malloc, sim.free, func() int {
+		return len(sim.allocated)
+	})
 	for _, opt := range opts {
 		opt(sim)
 	}
@@ -79,42 +76,10 @@ func (sim *Simulator) Allocated() []int {
 // Next generates [simulator.numToGen] random operations, one at a time. It
 // returns true if the operation was generated, else false.
 func (sim *Simulator) Next() bool {
-	if sim.generated == sim.numToGen {
-		sim.lastOp = nil
-		return false
-	}
-	switch {
-	case sim.replayer != nil:
+	if sim.replayer != nil {
 		return sim.replayer.Next()
-	default:
-		sim.lastOp = sim.generateOperation()
 	}
-	sim.generated++
-	return true
-}
-
-func (sim *Simulator) generateOperation() operation {
-	switch {
-	case len(sim.allocated) == 0:
-		// no allocated addresses available for free, malloc only.
-		return sim.randMalloc()
-	default:
-		return sim.randOp()
-	}
-}
-
-func (sim *Simulator) randOp() operation {
-	switch n := rand.IntN(ptsTotal); {
-	case n < ptsMalloc:
-		return sim.randMalloc()
-	default:
-		return sim.randFree()
-	}
-}
-
-func (sim *Simulator) randMalloc() operation {
-	sz := 1 + rand.IntN(mallocMaxSize) // +1 for at least one byte
-	return sim.malloc(sz)
+	return sim.generator.Next()
 }
 
 func (sim *Simulator) malloc(sz int) operation {
@@ -129,11 +94,6 @@ func (sim *Simulator) malloc(sz int) operation {
 			return nil
 		},
 	}
-}
-
-func (sim *Simulator) randFree() operation {
-	i := rand.IntN(len(sim.allocated))
-	return sim.free(i)
 }
 
 func (sim *Simulator) free(idx int) operation {
@@ -167,7 +127,7 @@ func (sim *Simulator) Op() operation {
 	if sim.replayer != nil {
 		return sim.replayer.Op()
 	}
-	return sim.lastOp
+	return sim.generator.Op()
 }
 
 type operation interface {
