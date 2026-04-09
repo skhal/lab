@@ -121,7 +121,11 @@ func New(base, size int, opts ...Option) (*Heap, error) {
 	if size > MaxSize {
 		return nil, fmt.Errorf("%w: heap size %d, max %d", ErrSize, size, MaxSize)
 	}
-	arena := make([]byte, size)
+	arena := func() []byte {
+		a := make([]byte, size)
+		Encoder(a).Encode(&Header{Size: size - headerSize}, headerSize)
+		return a
+	}()
 	hp := &Heap{
 		base:      base,
 		size:      size,
@@ -129,12 +133,15 @@ func New(base, size int, opts ...Option) (*Heap, error) {
 		enc:       Encoder(arena),
 		dec:       Decoder(arena),
 		scan:      newBlockScanner(Decoder(arena), size),
-		coal:      &noopCoalescer{},
-		alloc:     newFirstFitAllocator(newBlockScanner(Decoder(arena), size), Encoder(arena)),
 	}
-	hp.enc.Encode(&Header{Size: size - headerSize}, headerSize)
 	for _, opt := range opts {
 		opt(hp)
+	}
+	if hp.coal == nil {
+		hp.coal = &noopCoalescer{}
+	}
+	if hp.alloc == nil {
+		hp.alloc = newFirstFitAllocator(newBlockScanner(Decoder(arena), size), Encoder(arena))
 	}
 	return hp, nil
 }
