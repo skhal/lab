@@ -149,19 +149,20 @@ func New(base, size int, opts ...Option) (*Heap, error) {
 // Malloc allocates memory of requested size and returns address to newly
 // allocated block. It returns zero address along with non-nil error if
 // allocation fails, e.g., not enough space.
-func (hp *Heap) Malloc(size int) (int, error) {
-	size = hp.align(size)
-	if size >= hp.size-headerSize {
-		return 0, fmt.Errorf("malloc(%d): %w", size, ErrNoMemory)
+func (hp *Heap) Malloc(size int) (addr int, err error) {
+	defer func() {
+		if err != nil {
+			err = fmt.Errorf("malloc(%d): %w", size, err)
+		}
+	}()
+	sz := hp.align(size)
+	if sz >= hp.size-headerSize {
+		return 0, ErrNoMemory
 	}
-	if size < 1 {
-		return 0, fmt.Errorf("malloc(%d): %w", size, ErrSize)
+	if sz < 1 {
+		return 0, ErrSize
 	}
-	a, err := hp.alloc.Allocate(size)
-	if err != nil {
-		return 0, fmt.Errorf("malloc(%d): %w", size, err)
-	}
-	return a + hp.base, nil
+	return hp.malloc(sz)
 }
 
 func (hp *Heap) align(n int) int {
@@ -173,27 +174,37 @@ func (hp *Heap) align(n int) int {
 	return n + padding
 }
 
+func (hp *Heap) malloc(size int) (int, error) {
+	a, err := hp.alloc.Allocate(size)
+	if err != nil {
+		return 0, err
+	}
+	return hp.base + a, nil
+}
+
 // Free releases memory at previously allocated address addr. It returns an
 // errof if the address is invalid or memory is not allocated.
-func (hp *Heap) Free(addr int) error {
+func (hp *Heap) Free(addr int) (err error) {
+	defer func() {
+		if err != nil {
+			err = fmt.Errorf("free(%d): %w", addr, err)
+		}
+	}()
 	a := addr - hp.base
 	if a < headerSize {
-		return fmt.Errorf("free(%d): %w", addr, ErrAddress)
+		return ErrAddress
 	}
 	if a >= hp.size {
-		return fmt.Errorf("free(%d): %w", addr, ErrAddress)
+		return ErrAddress
 	}
-	if err := hp.free(a); err != nil {
-		return fmt.Errorf("free(%d): %w: %s", addr, ErrAddress, err)
-	}
-	return nil
+	return hp.free(a)
 }
 
 func (hp *Heap) free(a int) error {
 	var h Header
 	hp.dec.Decode(&h, a)
 	if !h.Allocated {
-		return fmt.Errorf("block is not allocated")
+		return fmt.Errorf("%w: block is not allocated", ErrAddress)
 	}
 
 	h.Allocated = false
