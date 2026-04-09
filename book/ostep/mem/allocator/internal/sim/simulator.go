@@ -8,8 +8,6 @@
 package sim
 
 import (
-	"fmt"
-
 	"github.com/skhal/lab/book/ostep/mem/allocator/internal/heap"
 )
 
@@ -128,36 +126,4 @@ func (sim *Simulator) Op() operation {
 		return sim.replayer.Op()
 	}
 	return sim.generator.Op()
-}
-
-type operation interface {
-	fmt.Stringer
-	Run() error // execute the operation.
-}
-
-type mallocOperation struct {
-	size int
-	runFunc
-}
-
-// String returns operation name.
-func (op mallocOperation) String() string {
-	return fmt.Sprintf("malloc(%d)", op.size)
-}
-
-type freeOperation struct {
-	addr int
-	runFunc
-}
-
-// String returns operation name.
-func (op freeOperation) String() string {
-	return fmt.Sprintf("free(%d)", op.addr)
-}
-
-type runFunc func() error
-
-// Run executes the operation.
-func (r runFunc) Run() error {
-	return r()
 }
