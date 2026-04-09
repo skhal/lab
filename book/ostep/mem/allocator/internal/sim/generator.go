@@ -7,6 +7,17 @@ package sim
 
 import "math/rand/v2"
 
+const mallocMaxSize = 1 << 10 // 1KB
+
+const (
+	// random points (weights) assignment to skew generation toward more
+	// allocations than free.
+	ptsMalloc = 6
+	ptsFree   = 4
+
+	ptsTotal = ptsMalloc + ptsFree
+)
+
 type generator struct {
 	ops int
 	op  operation

@@ -11,17 +11,6 @@ import (
 	"github.com/skhal/lab/book/ostep/mem/allocator/internal/heap"
 )
 
-const (
-	// random points (weights) assignment to skew generation toward more
-	// allocations than free.
-	ptsMalloc = 6
-	ptsFree   = 4
-
-	ptsTotal = ptsMalloc + ptsFree
-)
-
-const mallocMaxSize = 1 << 10 // 1KB
-
 // Simulator runs malloc operations on the heap. The operation can be random:
 //
 //	s := sim.NewSimulator(h, num)
