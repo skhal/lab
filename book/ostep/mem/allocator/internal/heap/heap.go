@@ -201,26 +201,35 @@ func (hp *Heap) Free(addr int) (err error) {
 }
 
 func (hp *Heap) free(a int) error {
+	h, err := hp.freeBlock(a)
+	if err != nil {
+		return err
+	}
+	hp.freeBlockUpdateNext(a, h.Size)
+	hp.coal.Coalesce(&h, a)
+	return nil
+}
+
+func (hp *Heap) freeBlock(a int) (Header, error) {
 	var h Header
 	hp.dec.Decode(&h, a)
 	if !h.Allocated {
-		return fmt.Errorf("%w: block is not allocated", ErrAddress)
+		return h, fmt.Errorf("%w: block is not allocated", ErrAddress)
 	}
-
 	h.Allocated = false
 	hp.enc.Encode(&h, a)
+	return h, nil
+}
 
-	// remove AllocatedPrev from the header of the next block
-	if b := a + h.Size + headerSize; b < hp.size {
-		var hb Header
-		hp.dec.Decode(&hb, b)
-		hb.AllocatedPrev = false
-		hp.enc.Encode(&hb, b)
+func (hp *Heap) freeBlockUpdateNext(a, blockSize int) {
+	a += blockSize + headerSize
+	if a >= hp.size {
+		return
 	}
-
-	hp.coal.Coalesce(&h, a)
-
-	return nil
+	var h Header
+	hp.dec.Decode(&h, a)
+	h.AllocatedPrev = false
+	hp.enc.Encode(&h, a)
 }
 
 // BlockFlags
