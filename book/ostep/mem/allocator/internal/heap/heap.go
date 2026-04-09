@@ -91,6 +91,8 @@ func WithAllocator(mode AllocateMode) Option {
 			hp.alloc = newBestFitAllocator(hp.scan, hp.enc)
 		case AllocateModeFirstFit:
 			hp.alloc = newFirstFitAllocator(hp.scan, hp.enc)
+		case AllocateMostWorstFit:
+			hp.alloc = newWorstFitAllocator(hp.scan, hp.enc)
 		default:
 			panic(fmt.Errorf("unsupported allocate mode - %s", mode))
 		}

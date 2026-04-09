@@ -20,6 +20,7 @@ const (
 
 	AllocateModeFirstFit // first-fit
 	AllocateModeBestFit  // best-fit
+	AllocateMostWorstFit // worst-fit
 )
 
 type noopAllocator struct {
@@ -115,4 +116,39 @@ func (al *bestFitAllocator) Allocate(size int) (int, error) {
 	}
 	al.allocate(bestFit.a, bestFit.h, size)
 	return bestFit.a, nil
+}
+
+type worstFitAllocator struct {
+	*noopAllocator
+	s scanner
+}
+
+func newWorstFitAllocator(s scanner, enc Encoder) *worstFitAllocator {
+	return &worstFitAllocator{&noopAllocator{enc}, s}
+}
+
+// Allocate allocates memory in the largest free block that can fit the
+// requested size.
+func (al *worstFitAllocator) Allocate(size int) (int, error) {
+	var worstFit struct {
+		h *Header
+		a int
+	}
+	for a, h := range al.s.Scan() {
+		switch {
+		case h.Allocated: // continue searching
+		case h.Size < size: // not enough space
+		case worstFit.h == nil:
+			worstFit.h = &h
+			worstFit.a = a
+		case h.Size > worstFit.h.Size:
+			worstFit.h = &h
+			worstFit.a = a
+		}
+	}
+	if worstFit.h == nil {
+		return 0, ErrAllocator
+	}
+	al.allocate(worstFit.a, worstFit.h, size)
+	return worstFit.a, nil
 }

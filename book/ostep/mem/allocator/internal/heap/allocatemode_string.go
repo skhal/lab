@@ -10,11 +10,12 @@ func _() {
 	var x [1]struct{}
 	_ = x[AllocateModeFirstFit-1]
 	_ = x[AllocateModeBestFit-2]
+	_ = x[AllocateMostWorstFit-3]
 }
 
-const _AllocateMode_name = "first-fitbest-fit"
+const _AllocateMode_name = "first-fitbest-fitworst-fit"
 
-var _AllocateMode_index = [...]uint8{0, 9, 17}
+var _AllocateMode_index = [...]uint8{0, 9, 17, 26}
 
 func (i AllocateMode) String() string {
 	idx := int(i) - 1
