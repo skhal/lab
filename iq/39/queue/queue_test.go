@@ -44,7 +44,6 @@ func TestQ_Empty(t *testing.T) {
 		},
 	}
 	for _, tc := range tests {
-		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			q := queue.New(tc.nn...)
 
@@ -81,7 +80,6 @@ func TestQ_Front(t *testing.T) {
 		},
 	}
 	for _, tc := range tests {
-		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			q := queue.New(tc.nn...)
 
@@ -119,7 +117,6 @@ func TestQ_Pop(t *testing.T) {
 		},
 	}
 	for _, tc := range tests {
-		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			q := queue.New(tc.nn...)
 
@@ -162,7 +159,6 @@ func TestQ_Push(t *testing.T) {
 		},
 	}
 	for _, tc := range tests {
-		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			q := queue.New(tc.nn...)
 
@@ -196,7 +192,6 @@ func TestQ_Size(t *testing.T) {
 		},
 	}
 	for _, tc := range tests {
-		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			q := queue.New(tc.nn...)
 

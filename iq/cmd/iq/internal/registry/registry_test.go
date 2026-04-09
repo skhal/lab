@@ -74,7 +74,6 @@ func TestWrite(t *testing.T) {
 		},
 	}
 	for _, tc := range tests {
-		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			reg := mustCreateRegistry(t, tc.opts...)
 			tmpfile := filepath.Join(t.TempDir(), "registry.txtpb")
@@ -119,7 +118,6 @@ func TestWrite_afterLoad(t *testing.T) {
 		},
 	}
 	for _, tc := range tests {
-		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			reg := mustLoad(t, tc.file)
 			tmpfile := filepath.Join(t.TempDir(), "registry.txtpb")
@@ -201,7 +199,6 @@ func TestRegistry_GetByID(t *testing.T) {
 		},
 	}
 	for _, tc := range tests {
-		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			reg := mustCreateRegistry(t, registry.QuestionSetOption(tc.qq))
 
@@ -251,7 +248,6 @@ func TestRegistry_GetByTag(t *testing.T) {
 		},
 	}
 	for _, tc := range tests {
-		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			reg := mustCreateRegistry(t, registry.QuestionSetOption(tc.qq))
 
@@ -305,7 +301,6 @@ func TestRegistry_GetTags(t *testing.T) {
 		},
 	}
 	for _, tc := range tests {
-		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			reg := mustCreateRegistry(t, registry.QuestionSetOption(tc.qq))
 

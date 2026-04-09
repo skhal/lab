@@ -96,7 +96,6 @@ func lessTriplets(x, y *Triplet) int {
 
 func TestFind(t *testing.T) {
 	for _, tc := range tests {
-		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			got := threesum.Find(tc.nn)
 			if diff := cmp.Diff(tc.want, got, cmpopts.SortSlices(lessTriplets)); diff != "" {
@@ -108,7 +107,6 @@ func TestFind(t *testing.T) {
 
 func TestFindWithOptimizations(t *testing.T) {
 	for _, tc := range tests {
-		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			got := threesum.FindWithOptimizations(tc.nn)
 			if diff := cmp.Diff(tc.want, got, cmpopts.SortSlices(lessTriplets)); diff != "" {

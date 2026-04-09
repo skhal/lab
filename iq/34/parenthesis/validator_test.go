@@ -102,7 +102,6 @@ func TestValidate(t *testing.T) {
 		},
 	}
 	for _, tc := range tests {
-		tc := tc
 		t.Run(tc.name, func(t *testing.T) { testInputs(t, tc.inputs, tc.want) })
 	}
 }
@@ -110,7 +109,6 @@ func TestValidate(t *testing.T) {
 func testInputs(t *testing.T, inputs []string, want bool) {
 	t.Helper()
 	for i, s := range inputs {
-		s := s
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			got := parenthesis.Validate(s)
 

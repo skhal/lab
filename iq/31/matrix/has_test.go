@@ -358,7 +358,6 @@ func TestMatrix(t *testing.T) {
 		},
 	}
 	for _, tc := range tests {
-		tc := tc
 		t.Run(tc.name, func(t *testing.T) { testMatrix(t, tc.tests) })
 	}
 }
@@ -366,7 +365,6 @@ func TestMatrix(t *testing.T) {
 func testMatrix(t *testing.T, tests []test) {
 	t.Helper()
 	for _, tc := range tests {
-		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			got := matrix.Has(tc.m, tc.n)
 

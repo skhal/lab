@@ -93,7 +93,7 @@ func (r *Row) String() string {
 		return emptyRow
 	}
 	buf := new(bytes.Buffer)
-	for c := ColA; c < NumCols; c++ {
+	for c := range NumCols {
 		n := r[c]
 		switch n {
 		case boxEmpty:
@@ -231,7 +231,7 @@ func (b *Board) String() string {
 			space = ' '
 		)
 		b.WriteString(blockSpaceOffset)
-		for c := ColA; c < NumCols; c++ {
+		for c := range NumCols {
 			b.WriteString(c.String())
 			switch c {
 			case ColC, ColF:
@@ -249,7 +249,7 @@ func (b *Board) String() string {
 	}
 	buf := new(bytes.Buffer)
 	writeHeader(buf)
-	for r := Row1; r < NumRows; r++ {
+	for r := range NumRows {
 		row := b.rows[r]
 		fmt.Fprintf(buf, "%v | %v |\n", r, row)
 		switch r {
@@ -286,7 +286,7 @@ func (v *validator) validate(b *Board) bool {
 }
 
 func (v *validator) validateRows(b *Board) bool {
-	for r := Row1; r < NumRows; r++ {
+	for r := range NumRows {
 		row := b.rows[r]
 		if row == nil {
 			continue
@@ -317,7 +317,7 @@ func (v *validator) fillBox(r RowID, c ColID, n int) {
 }
 
 func (v *validator) validateColumns() bool {
-	for c := ColA; c < NumCols; c++ {
+	for c := range NumCols {
 		if !v.isValidColumn(c) {
 			return false
 		}
@@ -327,7 +327,7 @@ func (v *validator) validateColumns() bool {
 
 func (v *validator) isValidColumn(c ColID) bool {
 	seen := make(map[int]struct{})
-	for r := Row1; r < NumRows; r++ {
+	for r := range NumRows {
 		row, ok := v.boxes[r]
 		if !ok {
 			continue

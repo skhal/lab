@@ -187,7 +187,6 @@ func TestEquateFloat64(t *testing.T) {
 		},
 	}
 	for i, tc := range testcases {
-		tc := tc
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			diff := cmp.Diff(tc.x, tc.y, tests.EquateFloat64(tc.tolerance))
 

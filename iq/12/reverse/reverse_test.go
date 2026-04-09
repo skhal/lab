@@ -17,13 +17,13 @@ func EquateLists() cmp.Option {
 	return cmp.FilterValues(areLists, cmp.Comparer(compareLists))
 }
 
-func areLists(x, y interface{}) bool {
+func areLists(x, y any) bool {
 	_, okX := x.(reverse.List)
 	_, okY := y.(reverse.List)
 	return okX && okY
 }
 
-func compareLists(x, y interface{}) bool {
+func compareLists(x, y any) bool {
 	listX := x.(reverse.List)
 	listY := y.(reverse.List)
 	nodeX, nodeY := listX.Head, listY.Head
@@ -71,7 +71,6 @@ func TestReverse(t *testing.T) {
 		},
 	}
 	for _, tc := range tests {
-		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			listString := fmt.Sprint(tc.list)
 

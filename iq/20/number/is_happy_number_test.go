@@ -29,7 +29,6 @@ func TestIsHappyNumber(t *testing.T) {
 		{936, false},
 	}
 	for _, tc := range tests {
-		tc := tc
 		t.Run(strconv.Itoa(tc.n), func(t *testing.T) {
 			got := number.IsHappyNumber(tc.n)
 

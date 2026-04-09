@@ -65,7 +65,6 @@ func TestFind(t *testing.T) {
 		},
 	}
 	for _, tc := range tests {
-		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			got := twosum.Find(tc.nn, tc.n)
 			if diff := cmp.Diff(tc.want, got); diff != "" {

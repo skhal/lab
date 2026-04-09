@@ -39,7 +39,6 @@ func TestActino_MarshalJSON(t *testing.T) {
 		},
 	}
 	for _, tc := range tests {
-		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			got, err := json.Marshal(tc.action)
 
@@ -81,7 +80,6 @@ func TestActino_UnmarshalJSON(t *testing.T) {
 		},
 	}
 	for _, tc := range tests {
-		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			var got build.Action
 			b := fmt.Sprintf("%q", tc.b)

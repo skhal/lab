@@ -582,7 +582,6 @@ func TestFind(t *testing.T) {
 		},
 	}
 	for _, tg := range tests {
-		tg := tg
 		t.Run(tg.group, func(t *testing.T) { testFind(t, tg.tests) })
 	}
 }
@@ -590,7 +589,6 @@ func TestFind(t *testing.T) {
 func testFind(t *testing.T, tests []testCase) {
 	t.Helper()
 	for _, tc := range tests {
-		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			got := bounds.Find(tc.nn, tc.n)
 

@@ -82,10 +82,7 @@ func (w *window) expandOne(r rune, rs int) bool {
 	canExpand := func(r rune) bool {
 		rfreq := w.freq[r] + 1
 		count := w.count + 1
-		nmax := w.freqMax
-		if rfreq > nmax {
-			nmax = rfreq
-		}
+		nmax := max(rfreq, w.freqMax)
 		replacements := count - nmax
 		return replacements <= w.nrepl
 	}

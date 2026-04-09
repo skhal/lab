@@ -39,7 +39,7 @@ func run(b *balancer.B, numRequests int) {
 
 func sendRequests(b *balancer.B, num int) {
 	c := b.Client()
-	for n := 0; n < num; n++ {
+	for range num {
 		req := balancer.NewRequest(task)
 		c.Send(req)
 	}

@@ -207,7 +207,6 @@ var tests = []struct {
 
 func TestClean(t *testing.T) {
 	for _, tc := range tests {
-		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			m := DeepCopy(t, tc.m)
 

@@ -76,7 +76,6 @@ func TestIs(t *testing.T) {
 		},
 	}
 	for _, tc := range tests {
-		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			got := palindrome.Is(tc.str)
 			if got != tc.want {

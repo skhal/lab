@@ -158,7 +158,6 @@ func TestW(t *testing.T) {
 		},
 	}
 	for _, tc := range tests {
-		tc := tc
 		t.Run(fmt.Sprintf("size=%d", tc.size), func(t *testing.T) {
 			testW(t, tc.size, tc.tests)
 		})
@@ -168,7 +167,6 @@ func TestW(t *testing.T) {
 func testW(t *testing.T, size int, tests []test) {
 	t.Helper()
 	for _, tc := range tests {
-		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			w := mustCreateWindow(t, tc.nn, size)
 			got := make([]int, 0, len(tc.nn))

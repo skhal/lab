@@ -34,7 +34,7 @@ func cleanRow(m [][]int, r int) {
 }
 
 func cleanColumn(m [][]int, c int) {
-	for r := 0; r < len(m); r++ {
+	for r := range m {
 		m[r][c] = 0
 	}
 }

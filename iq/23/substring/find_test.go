@@ -130,10 +130,8 @@ func TestFind(t *testing.T) {
 		},
 	}
 	for _, gtc := range tests {
-		gtc := gtc
 		t.Run(gtc.group, func(t *testing.T) {
 			for _, tc := range gtc.tests {
-				tc := tc
 				t.Run(tc.name, func(t *testing.T) {
 					got := substring.Find(tc.s, tc.n)
 

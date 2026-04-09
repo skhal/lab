@@ -221,7 +221,6 @@ func TestEvent_MarshalJSON(t *testing.T) {
 		},
 	}
 	for _, tc := range tests {
-		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			data, err := json.Marshal(tc.event)
 
@@ -300,7 +299,6 @@ func TestTestEvent_UnmarshalJSON(t *testing.T) {
 		},
 	}
 	for _, tc := range tests {
-		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			var testEvent *test.TestEvent
 

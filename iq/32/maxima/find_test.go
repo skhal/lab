@@ -6,6 +6,7 @@
 package maxima_test
 
 import (
+	"slices"
 	"testing"
 
 	"github.com/skhal/lab/iq/32/maxima"
@@ -86,7 +87,6 @@ func TestFind(t *testing.T) {
 		},
 	}
 	for _, tc := range tests {
-		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			got := maxima.Find(tc.nn)
 
@@ -99,10 +99,5 @@ func TestFind(t *testing.T) {
 
 func anyOf(t *testing.T, nn []int, x int) bool {
 	t.Helper()
-	for _, n := range nn {
-		if n == x {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(nn, x)
 }

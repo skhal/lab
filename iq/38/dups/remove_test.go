@@ -43,7 +43,6 @@ func TestRemove(t *testing.T) {
 		{s: "abbc", want: "ac"},
 	}
 	for i, tc := range tests {
-		tc := tc
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			got := dups.Remove(tc.s)
 

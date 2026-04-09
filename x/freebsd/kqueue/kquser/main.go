@@ -103,7 +103,7 @@ func send(kq *KQueue, eid EventID) {
 func receive(kq *KQueue) {
 	// Poll at most N times to prevent deadlock if send fails. Avoid context in demo.
 	const maxPolls = 5
-	for n := 0; n < maxPolls; n++ {
+	for range maxPolls {
 		timeout := time.Duration((5 + rand.Intn(10))) * time.Millisecond
 		event, ok := kq.Poll(timeout)
 		if !ok {

@@ -141,7 +141,6 @@ func TestIntWeighted(t *testing.T) {
 		},
 	}
 	for _, tc := range tests {
-		tc := tc
 		t.Run(tc.name, func(t *testing.T) { testIntWeighted(t, tc.tests) })
 	}
 }
@@ -149,7 +148,6 @@ func TestIntWeighted(t *testing.T) {
 func testIntWeighted(t *testing.T, tests []test) {
 	t.Helper()
 	for _, tc := range tests {
-		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			var gotWMax int
 			got := random.IntWeighted(tc.ww, func(n int) int { gotWMax = n; return tc.rand })

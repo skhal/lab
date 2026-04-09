@@ -60,7 +60,6 @@ func TestFind(t *testing.T) {
 		},
 	}
 	for _, tc := range tests {
-		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			got := container.Find(tc.nn)
 			if want := container.Volume(tc.want); got != want {

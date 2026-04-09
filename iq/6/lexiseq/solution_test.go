@@ -64,7 +64,6 @@ func TestNext(t *testing.T) {
 		},
 	}
 	for _, tc := range tests {
-		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			got := lexiseq.Next(tc.s)
 			if tc.want != got {
