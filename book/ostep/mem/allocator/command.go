@@ -52,7 +52,7 @@ func (cmd *command) parseFlags() error {
 	fs.Var(newBoundedIntFlag(&cmd.heapBase, 0, 10000), "base", "heap base address")
 	fs.Var(newBoundedIntFlag(&cmd.heapSize, 100, 10000), "size", "heab size")
 	fs.Var(newAlignmentFlag(&cmd.alignment), "align", "alignment, multiple of 2")
-	fs.Var(newBoundedIntFlag(&cmd.numOps, 5, 25), "n", "number of random operations")
+	fs.Var(newBoundedIntFlag(&cmd.numOps, 5, 50), "n", "number of random operations")
 	fs.Var(newCoalesceModeFlag(&cmd.coalMode), "c", "coalesce mode")
 	fs.Var(newAllocateModeFlag(&cmd.allocMode), "alloc", "allocate mode")
 	fs.Var(newOperationListFlag(&cmd.ops), "ops", "list of operations: +N,-N")
