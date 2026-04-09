@@ -19,8 +19,9 @@ const (
 	_ AllocateMode = iota
 
 	AllocateModeFirstFit // first-fit
+	AllocateModeNextFit  // next-fit
 	AllocateModeBestFit  // best-fit
-	AllocateMostWorstFit // worst-fit
+	AllocateModeWorstFit // worst-fit
 )
 
 type noopAllocator struct {

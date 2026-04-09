@@ -142,3 +142,49 @@ func (bs *blockScanner) Scan() iter.Seq2[int, Header] {
 		}
 	}
 }
+
+type loopedBlockScanner struct {
+	dec  Decoder
+	end  int
+	addr int
+}
+
+func newLoopedBlockScanner(dec Decoder, end int) *loopedBlockScanner {
+	return &loopedBlockScanner{dec, end, headerSize}
+}
+
+// Scan generates a sequence of blocks in the heap, starting from the last read
+// position. It loops at the end of the heap and continues scan from the
+// beginning until it reaches the starting position.
+//
+// # WARNING
+//
+// Unlike [blockScanner], [loopedBlockscanner] remembers last read block. The
+// behavior is undefined if the contents of the heap changes between the scans,
+// e.g., blocks are freed with coalesce policy.
+func (bs *loopedBlockScanner) Scan() iter.Seq2[int, Header] {
+	return func(yield func(int, Header) bool) {
+		var (
+			a      = bs.addr
+			looped = false
+		)
+		defer func() {
+			bs.addr = a
+		}()
+		for !looped || a != bs.addr {
+			var h Header
+			bs.dec.Decode(&h, a)
+			if h.Size == 0 {
+				panic(fmt.Sprintf("invalid header at %d: %v", a, h))
+			}
+			if !yield(a, h) {
+				break
+			}
+			a += h.Size + headerSize
+			if a > bs.end {
+				a = headerSize
+				looped = true
+			}
+		}
+	}
+}

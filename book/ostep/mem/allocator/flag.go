@@ -154,8 +154,9 @@ func newAllocateModeFlag(v *heap.AllocateMode) *allocateModeFlag {
 
 var allocateModes = []heap.AllocateMode{
 	heap.AllocateModeFirstFit,
+	heap.AllocateModeNextFit,
 	heap.AllocateModeBestFit,
-	heap.AllocateMostWorstFit,
+	heap.AllocateModeWorstFit,
 }
 
 // Set parses the allocate mode from the string and stores it in the flag

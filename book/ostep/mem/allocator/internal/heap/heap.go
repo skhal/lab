@@ -45,6 +45,8 @@ type Heap struct {
 	scan  scanner
 	coal  coalescer
 	alloc allocator
+
+	freeCallback func()
 }
 
 type scanner interface {
@@ -87,11 +89,20 @@ func WithCoalesce(mode CoalesceMode) Option {
 func WithAllocator(mode AllocateMode) Option {
 	return func(hp *Heap) {
 		switch mode {
-		case AllocateModeBestFit:
-			hp.alloc = newBestFitAllocator(hp.scan, hp.enc)
 		case AllocateModeFirstFit:
 			hp.alloc = newFirstFitAllocator(hp.scan, hp.enc)
-		case AllocateMostWorstFit:
+		case AllocateModeNextFit:
+			newAllocator := func() allocator {
+				scan := newLoopedBlockScanner(hp.dec, hp.size)
+				return newFirstFitAllocator(scan, hp.enc)
+			}
+			hp.alloc = newAllocator()
+			hp.freeCallback = func() {
+				hp.alloc = newAllocator()
+			}
+		case AllocateModeBestFit:
+			hp.alloc = newBestFitAllocator(hp.scan, hp.enc)
+		case AllocateModeWorstFit:
 			hp.alloc = newWorstFitAllocator(hp.scan, hp.enc)
 		default:
 			panic(fmt.Errorf("unsupported allocate mode - %s", mode))
@@ -209,6 +220,9 @@ func (hp *Heap) free(a int) error {
 	}
 	hp.freeBlockUpdateNext(a, h.Size)
 	hp.coal.Coalesce(&h, a)
+	if hp.freeCallback != nil {
+		hp.freeCallback()
+	}
 	return nil
 }
 

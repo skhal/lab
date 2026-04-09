@@ -9,13 +9,14 @@ func _() {
 	// Re-run the stringer command to generate them again.
 	var x [1]struct{}
 	_ = x[AllocateModeFirstFit-1]
-	_ = x[AllocateModeBestFit-2]
-	_ = x[AllocateMostWorstFit-3]
+	_ = x[AllocateModeNextFit-2]
+	_ = x[AllocateModeBestFit-3]
+	_ = x[AllocateModeWorstFit-4]
 }
 
-const _AllocateMode_name = "first-fitbest-fitworst-fit"
+const _AllocateMode_name = "first-fitnext-fitbest-fitworst-fit"
 
-var _AllocateMode_index = [...]uint8{0, 9, 17, 26}
+var _AllocateMode_index = [...]uint8{0, 9, 17, 25, 34}
 
 func (i AllocateMode) String() string {
 	idx := int(i) - 1
