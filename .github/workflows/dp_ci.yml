@@ -1,0 +1,31 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+name: Design Patterns CI
+
+on:
+  push:
+    branches: ["main"]
+    paths: ['dp/**']
+  schedule:
+  # Everyday at 6:00 UTC
+  - cron: '0 6 * * *'
+
+jobs:
+  bootstrap:
+    uses: ./.github/workflows/ci_analyze.yml
+
+  ci:
+    needs: bootstrap
+    if: |
+      needs.bootstrap.outputs.go_changes == 'true' ||
+        github.event_name == 'schedule'
+    strategy:
+      matrix:
+        go-version: ['1.26.x']
+    uses: ./.github/workflows/ci_go.yml
+    with:
+      package: ./dp
+      go-version: ${{ matrix.go-version }}
