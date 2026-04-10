@@ -9,7 +9,7 @@ require (
 	github.com/mmcdole/gofeed v1.3.0
 	github.com/protocolbuffers/txtpbfmt v0.0.0-20251016062345-16587c79cd91
 	google.golang.org/grpc v1.75.1
-	google.golang.org/protobuf v1.36.9
+	google.golang.org/protobuf v1.36.11
 	gopkg.in/yaml.v3 v3.0.1
 )
 
@@ -31,4 +31,7 @@ require (
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250707201910-8d1bb00bc6a7 // indirect
 )
 
-tool golang.org/x/tools/cmd/stringer
+tool (
+	golang.org/x/tools/cmd/stringer
+	google.golang.org/protobuf/cmd/protoc-gen-go
+)
