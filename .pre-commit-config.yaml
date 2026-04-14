@@ -8,7 +8,6 @@ repos:
 - repo: https://github.com/pre-commit/pre-commit-hooks
   rev: v6.0.0
   hooks:
-  # keep-sorted start
   - id: check-added-large-files
   - id: check-executables-have-shebangs
   - id: check-shebang-scripts-are-executable
@@ -16,207 +15,275 @@ repos:
   - id: end-of-file-fixer
     exclude: |
       (?x)^(
-        .*/testdata/.*
-        |.*\.diff
-        |.*\.patch
+         .*/testdata/.*
+        |.*\\.diff
+        |.*\\.patch
       )$
   - id: trailing-whitespace
     exclude: |
       (?x)^(
-        .*/testdata/.*
-        |.*\.diff
-        |.*\.patch
+         .*/testdata/.*
+        |.*\\.diff
+        |.*\\.patch
       )$
-    # keep-sorted end
+
 - repo: local
   hooks:
-  # keep-sorted start
-  - id: buildifier
-    name: "Format Bazel"
+
+  # Bazel
+  - id: bzl-fmt
+    name: "Bazel format"
+    description: "format Bazel files"
     entry: buildifier
     language: system
     types_or: [bazel]
-    args: ["-mode=fix", "-lint=fix"]
-  - id: buildifier-lint
-    name: "Lint Bazel"
+    args:
+    - "-mode=fix"
+    - "-lint=fix"
+  - id: bzl-lint
+    name: "Bazel lint"
+    description: "lint Bazel files"
     entry: buildifier
     language: system
     types_or: [bazel]
-    args: ["-mode=diff", "-lint=warn"]
-  - id: check-go-test
-    name: "Run go tests"
-    entry: env CHECKGOTESTPARALLEL=yes check-go-test
+    args:
+    - "-mode=diff"
+    - "-lint=warn"
+
+  # C++
+  - id: cc-fmt
+    name: "C++ format"
+    description: "format C/C++ files with clang-format"
+    entry: clang-format21 -i
+    language: system
+    types_or: [c++, c]
+    args: ["-style=file"]
+    exclude: |
+      (?x)^(
+        nvim/plugin/lab-skeleton/share/.*
+      )$
+  - id: cc-tidy
+    name: "C++ tidy"
+    description: "tidy C/C++ files with clang-tidy"
+    entry: clang-tidy21
+    language: system
+    types_or: [c++, c]
+    args: ["--fix"]
+    exclude: |
+      (?x)^(
+        nvim/plugin/lab-skeleton/share/.*
+      )$
+
+  # Go
+  - id: go-fmt
+    name: "Go format"
+    description: "format Go files"
+    entry: goimports
     language: system
     types_or: [go]
-    pass_filenames: true
-    exclude: "nvim/plugin/lab-skeleton/share/new.*$"
-    verbose: true
-  - id: check-godoc
-    name: "Go documentation"
+    exclude: |
+      (?x)^(
+         .*\.pb\.go
+        |nvim/plugin/lab-skeleton/share/new.*
+      )$
+    args: ["-w"]
+  - id: go-doc
+    name: "Go doc"
+    description: "Go entities must have documentation"
     entry: check-godoc
     language: system
     types_or: [go]
     pass_filenames: true
     exclude: |
       (?x)^(
-        .*/testdata/.*
+         .*/testdata/.*
         |nvim/plugin/lab-skeleton/share/new.*
       )$
-  - id: check-issue
-    name: "Issue is set"
-    entry: check-issue
-    language: system
-    stages: [commit-msg]
-  - id: check-license
-    name: "Check license"
-    entry: ./check/cmd/check-license/check_license
-    language: system
-    stages: [pre-commit]
-    exclude_types: [json]
-    exclude: |
-      (?x)^(
-         MODULE\.bazel\.lock
-        |go\.(mod|sum)
-        |.*/(test)?data/.*
-        |.*_string\.go
-        |.*\.pb\.go
-        |.*\.diff
-        |.*\.patch
-        |home/vim/templates/skel.*
-        |nvim/plugin/lab-skeleton/share/new.*
-      )$
-  - id: check-nosubmit
-    name: "No-submit is not set"
-    entry: check-nosubmit
-    language: system
-  - id: check-todo
-    name: "Lint TODO format"
-    entry: check-todo
-    language: system
-    exclude: |
-      (?x)^(
-        .*\.diff
-        |.*\.patch
-      )$
-  - id: clang-format
-    name: "Format C/C++"
-    entry: clang-format21 -i
-    language: system
-    types_or: [c++, c]
-    args: ["-style=file"]
-    exclude: "^nvim/plugin/lab-skeleton/share/"
-  - id: clang-tidy
-    name: "Tidy C/C++"
-    entry: clang-tidy21
-    language: system
-    types_or: [c++, c]
-    args: ["--fix"]
-    exclude: "^nvim/plugin/lab-skeleton/share/"
-  - id: goimports
-    name: "Fix Go imports"
-    entry: goimports
+  - id: go-test
+    name: "Go test"
+    description: "run Go tests for changes packages"
+    entry: env CHECKGOTESTPARALLEL=yes check-go-test
     language: system
     types_or: [go]
+    pass_filenames: true
     exclude: |
       (?x)^(
-        .*\.pb\.go
-        |nvim/plugin/lab-skeleton/share/new.*
+        nvim/plugin/lab-skeleton/share/new.*
       )$
-    args: ["-w"]
-  - id: html-format
-    name: "Format HTML"
+    verbose: true
+
+  # HTML
+  - id: html-fmt
+    name: "HTML format"
+    description: "format HTML files"
     entry: prettier
     language: system
     types_or: [html, json]
     args: ["-w"]
-  - id: keep-sorted
-    name: "Keep lines sorted"
-    entry: keep-sorted
-    language: system
-  - id: lua-format
-    name: "Format Lua"
+
+  # Lua
+  - id: lua-fmt
+    name: "Lua format"
+    description: "format Lua files"
     entry: stylua
     language: system
     types_or: [lua]
   - id: lua-lint
-    name: "Lint Lua"
+    name: "Lua lint"
+    description: "lint Lua files"
     entry: luacheck
     language: system
     types_or: [lua]
+
+  # Makefiles
   - id: make-lint
-    name: "Lint makefiles"
+    name: "Make lint"
+    description: "lint Makefiles on FreeBSD"
     entry: make
     language: system
     types_or: [makefile]
-    args: ["-N", "-f"]
-    exclude: "book/ostep/.*/Makefile$"
-  - id: markdown-format
-    name: "Format Markdown"
+    args:
+    - "-N"
+    - "-f"
+    exclude: |
+      (?x)^(
+        book/ostep/.*/Makefile
+      )$
+
+  # Markdown
+  - id: md-fmt
+    name: "Markdown format"
+    description: "format Markdown files"
     entry: markdownfmt
     language: system
     types_or: [markdown]
     args:
     - "-soft-wraps"
     - "-w"
-  - id: no-binary
-    name: "No binaries"
-    entry: "Binaries are not allowed"
-    language: fail
-    types_or: [binary]
-  - id: proto-doc
-    name: "Validate Protobuf documentation"
-    entry: check-pbdoc
-    language: system
-    types_or: [proto]
-  - id: proto-format
-    name: "Format Protocol buffers"
+
+  # Protocol buffers
+  - id: proto-fmt
+    name: "Proto format"
+    description: "format Proto files"
     entry: clang-format21 -i
     language: system
     types_or: [proto]
     args: ["-style=file"]
+  - id: proto-doc
+    name: "Proto documentation"
+    description: "Proto entities must have documentation"
+    entry: check-pbdoc
+    language: system
+    types_or: [proto]
   - id: proto-nextid
-    name: "Validate protobuf next id"
+    name: "Proto next id"
+    description: "validate next-id comment in Proto messages if set"
     entry: check-nextid
     language: system
     types_or: [proto]
-  - id: shell-format
-    name: "Format shell"
-    entry: shfmt
-    language: system
-    types_or: [shell]
-    exclude_types: [csh, tcsh]
-    args:
-    - "--binary-next-line"
-    - "--case-indent"
-    - "--indent=2"
-    - "--posix"
-    - "--write"
-  - id: shell-no-extension
-    name: "No extension in shell executable"
-    entry: "Shell executable with extension is not allowed"
-    language: fail
-    types: [shell, executable]
-    files: "\\.sh$"
-  - id: txtpb-format
-    name: "Format text Protobuf"
+  - id: txtpb-fmt
+    name: "Proto text format"
+    description: "format text Proto files"
     entry: txtpbfmt
     language: system
     types: [textproto]
     exclude: "testdata"
     args: ["-skip_all_colons"]
+
+  # Shell
+  - id: sh-fmt
+    name: "Shell format"
+    entry: shfmt
+    language: system
+    types_or: [shell]
+    exclude_types: [csh, tcsh]
+    args:
+    # keep-sorted start
+    - "--binary-next-line"
+    - "--case-indent"
+    - "--indent=2"
+    - "--posix"
+    - "--write"
+    # keep-sorted end
+  - id: sh-noext
+    name: "Shell exec no ext"
+    description: "no extension in shell executables"
+    entry: "shell executable should not have extension"
+    language: fail
+    types: [shell, executable]
+    files: |
+      (?x)^(
+        .*\\.\\w*sh
+      )$
+
+  # YAML
+  - id: yaml-fmt
+    name: "YAML format"
+    description: "format YAML files"
+    entry: yamlfmt
+    language: system
+    types_or: [yaml]
+
+  # ... everything else
+  - id: issue
+    name: "Issue"
+    description: "a commit message must have an issue set"
+    entry: check-issue
+    language: system
+    stages: [commit-msg]
+  - id: license
+    name: "License"
+    description: "a file must have a license block"
+    entry: ./check/cmd/check-license/check_license
+    language: system
+    stages: [pre-commit]
+    exclude_types: [json]
+    exclude: |
+      (?x)^(
+         MODULE\\.bazel\\.lock
+        |go\.(mod|sum)
+        |.*/(test)?data/.*
+        |.*_string\.go
+        |.*\\.pb\\.go
+        |.*\\.diff
+        |.*\\.patch
+        |home/vim/templates/skel.*
+        |nvim/plugin/lab-skeleton/share/new.*
+      )$
+  - id: nosubmit
+    name: "No-submit"
+    description: "NOSUMIT should not be set"
+    entry: check-nosubmit
+    language: system
+  - id: todo
+    name: "Todo lint"
+    description: "a TODO comment must include an issue"
+    entry: check-todo
+    language: system
+    exclude: |
+      (?x)^(
+         .*\\.diff
+        |.*\\.patch
+      )$
+  - id: keep-sorted
+    name: "Keep sorted"
+    description: "keep lines sorted"
+    entry: keep-sorted
+    language: system
+  - id: no-binary
+    name: "No binaries"
+    description: "binaries are not allowed"
+    entry: "binaries are not allowed"
+    language: fail
+    types_or: [binary]
   - id: typos
-    name: "Check typos"
+    name: "Typos"
+    description: "check typos"
     entry: typos
     language: system
     types: [text]
     exclude: |
       (?x)^(
-        .*\.diff
-        |infra/net\.lab.*\.conf
+         .*\\.diff
+        |infra/net\\.lab.*\\.conf
       )$
-  - id: yaml-format
-    name: "Format YAML"
-    entry: yamlfmt
-    language: system
-    types_or: [yaml]
-  # keep-sorted end
