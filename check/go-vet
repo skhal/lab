@@ -1,0 +1,34 @@
+#!/bin/sh
+#
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+# go-vet is a pre-commit hook to run `go tool vet` on staged packages. It
+# extracts packages from Go-files passed as arguments.
+#
+# SYNOPSIS
+#
+#   go-vet file [file ...]
+
+set -e
+
+packages=
+for src; do
+  pkg=$(dirname "$src")
+  case "$packages" in
+    *:$pkg:*)
+      continue
+      ;;
+  esac
+  packages="$packages:$pkg:"
+done
+
+IFS=:
+for pkg in $packages; do
+  if [ -z "$pkg" ]; then
+    continue
+  fi
+  go vet ./"$pkg"/...
+done

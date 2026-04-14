@@ -99,6 +99,17 @@ repos:
          .*/testdata/.*
         |nvim/plugin/lab-skeleton/share/new.*
       )$
+  - id: go-vet
+    name: "Go vet"
+    description: "static analysis of Go code"
+    entry: ./check/go-vet
+    language: system
+    types_or: [go]
+    exclude: |
+      (?x)^(
+         .*\.pb\.go
+        |nvim/plugin/lab-skeleton/share/new.*
+      )$
   - id: go-test
     name: "Go test"
     description: "run Go tests for changes packages"
