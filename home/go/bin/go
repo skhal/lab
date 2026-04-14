@@ -20,14 +20,25 @@ eof
   exit 1
 fi
 
-case "$1" in
-  doc | help)
-    if ! [ -t 1 ]; then
-      break
-    fi
-    eval exec "${go_cmd}" "$@" | $PAGER
-    exit
-    ;;
-esac
+# page passes the output of go-command through PAGER.
+page() {
+  set -o pipefail
+  eval "$@" | $PAGER
+  exit $?
+}
+
+if [ -t 1 ]; then
+  case "$1" in
+    doc | help)
+      page "${go_cmd}" "$@"
+      ;;
+    tool) # ex: go tool vet help
+      if [ "$3" != "help" ]; then
+        break
+      fi
+      page "${go_cmd}" "$@"
+      ;;
+  esac
+fi
 
 eval exec "${go_cmd}" "$@"
