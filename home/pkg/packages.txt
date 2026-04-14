@@ -36,6 +36,7 @@ pkg
 protobuf
 protobuf-go
 py311-pre-commit
+py311-ty
 python
 ripgrep
 rsync
