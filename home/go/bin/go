@@ -23,7 +23,7 @@ fi
 # page passes the output of go-command through PAGER.
 page() {
   set -o pipefail
-  eval "$@" | $PAGER
+  eval 2>&1 "$@" | $PAGER
   exit $?
 }
 
@@ -33,9 +33,13 @@ if [ -t 1 ]; then
       page "${go_cmd}" "$@"
       ;;
     tool) # ex: go tool vet help
-      if [ "$3" != "help" ]; then
-        break
-      fi
+      case "$3" in
+        help | -help)
+          ;;
+        *)
+          break
+          ;;
+      esac
       page "${go_cmd}" "$@"
       ;;
   esac
