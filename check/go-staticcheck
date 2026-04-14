@@ -1,0 +1,38 @@
+#!/bin/sh
+#
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+# go-staticcheck is a pre-commit hook to run [staticheck][1] on staged packages.
+# It extracts packages from Go-files passed as arguments.
+#
+# SYNOPSIS
+#
+#   go-staticcheck file [file ...]
+#
+# REFERENCES
+#
+# [1]: github.com/dominikh/go-tools/cmd/staticcheck
+
+set -e
+
+packages=
+for src; do
+  pkg=$(dirname "$src")
+  case "$packages" in
+    *:$pkg:*)
+      continue
+      ;;
+  esac
+  packages="$packages:$pkg:"
+done
+
+IFS=:
+for pkg in $packages; do
+  if [ -z "$pkg" ]; then
+    continue
+  fi
+  staticcheck ./"$pkg"/...
+done

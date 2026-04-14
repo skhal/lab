@@ -42,5 +42,6 @@ golang.org/x/pkgsite/cmd/pkgsite@latest
 golang.org/x/tools/cmd/goimports@latest
 golang.org/x/tools/cmd/present@latest
 golang.org/x/tools/gopls@latest
+honnef.co/go/tools/cmd/staticcheck@latest
 mvdan.cc/sh/v3/cmd/shfmt@latest
 # keep-sorted end

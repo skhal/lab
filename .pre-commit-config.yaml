@@ -121,6 +121,17 @@ repos:
          .*\.pb\.go
         |nvim/plugin/lab-skeleton/share/new.*
       )$
+  - id: go-staticcheck
+    name: "Go staticcheck"
+    description: "static analysis of Go code using github.com/dominikh/go-tools"
+    entry: ./check/go-staticcheck
+    language: system
+    types_or: [go]
+    exclude: |
+      (?x)^(
+         .*\.pb\.go
+        |nvim/plugin/lab-skeleton/share/new.*
+      )$
   - id: go-test
     name: "Go test"
     description: "run Go tests for changes packages"
