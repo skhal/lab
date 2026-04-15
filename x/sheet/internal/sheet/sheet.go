@@ -8,6 +8,8 @@ package sheet
 
 import (
 	"fmt"
+	"maps"
+	"slices"
 
 	"github.com/skhal/lab/x/sheet/internal/ast"
 	parser "github.com/skhal/lab/x/sheet/internal/parse"
@@ -50,7 +52,10 @@ func (s *sheet) parse(c *cell) error {
 // VisitAll calls function f on every cell. It passes cell identifier and
 // calculated value.
 func (s *sheet) VisitAll(f func(cell string, val float64) bool) {
-	for id, c := range s.data {
+	kk := slices.Collect(maps.Keys(s.data))
+	slices.Sort(kk)
+	for _, id := range kk {
+		c := s.data[id]
 		if !f(id, c.Node.Value()) {
 			break
 		}
