@@ -7,13 +7,18 @@
 package sheet
 
 import (
+	"errors"
 	"fmt"
 	"maps"
 	"slices"
 
 	"github.com/skhal/lab/x/sheet/internal/ast"
-	parser "github.com/skhal/lab/x/sheet/internal/parse"
+	"github.com/skhal/lab/x/sheet/internal/calc"
+	"github.com/skhal/lab/x/sheet/internal/parse"
 )
+
+// ErrCell means there is an error in the cell value.
+var ErrCell = errors.New("cell error")
 
 type sheet struct {
 	data map[string]*cell
@@ -25,27 +30,23 @@ func New() *sheet {
 }
 
 // Set places a value to the cell.
-func (s *sheet) Set(id, val string) {
-	s.data[id] = &cell{Text: val}
+func (s *sheet) Set(id, val string) error {
+	n, err := parse.Parse(val)
+	if err != nil {
+		return fmt.Errorf("%w: set %s to %q: %s", ErrCell, id, val, err)
+	}
+	s.data[id] = &cell{Text: val, Node: n}
+	return nil
 }
 
 // Calculate parses cell content. It returns an error if any of the cell fails
 // to parse.
 func (s *sheet) Calculate() error {
 	for id, c := range s.data {
-		if err := s.parse(c); err != nil {
+		if err := calc.Calculate(c.Node); err != nil {
 			return fmt.Errorf("calculate %s: %s", id, err)
 		}
 	}
-	return nil
-}
-
-func (s *sheet) parse(c *cell) error {
-	n, err := parser.Parse(c.Text)
-	if err != nil {
-		return err
-	}
-	c.Node = n
 	return nil
 }
 

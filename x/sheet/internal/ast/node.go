@@ -20,3 +20,14 @@ type NumberNode struct {
 func (n *NumberNode) Value() float64 {
 	return n.Number
 }
+
+// FormulaNode is a formula with a single number, e.g. "=123".
+type FormulaNode struct {
+	Number *NumberNode // number node
+	Result float64     // result of the calculation
+}
+
+// Value returns calculated result of the formula.
+func (n *FormulaNode) Value() float64 {
+	return n.Result
+}
