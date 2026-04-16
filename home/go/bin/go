@@ -24,23 +24,23 @@ fi
 page() {
   set -o pipefail
   eval 2>&1 "$@" | $PAGER
-  exit $?
 }
 
 if [ -t 1 ]; then
   case "$1" in
     doc | help)
       page "${go_cmd}" "$@"
+      exit $?
       ;;
     tool) # ex: go tool vet help
       case "$3" in
         help | -help)
+          page "${go_cmd}" "$@"
+          exit $?
           ;;
         *)
-          break
           ;;
       esac
-      page "${go_cmd}" "$@"
       ;;
   esac
 fi
