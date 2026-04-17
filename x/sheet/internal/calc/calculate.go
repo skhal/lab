@@ -6,20 +6,22 @@
 // Package calc evaluates formulas.
 package calc
 
-import "github.com/skhal/lab/x/sheet/internal/ast"
+import (
+	"strconv"
+
+	"github.com/skhal/lab/x/sheet/internal/ast"
+)
 
 // Calculate evaluates a formula node and skips other types of nodes. It
 // returns an error if evaluation fails.
-func Calculate(node ast.Node) error {
+func Calculate(node ast.Node) (float64, error) {
 	switch n := node.(type) {
-	case *ast.FormulaNode:
-		return calcFormula(n)
-	default:
-		return nil
+	case *ast.NumberNode:
+		return calculateNumber(n)
 	}
+	return 0, nil
 }
 
-func calcFormula(n *ast.FormulaNode) error {
-	n.Result = n.Number.Value()
-	return nil
+func calculateNumber(n *ast.NumberNode) (float64, error) {
+	return strconv.ParseFloat(n.Number, 64)
 }

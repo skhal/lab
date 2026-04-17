@@ -7,27 +7,9 @@
 package ast
 
 // Node represents any node.
-type Node interface {
-	Value() float64 // retrieve node value
-}
+type Node any
 
 // NumberNode is a number value.
 type NumberNode struct {
-	Number float64 // node value
-}
-
-// Value returns the value of the NumberNode.
-func (n *NumberNode) Value() float64 {
-	return n.Number
-}
-
-// FormulaNode is a formula with a single number, e.g. "=123".
-type FormulaNode struct {
-	Number *NumberNode // number node
-	Result float64     // result of the calculation
-}
-
-// Value returns calculated result of the formula.
-func (n *FormulaNode) Value() float64 {
-	return n.Result
+	Number string // number text value
 }

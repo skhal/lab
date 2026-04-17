@@ -37,7 +37,7 @@ func TestSheet_Set(t *testing.T) {
 			err := s.Set(cell, tc.text)
 
 			if !errors.Is(err, tc.want) {
-				t.Errorf("Set(_, %s) = %v; want %v", tc.text, err, tc.want)
+				t.Errorf("Set(_, %q) = %v; want %v", tc.text, err, tc.want)
 			}
 		})
 	}

@@ -9,7 +9,6 @@ package parse
 import (
 	"errors"
 	"fmt"
-	"strconv"
 	"strings"
 
 	"github.com/skhal/lab/x/sheet/internal/ast"
@@ -25,16 +24,18 @@ func Parse(s string) (ast.Node, error) {
 	const (
 		formulaPrefix = "="
 	)
-	s, ok := strings.CutPrefix(s, formulaPrefix)
-	if ok {
+	switch s, ok := strings.CutPrefix(s, formulaPrefix); {
+	case ok:
 		return parseFormula(s)
+	case len(s) != 0:
+		return parseNode(s)
 	}
-	return parseNumber(s)
+	return nil, nil
 }
 
 // parseFormula parses a formula string without "=" prefix. It returns a
 // formula AST node upon success or error.
-func parseFormula(s string) (node *ast.FormulaNode, _ error) {
+func parseFormula(s string) (node ast.Node, _ error) {
 	for tok := range lex.Lex([]byte(s)) {
 		switch tok.Type {
 		case lex.TokenError:
@@ -45,8 +46,7 @@ func parseFormula(s string) (node *ast.FormulaNode, _ error) {
 				err := fmt.Errorf("%w: formula %q: multiple numbers", ErrParse, s)
 				return nil, err
 			}
-			n, _ := strconv.ParseFloat(tok.Text, 64)
-			node = &ast.FormulaNode{Number: &ast.NumberNode{Number: n}}
+			node = &ast.NumberNode{Number: tok.Text}
 		default:
 			err := fmt.Errorf("%w: formula %q: unsupported token %s - %q", ErrParse, s, tok.Type, tok.Text)
 			return nil, err
@@ -58,10 +58,20 @@ func parseFormula(s string) (node *ast.FormulaNode, _ error) {
 	return
 }
 
-func parseNumber(s string) (*ast.NumberNode, error) {
-	n, err := strconv.ParseFloat(s, 64)
-	if err != nil {
-		return nil, fmt.Errorf("%w: %s", ErrParse, s)
+func parseNode(s string) (node ast.Node, _ error) {
+	for tok := range lex.Lex([]byte(s)) {
+		switch tok.Type {
+		case lex.TokenNumber:
+			if node != nil {
+				return nil, fmt.Errorf("%w: multiple values - %q", ErrParse, s)
+			}
+			node = &ast.NumberNode{Number: tok.Text}
+		default:
+			return nil, fmt.Errorf("%w: unsupported node value - %q", ErrParse, s)
+		}
 	}
-	return &ast.NumberNode{Number: n}, nil
+	if node == nil {
+		return nil, fmt.Errorf("%w: empty cell", ErrParse)
+	}
+	return
 }

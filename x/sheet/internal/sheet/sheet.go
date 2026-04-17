@@ -43,9 +43,11 @@ func (s *sheet) Set(id, val string) error {
 // to parse.
 func (s *sheet) Calculate() error {
 	for id, c := range s.data {
-		if err := calc.Calculate(c.Node); err != nil {
+		res, err := calc.Calculate(c.Node)
+		if err != nil {
 			return fmt.Errorf("calculate %s: %s", id, err)
 		}
+		c.Result = res
 	}
 	return nil
 }
@@ -57,13 +59,14 @@ func (s *sheet) VisitAll(f func(cell string, val float64) bool) {
 	slices.Sort(kk)
 	for _, id := range kk {
 		c := s.data[id]
-		if !f(id, c.Node.Value()) {
+		if !f(id, c.Result) {
 			break
 		}
 	}
 }
 
 type cell struct {
-	Text string
-	Node ast.Node
+	Text   string
+	Node   ast.Node
+	Result float64
 }
