@@ -21,6 +21,12 @@ var (
 // scanState is the default state of the scanner. It skips whitespace and
 // advances to the next supported state.
 func scanState(lx *lexer) stateFunc {
+	const (
+		plus  = '+'
+		minus = '-'
+		lpar  = '('
+		rpar  = ')'
+	)
 	lx.scan(whitespace)
 	lx.ignore()
 	switch r, err := lx.peek(); {
@@ -31,10 +37,14 @@ func scanState(lx *lexer) stateFunc {
 		return errorState
 	case unicode.IsNumber(r):
 		return numberState
-	case r == '+':
+	case r == plus:
 		return plusState
-	case r == '-':
+	case r == minus:
 		return minusState
+	case r == lpar:
+		return lparState
+	case r == rpar:
+		return rparState
 	default:
 		lx.err = fmt.Errorf("unsupported text at %d -  %q", lx.pos, lx.b[lx.pos:])
 		return errorState
@@ -65,6 +75,18 @@ func plusState(lx *lexer) stateFunc {
 func minusState(lx *lexer) stateFunc {
 	lx.read() // ignore err - previous state has peeked into the next rune
 	lx.emit(TokenMinus)
+	return scanState
+}
+
+func lparState(lx *lexer) stateFunc {
+	lx.read()
+	lx.emit(TokenLpar)
+	return scanState
+}
+
+func rparState(lx *lexer) stateFunc {
+	lx.read()
+	lx.emit(TokenRpar)
 	return scanState
 }
 

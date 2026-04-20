@@ -107,13 +107,48 @@ func TestParse_formula(t *testing.T) {
 			wantErr: parse.ErrParse,
 		},
 		{
-			name:    "missing left operand",
+			name:    "plus misses left operand",
 			s:       "=+ 2",
+			wantErr: parse.ErrParse,
+		},
+		{
+			name:    "plus misses right operand",
+			s:       "=1 +",
 			wantErr: parse.ErrParse,
 		},
 		{
 			name:    "invalid left operand",
 			s:       "=1 + +",
+			wantErr: parse.ErrParse,
+		},
+		{
+			name:     "parentheses",
+			s:        "=(1)",
+			wantNode: &ast.NumberNode{Number: "1"},
+		},
+		{
+			name:    "missing right parenthesis",
+			s:       "=(1",
+			wantErr: parse.ErrParse,
+		},
+		{
+			name:    "missing left parenthesis",
+			s:       "=1)",
+			wantErr: parse.ErrParse,
+		},
+		{
+			name:    "parentheses without expression",
+			s:       "=()",
+			wantErr: parse.ErrParse,
+		},
+		{
+			name:     "nested parentheses",
+			s:        "=((1))",
+			wantNode: &ast.NumberNode{Number: "1"},
+		},
+		{
+			name:    "nested parentheses unbalanced",
+			s:       "=((1)",
 			wantErr: parse.ErrParse,
 		},
 	}

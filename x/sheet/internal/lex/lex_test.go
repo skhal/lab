@@ -87,6 +87,20 @@ func TestLex(t *testing.T) {
 				{Type: lex.TokenMinus, Text: "-"},
 			},
 		},
+		{
+			name: "left parenthesis",
+			b:    []byte("("),
+			want: []lex.Token{
+				{Type: lex.TokenLpar, Text: "("},
+			},
+		},
+		{
+			name: "right parenthesis",
+			b:    []byte(")"),
+			want: []lex.Token{
+				{Type: lex.TokenRpar, Text: ")"},
+			},
+		},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {

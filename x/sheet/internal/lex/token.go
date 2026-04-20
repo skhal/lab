@@ -21,4 +21,6 @@ const (
 	TokenNumber           // number
 	TokenPlus             // plus
 	TokenMinus            // minus
+	TokenLpar             // rpar
+	TokenRpar             // lpar
 )

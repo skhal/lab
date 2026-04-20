@@ -60,11 +60,12 @@ func parseFormula(s string) (ast.Node, error) {
 // Context free grammar (CFG):
 //
 //	Expr       = Operand | BinaryExpr
-//	Operand    = Number
+//	Operand    = Number | "(" Expr ")"
 //	BinaryExpr = Expr Op Expr
 //	Op         = "+" | "-"
 type formulaParser struct {
-	next func() (lex.Token, bool)
+	next  func() (lex.Token, bool)
+	depth int // parentheses level
 }
 
 // Parse parses formula b and returns root AST node.
@@ -88,6 +89,12 @@ func (p *formulaParser) parseExpr() (ast.Node, error) {
 	switch op.Type {
 	case lex.TokenPlus, lex.TokenMinus:
 		return p.parseBinaryExpr(lhs, op)
+	case lex.TokenRpar:
+		if p.depth == 0 {
+			return nil, fmt.Errorf("%w: unbalanced right parenthesis", ErrParse)
+		}
+		p.depth--
+		return lhs, nil
 	}
 	return nil, ErrParse
 }
@@ -98,11 +105,25 @@ func (p *formulaParser) parseOperand() (ast.Node, error) {
 		// no more tokens
 		return nil, fmt.Errorf("%w: expected operand", ErrParse)
 	}
+	parseLpar := func() (ast.Node, error) {
+		depth := p.depth
+		p.depth++
+		n, err := p.parseExpr()
+		if err != nil {
+			return nil, err
+		}
+		if p.depth != depth {
+			return nil, fmt.Errorf("%w: unbalances parentheses", ErrParse)
+		}
+		return n, nil
+	}
 	switch tok.Type {
 	case lex.TokenError:
 		return nil, fmt.Errorf("%w: %s", ErrParse, tok.Err)
 	case lex.TokenNumber:
 		return &ast.NumberNode{Number: tok.Text}, nil
+	case lex.TokenLpar:
+		return parseLpar()
 	}
 	return nil, fmt.Errorf("%w: invalid token - %s", ErrParse, tok.Type)
 }

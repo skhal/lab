@@ -12,11 +12,13 @@ func _() {
 	_ = x[TokenNumber-2]
 	_ = x[TokenPlus-3]
 	_ = x[TokenMinus-4]
+	_ = x[TokenLpar-5]
+	_ = x[TokenRpar-6]
 }
 
-const _tokenType_name = "errornumberplusminus"
+const _tokenType_name = "errornumberplusminusrparlpar"
 
-var _tokenType_index = [...]uint8{0, 5, 11, 15, 20}
+var _tokenType_index = [...]uint8{0, 5, 11, 15, 20, 24, 28}
 
 func (i tokenType) String() string {
 	idx := int(i) - 1
