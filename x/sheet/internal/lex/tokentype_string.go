@@ -10,11 +10,13 @@ func _() {
 	var x [1]struct{}
 	_ = x[TokenError-1]
 	_ = x[TokenNumber-2]
+	_ = x[TokenPlus-3]
+	_ = x[TokenMinus-4]
 }
 
-const _tokenType_name = "errornumber"
+const _tokenType_name = "errornumberplusminus"
 
-var _tokenType_index = [...]uint8{0, 5, 11}
+var _tokenType_index = [...]uint8{0, 5, 11, 15, 20}
 
 func (i tokenType) String() string {
 	idx := int(i) - 1

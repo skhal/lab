@@ -19,4 +19,6 @@ const (
 	_           tokenType = iota
 	TokenError            // error
 	TokenNumber           // number
+	TokenPlus             // plus
+	TokenMinus            // minus
 )

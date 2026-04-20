@@ -13,3 +13,10 @@ type Node any
 type NumberNode struct {
 	Number string // number text value
 }
+
+// BinOpNode is a binary operation of the form "left op right".
+type BinOpNode struct {
+	Op    string // binary operator
+	Left  Node   // left operand
+	Right Node   // right operand
+}

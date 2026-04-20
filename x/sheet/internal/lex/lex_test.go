@@ -73,6 +73,20 @@ func TestLex(t *testing.T) {
 				{Type: lex.TokenError, Err: lex.ErrLex},
 			},
 		},
+		{
+			name: "operator plus",
+			b:    []byte("+"),
+			want: []lex.Token{
+				{Type: lex.TokenPlus, Text: "+"},
+			},
+		},
+		{
+			name: "operator minus",
+			b:    []byte("-"),
+			want: []lex.Token{
+				{Type: lex.TokenMinus, Text: "-"},
+			},
+		},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {

@@ -9,6 +9,8 @@ package parse
 import (
 	"errors"
 	"fmt"
+	"iter"
+	"regexp"
 	"strings"
 
 	"github.com/skhal/lab/x/sheet/internal/ast"
@@ -24,54 +26,96 @@ func Parse(s string) (ast.Node, error) {
 	const (
 		formulaPrefix = "="
 	)
-	switch s, ok := strings.CutPrefix(s, formulaPrefix); {
-	case ok:
-		return parseFormula(s)
-	case len(s) != 0:
-		return parseNode(s)
+	s, ok := strings.CutPrefix(s, formulaPrefix)
+	s = strings.TrimSpace(s)
+	if !ok {
+		return parseCell(s)
 	}
-	return nil, nil
+	return parseFormula(s)
 }
 
-// parseFormula parses a formula string without "=" prefix. It returns a
-// formula AST node upon success or error.
-func parseFormula(s string) (node ast.Node, _ error) {
-	for tok := range lex.Lex([]byte(s)) {
-		switch tok.Type {
-		case lex.TokenError:
-			err := fmt.Errorf("%w: formula %q: %s", ErrParse, s, tok.Err)
-			return nil, err
-		case lex.TokenNumber:
-			if node != nil {
-				err := fmt.Errorf("%w: formula %q: multiple numbers", ErrParse, s)
-				return nil, err
-			}
-			node = &ast.NumberNode{Number: tok.Text}
-		default:
-			err := fmt.Errorf("%w: formula %q: unsupported token %s - %q", ErrParse, s, tok.Type, tok.Text)
-			return nil, err
-		}
-	}
-	if node == nil {
-		return nil, fmt.Errorf("%w: empty formula", ErrParse)
-	}
-	return
-}
+var cellRx = regexp.MustCompile(`^\d+(?:\.\d*)?$`)
 
-func parseNode(s string) (node ast.Node, _ error) {
-	for tok := range lex.Lex([]byte(s)) {
-		switch tok.Type {
-		case lex.TokenNumber:
-			if node != nil {
-				return nil, fmt.Errorf("%w: multiple values - %q", ErrParse, s)
-			}
-			node = &ast.NumberNode{Number: tok.Text}
-		default:
-			return nil, fmt.Errorf("%w: unsupported node value - %q", ErrParse, s)
-		}
-	}
-	if node == nil {
+// parseCell parses a cell without formula.
+func parseCell(s string) (ast.Node, error) {
+	if len(s) == 0 {
 		return nil, fmt.Errorf("%w: empty cell", ErrParse)
 	}
-	return
+	if !cellRx.MatchString(s) {
+		return nil, fmt.Errorf("%w: invalid cell", ErrParse)
+	}
+	return &ast.NumberNode{Number: s}, nil
+}
+
+func parseFormula(s string) (ast.Node, error) {
+	if len(s) == 0 {
+		return nil, fmt.Errorf("%w: empty formula", ErrParse)
+	}
+	p := &formulaParser{}
+	return p.Parse([]byte(s))
+}
+
+// formulaParser parses formula without "=" prefix into an AST tree.
+//
+// Context free grammar (CFG):
+//
+//	Expr       = Operand | BinaryExpr
+//	Operand    = Number
+//	BinaryExpr = Expr Op Expr
+//	Op         = "+" | "-"
+type formulaParser struct {
+	next func() (lex.Token, bool)
+}
+
+// Parse parses formula b and returns root AST node.
+func (p *formulaParser) Parse(b []byte) (ast.Node, error) {
+	var stop func()
+	p.next, stop = iter.Pull(lex.Lex(b))
+	defer stop()
+	return p.parseExpr()
+}
+
+func (p *formulaParser) parseExpr() (ast.Node, error) {
+	lhs, err := p.parseOperand()
+	if err != nil {
+		return nil, err
+	}
+	op, ok := p.next()
+	if !ok {
+		// no more tokens
+		return lhs, nil
+	}
+	switch op.Type {
+	case lex.TokenPlus, lex.TokenMinus:
+		return p.parseBinaryExpr(lhs, op)
+	}
+	return nil, ErrParse
+}
+
+func (p *formulaParser) parseOperand() (ast.Node, error) {
+	tok, ok := p.next()
+	if !ok {
+		// no more tokens
+		return nil, fmt.Errorf("%w: expected operand", ErrParse)
+	}
+	switch tok.Type {
+	case lex.TokenError:
+		return nil, fmt.Errorf("%w: %s", ErrParse, tok.Err)
+	case lex.TokenNumber:
+		return &ast.NumberNode{Number: tok.Text}, nil
+	}
+	return nil, fmt.Errorf("%w: invalid token - %s", ErrParse, tok.Type)
+}
+
+func (p *formulaParser) parseBinaryExpr(lhs ast.Node, op lex.Token) (ast.Node, error) {
+	// binary expression
+	rhs, err := p.parseExpr()
+	if err != nil {
+		return nil, err
+	}
+	return &ast.BinOpNode{
+		Op:    op.Text,
+		Left:  lhs,
+		Right: rhs,
+	}, nil
 }

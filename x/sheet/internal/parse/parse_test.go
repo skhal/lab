@@ -14,7 +14,7 @@ import (
 	"github.com/skhal/lab/x/sheet/internal/parse"
 )
 
-func TestParse_number(t *testing.T) {
+func TestParse_nonFormula(t *testing.T) {
 	tt := []struct {
 		name     string
 		s        string
@@ -22,7 +22,13 @@ func TestParse_number(t *testing.T) {
 		wantErr  error
 	}{
 		{
-			name: "empty",
+			name:    "empty",
+			wantErr: parse.ErrParse,
+		},
+		{
+			name:    "not number",
+			s:       "abc",
+			wantErr: parse.ErrParse,
 		},
 		{
 			name:     "integer",
@@ -82,13 +88,32 @@ func TestParse_formula(t *testing.T) {
 			wantErr: parse.ErrParse,
 		},
 		{
-			name:    "multiple numbers",
+			name:    "unsupported token",
+			s:       "=invalid",
+			wantErr: parse.ErrParse,
+		},
+		{
+			name: "operator plus",
+			s:    "=1+2",
+			wantNode: &ast.BinOpNode{
+				Op:    "+",
+				Left:  &ast.NumberNode{Number: "1"},
+				Right: &ast.NumberNode{Number: "2"},
+			},
+		},
+		{
+			name:    "missing operator",
 			s:       "=1 2",
 			wantErr: parse.ErrParse,
 		},
 		{
-			name:    "unsupported token",
-			s:       "=invalid",
+			name:    "missing left operand",
+			s:       "=+ 2",
+			wantErr: parse.ErrParse,
+		},
+		{
+			name:    "invalid left operand",
+			s:       "=1 + +",
 			wantErr: parse.ErrParse,
 		},
 	}

@@ -31,6 +31,10 @@ func scanState(lx *lexer) stateFunc {
 		return errorState
 	case unicode.IsNumber(r):
 		return numberState
+	case r == '+':
+		return plusState
+	case r == '-':
+		return minusState
 	default:
 		lx.err = fmt.Errorf("unsupported text at %d -  %q", lx.pos, lx.b[lx.pos:])
 		return errorState
@@ -41,10 +45,7 @@ func scanState(lx *lexer) stateFunc {
 // emits parsed number token and advances to the scanState.
 func numberState(lx *lexer) stateFunc {
 	lx.scan(digits)
-	nextState := scanState
 	switch r, err := lx.peek(); {
-	case err == io.EOF:
-		nextState = eofState
 	case err != nil:
 		// read failed - the next state will handle the error
 	case r == '.':
@@ -52,7 +53,19 @@ func numberState(lx *lexer) stateFunc {
 		lx.scan(digits)
 	}
 	lx.emit(TokenNumber)
-	return nextState
+	return scanState
+}
+
+func plusState(lx *lexer) stateFunc {
+	lx.read() // ignore err - previous state has peeked into the next rune
+	lx.emit(TokenPlus)
+	return scanState
+}
+
+func minusState(lx *lexer) stateFunc {
+	lx.read() // ignore err - previous state has peeked into the next rune
+	lx.emit(TokenMinus)
+	return scanState
 }
 
 // errorState emits an error token and advances to eofState.
