@@ -57,8 +57,8 @@ func run() (err error) {
 
 	must(s.Calculate())
 
-	s.VisitAll(func(c string, n float64) bool {
-		fmt.Printf("%s: %.2f\n", c, n)
+	s.VisitAll(func(id, cell string, n float64) bool {
+		fmt.Printf("%s %q = %.2f\n", id, cell, n)
 		return true
 	})
 	return nil

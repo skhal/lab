@@ -54,12 +54,12 @@ func (s *sheet) Calculate() error {
 
 // VisitAll calls function f on every cell. It passes cell identifier and
 // calculated value.
-func (s *sheet) VisitAll(f func(cell string, val float64) bool) {
+func (s *sheet) VisitAll(f func(id, cell string, val float64) bool) {
 	kk := slices.Collect(maps.Keys(s.data))
 	slices.Sort(kk)
 	for _, id := range kk {
 		c := s.data[id]
-		if !f(id, c.Result) {
+		if !f(id, c.Text, c.Result) {
 			break
 		}
 	}

@@ -77,7 +77,7 @@ func TestSheet_VisitAll(t *testing.T) {
 			s.Calculate()
 
 			var got []string
-			s.VisitAll(func(id string, _ float64) bool {
+			s.VisitAll(func(id, _ string, _ float64) bool {
 				got = append(got, id)
 				return true
 			})
@@ -128,7 +128,7 @@ func TestSheet_VisitAll_collectFew(t *testing.T) {
 			s.Calculate()
 
 			var got []string
-			s.VisitAll(func(id string, _ float64) bool {
+			s.VisitAll(func(id, _ string, _ float64) bool {
 				got = append(got, id)
 				return len(got) < tc.size
 			})
