@@ -151,6 +151,16 @@ func TestParse_formula(t *testing.T) {
 			s:       "=((1)",
 			wantErr: parse.ErrParse,
 		},
+		{
+			name:     "identifier",
+			s:        "=ABC123",
+			wantNode: &ast.RefNode{Ref: "ABC123"},
+		},
+		{
+			name:    "identifier must has upper case",
+			s:       "=abc123",
+			wantErr: parse.ErrParse,
+		},
 	}
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {

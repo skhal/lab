@@ -7,6 +7,7 @@ package calc_test
 
 import (
 	"errors"
+	"fmt"
 	"testing"
 
 	"github.com/skhal/lab/x/sheet/internal/ast"
@@ -39,7 +40,7 @@ func TestCalculate(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			got, err := calc.Calculate(tc.node)
+			got, err := calc.Calculate(tc.node, newTestRefCalculator(t, nil))
 
 			if !errors.Is(err, tc.wantErr) {
 				t.Errorf("Calculate() = _, %v; want %v", err, tc.wantErr)
@@ -137,7 +138,7 @@ func TestCalculate_plus(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			got, err := calc.Calculate(tc.node)
+			got, err := calc.Calculate(tc.node, newTestRefCalculator(t, nil))
 
 			if !errors.Is(err, tc.wantErr) {
 				t.Errorf("Calculate() = _, %v; want %v", err, tc.wantErr)
@@ -235,7 +236,7 @@ func TestCalculate_minus(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			got, err := calc.Calculate(tc.node)
+			got, err := calc.Calculate(tc.node, newTestRefCalculator(t, nil))
 
 			if !errors.Is(err, tc.wantErr) {
 				t.Errorf("Calculate() = _, %v; want %v", err, tc.wantErr)
@@ -245,4 +246,71 @@ func TestCalculate_minus(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestCalculate_reference(t *testing.T) {
+	tests := []struct {
+		name    string
+		node    ast.Node
+		refs    map[string]testCell
+		want    float64
+		wantErr error
+	}{
+		{
+			name: "reference",
+			node: &ast.RefNode{
+				Ref: "A1",
+			},
+			refs: map[string]testCell{
+				"A1": {res: 123},
+			},
+			want: 123,
+		},
+		{
+			name: "missing reference",
+			node: &ast.RefNode{
+				Ref: "A1",
+			},
+			wantErr: errTest,
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			got, err := calc.Calculate(tc.node, newTestRefCalculator(t, tc.refs))
+
+			if !errors.Is(err, tc.wantErr) {
+				t.Errorf("Calculate() = _, %v; want %v", err, tc.wantErr)
+			}
+			if got != tc.want {
+				t.Errorf("Calculate() = %f, _; want %f", got, tc.want)
+			}
+		})
+	}
+}
+
+var errTest = errors.New("test error")
+
+type testCell struct {
+	res float64
+	err error
+}
+
+type testRefCalculator struct {
+	refs map[string]testCell
+}
+
+func newTestRefCalculator(t *testing.T, refs map[string]testCell) *testRefCalculator {
+	t.Helper()
+	return &testRefCalculator{refs}
+}
+
+func (rc *testRefCalculator) Calculate(id string) (float64, error) {
+	c, ok := rc.refs[id]
+	if !ok {
+		return 0, fmt.Errorf("%w: ref %s does not exist", errTest, id)
+	}
+	if c.err != nil {
+		return 0, c.err
+	}
+	return c.res, nil
 }

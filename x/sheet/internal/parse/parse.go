@@ -34,7 +34,10 @@ func Parse(s string) (ast.Node, error) {
 	return parseFormula(s)
 }
 
-var cellRx = regexp.MustCompile(`^\d+(?:\.\d*)?$`)
+var (
+	cellRx       = regexp.MustCompile(`^\d+(?:\.\d*)?$`)
+	identifierRx = regexp.MustCompile(`^[[:upper:]]+\d+$`)
+)
 
 // parseCell parses a cell without formula.
 func parseCell(s string) (ast.Node, error) {
@@ -60,7 +63,8 @@ func parseFormula(s string) (ast.Node, error) {
 // Context free grammar (CFG):
 //
 //	Expr       = Operand | BinaryExpr
-//	Operand    = Number | "(" Expr ")"
+//	Operand    = Number | Identifier | "(" Expr ")"
+//	Identifier = Letter Digit
 //	BinaryExpr = Expr Op Expr
 //	Op         = "+" | "-"
 type formulaParser struct {
@@ -105,6 +109,12 @@ func (p *formulaParser) parseOperand() (ast.Node, error) {
 		// no more tokens
 		return nil, fmt.Errorf("%w: expected operand", ErrParse)
 	}
+	parseIdentifier := func(tok lex.Token) (ast.Node, error) {
+		if !identifierRx.MatchString(tok.Text) {
+			return nil, fmt.Errorf("%w: invalid identifier %s", ErrParse, tok.Text)
+		}
+		return &ast.RefNode{Ref: tok.Text}, nil
+	}
 	parseLpar := func() (ast.Node, error) {
 		depth := p.depth
 		p.depth++
@@ -120,6 +130,8 @@ func (p *formulaParser) parseOperand() (ast.Node, error) {
 	switch tok.Type {
 	case lex.TokenError:
 		return nil, fmt.Errorf("%w: %s", ErrParse, tok.Err)
+	case lex.TokenIdent:
+		return parseIdentifier(tok)
 	case lex.TokenNumber:
 		return &ast.NumberNode{Number: tok.Text}, nil
 	case lex.TokenLpar:

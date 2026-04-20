@@ -17,23 +17,41 @@ import (
 // ErrCalculate means the AST has an error can can't be calculated.
 var ErrCalculate = errors.New("calculate error")
 
+// RefCalculator calculates reference value.
+type RefCalculator interface {
+	Calculate(string) (float64, error) // calculate reference cell value
+}
+
 // Calculate evaluates a formula node and skips other types of nodes. It
 // returns an error if evaluation fails.
-func Calculate(node ast.Node) (float64, error) {
+func Calculate(n ast.Node, ref RefCalculator) (float64, error) {
+	c := &calculator{ref}
+	return c.Calculate(n)
+}
+
+type calculator struct {
+	ref RefCalculator
+}
+
+// Calculate calculates the value of the node. It uses RefCalculator to get
+// the value of a reference.
+func (c *calculator) Calculate(node ast.Node) (float64, error) {
 	switch n := node.(type) {
 	case *ast.NumberNode:
-		return calculateNumber(n)
+		return c.calcNum(n)
 	case *ast.BinOpNode:
-		return calculateBinaryOperator(n)
+		return c.calcBinOp(n)
+	case *ast.RefNode:
+		return c.ref.Calculate(n.Ref)
 	}
 	return 0, ErrCalculate
 }
 
-func calculateNumber(n *ast.NumberNode) (float64, error) {
+func (c *calculator) calcNum(n *ast.NumberNode) (float64, error) {
 	return strconv.ParseFloat(n.Number, 64)
 }
 
-func calculateBinaryOperator(n *ast.BinOpNode) (_ float64, err error) {
+func (c *calculator) calcBinOp(n *ast.BinOpNode) (_ float64, err error) {
 	defer func() {
 		r := recover()
 		if r == nil {
@@ -51,10 +69,10 @@ func calculateBinaryOperator(n *ast.BinOpNode) (_ float64, err error) {
 	)
 	switch n.Op {
 	case opPlus:
-		op := newBinaryOperator(plus, n.Left, n.Right)
+		op := newBinaryOperator(c, plus, n.Left, n.Right)
 		return op.Calculate(), nil
 	case opMinus:
-		op := newBinaryOperator(minus, n.Left, n.Right)
+		op := newBinaryOperator(c, minus, n.Left, n.Right)
 		return op.Calculate(), nil
 	}
 
@@ -62,17 +80,18 @@ func calculateBinaryOperator(n *ast.BinOpNode) (_ float64, err error) {
 }
 
 type binaryOperator struct {
+	c        *calculator
 	f        func(x, y float64) float64
 	lhs, rhs ast.Node
 }
 
-func newBinaryOperator(op func(x, y float64) float64, lhs, rhs ast.Node) *binaryOperator {
-	return &binaryOperator{op, lhs, rhs}
+func newBinaryOperator(c *calculator, op func(x, y float64) float64, lhs, rhs ast.Node) *binaryOperator {
+	return &binaryOperator{c, op, lhs, rhs}
 }
 
 // Calculate executes binary operator after calculating left and right operands.
 func (op *binaryOperator) Calculate() float64 {
-	return op.f(mustCalculate(op.lhs), mustCalculate(op.rhs))
+	return op.f(must(op.c.Calculate(op.lhs)), must(op.c.Calculate(op.rhs)))
 }
 
 func plus(x, y float64) float64 {
@@ -83,10 +102,9 @@ func minus(x, y float64) float64 {
 	return x - y
 }
 
-func mustCalculate(n ast.Node) float64 {
-	res, err := Calculate(n)
+func must(n float64, err error) float64 {
 	if err != nil {
 		panic(err)
 	}
-	return res
+	return n
 }

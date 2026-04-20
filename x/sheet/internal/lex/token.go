@@ -23,4 +23,5 @@ const (
 	TokenMinus            // minus
 	TokenLpar             // rpar
 	TokenRpar             // lpar
+	TokenIdent            // identifier
 )

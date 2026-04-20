@@ -20,3 +20,8 @@ type BinOpNode struct {
 	Left  Node   // left operand
 	Right Node   // right operand
 }
+
+// RefNode is a cell reference.
+type RefNode struct {
+	Ref string // cell reference
+}

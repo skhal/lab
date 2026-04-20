@@ -59,13 +59,6 @@ func TestLex(t *testing.T) {
 			},
 		},
 		{
-			name: "not number",
-			b:    []byte("abc"),
-			want: []lex.Token{
-				{Type: lex.TokenError, Err: lex.ErrLex},
-			},
-		},
-		{
 			name: "invalid utf8 encoding",
 			// https://cs.opensource.google/go/go/+/master:src/unicode/utf8/utf8_test.go;l=253;drc=925a3cdcd13472c8f78d51c9ce99a59e77d46eb4
 			b: []byte("\x91\x80\x80\x80"),
@@ -99,6 +92,34 @@ func TestLex(t *testing.T) {
 			b:    []byte(")"),
 			want: []lex.Token{
 				{Type: lex.TokenRpar, Text: ")"},
+			},
+		},
+		{
+			name: "identifier",
+			b:    []byte("ABC123"),
+			want: []lex.Token{
+				{Type: lex.TokenIdent, Text: "ABC123"},
+			},
+		},
+		{
+			name: "identifier no digits",
+			b:    []byte("ABC"),
+			want: []lex.Token{
+				{Type: lex.TokenIdent, Text: "ABC"},
+			},
+		},
+		{
+			name: "identifier mixed case",
+			b:    []byte("AbC123"),
+			want: []lex.Token{
+				{Type: lex.TokenIdent, Text: "AbC123"},
+			},
+		},
+		{
+			name: "identifier mixed case no digits",
+			b:    []byte("ABc"),
+			want: []lex.Token{
+				{Type: lex.TokenIdent, Text: "ABc"},
 			},
 		},
 	}

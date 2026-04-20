@@ -178,19 +178,29 @@ func (lx *lexer) unread() {
 	lx.lastRuneSize = 0
 }
 
-// scan reads a sequence of characters that are in the set of allowed chars.
+// scan reads runs as long as they are in the allowed set. It stops on error
+// or EOF.
 func (lx *lexer) scan(allowed []byte) {
-	for lx.accept(allowed) {
+	pred := func(r rune) bool { return bytes.ContainsRune(allowed, r) }
+	for lx.acceptFunc(pred) {
 	}
 }
 
-// accept reads next rune if it is in the set of allowed chars.
-func (lx *lexer) accept(chars []byte) bool {
+// scanFunc reads runes while predicate f returns true. It stops on error or
+// EOF.
+func (lx *lexer) scanFunc(f func(r rune) bool) {
+	for lx.acceptFunc(f) {
+	}
+}
+
+// acceptFunc consumes the next rune if predicate f returns true, there is a
+// read error, or EOF.
+func (lx *lexer) acceptFunc(f func(r rune) bool) bool {
 	r, err := lx.read()
 	if err != nil {
 		return false
 	}
-	if !bytes.ContainsRune(chars, r) {
+	if !f(r) {
 		lx.unread()
 		return false
 	}

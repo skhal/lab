@@ -13,10 +13,7 @@ import (
 
 type stateFunc func(*lexer) stateFunc
 
-var (
-	digits     = []byte(`0123456789`)
-	whitespace = []byte(` \t`)
-)
+var whitespace = []byte(` \t`)
 
 // scanState is the default state of the scanner. It skips whitespace and
 // advances to the next supported state.
@@ -37,6 +34,8 @@ func scanState(lx *lexer) stateFunc {
 		return errorState
 	case unicode.IsNumber(r):
 		return numberState
+	case unicode.IsLetter(r):
+		return identifierState
 	case r == plus:
 		return plusState
 	case r == minus:
@@ -54,26 +53,40 @@ func scanState(lx *lexer) stateFunc {
 // numberState parses a floating value number with non-empty integral part. It
 // emits parsed number token and advances to the scanState.
 func numberState(lx *lexer) stateFunc {
-	lx.scan(digits)
+	lx.scanFunc(unicode.IsDigit)
 	switch r, err := lx.peek(); {
 	case err != nil:
 		// read failed - the next state will handle the error
 	case r == '.':
 		lx.read()
-		lx.scan(digits)
+		lx.scanFunc(unicode.IsDigit)
 	}
 	lx.emit(TokenNumber)
 	return scanState
 }
 
+// identifierState parses an identifier that consists of any number of letters
+// optionally followed by numbers, e.g. "abC123" or "Ab". The function is case
+// insensitive.
+func identifierState(lx *lexer) stateFunc {
+	lx.scanFunc(unicode.IsLetter)
+	switch r, err := lx.peek(); {
+	case err != nil:
+	case unicode.IsNumber(r):
+		lx.scanFunc(unicode.IsNumber)
+	}
+	lx.emit(TokenIdent)
+	return scanState
+}
+
 func plusState(lx *lexer) stateFunc {
-	lx.read() // ignore err - previous state has peeked into the next rune
+	lx.read()
 	lx.emit(TokenPlus)
 	return scanState
 }
 
 func minusState(lx *lexer) stateFunc {
-	lx.read() // ignore err - previous state has peeked into the next rune
+	lx.read()
 	lx.emit(TokenMinus)
 	return scanState
 }

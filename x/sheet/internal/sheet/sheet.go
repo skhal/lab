@@ -35,21 +35,66 @@ func (s *sheet) Set(id, val string) error {
 	if err != nil {
 		return fmt.Errorf("%w: set %s to %q: %s", ErrCell, id, val, err)
 	}
-	s.data[id] = &cell{Text: val, Node: n}
+	s.data[id] = &cell{Text: val, AST: n}
 	return nil
 }
 
 // Calculate parses cell content. It returns an error if any of the cell fails
 // to parse.
 func (s *sheet) Calculate() error {
+	rc := newRefCalculator(s)
 	for id, c := range s.data {
-		res, err := calc.Calculate(c.Node)
-		if err != nil {
-			return fmt.Errorf("calculate %s: %s", id, err)
+		if err := s.calculate(id, c, rc); err != nil {
+			return fmt.Errorf("%w %s: calculate: %s", ErrCell, id, err)
 		}
-		c.Result = res
 	}
 	return nil
+}
+
+func (s *sheet) calculate(id string, c *cell, rc *refCalculator) error {
+	if c.Calculated {
+		return nil
+	}
+	res, err := calc.Calculate(c.AST, rc)
+	if err != nil {
+		return fmt.Errorf("%s: %s", id, err)
+	}
+	c.Value = res
+	c.Calculated = true
+	return nil
+}
+
+type refCalculator struct {
+	s    *sheet
+	seen map[string]bool
+	path []string // references path for cycle detection
+}
+
+func newRefCalculator(s *sheet) *refCalculator {
+	return &refCalculator{s: s, seen: make(map[string]bool)}
+}
+
+// Calculate calculates a reference value. It returns an error if calculation
+// fails or reference calculator detects a circular dependency.
+func (rc *refCalculator) Calculate(id string) (float64, error) {
+	if rc.seen[id] {
+		// circular dependency
+		return 0, fmt.Errorf("circular dependency - %v", rc.path)
+	}
+	rc.seen[id] = true
+	rc.path = append(rc.path, id)
+	defer func() {
+		rc.path = rc.path[:len(rc.path)-1]
+		rc.seen[id] = false
+	}()
+	c, ok := rc.s.data[id]
+	if !ok {
+		return 0, fmt.Errorf("invalid cell %s", id)
+	}
+	if err := rc.s.calculate(id, c, rc); err != nil {
+		return 0, err
+	}
+	return c.Value, nil
 }
 
 // VisitAll calls function f on every cell. It passes cell identifier and
@@ -59,14 +104,16 @@ func (s *sheet) VisitAll(f func(id, cell string, val float64) bool) {
 	slices.Sort(kk)
 	for _, id := range kk {
 		c := s.data[id]
-		if !f(id, c.Text, c.Result) {
+		if !f(id, c.Text, c.Value) {
 			break
 		}
 	}
 }
 
 type cell struct {
-	Text   string
-	Node   ast.Node
-	Result float64
+	Text string
+	AST  ast.Node
+
+	Calculated bool
+	Value      float64
 }

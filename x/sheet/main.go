@@ -54,6 +54,12 @@ func run() (err error) {
 	must(s.Set("D1", "=(1+3)"))
 	must(s.Set("D2", "=1-(2+3)"))
 	must(s.Set("D3", "=1-(2-3)"))
+	must(s.Set("E1", "=A1"))
+	must(s.Set("E2", "=B1"))
+	must(s.Set("E3", "=C1"))
+	must(s.Set("E4", "=D2"))
+	must(s.Set("E5", "=A1 - 3"))
+	must(s.Set("E6", "=D2 + 10"))
 
 	must(s.Calculate())
 
