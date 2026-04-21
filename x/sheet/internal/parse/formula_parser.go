@@ -141,7 +141,7 @@ func (p *formulaParser) parseCall(ident lex.Token) (ast.Node, error) {
 	if !callRx.MatchString(ident.Text) {
 		return nil, fmt.Errorf("invalid function name %s", ident.Text)
 	}
-	p.next() // skip left-parenthesis
+	p.next() // ignore left-parenthesis
 	var args []ast.Node
 	if tok, ok := p.peek(); ok && tok.Type != lex.TokenRpar {
 		var err error
@@ -164,14 +164,10 @@ func (p *formulaParser) parseArgs() ([]ast.Node, error) {
 			return nil, err
 		}
 		args = append(args, arg)
-		tok, ok := p.peek()
-		if !ok {
+		if tok, ok := p.peek(); !ok || tok.Type != lex.TokenComma {
 			break
 		}
-		if tok.Type != lex.TokenComma {
-			break
-		}
-		p.next()
+		p.next() // ignore comma
 	}
 	return args, nil
 }
