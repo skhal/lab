@@ -27,9 +27,9 @@ func scanState(lx *lexer) stateFunc {
 		rpar  = ')'
 		// keep-sorted end
 	)
-	lx.scan(whitespace)
-	lx.ignore()
-	switch r, err := lx.peek(); {
+	lx.Scan(whitespace)
+	lx.Ignore()
+	switch r, err := lx.Peek(); {
 	case err == io.EOF:
 		return eofState
 	case err != nil:
@@ -60,15 +60,15 @@ func scanState(lx *lexer) stateFunc {
 // numberState parses a floating value number with non-empty integral part. It
 // emits parsed number token and advances to the scanState.
 func numberState(lx *lexer) stateFunc {
-	lx.scanFunc(unicode.IsDigit)
-	switch r, err := lx.peek(); {
+	lx.ScanFunc(unicode.IsDigit)
+	switch r, err := lx.Peek(); {
 	case err != nil:
 		// read failed - the next state will handle the error
 	case r == '.':
-		lx.read()
-		lx.scanFunc(unicode.IsDigit)
+		lx.Read()
+		lx.ScanFunc(unicode.IsDigit)
 	}
-	lx.emit(TokenNumber)
+	lx.Emit(TokenNumber)
 	return scanState
 }
 
@@ -76,27 +76,27 @@ func numberState(lx *lexer) stateFunc {
 // optionally followed by numbers, e.g. "abC123" or "Ab". The function is case
 // insensitive.
 func identifierState(lx *lexer) stateFunc {
-	lx.scanFunc(unicode.IsLetter)
-	switch r, err := lx.peek(); {
+	lx.ScanFunc(unicode.IsLetter)
+	switch r, err := lx.Peek(); {
 	case err != nil:
 	case unicode.IsNumber(r):
-		lx.scanFunc(unicode.IsNumber)
+		lx.ScanFunc(unicode.IsNumber)
 	}
-	lx.emit(TokenIdent)
+	lx.Emit(TokenIdent)
 	return scanState
 }
 
 func genState(tok tokenType) stateFunc {
 	return func(lx *lexer) stateFunc {
-		lx.read()
-		lx.emit(tok)
+		lx.Read()
+		lx.Emit(tok)
 		return scanState
 	}
 }
 
 // errorState emits an error token and advances to eofState.
 func errorState(lx *lexer) stateFunc {
-	lx.emit(TokenError)
+	lx.Emit(TokenError)
 	return eofState
 }
 

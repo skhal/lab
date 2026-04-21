@@ -93,9 +93,9 @@ func (lx *lexer) Stop() {
 	close(lx.done)
 }
 
-// emit creates a token and sends it on the tokkens channel. It blocks until
+// Emit creates a token and sends it on the tokkens channel. It blocks until
 // token receiver reads the token or if [lexer.Stop] called.
-func (lx *lexer) emit(tk tokenType) {
+func (lx *lexer) Emit(tk tokenType) {
 	var tok Token
 	switch tk {
 	case TokenError:
@@ -113,19 +113,19 @@ func (lx *lexer) emit(tk tokenType) {
 // text returns token text [start:pos) and calls [lexer.ignore].
 func (lx *lexer) text() string {
 	b := lx.b[lx.start:lx.pos]
-	lx.ignore()
+	lx.Ignore()
 	return string(b)
 }
 
-// ignore brings start to current positin and resets the size of the last read
+// Ignore brings start to current positin and resets the size of the last read
 // rune.
-func (lx *lexer) ignore() {
+func (lx *lexer) Ignore() {
 	lx.start = lx.pos
 	lx.lastRuneSize = 0
 }
 
-// peek returns the next rune in the buffer without advancing current position.
-func (lx *lexer) peek() (r rune, err error) {
+// Peek returns the next rune in the buffer without advancing current position.
+func (lx *lexer) Peek() (r rune, err error) {
 	r, _, err = lx.decodeRune()
 	if err != nil {
 		return
@@ -156,9 +156,9 @@ func (lx *lexer) decodeRune() (r rune, sz int, err error) {
 	return
 }
 
-// read reads the next rune and advances current position in the buffer. It
-// also sets the size of the last read rune to unblock [lexer.unread].
-func (lx *lexer) read() (r rune, err error) {
+// Read reads the next rune and advances current position in the buffer. It
+// also sets the size of the last Read rune to unblock [lexer.unread].
+func (lx *lexer) Read() (r rune, err error) {
 	r, sz, err := lx.decodeRune()
 	if err != nil {
 		return
@@ -178,17 +178,17 @@ func (lx *lexer) unread() {
 	lx.lastRuneSize = 0
 }
 
-// scan reads runs as long as they are in the allowed set. It stops on error
+// Scan reads runs as long as they are in the allowed set. It stops on error
 // or EOF.
-func (lx *lexer) scan(allowed []byte) {
+func (lx *lexer) Scan(allowed []byte) {
 	pred := func(r rune) bool { return bytes.ContainsRune(allowed, r) }
 	for lx.acceptFunc(pred) {
 	}
 }
 
-// scanFunc reads runes while predicate f returns true. It stops on error or
+// ScanFunc reads runes while predicate f returns true. It stops on error or
 // EOF.
-func (lx *lexer) scanFunc(f func(r rune) bool) {
+func (lx *lexer) ScanFunc(f func(r rune) bool) {
 	for lx.acceptFunc(f) {
 	}
 }
@@ -196,7 +196,7 @@ func (lx *lexer) scanFunc(f func(r rune) bool) {
 // acceptFunc consumes the next rune if predicate f returns true, there is a
 // read error, or EOF.
 func (lx *lexer) acceptFunc(f func(r rune) bool) bool {
-	r, err := lx.read()
+	r, err := lx.Read()
 	if err != nil {
 		return false
 	}
