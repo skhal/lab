@@ -6,6 +6,7 @@
 package lex
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"unicode"
@@ -14,6 +15,8 @@ import (
 type stateFunc func(*lexer) stateFunc
 
 var whitespace = []byte(` \t`)
+
+func isWhitespace(r rune) bool { return bytes.ContainsRune(whitespace, r) }
 
 // scanState is the default state of the scanner. It skips whitespace and
 // advances to the next supported state.
@@ -27,7 +30,7 @@ func scanState(lx *lexer) stateFunc {
 		rpar  = ')'
 		// keep-sorted end
 	)
-	lx.Scan(whitespace)
+	lx.ScanFunc(isWhitespace)
 	lx.Ignore()
 	switch r, err := lx.Peek(); {
 	case err == io.EOF:

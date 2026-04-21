@@ -6,7 +6,6 @@
 package lex
 
 import (
-	"bytes"
 	"errors"
 	"fmt"
 	"io"
@@ -176,14 +175,6 @@ func (lx *lexer) unread() {
 	}
 	lx.pos -= lx.lastRuneSize
 	lx.lastRuneSize = 0
-}
-
-// Scan reads runs as long as they are in the allowed set. It stops on error
-// or EOF.
-func (lx *lexer) Scan(allowed []byte) {
-	pred := func(r rune) bool { return bytes.ContainsRune(allowed, r) }
-	for lx.acceptFunc(pred) {
-	}
 }
 
 // ScanFunc reads runes while predicate f returns true. It stops on error or
