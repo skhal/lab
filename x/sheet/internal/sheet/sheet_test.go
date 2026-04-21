@@ -264,3 +264,16 @@ func TestSheet_Calculate(t *testing.T) {
 		})
 	}
 }
+
+func BenchmarkSheet(b *testing.B) {
+	for b.Loop() {
+		s := sheet.New()
+		s.Set("A1", "1")
+		s.Set("A2", "2")
+		s.Set("A3", "3")
+		s.Set("A4", "4")
+		s.Set("A5", "5")
+		s.Set("B1", "=SUM(A1:A5, 6-7)")
+		s.Calculate()
+	}
+}
