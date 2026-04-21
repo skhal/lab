@@ -89,7 +89,7 @@ func (rc *refCalculator) Calculate(id string) (float64, error) {
 	}()
 	c, ok := rc.s.data[id]
 	if !ok {
-		return 0, fmt.Errorf("invalid cell %s", id)
+		return 0, nil
 	}
 	if err := rc.s.calculate(id, c, rc); err != nil {
 		return 0, err

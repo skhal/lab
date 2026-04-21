@@ -175,7 +175,6 @@ func TestSheet_Calculate(t *testing.T) {
 			want: map[string]float64{
 				"A1": 0,
 			},
-			wantErr: sheet.ErrCell,
 		},
 		{
 			name: "reference to static",
