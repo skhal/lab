@@ -91,31 +91,30 @@ func (p *formulaParser) parseOperand() (ast.Node, error) {
 		return nil, fmt.Errorf("expected operand")
 	}
 	switch tok.Type {
+	// keep-sorted start
 	case lex.TokenError:
 		return nil, tok.Err
-	case lex.TokenIdent:
+	case lex.TokenIdent: // identifier or a function call
 		next, ok := p.peek()
 		if ok && next.Type == lex.TokenLpar {
 			return p.parseCall(tok)
 		}
 		return p.parseIdentifier(tok)
-	case lex.TokenRange:
-		return p.parseRange(tok)
-	case lex.TokenNumber:
-		return &ast.NumberNode{Number: tok.Text}, nil
-	case lex.TokenLpar:
+	case lex.TokenLpar: // an expression in parentheses
 		n, err := p.parseExpr()
 		if err != nil {
 			return nil, err
 		}
 		tok, ok = p.next()
-		if !ok {
-			return nil, fmt.Errorf("unbalanced parentheses")
-		}
-		if tok.Type != lex.TokenRpar {
+		if !ok || tok.Type != lex.TokenRpar {
 			return nil, fmt.Errorf("unbalanced parentheses")
 		}
 		return n, nil
+	case lex.TokenNumber:
+		return &ast.NumberNode{Number: tok.Text}, nil
+	case lex.TokenRange:
+		return p.parseRange(tok)
+		// keep-sorted end
 	}
 	return nil, fmt.Errorf("invalid token - %s", tok.Type)
 }
