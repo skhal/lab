@@ -132,6 +132,11 @@ func TestParse_formula(t *testing.T) {
 			wantErr: parse.ErrParse,
 		},
 		{
+			name:    "unbalanced parentheses",
+			s:       "=(1 2",
+			wantErr: parse.ErrParse,
+		},
+		{
 			name:    "missing left parenthesis",
 			s:       "=1)",
 			wantErr: parse.ErrParse,
@@ -159,6 +164,61 @@ func TestParse_formula(t *testing.T) {
 		{
 			name:    "identifier must has upper case",
 			s:       "=abc123",
+			wantErr: parse.ErrParse,
+		},
+		{
+			name:     "call with empty args",
+			s:        "=SUM()",
+			wantNode: &ast.CallNode{Name: "SUM"},
+		},
+		{
+			name:    "call with invalid name",
+			s:       "=SUM123()",
+			wantErr: parse.ErrParse,
+		},
+		{
+			name:    "call without right parenthesis",
+			s:       "=SUM123(",
+			wantErr: parse.ErrParse,
+		},
+		{
+			name: "call with one literal arg",
+			s:    "=SUM(123)",
+			wantNode: &ast.CallNode{
+				Name: "SUM",
+				Args: []ast.Node{
+					&ast.NumberNode{Number: "123"},
+				},
+			},
+		},
+		{
+			name: "call with one literal args",
+			s:    "=SUM(1, 2)",
+			wantNode: &ast.CallNode{
+				Name: "SUM",
+				Args: []ast.Node{
+					&ast.NumberNode{Number: "1"},
+					&ast.NumberNode{Number: "2"},
+				},
+			},
+		},
+		{
+			name: "call with one expr args",
+			s:    "=SUM(1 + 2)",
+			wantNode: &ast.CallNode{
+				Name: "SUM",
+				Args: []ast.Node{
+					&ast.BinOpNode{
+						Op:    "+",
+						Left:  &ast.NumberNode{Number: "1"},
+						Right: &ast.NumberNode{Number: "2"},
+					},
+				},
+			},
+		},
+		{
+			name:    "call with invalid expr args",
+			s:       "=SUM(1 2)",
 			wantErr: parse.ErrParse,
 		},
 	}

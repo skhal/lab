@@ -288,6 +288,75 @@ func TestCalculate_reference(t *testing.T) {
 	}
 }
 
+func TestCalculate_call(t *testing.T) {
+	tests := []struct {
+		name    string
+		node    ast.Node
+		want    float64
+		wantErr bool
+	}{
+		{
+			name: "unsupported function",
+			node: &ast.CallNode{
+				Name: "UNSUPPORTED",
+			},
+			wantErr: true,
+		},
+		{
+			name: "disabled function",
+			node: &ast.CallNode{
+				Name: "MIN",
+				Args: []ast.Node{
+					&ast.NumberNode{Number: "3"},
+					&ast.NumberNode{Number: "2"},
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "sum no args",
+			node: &ast.CallNode{
+				Name: "SUM",
+			},
+		},
+		{
+			name: "sum with static args",
+			node: &ast.CallNode{
+				Name: "SUM",
+				Args: []ast.Node{
+					&ast.NumberNode{Number: "123"},
+				},
+			},
+			want: 123,
+		},
+		{
+			name: "fail to calculate arg",
+			node: &ast.CallNode{
+				Name: "SUM",
+				Args: []ast.Node{
+					&ast.RefNode{Ref: "A1"},
+				},
+			},
+			wantErr: true,
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			got, err := calc.Calculate(tc.node, newTestRefCalculator(t, nil))
+
+			switch {
+			case tc.wantErr && err == nil:
+				t.Error("Calculate() missing error")
+			case !tc.wantErr && err != nil:
+				t.Errorf("Calculate() unexpected error: %v", err)
+			}
+			if got != tc.want {
+				t.Errorf("Calculate() = %f, _; want %f", got, tc.want)
+			}
+		})
+	}
+}
+
 var errTest = errors.New("test error")
 
 type testCell struct {

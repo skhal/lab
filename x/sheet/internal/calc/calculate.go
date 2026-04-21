@@ -37,12 +37,16 @@ type calculator struct {
 // the value of a reference.
 func (c *calculator) Calculate(node ast.Node) (float64, error) {
 	switch n := node.(type) {
-	case *ast.NumberNode:
-		return c.calcNum(n)
+	// keep-sorted start
 	case *ast.BinOpNode:
 		return c.calcBinOp(n)
+	case *ast.CallNode:
+		return c.calcCall(n)
+	case *ast.NumberNode:
+		return c.calcNum(n)
 	case *ast.RefNode:
 		return c.ref.Calculate(n.Ref)
+		// keep-sorted end
 	}
 	return 0, ErrCalculate
 }
@@ -107,4 +111,38 @@ func must(n float64, err error) float64 {
 		panic(err)
 	}
 	return n
+}
+
+var calls = map[string]func([]float64) float64{
+	// keep-sorted start
+	"MIN": nil,
+	"SUM": callSum,
+	// keep-sorted end
+}
+
+func (c *calculator) calcCall(n *ast.CallNode) (float64, error) {
+	fn, ok := calls[n.Name]
+	if !ok {
+		return 0, fmt.Errorf("unsupported formula - %s", n.Name)
+	}
+	if fn == nil {
+		return 0, fmt.Errorf("disabled formula - %s", n.Name)
+	}
+	var args []float64
+	for _, na := range n.Args {
+		arg, err := c.Calculate(na)
+		if err != nil {
+			return 0, err
+		}
+		args = append(args, arg)
+	}
+	return fn(args), nil
+}
+
+func callSum(nn []float64) float64 {
+	var sum float64
+	for _, n := range nn {
+		sum += n
+	}
+	return sum
 }

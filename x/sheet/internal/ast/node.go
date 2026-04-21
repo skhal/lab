@@ -25,3 +25,9 @@ type BinOpNode struct {
 type RefNode struct {
 	Ref string // cell reference
 }
+
+// CallNode is a function call.
+type CallNode struct {
+	Name string // function name
+	Args []Node // function arguments, can be empty
+}

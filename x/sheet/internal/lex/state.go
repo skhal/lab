@@ -19,10 +19,13 @@ var whitespace = []byte(` \t`)
 // advances to the next supported state.
 func scanState(lx *lexer) stateFunc {
 	const (
-		plus  = '+'
-		minus = '-'
+		// keep-sorted start
+		comma = ','
 		lpar  = '('
+		minus = '-'
+		plus  = '+'
 		rpar  = ')'
+		// keep-sorted end
 	)
 	lx.scan(whitespace)
 	lx.ignore()
@@ -36,14 +39,18 @@ func scanState(lx *lexer) stateFunc {
 		return numberState
 	case unicode.IsLetter(r):
 		return identifierState
-	case r == plus:
-		return genState(TokenPlus)
-	case r == minus:
-		return genState(TokenMinus)
+	// keep-sorted start
+	case r == comma:
+		return genState(TokenComma)
 	case r == lpar:
 		return genState(TokenLpar)
+	case r == minus:
+		return genState(TokenMinus)
+	case r == plus:
+		return genState(TokenPlus)
 	case r == rpar:
 		return genState(TokenRpar)
+	// keep-sorted end
 	default:
 		lx.err = fmt.Errorf("unsupported text at %d -  %q", lx.pos, lx.b[lx.pos:])
 		return errorState

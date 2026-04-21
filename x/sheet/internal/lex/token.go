@@ -24,4 +24,5 @@ const (
 	TokenLpar             // rpar
 	TokenRpar             // lpar
 	TokenIdent            // identifier
+	TokenComma            // comma
 )

@@ -60,6 +60,12 @@ func run() (err error) {
 	must(s.Set("E4", "=D2"))
 	must(s.Set("E5", "=A1 - 3"))
 	must(s.Set("E6", "=D2 + 10"))
+	must(s.Set("F1", "=SUM()"))
+	must(s.Set("F2", "=SUM(1)"))
+	must(s.Set("F3", "=SUM(1, 2, 3)"))
+	must(s.Set("F3", "=SUM(A1, 2)"))
+	must(s.Set("F3", "=SUM(A1, A1)"))
+	must(s.Set("F4", "=SUM(A1, SUM(A2, A3))"))
 
 	must(s.Calculate())
 

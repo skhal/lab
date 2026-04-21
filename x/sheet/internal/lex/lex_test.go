@@ -122,6 +122,13 @@ func TestLex(t *testing.T) {
 				{Type: lex.TokenIdent, Text: "ABc"},
 			},
 		},
+		{
+			name: "comma",
+			b:    []byte(","),
+			want: []lex.Token{
+				{Type: lex.TokenComma, Text: ","},
+			},
+		},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
