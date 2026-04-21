@@ -69,8 +69,9 @@ func parseFormula(s string) (ast.Node, error) {
 //
 //	Expr       = Operand | BinaryExpr
 //
-//	Operand    = Number | Identifier | Call | "(" Expr ")"
+//	Operand    = Number | Identifier | Range | Call | "(" Expr ")"
 //	Identifier = Letter Digit
+//	Range      = Identifier ":" Identifier
 //	Call       = Identifier "(" [ ArgList ] ")"
 //	ArgList    = Expr { "," ArgsList }
 //
@@ -147,6 +148,8 @@ func (p *formulaParser) parseOperand() (ast.Node, error) {
 			return p.parseCall(tok)
 		}
 		return p.parseIdentifier(tok)
+	case lex.TokenRange:
+		return p.parseRange(tok)
 	case lex.TokenNumber:
 		return &ast.NumberNode{Number: tok.Text}, nil
 	case lex.TokenLpar:
@@ -171,6 +174,19 @@ func (p *formulaParser) parseIdentifier(ident lex.Token) (ast.Node, error) {
 		return nil, fmt.Errorf("invalid identifier %s", ident.Text)
 	}
 	return &ast.RefNode{Ref: ident.Text}, nil
+}
+
+func (p *formulaParser) parseRange(tok lex.Token) (ast.Node, error) {
+	const (
+		sep    = ":"
+		fields = 2
+	)
+	items := strings.SplitN(tok.Text, sep, fields)
+	if len(items) != fields {
+		// should not happen as long as the lexer and the parser are in sync.
+		return nil, fmt.Errorf("invalid range %s", tok.Text)
+	}
+	return &ast.RangeNode{From: items[0], To: items[1]}, nil
 }
 
 func (p *formulaParser) parseCall(ident lex.Token) (ast.Node, error) {

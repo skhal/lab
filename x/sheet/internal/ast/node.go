@@ -31,3 +31,9 @@ type CallNode struct {
 	Name string // function name
 	Args []Node // function arguments, can be empty
 }
+
+// RangeNode represents a cells rang, e.g. A1:A5
+type RangeNode struct {
+	From string // from cell
+	To   string // to cell (inclusive)
+}

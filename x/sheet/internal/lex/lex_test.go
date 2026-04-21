@@ -129,6 +129,28 @@ func TestLex(t *testing.T) {
 				{Type: lex.TokenComma, Text: ","},
 			},
 		},
+		{
+			name: "range",
+			b:    []byte("A1:A2"),
+			want: []lex.Token{
+				{Type: lex.TokenRange, Text: "A1:A2"},
+			},
+		},
+		{
+			name: "range misses second identifier",
+			b:    []byte("A1:"),
+			want: []lex.Token{
+				{Type: lex.TokenError, Err: lex.ErrLex},
+			},
+		},
+		{
+			// a reference is a cell identifier, e.g. A123
+			name: "range second identifier is not a reference",
+			b:    []byte("A1:B"),
+			want: []lex.Token{
+				{Type: lex.TokenError, Err: lex.ErrLex},
+			},
+		},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {

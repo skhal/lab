@@ -221,6 +221,21 @@ func TestParse_formula(t *testing.T) {
 			s:       "=SUM(1 2)",
 			wantErr: parse.ErrParse,
 		},
+		{
+			name:     "range",
+			s:        "=A1:A3",
+			wantNode: &ast.RangeNode{From: "A1", To: "A3"},
+		},
+		{
+			name:    "range misses first identifier",
+			s:       "=:A3",
+			wantErr: parse.ErrParse,
+		},
+		{
+			name:    "range misses second identifier",
+			s:       "=A1:",
+			wantErr: parse.ErrParse,
+		},
 	}
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {

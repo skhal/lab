@@ -79,12 +79,37 @@ func numberState(lx *lexer) stateFunc {
 // insensitive.
 func identifierState(lx *lexer) stateFunc {
 	lx.ScanFunc(unicode.IsLetter)
-	switch r, err := lx.Peek(); {
-	case err != nil:
-	case unicode.IsNumber(r):
-		lx.ScanFunc(unicode.IsNumber)
+
+	if r, err := lx.Peek(); err != nil || !unicode.IsNumber(r) {
+		lx.Emit(TokenIdent)
+		return scanState
 	}
-	lx.Emit(TokenIdent)
+	lx.ScanFunc(unicode.IsNumber)
+
+	const colon = ':'
+	if r, err := lx.Peek(); err != nil || r != colon {
+		lx.Emit(TokenIdent)
+		return scanState
+	}
+	lx.Read() // skip colon
+
+	var (
+		pos = lx.pos
+		b   = lx.b[lx.pos:]
+	)
+	if r, err := lx.Peek(); err != nil || !unicode.IsLetter(r) {
+		err := fmt.Errorf("missing identifier after colon at %d - %q", pos, b)
+		return errorState(err)
+	}
+	lx.ScanFunc(unicode.IsLetter)
+
+	if r, err := lx.Peek(); err != nil || !unicode.IsNumber(r) {
+		err := fmt.Errorf("invalid identifier after colon at %d - %q", pos, b)
+		return errorState(err)
+	}
+	lx.ScanFunc(unicode.IsNumber)
+
+	lx.Emit(TokenRange)
 	return scanState
 }
 

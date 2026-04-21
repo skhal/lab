@@ -292,6 +292,7 @@ func TestCalculate_call(t *testing.T) {
 	tests := []struct {
 		name    string
 		node    ast.Node
+		refs    map[string]testCell
 		want    float64
 		wantErr bool
 	}{
@@ -339,10 +340,67 @@ func TestCalculate_call(t *testing.T) {
 			},
 			wantErr: true,
 		},
+		{
+			name: "range",
+			node: &ast.CallNode{
+				Name: "SUM",
+				Args: []ast.Node{
+					&ast.RangeNode{From: "A1", To: "A2"},
+				},
+			},
+			refs: map[string]testCell{
+				"A1": {res: 1},
+				"A2": {res: 2},
+			},
+			want: 3,
+		},
+		{
+			name: "range with undefined cell",
+			node: &ast.CallNode{
+				Name: "SUM",
+				Args: []ast.Node{
+					&ast.RangeNode{From: "A1", To: "A2"},
+				},
+			},
+			refs: map[string]testCell{
+				"A1": {res: 1},
+			},
+			wantErr: true,
+		},
+		{
+			name: "range invalid from",
+			node: &ast.CallNode{
+				Name: "SUM",
+				Args: []ast.Node{
+					// want a single letter cell, e.g. A1
+					&ast.RangeNode{From: "AB1", To: "A2"},
+				},
+			},
+			refs: map[string]testCell{
+				"A1": {res: 1},
+				"A2": {res: 2},
+			},
+			wantErr: true,
+		},
+		{
+			name: "range invalid to",
+			node: &ast.CallNode{
+				Name: "SUM",
+				Args: []ast.Node{
+					// want a single letter cell, e.g. A2
+					&ast.RangeNode{From: "A1", To: "AB2"},
+				},
+			},
+			refs: map[string]testCell{
+				"A1": {res: 1},
+				"A2": {res: 2},
+			},
+			wantErr: true,
+		},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			got, err := calc.Calculate(tc.node, newTestRefCalculator(t, nil))
+			got, err := calc.Calculate(tc.node, newTestRefCalculator(t, tc.refs))
 
 			switch {
 			case tc.wantErr && err == nil:

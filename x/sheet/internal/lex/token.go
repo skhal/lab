@@ -16,13 +16,16 @@ type Token struct {
 type tokenType int
 
 const (
-	_           tokenType = iota
-	TokenError            // error
-	TokenNumber           // number
-	TokenPlus             // plus
-	TokenMinus            // minus
-	TokenLpar             // rpar
-	TokenRpar             // lpar
-	TokenIdent            // identifier
-	TokenComma            // comma
+	_ tokenType = iota
+	// keep-sorted start
+	TokenComma  // comma
+	TokenError  // error
+	TokenIdent  // identifier
+	TokenLpar   // rpar
+	TokenMinus  // minus
+	TokenNumber // number
+	TokenPlus   // plus
+	TokenRange  // range
+	TokenRpar   // lpar
+	// keep-sorted end
 )

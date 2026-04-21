@@ -130,6 +130,15 @@ func (c *calculator) calcCall(n *ast.CallNode) (float64, error) {
 	}
 	var args []float64
 	for _, na := range n.Args {
+		switch n := na.(type) {
+		case *ast.RangeNode:
+			rng, err := c.calcRange(n)
+			if err != nil {
+				return 0, err
+			}
+			args = append(args, rng...)
+			continue
+		}
 		arg, err := c.Calculate(na)
 		if err != nil {
 			return 0, err
@@ -137,6 +146,22 @@ func (c *calculator) calcCall(n *ast.CallNode) (float64, error) {
 		args = append(args, arg)
 	}
 	return fn(args), nil
+}
+
+func (c *calculator) calcRange(n *ast.RangeNode) ([]float64, error) {
+	cr, err := NewCellScanner(n.From, n.To)
+	if err != nil {
+		return nil, err
+	}
+	var nn []float64
+	for id := range cr.Scan() {
+		res, err := c.Calculate(&ast.RefNode{Ref: id})
+		if err != nil {
+			return nil, err
+		}
+		nn = append(nn, res)
+	}
+	return nn, nil
 }
 
 func callSum(nn []float64) float64 {
