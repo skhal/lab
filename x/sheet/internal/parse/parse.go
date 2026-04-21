@@ -26,12 +26,16 @@ func Parse(s string) (ast.Node, error) {
 	const (
 		formulaPrefix = "="
 	)
+	parse := parseFormula
 	s, ok := strings.CutPrefix(s, formulaPrefix)
-	s = strings.TrimSpace(s)
 	if !ok {
-		return parseCell(s)
+		parse = parseCell
 	}
-	return parseFormula(s)
+	n, err := parse(strings.TrimSpace(s))
+	if err != nil {
+		return nil, fmt.Errorf("%w: %s", ErrParse, err)
+	}
+	return n, nil
 }
 
 var (
@@ -43,24 +47,20 @@ var (
 // parseCell parses a cell without formula.
 func parseCell(s string) (ast.Node, error) {
 	if len(s) == 0 {
-		return nil, fmt.Errorf("%w: empty cell", ErrParse)
+		return nil, fmt.Errorf("empty cell")
 	}
 	if !cellRx.MatchString(s) {
-		return nil, fmt.Errorf("%w: not a number %q", ErrParse, s)
+		return nil, fmt.Errorf(" not a number %q", s)
 	}
 	return &ast.NumberNode{Number: s}, nil
 }
 
 func parseFormula(s string) (ast.Node, error) {
 	if len(s) == 0 {
-		return nil, fmt.Errorf("%w: empty formula", ErrParse)
+		return nil, fmt.Errorf("empty formula")
 	}
 	p := &formulaParser{}
-	n, err := p.Parse([]byte(s))
-	if err != nil {
-		return nil, fmt.Errorf("%w: %s", ErrParse, err)
-	}
-	return n, nil
+	return p.Parse([]byte(s))
 }
 
 // formulaParser parses formula without "=" prefix into an AST tree.
