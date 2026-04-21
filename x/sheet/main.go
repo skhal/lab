@@ -11,13 +11,18 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"os"
+	"runtime/pprof"
 
 	"github.com/skhal/lab/x/sheet/internal/sheet"
 )
 
+var cpuprofile = flag.String("cpuprofile", "", "write CPU profile to file")
+
 func main() {
+	flag.Parse()
 	if err := run(); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
@@ -25,6 +30,17 @@ func main() {
 }
 
 func run() (err error) {
+	if *cpuprofile != "" {
+		f, err := os.Create(*cpuprofile)
+		if err != nil {
+			return fmt.Errorf("failed to create CPU profile: %s", err)
+		}
+		defer f.Close()
+		if err := pprof.StartCPUProfile(f); err != nil {
+			return fmt.Errorf("failed to start CPU profile: %s", err)
+		}
+		defer pprof.StopCPUProfile()
+	}
 	defer func() {
 		x := recover()
 		if x == nil {
@@ -68,6 +84,7 @@ func run() (err error) {
 	must(s.Set("F4", "=SUM(A1, SUM(A2, A3))"))
 	must(s.Set("G1", "=SUM(A1:A3)"))
 	must(s.Set("G2", "=SUM(A1:A3, 5-7)"))
+	must(s.Set("G3", "=SUM(A1:A5, 1+(9-7+(2+3)), B1:B5, C1:C5, D1:D5, E1:E5, 1+(2-3))"))
 
 	must(s.Calculate())
 
