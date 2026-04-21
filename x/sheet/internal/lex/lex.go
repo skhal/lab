@@ -47,7 +47,7 @@ type lexer struct {
 	start        int // starting position of the token being scanned
 	pos          int // current positin during the scan
 	lastRuneSize int
-	err          error
+	Err          error // error for TokenError
 }
 
 func newLexer(b []byte) *lexer {
@@ -98,8 +98,9 @@ func (lx *lexer) Emit(tk tokenType) {
 	var tok Token
 	switch tk {
 	case TokenError:
-		err := fmt.Errorf("%w: %s", ErrLex, lx.err)
+		err := fmt.Errorf("%w: %s", ErrLex, lx.Err)
 		tok = Token{Type: tk, Err: err}
+		lx.Err = nil
 	default:
 		tok = Token{Type: tk, Text: lx.text()}
 	}

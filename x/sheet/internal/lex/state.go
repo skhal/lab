@@ -36,8 +36,7 @@ func scanState(lx *lexer) stateFunc {
 	case err == io.EOF:
 		return eofState
 	case err != nil:
-		lx.err = err
-		return errorState
+		return errorState(err)
 	case unicode.IsNumber(r):
 		return numberState
 	case unicode.IsLetter(r):
@@ -55,8 +54,8 @@ func scanState(lx *lexer) stateFunc {
 		return genState(TokenRpar)
 	// keep-sorted end
 	default:
-		lx.err = fmt.Errorf("unsupported text at %d -  %q", lx.pos, lx.b[lx.pos:])
-		return errorState
+		err := fmt.Errorf("unsupported text at %d -  %q", lx.pos, lx.b[lx.pos:])
+		return errorState(err)
 	}
 }
 
@@ -98,9 +97,12 @@ func genState(tok tokenType) stateFunc {
 }
 
 // errorState emits an error token and advances to eofState.
-func errorState(lx *lexer) stateFunc {
-	lx.Emit(TokenError)
-	return eofState
+func errorState(err error) stateFunc {
+	return func(lx *lexer) stateFunc {
+		lx.Err = err
+		lx.Emit(TokenError)
+		return eofState
+	}
 }
 
 // eofState terminates the sequence of the states.
