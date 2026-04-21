@@ -105,8 +105,7 @@ func (p *formulaParser) parseOperand() (ast.Node, error) {
 		if err != nil {
 			return nil, err
 		}
-		tok, ok = p.next()
-		if !ok || tok.Type != lex.TokenRpar {
+		if tok, ok = p.next(); !ok || tok.Type != lex.TokenRpar {
 			return nil, fmt.Errorf("unbalanced parentheses")
 		}
 		return n, nil
@@ -152,11 +151,7 @@ func (p *formulaParser) parseCall(ident lex.Token) (ast.Node, error) {
 			return nil, err
 		}
 	}
-	tok, ok := p.next()
-	if !ok {
-		return nil, fmt.Errorf("unbalanced parentheses")
-	}
-	if tok.Type != lex.TokenRpar {
+	if tok, ok := p.next(); !ok || tok.Type != lex.TokenRpar {
 		return nil, fmt.Errorf("unbalanced parentheses")
 	}
 	return &ast.CallNode{Name: ident.Text, Args: args}, nil
