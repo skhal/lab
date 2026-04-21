@@ -68,12 +68,14 @@ func parseFormula(s string) (ast.Node, error) {
 // Context free grammar (CFG):
 //
 //	Expr       = Operand | BinaryExpr
+//
 //	Operand    = Number | Identifier | Call | "(" Expr ")"
 //	Identifier = Letter Digit
-//	BinaryExpr = Expr Op Expr
-//	Op         = "+" | "-"
 //	Call       = Identifier "(" [ ArgList ] ")"
 //	ArgList    = Expr { "," ArgsList }
+//
+//	BinaryExpr = Expr Op Expr
+//	Op         = "+" | "-"
 type formulaParser struct {
 	next func() (lex.Token, bool)
 	peek func() (lex.Token, bool)
