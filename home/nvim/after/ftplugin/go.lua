@@ -356,6 +356,9 @@ function LocationList.rename(opt)
 	if opt.kind == "Method" then
 		name = name:gsub("^%(%*?(%w+)%)%.", "")
 	end
+	if not name:match("^%u") then
+		kind = kind:lower()
+	end
 	opt.text = ("%s %s"):format(kind, name)
 	if LocationList.indent.kind[opt.kind] then
 		opt.text = LocationList.indentation .. opt.text
