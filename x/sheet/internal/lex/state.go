@@ -37,13 +37,13 @@ func scanState(lx *lexer) stateFunc {
 	case unicode.IsLetter(r):
 		return identifierState
 	case r == plus:
-		return plusState
+		return genState(TokenPlus)
 	case r == minus:
-		return minusState
+		return genState(TokenMinus)
 	case r == lpar:
-		return lparState
+		return genState(TokenLpar)
 	case r == rpar:
-		return rparState
+		return genState(TokenRpar)
 	default:
 		lx.err = fmt.Errorf("unsupported text at %d -  %q", lx.pos, lx.b[lx.pos:])
 		return errorState
@@ -79,28 +79,12 @@ func identifierState(lx *lexer) stateFunc {
 	return scanState
 }
 
-func plusState(lx *lexer) stateFunc {
-	lx.read()
-	lx.emit(TokenPlus)
-	return scanState
-}
-
-func minusState(lx *lexer) stateFunc {
-	lx.read()
-	lx.emit(TokenMinus)
-	return scanState
-}
-
-func lparState(lx *lexer) stateFunc {
-	lx.read()
-	lx.emit(TokenLpar)
-	return scanState
-}
-
-func rparState(lx *lexer) stateFunc {
-	lx.read()
-	lx.emit(TokenRpar)
-	return scanState
+func genState(tok tokenType) stateFunc {
+	return func(lx *lexer) stateFunc {
+		lx.read()
+		lx.emit(tok)
+		return scanState
+	}
 }
 
 // errorState emits an error token and advances to eofState.
