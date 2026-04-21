@@ -128,7 +128,7 @@ func (c *calculator) calcCall(n *ast.CallNode) (float64, error) {
 	if fn == nil {
 		return 0, fmt.Errorf("disabled formula - %s", n.Name)
 	}
-	var args []float64
+	args := make([]float64, 0, len(n.Args))
 	for _, na := range n.Args {
 		switch n := na.(type) {
 		case *ast.RangeNode:
