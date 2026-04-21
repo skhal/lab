@@ -79,8 +79,7 @@ func (p *formulaParser) parseExpr() (ast.Node, error) {
 	}
 	switch op.Type {
 	case lex.TokenPlus, lex.TokenMinus:
-		p.next() // discard peek cache
-		return p.parseBinaryExpr(lhs, op)
+		return p.parseBinaryExpr(lhs)
 	}
 	return lhs, nil
 }
@@ -177,7 +176,8 @@ func (p *formulaParser) parseArgs() ([]ast.Node, error) {
 	return args, nil
 }
 
-func (p *formulaParser) parseBinaryExpr(lhs ast.Node, op lex.Token) (ast.Node, error) {
+func (p *formulaParser) parseBinaryExpr(lhs ast.Node) (ast.Node, error) {
+	op, _ := p.next()
 	rhs, err := p.parseExpr()
 	if err != nil {
 		return nil, err
