@@ -361,6 +361,28 @@ func BenchmarkSheet(b *testing.B) {
 	}
 }
 
+func BenchmarkSheetRead(b *testing.B) {
+	buf := func() []byte {
+		s := sheet.New()
+		s.Set("A1", "1")
+		s.Set("A2", "2")
+		s.Set("A3", "3")
+		s.Set("A4", "4")
+		s.Set("A5", "5")
+		s.Set("B1", "=SUM(A1:A5, 6-7)")
+		var buf bytes.Buffer
+		if err := s.Write(&buf); err != nil {
+			b.Fatalf("Write() error: %s", err)
+		}
+		return buf.Bytes()
+	}()
+	for b.Loop() {
+		s := sheet.New()
+		s.Read(bytes.NewReader(buf))
+		s.Calculate()
+	}
+}
+
 func ExampleSheet() {
 	s := sheet.New()
 	// ignore-error start
