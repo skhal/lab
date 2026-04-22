@@ -11,6 +11,7 @@
 package main
 
 import (
+	"bytes"
 	"flag"
 	"fmt"
 	"os"
@@ -30,17 +31,6 @@ func main() {
 }
 
 func run() (err error) {
-	if *cpuprofile != "" {
-		f, err := os.Create(*cpuprofile)
-		if err != nil {
-			return fmt.Errorf("failed to create CPU profile: %s", err)
-		}
-		defer f.Close()
-		if err := pprof.StartCPUProfile(f); err != nil {
-			return fmt.Errorf("failed to start CPU profile: %s", err)
-		}
-		defer pprof.StopCPUProfile()
-	}
 	defer func() {
 		x := recover()
 		if x == nil {
@@ -52,14 +42,40 @@ func run() (err error) {
 		}
 		err = e
 	}()
-	must := func(err error) {
+	if *cpuprofile != "" {
+		var f *os.File
+		f, err = os.Create(*cpuprofile)
 		if err != nil {
-			panic(err)
+			return fmt.Errorf("failed to create CPU profile: %s", err)
 		}
+		defer f.Close()
+		if err = pprof.StartCPUProfile(f); err != nil {
+			return fmt.Errorf("failed to start CPU profile: %s", err)
+		}
+		defer pprof.StopCPUProfile()
 	}
-
+	b, err := create()
+	if err != nil {
+		return err
+	}
+	if len(b) == 0 {
+		return fmt.Errorf("empty sheet")
+	}
 	s := sheet.New()
+	err = s.Read(bytes.NewReader(b))
+	if err != nil {
+		return err
+	}
+	must(s.Calculate())
+	s.VisitAll(func(id, cell string, n float64) bool {
+		fmt.Printf("%s %q = %.2f\n", id, cell, n)
+		return true
+	})
+	return nil
+}
 
+func create() ([]byte, error) {
+	s := sheet.New()
 	must(s.Set("A1", "5"))
 	must(s.Set("A2", "10"))
 	must(s.Set("A3", "12"))
@@ -85,12 +101,15 @@ func run() (err error) {
 	must(s.Set("G1", "=SUM(A1:A3)"))
 	must(s.Set("G2", "=SUM(A1:A3, 5-7)"))
 	must(s.Set("G3", "=SUM(A1:A5, 1+(9-7+(2+3)), B1:B5, C1:C5, D1:D5, E1:E5, 1+(2-3))"))
+	var b bytes.Buffer
+	if err := s.Write(&b); err != nil {
+		return nil, err
+	}
+	return b.Bytes(), nil
+}
 
-	must(s.Calculate())
-
-	s.VisitAll(func(id, cell string, n float64) bool {
-		fmt.Printf("%s %q = %.2f\n", id, cell, n)
-		return true
-	})
-	return nil
+func must(err error) {
+	if err != nil {
+		panic(err)
+	}
 }
