@@ -17,24 +17,19 @@ import (
 // ErrCalculate means the AST has an error can can't be calculated.
 var ErrCalculate = errors.New("calculate error")
 
-// RefCalculator calculates reference value.
-type RefCalculator interface {
-	Calculate(string) (float64, error) // calculate reference cell value
-}
-
 // Calculate evaluates a formula node and skips other types of nodes. It
 // returns an error if evaluation fails.
-func Calculate(n ast.Node, ref RefCalculator) (float64, error) {
-	c := &calculator{ref}
+func Calculate(n ast.Node, refcal func(string) (float64, error)) (float64, error) {
+	c := &calculator{refcal}
 	return c.Calculate(n)
 }
 
 type calculator struct {
-	ref RefCalculator
+	refcal func(string) (float64, error)
 }
 
-// Calculate calculates the value of the node. It uses RefCalculator to get
-// the value of a reference.
+// Calculate calculates the value of the node. It uses reference calculator to
+// get the value of a reference.
 func (c *calculator) Calculate(node ast.Node) (float64, error) {
 	switch n := node.(type) {
 	// keep-sorted start
@@ -45,7 +40,7 @@ func (c *calculator) Calculate(node ast.Node) (float64, error) {
 	case *ast.NumberNode:
 		return c.calcNum(n)
 	case *ast.RefNode:
-		return c.ref.Calculate(n.Ref)
+		return c.refcal(n.Ref)
 		// keep-sorted end
 	}
 	return 0, ErrCalculate

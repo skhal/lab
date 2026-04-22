@@ -426,9 +426,10 @@ type testRefCalculator struct {
 	refs map[string]testCell
 }
 
-func newTestRefCalculator(t *testing.T, refs map[string]testCell) *testRefCalculator {
+func newTestRefCalculator(t *testing.T, refs map[string]testCell) func(string) (float64, error) {
 	t.Helper()
-	return &testRefCalculator{refs}
+	refcal := &testRefCalculator{refs}
+	return refcal.Calculate
 }
 
 func (rc *testRefCalculator) Calculate(id string) (float64, error) {

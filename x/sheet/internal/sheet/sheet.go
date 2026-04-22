@@ -14,9 +14,7 @@ import (
 	"maps"
 	"slices"
 
-	"github.com/skhal/lab/x/sheet/internal/ast"
-	"github.com/skhal/lab/x/sheet/internal/calc"
-	"github.com/skhal/lab/x/sheet/internal/parse"
+	"github.com/skhal/lab/x/sheet/internal/engine"
 )
 
 // ErrCell means there is an error in the cell value.
@@ -25,30 +23,64 @@ var ErrCell = errors.New("cell error")
 // Sheet is a table of cells, organized into columns and rows.
 type Sheet struct {
 	data map[string]*cell
+	eng  Engine
+}
+
+// Engine is the Sheets table backend to parse and calculate cells.
+type Engine interface {
+	// Parse cell content
+	Parse(string) (any, error)
+
+	// Calculate calculate cell value. The passed function can be used to
+	// trigger calculation of the reference cells.
+	Calculate(any, func(string) (float64, error)) (float64, error)
 }
 
 type cell struct {
 	ID   string
 	Text string
 
-	ast ast.Node
+	ir any
 
 	calculated bool
-	value      float64
+	result     float64
+}
+
+// Option represents a configuration option for the Sheets table.
+type Option func(*Sheet)
+
+// WithASTEngine makes Sheets table use AST engine.
+func WithASTEngine() Option {
+	return func(s *Sheet) {
+		if s.eng != nil {
+			panic("engine is already set")
+		}
+		s.eng = engine.NewAST()
+	}
 }
 
 // New creates a cells table.
-func New() *Sheet {
-	return &Sheet{make(map[string]*cell)}
+func New(opts ...Option) *Sheet {
+	s := &Sheet{
+		data: make(map[string]*cell),
+	}
+	for _, opt := range opts {
+		opt(s)
+	}
+	if s.eng == nil {
+		opt := WithASTEngine()
+		opt(s)
+	}
+	return s
 }
 
 // Set places a value to the cell.
 func (s *Sheet) Set(id, val string) error {
-	n, err := parse.Parse(val)
+	data, err := s.eng.Parse(val)
 	if err != nil {
 		return fmt.Errorf("%w: set %s to %q: %s", ErrCell, id, val, err)
 	}
-	s.data[id] = &cell{ID: id, Text: val, ast: n}
+	s.data[id] = &cell{ID: id, Text: val, ir: data}
 	return nil
 }
 
@@ -68,11 +100,11 @@ func (s *Sheet) calculate(id string, c *cell, rc *refCalculator) error {
 	if c.calculated {
 		return nil
 	}
-	res, err := calc.Calculate(c.ast, rc)
+	res, err := s.eng.Calculate(c.ir, rc.Calculate)
 	if err != nil {
 		return fmt.Errorf("%s: %s", id, err)
 	}
-	c.value = res
+	c.result = res
 	c.calculated = true
 	return nil
 }
@@ -107,7 +139,7 @@ func (rc *refCalculator) Calculate(id string) (float64, error) {
 	if err := rc.s.calculate(id, c, rc); err != nil {
 		return 0, err
 	}
-	return c.value, nil
+	return c.result, nil
 }
 
 // VisitAll calls function f on every cell. It passes cell identifier and
@@ -117,7 +149,7 @@ func (s *Sheet) VisitAll(f func(id, cell string, val float64) bool) {
 	slices.Sort(kk)
 	for _, id := range kk {
 		c := s.data[id]
-		if !f(id, c.Text, c.value) {
+		if !f(id, c.Text, c.result) {
 			break
 		}
 	}
@@ -126,6 +158,7 @@ func (s *Sheet) VisitAll(f func(id, cell string, val float64) bool) {
 // Write writes the sheet to the writer in binary format. It returns an error
 // if it fails to write data.
 func (s *Sheet) Write(w io.Writer) error {
+	// TODO(github.com/skhal/lab/issues/249): save the engine
 	kk := slices.Collect(maps.Keys(s.data))
 	slices.Sort(kk)
 	enc := gob.NewEncoder(w)
@@ -141,6 +174,7 @@ func (s *Sheet) Write(w io.Writer) error {
 // Read reads the sheet from the reader. It resets the sheet if there is any
 // data in cells.
 func (s *Sheet) Read(r io.Reader) error {
+	// TODO(github.com/skhal/lab/issues/249): load engine
 	if len(s.data) != 0 {
 		s.data = New().data
 	}
