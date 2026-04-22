@@ -47,10 +47,7 @@ func run() (err error) {
 		return fmt.Errorf("empty sheet")
 	}
 	s := sheet.New()
-	err = s.Read(bytes.NewReader(b))
-	if err != nil {
-		return err
-	}
+	must(s.Read(bytes.NewReader(b)))
 	must(s.Calculate())
 	s.VisitAll(func(id, cell string, n float64) bool {
 		fmt.Printf("%s %q = %.2f\n", id, cell, n)
@@ -86,10 +83,9 @@ func create() ([]byte, error) {
 	must(s.Set("G1", "=SUM(A1:A3)"))
 	must(s.Set("G2", "=SUM(A1:A3, 5-7)"))
 	must(s.Set("G3", "=SUM(A1:A5, 1+(9-7+(2+3)), B1:B5, C1:C5, D1:D5, E1:E5, 1+(2-3))"))
+
 	var b bytes.Buffer
-	if err := s.Write(&b); err != nil {
-		return nil, err
-	}
+	must(s.Write(&b))
 	return b.Bytes(), nil
 }
 
