@@ -153,7 +153,7 @@ func (c *calculator) calcRange(n *ast.RangeNode) ([]float64, error) {
 	if err != nil {
 		return nil, err
 	}
-	var nn []float64
+	nn := make([]float64, 0, cr.Len())
 	for id := range cr.Scan() {
 		res, err := c.Calculate(&ast.RefNode{Ref: id})
 		if err != nil {

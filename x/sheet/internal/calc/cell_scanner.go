@@ -66,6 +66,14 @@ func minmax[T cmp.Ordered](x, y T) (T, T) {
 	return min(x, y), max(x, y)
 }
 
+// Len returns the number of cells in the cell range.
+func (sc *CellScanner) Len() int {
+	// Assuming a single letter columns
+	cols := int(sc.to.col-sc.from.col) + 1
+	rows := (sc.to.row - sc.from.row + 1)
+	return rows * cols
+}
+
 // Scan generates a sequence of cell identiifiers in the range.
 func (sc *CellScanner) Scan() iter.Seq[string] {
 	return func(yield func(string) bool) {
