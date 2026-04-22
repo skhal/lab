@@ -15,12 +15,9 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"runtime/pprof"
 
 	"github.com/skhal/lab/x/sheet/internal/sheet"
 )
-
-var cpuprofile = flag.String("cpuprofile", "", "write CPU profile to file")
 
 func main() {
 	flag.Parse()
@@ -42,18 +39,6 @@ func run() (err error) {
 		}
 		err = e
 	}()
-	if *cpuprofile != "" {
-		var f *os.File
-		f, err = os.Create(*cpuprofile)
-		if err != nil {
-			return fmt.Errorf("failed to create CPU profile: %s", err)
-		}
-		defer f.Close()
-		if err = pprof.StartCPUProfile(f); err != nil {
-			return fmt.Errorf("failed to start CPU profile: %s", err)
-		}
-		defer pprof.StopCPUProfile()
-	}
 	b, err := create()
 	if err != nil {
 		return err
