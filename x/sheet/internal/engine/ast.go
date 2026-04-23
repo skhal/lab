@@ -9,7 +9,6 @@ import (
 	"fmt"
 
 	"github.com/skhal/lab/x/sheet/internal/ast"
-	"github.com/skhal/lab/x/sheet/internal/calc"
 )
 
 // AST engine uses AST for intermediate representation.
@@ -24,7 +23,7 @@ func (AST) Parse(s string) (any, error) {
 func (AST) Calculate(data any, refcal func(string) (float64, error)) (float64, error) {
 	switch ir := data.(type) {
 	case ast.Node:
-		return calc.Calculate(ir, refcal)
+		return ast.Calculate(ir, refcal)
 	default:
 		return 0, fmt.Errorf("unsupported IR - %T", ir)
 	}

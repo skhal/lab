@@ -3,7 +3,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package calc_test
+package ast_test
 
 import (
 	"errors"
@@ -11,7 +11,6 @@ import (
 	"testing"
 
 	"github.com/skhal/lab/x/sheet/internal/ast"
-	"github.com/skhal/lab/x/sheet/internal/calc"
 )
 
 const invalidOperator = "~!@#$%^&*"
@@ -35,12 +34,12 @@ func TestCalculate(t *testing.T) {
 				Left:  &ast.NumberNode{Number: "1"},
 				Right: &ast.NumberNode{Number: "2"},
 			},
-			wantErr: calc.ErrCalculate,
+			wantErr: ast.ErrCalculate,
 		},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			got, err := calc.Calculate(tc.node, newTestRefCalculator(t, nil))
+			got, err := ast.Calculate(tc.node, newTestRefCalculator(t, nil))
 
 			if !errors.Is(err, tc.wantErr) {
 				t.Errorf("Calculate() = _, %v; want %v", err, tc.wantErr)
@@ -73,7 +72,7 @@ func TestCalculate_plus(t *testing.T) {
 			node: &ast.BinOpNode{
 				Op: "+",
 			},
-			wantErr: calc.ErrCalculate,
+			wantErr: ast.ErrCalculate,
 		},
 		{
 			name: "operator plus one operand",
@@ -81,7 +80,7 @@ func TestCalculate_plus(t *testing.T) {
 				Op:   "+",
 				Left: &ast.NumberNode{Number: "1"},
 			},
-			wantErr: calc.ErrCalculate,
+			wantErr: ast.ErrCalculate,
 		},
 		{
 			name: "operator plus recurse first",
@@ -107,7 +106,7 @@ func TestCalculate_plus(t *testing.T) {
 				},
 				Right: &ast.NumberNode{Number: "3"},
 			},
-			wantErr: calc.ErrCalculate,
+			wantErr: ast.ErrCalculate,
 		},
 		{
 			name: "operator plus recurse second",
@@ -133,12 +132,12 @@ func TestCalculate_plus(t *testing.T) {
 					Right: &ast.NumberNode{Number: "3"},
 				},
 			},
-			wantErr: calc.ErrCalculate,
+			wantErr: ast.ErrCalculate,
 		},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			got, err := calc.Calculate(tc.node, newTestRefCalculator(t, nil))
+			got, err := ast.Calculate(tc.node, newTestRefCalculator(t, nil))
 
 			if !errors.Is(err, tc.wantErr) {
 				t.Errorf("Calculate() = _, %v; want %v", err, tc.wantErr)
@@ -171,7 +170,7 @@ func TestCalculate_minus(t *testing.T) {
 			node: &ast.BinOpNode{
 				Op: "-",
 			},
-			wantErr: calc.ErrCalculate,
+			wantErr: ast.ErrCalculate,
 		},
 		{
 			name: "operator minus one operand",
@@ -179,7 +178,7 @@ func TestCalculate_minus(t *testing.T) {
 				Op:   "-",
 				Left: &ast.NumberNode{Number: "1"},
 			},
-			wantErr: calc.ErrCalculate,
+			wantErr: ast.ErrCalculate,
 		},
 		{
 			name: "operator minus recurse first",
@@ -205,7 +204,7 @@ func TestCalculate_minus(t *testing.T) {
 				},
 				Right: &ast.NumberNode{Number: "3"},
 			},
-			wantErr: calc.ErrCalculate,
+			wantErr: ast.ErrCalculate,
 		},
 		{
 			name: "operator minus recurse second",
@@ -231,12 +230,12 @@ func TestCalculate_minus(t *testing.T) {
 					Right: &ast.NumberNode{Number: "3"},
 				},
 			},
-			wantErr: calc.ErrCalculate,
+			wantErr: ast.ErrCalculate,
 		},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			got, err := calc.Calculate(tc.node, newTestRefCalculator(t, nil))
+			got, err := ast.Calculate(tc.node, newTestRefCalculator(t, nil))
 
 			if !errors.Is(err, tc.wantErr) {
 				t.Errorf("Calculate() = _, %v; want %v", err, tc.wantErr)
@@ -276,7 +275,7 @@ func TestCalculate_reference(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			got, err := calc.Calculate(tc.node, newTestRefCalculator(t, tc.refs))
+			got, err := ast.Calculate(tc.node, newTestRefCalculator(t, tc.refs))
 
 			if !errors.Is(err, tc.wantErr) {
 				t.Errorf("Calculate() = _, %v; want %v", err, tc.wantErr)
@@ -400,7 +399,7 @@ func TestCalculate_call(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			got, err := calc.Calculate(tc.node, newTestRefCalculator(t, tc.refs))
+			got, err := ast.Calculate(tc.node, newTestRefCalculator(t, tc.refs))
 
 			switch {
 			case tc.wantErr && err == nil:

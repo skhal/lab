@@ -3,15 +3,12 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Package calc evaluates formulas.
-package calc
+package ast
 
 import (
 	"errors"
 	"fmt"
 	"strconv"
-
-	"github.com/skhal/lab/x/sheet/internal/ast"
 )
 
 // ErrCalculate means the AST has an error can can't be calculated.
@@ -19,7 +16,7 @@ var ErrCalculate = errors.New("calculate error")
 
 // Calculate evaluates a formula node and skips other types of nodes. It
 // returns an error if evaluation fails.
-func Calculate(n ast.Node, refcal func(string) (float64, error)) (float64, error) {
+func Calculate(n Node, refcal func(string) (float64, error)) (float64, error) {
 	c := &calculator{refcal}
 	return c.Calculate(n)
 }
@@ -30,27 +27,27 @@ type calculator struct {
 
 // Calculate calculates the value of the node. It uses reference calculator to
 // get the value of a reference.
-func (c *calculator) Calculate(node ast.Node) (float64, error) {
+func (c *calculator) Calculate(node Node) (float64, error) {
 	switch n := node.(type) {
 	// keep-sorted start
-	case *ast.BinOpNode:
+	case *BinOpNode:
 		return c.calcBinOp(n)
-	case *ast.CallNode:
+	case *CallNode:
 		return c.calcCall(n)
-	case *ast.NumberNode:
+	case *NumberNode:
 		return c.calcNum(n)
-	case *ast.RefNode:
+	case *RefNode:
 		return c.refcal(n.Ref)
 		// keep-sorted end
 	}
 	return 0, ErrCalculate
 }
 
-func (c *calculator) calcNum(n *ast.NumberNode) (float64, error) {
+func (c *calculator) calcNum(n *NumberNode) (float64, error) {
 	return strconv.ParseFloat(n.Number, 64)
 }
 
-func (c *calculator) calcBinOp(n *ast.BinOpNode) (_ float64, err error) {
+func (c *calculator) calcBinOp(n *BinOpNode) (_ float64, err error) {
 	defer func() {
 		r := recover()
 		if r == nil {
@@ -81,10 +78,10 @@ func (c *calculator) calcBinOp(n *ast.BinOpNode) (_ float64, err error) {
 type binaryOperator struct {
 	c        *calculator
 	f        func(x, y float64) float64
-	lhs, rhs ast.Node
+	lhs, rhs Node
 }
 
-func newBinaryOperator(c *calculator, op func(x, y float64) float64, lhs, rhs ast.Node) *binaryOperator {
+func newBinaryOperator(c *calculator, op func(x, y float64) float64, lhs, rhs Node) *binaryOperator {
 	return &binaryOperator{c, op, lhs, rhs}
 }
 
@@ -115,7 +112,7 @@ var calls = map[string]func([]float64) float64{
 	// keep-sorted end
 }
 
-func (c *calculator) calcCall(n *ast.CallNode) (float64, error) {
+func (c *calculator) calcCall(n *CallNode) (float64, error) {
 	fn, ok := calls[n.Name]
 	if !ok {
 		return 0, fmt.Errorf("unsupported formula - %s", n.Name)
@@ -126,7 +123,7 @@ func (c *calculator) calcCall(n *ast.CallNode) (float64, error) {
 	args := make([]float64, 0, len(n.Args))
 	for _, na := range n.Args {
 		switch n := na.(type) {
-		case *ast.RangeNode:
+		case *RangeNode:
 			rng, err := c.calcRange(n)
 			if err != nil {
 				return 0, err
@@ -143,14 +140,14 @@ func (c *calculator) calcCall(n *ast.CallNode) (float64, error) {
 	return fn(args), nil
 }
 
-func (c *calculator) calcRange(n *ast.RangeNode) ([]float64, error) {
+func (c *calculator) calcRange(n *RangeNode) ([]float64, error) {
 	cr, err := NewCellScanner(n.From, n.To)
 	if err != nil {
 		return nil, err
 	}
 	nn := make([]float64, 0, cr.Len())
 	for id := range cr.Scan() {
-		res, err := c.Calculate(&ast.RefNode{Ref: id})
+		res, err := c.Calculate(&RefNode{Ref: id})
 		if err != nil {
 			return nil, err
 		}

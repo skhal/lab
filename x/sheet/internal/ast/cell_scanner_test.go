@@ -3,7 +3,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package calc_test
+package ast_test
 
 import (
 	"errors"
@@ -11,7 +11,7 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/skhal/lab/x/sheet/internal/calc"
+	"github.com/skhal/lab/x/sheet/internal/ast"
 )
 
 func TestCellScanner_new(t *testing.T) {
@@ -23,29 +23,29 @@ func TestCellScanner_new(t *testing.T) {
 	}{
 		{
 			name:    "empty",
-			wantErr: calc.ErrCellRange,
+			wantErr: ast.ErrCellRange,
 		},
 		{
 			name:    "empty from",
 			to:      "A2",
-			wantErr: calc.ErrCellRange,
+			wantErr: ast.ErrCellRange,
 		},
 		{
 			name:    "empty to",
 			from:    "A1",
-			wantErr: calc.ErrCellRange,
+			wantErr: ast.ErrCellRange,
 		},
 		{
 			name:    "from has no row",
 			from:    "A",
 			to:      "A2",
-			wantErr: calc.ErrCellRange,
+			wantErr: ast.ErrCellRange,
 		},
 		{
 			name:    "to has no row",
 			from:    "A1",
 			to:      "A",
-			wantErr: calc.ErrCellRange,
+			wantErr: ast.ErrCellRange,
 		},
 		{
 			name: "valid range",
@@ -60,7 +60,7 @@ func TestCellScanner_new(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			_, err := calc.NewCellScanner(tc.from, tc.to)
+			_, err := ast.NewCellScanner(tc.from, tc.to)
 
 			if !errors.Is(err, tc.wantErr) {
 				t.Errorf("NewCellScanner(%q, %q) = _, %v; want %v", tc.from, tc.to, err, tc.wantErr)
@@ -109,7 +109,7 @@ func TestCellScanner_Range(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			cr, err := calc.NewCellScanner(tc.from, tc.to)
+			cr, err := ast.NewCellScanner(tc.from, tc.to)
 			if err != nil {
 				t.Fatalf("NewCellScanner(%q, %q) unexpected error: %s", tc.from, tc.to, err)
 			}

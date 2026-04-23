@@ -11,7 +11,6 @@ import (
 	"strconv"
 
 	"github.com/skhal/lab/x/sheet/internal/ast"
-	"github.com/skhal/lab/x/sheet/internal/calc"
 )
 
 // ErrCompile means error to compile AST into the instructions set.
@@ -117,7 +116,7 @@ func (c *compiler) compileCall(call *ast.CallNode) error {
 }
 
 func (c *compiler) compileRange(n *ast.RangeNode) (int, error) {
-	cr, err := calc.NewCellScanner(n.From, n.To)
+	cr, err := ast.NewCellScanner(n.From, n.To)
 	if err != nil {
 		return 0, err
 	}
