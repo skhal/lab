@@ -431,6 +431,10 @@ func benchmarkSuite(b *testing.B, opts ...sheet.Option) {
 			f:    benchmarkSheet_mem,
 		},
 		{
+			name: "write",
+			f:    benchmarkSheet_write,
+		},
+		{
 			name: "read",
 			f:    benchmarkSheet_read,
 		},
@@ -456,6 +460,22 @@ func benchmarkSheet_mem(b *testing.B, opts ...sheet.Option) {
 	}
 }
 
+func benchmarkSheet_write(b *testing.B, opts ...sheet.Option) {
+	b.Helper()
+	s := sheet.New(opts...)
+	s.Set("A1", "1")
+	s.Set("A2", "2")
+	s.Set("A3", "3")
+	s.Set("A4", "4")
+	s.Set("A5", "5")
+	s.Set("B1", "=SUM(A1:A5, 6-7)")
+	buf := new(bytes.Buffer)
+	for b.Loop() {
+		buf.Reset()
+		s.Write(buf)
+	}
+}
+
 func benchmarkSheet_read(b *testing.B, opts ...sheet.Option) {
 	b.Helper()
 	buf := func() []byte {
@@ -475,7 +495,6 @@ func benchmarkSheet_read(b *testing.B, opts ...sheet.Option) {
 	for b.Loop() {
 		s := sheet.New()
 		s.Read(bytes.NewReader(buf))
-		s.Calculate()
 	}
 }
 
