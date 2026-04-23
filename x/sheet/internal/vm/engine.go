@@ -27,10 +27,10 @@ func (Engine) Parse(s string) (any, error) {
 // Calculate run bytecode through Virtual Machine. It reports an error if IR is
 // not bytecode.
 func (Engine) Calculate(data any, refcal func(string) (float64, error)) (float64, error) {
-	switch ir := data.(type) {
-	case *InstructionsSet:
-		return Run(ir, refcal)
+	switch v := data.(type) {
+	case InstructionsSet:
+		return Run(&v, refcal)
 	default:
-		return 0, fmt.Errorf("unsupported IR - %T", ir)
+		return 0, fmt.Errorf("unsupported IR - %T", v)
 	}
 }

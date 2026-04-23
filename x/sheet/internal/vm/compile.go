@@ -17,14 +17,14 @@ import (
 var ErrCompile = errors.New("compile error")
 
 // Compile converts AST to the instructions set.
-func Compile(n ast.Node) (*InstructionsSet, error) {
+func Compile(n ast.Node) (InstructionsSet, error) {
 	if n == nil {
-		return nil, nil
+		return InstructionsSet{}, nil
 	}
 	c := new(compiler)
 	iset, err := c.Compile(n)
 	if err != nil {
-		return nil, fmt.Errorf("%w: %s", ErrCompile, err)
+		return InstructionsSet{}, fmt.Errorf("%w: %s", ErrCompile, err)
 	}
 	return iset, nil
 }
@@ -35,11 +35,11 @@ type compiler struct {
 }
 
 // Compile converts an Abstract Syntax Tree (AST) to the instructions set.
-func (c *compiler) Compile(node ast.Node) (*InstructionsSet, error) {
+func (c *compiler) Compile(node ast.Node) (InstructionsSet, error) {
 	if err := c.compile(node); err != nil {
-		return nil, err
+		return InstructionsSet{}, err
 	}
-	return &InstructionsSet{c.iset}, nil
+	return InstructionsSet{c.iset}, nil
 }
 
 func (c *compiler) compile(node ast.Node) error {

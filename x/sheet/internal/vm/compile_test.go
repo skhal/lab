@@ -19,7 +19,7 @@ func TestCompile_nonFormula(t *testing.T) {
 	tests := []struct {
 		name    string
 		ast     ast.Node
-		want    *vm.InstructionsSet
+		want    vm.InstructionsSet
 		wantErr error
 	}{
 		{
@@ -28,7 +28,7 @@ func TestCompile_nonFormula(t *testing.T) {
 		{
 			name: "integer",
 			ast:  &ast.NumberNode{Number: "123"},
-			want: &vm.InstructionsSet{
+			want: vm.InstructionsSet{
 				Instructions: []any{
 					vm.Number(123),
 				},
@@ -37,7 +37,7 @@ func TestCompile_nonFormula(t *testing.T) {
 		{
 			name: "float",
 			ast:  &ast.NumberNode{Number: "1.23"},
-			want: &vm.InstructionsSet{
+			want: vm.InstructionsSet{
 				Instructions: []any{
 					vm.Number(1.23),
 				},
@@ -67,7 +67,7 @@ func TestCompile_formula(t *testing.T) {
 	tests := []struct {
 		name    string
 		ast     ast.Node
-		want    *vm.InstructionsSet
+		want    vm.InstructionsSet
 		wantErr error
 	}{
 		{
@@ -77,7 +77,7 @@ func TestCompile_formula(t *testing.T) {
 				Left:  &ast.NumberNode{Number: "1"},
 				Right: &ast.NumberNode{Number: "2"},
 			},
-			want: &vm.InstructionsSet{
+			want: vm.InstructionsSet{
 				Instructions: []any{
 					vm.Number(1),
 					vm.Number(2),
@@ -92,7 +92,7 @@ func TestCompile_formula(t *testing.T) {
 				Left:  &ast.NumberNode{Number: "1"},
 				Right: &ast.NumberNode{Number: "2"},
 			},
-			want: &vm.InstructionsSet{
+			want: vm.InstructionsSet{
 				Instructions: []any{
 					vm.Number(1),
 					vm.Number(2),
@@ -130,7 +130,7 @@ func TestCompile_formula(t *testing.T) {
 		{
 			name: "identifier",
 			ast:  &ast.RefNode{Ref: "ABC123"},
-			want: &vm.InstructionsSet{
+			want: vm.InstructionsSet{
 				Instructions: []any{
 					vm.Ref("ABC123"),
 				},
@@ -144,7 +144,7 @@ func TestCompile_formula(t *testing.T) {
 		{
 			name: "call no args",
 			ast:  &ast.CallNode{Name: "SUM"},
-			want: &vm.InstructionsSet{
+			want: vm.InstructionsSet{
 				Instructions: []any{
 					vm.Call{Func: vm.FuncSum},
 				},
@@ -163,7 +163,7 @@ func TestCompile_formula(t *testing.T) {
 					&ast.NumberNode{Number: "123"},
 				},
 			},
-			want: &vm.InstructionsSet{
+			want: vm.InstructionsSet{
 				Instructions: []any{
 					vm.Number(123),
 					vm.Call{Func: vm.FuncSum, Args: 1},
@@ -189,7 +189,7 @@ func TestCompile_formula(t *testing.T) {
 					&ast.NumberNode{Number: "2"},
 				},
 			},
-			want: &vm.InstructionsSet{
+			want: vm.InstructionsSet{
 				Instructions: []any{
 					vm.Number(1),
 					vm.Number(2),
@@ -209,7 +209,7 @@ func TestCompile_formula(t *testing.T) {
 					},
 				},
 			},
-			want: &vm.InstructionsSet{
+			want: vm.InstructionsSet{
 				Instructions: []any{
 					vm.Number(1),
 					vm.Number(2),
@@ -235,7 +235,7 @@ func TestCompile_formula(t *testing.T) {
 					},
 				},
 			},
-			want: &vm.InstructionsSet{
+			want: vm.InstructionsSet{
 				Instructions: []any{
 					vm.Number(1),
 					vm.Number(2),
@@ -255,7 +255,7 @@ func TestCompile_formula(t *testing.T) {
 					&ast.RangeNode{From: "A1", To: "A3"},
 				},
 			},
-			want: &vm.InstructionsSet{
+			want: vm.InstructionsSet{
 				Instructions: []any{
 					vm.Ref("A1"),
 					vm.Ref("A2"),
