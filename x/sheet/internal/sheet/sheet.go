@@ -56,7 +56,7 @@ func WithASTEngine() Option {
 		if s.eng != nil {
 			panic("engine is already set")
 		}
-		s.eng = engine.NewAST()
+		s.eng = engine.AST{}
 	}
 }
 
@@ -67,7 +67,7 @@ func WithVMEngine() Option {
 		if s.eng != nil {
 			panic("engine is already set")
 		}
-		s.eng = engine.NewVirtualMachine()
+		s.eng = engine.VirtualMachine{}
 	}
 }
 
@@ -116,11 +116,16 @@ func (s *Sheet) VisitAll(f func(id, cell string, val float64) bool) {
 	}
 }
 
+func init() {
+	gob.Register(engine.AST{})
+	gob.Register(engine.VirtualMachine{})
+}
+
 // Write writes the sheet to the writer in binary format. It returns an error
 // if it fails to write data.
 func (s *Sheet) Write(w io.Writer) error {
 	enc := gob.NewEncoder(w)
-	if err := enc.Encode(s.eng); err != nil {
+	if err := enc.Encode(&s.eng); err != nil {
 		return fmt.Errorf("write: failed to save engine: %s", err)
 	}
 	kk := slices.Collect(maps.Keys(s.data))
@@ -137,12 +142,12 @@ func (s *Sheet) Write(w io.Writer) error {
 // Read reads the sheet from the reader. It resets the sheet if there is any
 // data in cells.
 func (s *Sheet) Read(r io.Reader) error {
-	dec := gob.NewDecoder(r)
-	if err := dec.Decode(s.eng); err != nil {
-		return fmt.Errorf("read: failed to load engine: %s", err)
-	}
 	if len(s.data) != 0 {
 		s.data = New().data
+	}
+	dec := gob.NewDecoder(r)
+	if err := dec.Decode(&s.eng); err != nil {
+		return fmt.Errorf("read: failed to load engine: %s", err)
 	}
 	var c cell
 	for {

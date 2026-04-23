@@ -16,18 +16,13 @@ import (
 // AST engine uses AST for intermediate representation.
 type AST struct{}
 
-// NewAST creates an AST engine.
-func NewAST() *AST {
-	return new(AST)
-}
-
 // Parse parses a cell value into an AST node.
-func (eng *AST) Parse(s string) (any, error) {
+func (AST) Parse(s string) (any, error) {
 	return parse.Parse(s)
 }
 
 // Calculate evaluates cell's AST node.
-func (eng *AST) Calculate(data any, refcal func(string) (float64, error)) (float64, error) {
+func (AST) Calculate(data any, refcal func(string) (float64, error)) (float64, error) {
 	switch ir := data.(type) {
 	case ast.Node:
 		return calc.Calculate(ir, refcal)

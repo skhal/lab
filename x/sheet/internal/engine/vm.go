@@ -16,13 +16,8 @@ import (
 // representation in parsed cells.
 type VirtualMachine struct{}
 
-// NewVirtualMachine creates a new VM engine.
-func NewVirtualMachine() *VirtualMachine {
-	return new(VirtualMachine)
-}
-
 // Parse parses cell content and returns bytecode.
-func (eng *VirtualMachine) Parse(s string) (any, error) {
+func (VirtualMachine) Parse(s string) (any, error) {
 	ast, err := parse.Parse(s)
 	if err != nil {
 		return nil, err
@@ -32,7 +27,7 @@ func (eng *VirtualMachine) Parse(s string) (any, error) {
 
 // Calculate run bytecode through Virtual Machine. It reports an error if IR is
 // not bytecode.
-func (eng *VirtualMachine) Calculate(data any, refcal func(string) (float64, error)) (float64, error) {
+func (VirtualMachine) Calculate(data any, refcal func(string) (float64, error)) (float64, error) {
 	switch ir := data.(type) {
 	case *vm.InstructionsSet:
 		return vm.Run(ir, refcal)
