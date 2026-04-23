@@ -3,16 +3,13 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Package parse implements lexical analysis of cell contents.
-package parse
+package ast
 
 import (
 	"errors"
 	"fmt"
 	"regexp"
 	"strings"
-
-	"github.com/skhal/lab/x/sheet/internal/ast"
 )
 
 // ErrParse means the was en error parsing data.
@@ -20,7 +17,7 @@ var ErrParse = errors.New("parse error")
 
 // Parse runs lexical and syntacit analysis of s. It returns an AST node upon
 // success or a non-nil error in case of failure.
-func Parse(s string) (ast.Node, error) {
+func Parse(s string) (Node, error) {
 	const (
 		formulaPrefix = "="
 	)
@@ -43,17 +40,17 @@ var (
 )
 
 // parseCell parses a cell without formula.
-func parseCell(s string) (ast.Node, error) {
+func parseCell(s string) (Node, error) {
 	if len(s) == 0 {
 		return nil, fmt.Errorf("empty cell")
 	}
 	if !cellRx.MatchString(s) {
 		return nil, fmt.Errorf("not a number %q", s)
 	}
-	return &ast.NumberNode{Number: s}, nil
+	return &NumberNode{Number: s}, nil
 }
 
-func parseFormula(s string) (ast.Node, error) {
+func parseFormula(s string) (Node, error) {
 	if len(s) == 0 {
 		return nil, fmt.Errorf("empty formula")
 	}

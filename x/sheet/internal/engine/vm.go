@@ -8,7 +8,7 @@ package engine
 import (
 	"fmt"
 
-	"github.com/skhal/lab/x/sheet/internal/parse"
+	"github.com/skhal/lab/x/sheet/internal/ast"
 	"github.com/skhal/lab/x/sheet/internal/vm"
 )
 
@@ -18,7 +18,7 @@ type VirtualMachine struct{}
 
 // Parse parses cell content and returns bytecode.
 func (VirtualMachine) Parse(s string) (any, error) {
-	ast, err := parse.Parse(s)
+	ast, err := ast.Parse(s)
 	if err != nil {
 		return nil, err
 	}

@@ -11,9 +11,9 @@ func _() {
 	_ = x[FuncSum-1]
 }
 
-const _Function_name = "FuncSum"
+const _Function_name = "SUM"
 
-var _Function_index = [...]uint8{0, 7}
+var _Function_index = [...]uint8{0, 3}
 
 func (i Function) String() string {
 	idx := int(i) - 1

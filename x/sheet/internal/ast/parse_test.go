@@ -3,7 +3,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package parse_test
+package ast_test
 
 import (
 	"errors"
@@ -11,7 +11,6 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/skhal/lab/x/sheet/internal/ast"
-	"github.com/skhal/lab/x/sheet/internal/parse"
 )
 
 func TestParse_nonFormula(t *testing.T) {
@@ -23,12 +22,12 @@ func TestParse_nonFormula(t *testing.T) {
 	}{
 		{
 			name:    "empty",
-			wantErr: parse.ErrParse,
+			wantErr: ast.ErrParse,
 		},
 		{
 			name:    "not number",
 			s:       "abc",
-			wantErr: parse.ErrParse,
+			wantErr: ast.ErrParse,
 		},
 		{
 			name:     "integer",
@@ -43,7 +42,7 @@ func TestParse_nonFormula(t *testing.T) {
 	}
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
-			got, err := parse.Parse(tc.s)
+			got, err := ast.Parse(tc.s)
 
 			if !errors.Is(err, tc.wantErr) {
 				t.Errorf("Parse(%q) = _, %v; want %v", tc.s, err, tc.wantErr)
@@ -65,7 +64,7 @@ func TestParse_formula(t *testing.T) {
 		{
 			name:    "empty",
 			s:       "=",
-			wantErr: parse.ErrParse,
+			wantErr: ast.ErrParse,
 		},
 		{
 			name:     "integer",
@@ -85,12 +84,12 @@ func TestParse_formula(t *testing.T) {
 		{
 			name:    "float must have integral part",
 			s:       "=.1",
-			wantErr: parse.ErrParse,
+			wantErr: ast.ErrParse,
 		},
 		{
 			name:    "unsupported token",
 			s:       "=invalid",
-			wantErr: parse.ErrParse,
+			wantErr: ast.ErrParse,
 		},
 		{
 			name: "operator plus",
@@ -104,22 +103,22 @@ func TestParse_formula(t *testing.T) {
 		{
 			name:    "missing operator",
 			s:       "=1 2",
-			wantErr: parse.ErrParse,
+			wantErr: ast.ErrParse,
 		},
 		{
 			name:    "plus misses left operand",
 			s:       "=+ 2",
-			wantErr: parse.ErrParse,
+			wantErr: ast.ErrParse,
 		},
 		{
 			name:    "plus misses right operand",
 			s:       "=1 +",
-			wantErr: parse.ErrParse,
+			wantErr: ast.ErrParse,
 		},
 		{
 			name:    "invalid left operand",
 			s:       "=1 + +",
-			wantErr: parse.ErrParse,
+			wantErr: ast.ErrParse,
 		},
 		{
 			name:     "parentheses",
@@ -129,22 +128,22 @@ func TestParse_formula(t *testing.T) {
 		{
 			name:    "missing right parenthesis",
 			s:       "=(1",
-			wantErr: parse.ErrParse,
+			wantErr: ast.ErrParse,
 		},
 		{
 			name:    "unbalanced parentheses",
 			s:       "=(1 2",
-			wantErr: parse.ErrParse,
+			wantErr: ast.ErrParse,
 		},
 		{
 			name:    "missing left parenthesis",
 			s:       "=1)",
-			wantErr: parse.ErrParse,
+			wantErr: ast.ErrParse,
 		},
 		{
 			name:    "parentheses without expression",
 			s:       "=()",
-			wantErr: parse.ErrParse,
+			wantErr: ast.ErrParse,
 		},
 		{
 			name:     "nested parentheses",
@@ -154,7 +153,7 @@ func TestParse_formula(t *testing.T) {
 		{
 			name:    "nested parentheses unbalanced",
 			s:       "=((1)",
-			wantErr: parse.ErrParse,
+			wantErr: ast.ErrParse,
 		},
 		{
 			name:     "identifier",
@@ -164,7 +163,7 @@ func TestParse_formula(t *testing.T) {
 		{
 			name:    "identifier must has upper case",
 			s:       "=abc123",
-			wantErr: parse.ErrParse,
+			wantErr: ast.ErrParse,
 		},
 		{
 			name:     "call with empty args",
@@ -174,12 +173,12 @@ func TestParse_formula(t *testing.T) {
 		{
 			name:    "call with invalid name",
 			s:       "=SUM123()",
-			wantErr: parse.ErrParse,
+			wantErr: ast.ErrParse,
 		},
 		{
 			name:    "call without right parenthesis",
 			s:       "=SUM123(",
-			wantErr: parse.ErrParse,
+			wantErr: ast.ErrParse,
 		},
 		{
 			name: "call with one literal arg",
@@ -219,7 +218,7 @@ func TestParse_formula(t *testing.T) {
 		{
 			name:    "call with invalid expr args",
 			s:       "=SUM(1 2)",
-			wantErr: parse.ErrParse,
+			wantErr: ast.ErrParse,
 		},
 		{
 			name:     "range",
@@ -229,17 +228,17 @@ func TestParse_formula(t *testing.T) {
 		{
 			name:    "range misses first identifier",
 			s:       "=:A3",
-			wantErr: parse.ErrParse,
+			wantErr: ast.ErrParse,
 		},
 		{
 			name:    "range misses second identifier",
 			s:       "=A1:",
-			wantErr: parse.ErrParse,
+			wantErr: ast.ErrParse,
 		},
 	}
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
-			got, err := parse.Parse(tc.s)
+			got, err := ast.Parse(tc.s)
 
 			if !errors.Is(err, tc.wantErr) {
 				t.Errorf("Parse(%q) = _, %v; want %v", tc.s, err, tc.wantErr)

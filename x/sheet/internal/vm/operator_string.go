@@ -12,9 +12,9 @@ func _() {
 	_ = x[OpPlus-2]
 }
 
-const _Operator_name = "OpMinusOpPlus"
+const _Operator_name = "minusplus"
 
-var _Operator_index = [...]uint8{0, 7, 13}
+var _Operator_index = [...]uint8{0, 5, 9}
 
 func (i Operator) String() string {
 	idx := int(i) - 1

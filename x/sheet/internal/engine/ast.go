@@ -10,7 +10,6 @@ import (
 
 	"github.com/skhal/lab/x/sheet/internal/ast"
 	"github.com/skhal/lab/x/sheet/internal/calc"
-	"github.com/skhal/lab/x/sheet/internal/parse"
 )
 
 // AST engine uses AST for intermediate representation.
@@ -18,7 +17,7 @@ type AST struct{}
 
 // Parse parses a cell value into an AST node.
 func (AST) Parse(s string) (any, error) {
-	return parse.Parse(s)
+	return ast.Parse(s)
 }
 
 // Calculate evaluates cell's AST node.
