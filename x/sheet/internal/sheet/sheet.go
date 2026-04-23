@@ -107,10 +107,12 @@ func (s *Sheet) VisitAll(f func(id, cell string, val float64) bool) {
 // Write writes the sheet to the writer in binary format. It returns an error
 // if it fails to write data.
 func (s *Sheet) Write(w io.Writer) error {
-	// TODO(github.com/skhal/lab/issues/249): save the engine
+	enc := gob.NewEncoder(w)
+	if err := enc.Encode(s.eng); err != nil {
+		return fmt.Errorf("write: failed to save engine: %s", err)
+	}
 	kk := slices.Collect(maps.Keys(s.data))
 	slices.Sort(kk)
-	enc := gob.NewEncoder(w)
 	for id := range slices.Values(kk) {
 		c := s.data[id]
 		if err := enc.Encode(c); err != nil {
@@ -123,14 +125,14 @@ func (s *Sheet) Write(w io.Writer) error {
 // Read reads the sheet from the reader. It resets the sheet if there is any
 // data in cells.
 func (s *Sheet) Read(r io.Reader) error {
-	// TODO(github.com/skhal/lab/issues/249): load engine
+	dec := gob.NewDecoder(r)
+	if err := dec.Decode(s.eng); err != nil {
+		return fmt.Errorf("read: failed to load engine: %s", err)
+	}
 	if len(s.data) != 0 {
 		s.data = New().data
 	}
-	var (
-		c   cell
-		dec = gob.NewDecoder(r)
-	)
+	var c cell
 	for {
 		err := dec.Decode(&c)
 		switch {
