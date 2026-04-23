@@ -3,34 +3,33 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package engine
+package vm
 
 import (
 	"fmt"
 
 	"github.com/skhal/lab/x/sheet/internal/ast"
-	"github.com/skhal/lab/x/sheet/internal/vm"
 )
 
-// VirtualMachine uses bytecode (instructions set) for intermediate
+// Engine uses bytecode (instructions set) for intermediate
 // representation in parsed cells.
-type VirtualMachine struct{}
+type Engine struct{}
 
 // Parse parses cell content and returns bytecode.
-func (VirtualMachine) Parse(s string) (any, error) {
+func (Engine) Parse(s string) (any, error) {
 	ast, err := ast.Parse(s)
 	if err != nil {
 		return nil, err
 	}
-	return vm.Compile(ast)
+	return Compile(ast)
 }
 
 // Calculate run bytecode through Virtual Machine. It reports an error if IR is
 // not bytecode.
-func (VirtualMachine) Calculate(data any, refcal func(string) (float64, error)) (float64, error) {
+func (Engine) Calculate(data any, refcal func(string) (float64, error)) (float64, error) {
 	switch ir := data.(type) {
-	case *vm.InstructionsSet:
-		return vm.Run(ir, refcal)
+	case *InstructionsSet:
+		return Run(ir, refcal)
 	default:
 		return 0, fmt.Errorf("unsupported IR - %T", ir)
 	}

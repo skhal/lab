@@ -14,7 +14,8 @@ import (
 	"maps"
 	"slices"
 
-	"github.com/skhal/lab/x/sheet/internal/engine"
+	"github.com/skhal/lab/x/sheet/internal/ast"
+	"github.com/skhal/lab/x/sheet/internal/vm"
 )
 
 // ErrCell means there is an error in the cell value.
@@ -56,7 +57,7 @@ func WithASTEngine() Option {
 		if s.eng != nil {
 			panic("engine is already set")
 		}
-		s.eng = engine.AST{}
+		s.eng = ast.Engine{}
 	}
 }
 
@@ -67,7 +68,7 @@ func WithVMEngine() Option {
 		if s.eng != nil {
 			panic("engine is already set")
 		}
-		s.eng = engine.VirtualMachine{}
+		s.eng = vm.Engine{}
 	}
 }
 
@@ -117,8 +118,8 @@ func (s *Sheet) VisitAll(f func(id, cell string, val float64) bool) {
 }
 
 func init() {
-	gob.Register(engine.AST{})
-	gob.Register(engine.VirtualMachine{})
+	gob.Register(ast.Engine{})
+	gob.Register(vm.Engine{})
 }
 
 // Write writes the sheet to the writer in binary format. It returns an error

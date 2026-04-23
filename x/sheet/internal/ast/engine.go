@@ -3,27 +3,25 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package engine
+package ast
 
 import (
 	"fmt"
-
-	"github.com/skhal/lab/x/sheet/internal/ast"
 )
 
-// AST engine uses AST for intermediate representation.
-type AST struct{}
+// Engine uses AST for intermediate representation.
+type Engine struct{}
 
 // Parse parses a cell value into an AST node.
-func (AST) Parse(s string) (any, error) {
-	return ast.Parse(s)
+func (Engine) Parse(s string) (any, error) {
+	return Parse(s)
 }
 
 // Calculate evaluates cell's AST node.
-func (AST) Calculate(data any, refcal func(string) (float64, error)) (float64, error) {
+func (Engine) Calculate(data any, refcal func(string) (float64, error)) (float64, error) {
 	switch ir := data.(type) {
-	case ast.Node:
-		return ast.Calculate(ir, refcal)
+	case Node:
+		return Calculate(ir, refcal)
 	default:
 		return 0, fmt.Errorf("unsupported IR - %T", ir)
 	}
