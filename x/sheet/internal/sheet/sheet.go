@@ -35,11 +35,16 @@ type Engine interface {
 	// Calculate calculate cell value. The passed function can be used to
 	// trigger calculation of the reference cells.
 	Calculate(any, func(string) (float64, error)) (float64, error)
+
+	// WriteIR forces Sheet to write intermediate representation in
+	// [Sheet.Write] and load it in [Sheet.Read], skipping cell text parsing.
+	//
+	// Note: register IR structures with [encoding/gob].
+	WriteIR() bool
 }
 
 type cell struct {
-	ID   string
-	Text string
+	text string
 
 	ir any
 
@@ -93,7 +98,7 @@ func (s *Sheet) Set(id, val string) error {
 	if err != nil {
 		return fmt.Errorf("%w: set %s to %q: %s", ErrCell, id, val, err)
 	}
-	s.data[id] = &cell{ID: id, Text: val, ir: data}
+	s.data[id] = &cell{text: val, ir: data}
 	return nil
 }
 
@@ -111,7 +116,7 @@ func (s *Sheet) VisitAll(f func(id, cell string, val float64) bool) {
 	slices.Sort(kk)
 	for _, id := range kk {
 		c := s.data[id]
-		if !f(id, c.Text, c.result) {
+		if !f(id, c.text, c.result) {
 			break
 		}
 	}
@@ -120,6 +125,12 @@ func (s *Sheet) VisitAll(f func(id, cell string, val float64) bool) {
 func init() {
 	gob.Register(ast.Engine{})
 	gob.Register(vm.Engine{})
+}
+
+type gobCell struct {
+	ID   string
+	Text string
+	IR   any
 }
 
 // Write writes the sheet to the writer in binary format. It returns an error
@@ -131,9 +142,20 @@ func (s *Sheet) Write(w io.Writer) error {
 	}
 	kk := slices.Collect(maps.Keys(s.data))
 	slices.Sort(kk)
+	encodeWithIR := func(id string, c *cell) error {
+		gc := gobCell{ID: id, Text: c.text, IR: c.ir}
+		return enc.Encode(gc)
+	}
+	encodeNoIR := func(id string, c *cell) error {
+		gc := gobCell{ID: id, Text: c.text}
+		return enc.Encode(gc)
+	}
+	encode := encodeNoIR
+	if s.eng.WriteIR() {
+		encode = encodeWithIR
+	}
 	for id := range slices.Values(kk) {
-		c := s.data[id]
-		if err := enc.Encode(c); err != nil {
+		if err := encode(id, s.data[id]); err != nil {
 			return fmt.Errorf("write: %s", err)
 		}
 	}
@@ -150,15 +172,31 @@ func (s *Sheet) Read(r io.Reader) error {
 	if err := dec.Decode(&s.eng); err != nil {
 		return fmt.Errorf("read: failed to load engine: %s", err)
 	}
-	var c cell
+	var gc gobCell
+	decodeWithIR := func() error {
+		if err := dec.Decode(&gc); err != nil {
+			return err
+		}
+		s.data[gc.ID] = &cell{text: gc.Text, ir: gc.IR}
+		return nil
+	}
+	decodeNoIR := func() error {
+		if err := dec.Decode(&gc); err != nil {
+			return err
+		}
+		s.Set(gc.ID, gc.Text)
+		return nil
+	}
+	decode := decodeNoIR
+	if s.eng.WriteIR() {
+		decode = decodeWithIR
+	}
 	for {
-		err := dec.Decode(&c)
-		switch {
+		switch err := decode(); {
 		case err == io.EOF:
 			return nil
 		case err != nil:
 			return fmt.Errorf("read: %s", err)
 		}
-		s.Set(c.ID, c.Text)
 	}
 }

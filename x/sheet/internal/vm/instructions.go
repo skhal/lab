@@ -5,6 +5,17 @@
 
 package vm
 
+import "encoding/gob"
+
+func init() {
+	gob.Register(InstructionsSet{})
+	gob.Register(Number(0))
+	gob.Register(BinOp(0))
+	gob.Register(Ref(""))
+	gob.Register(Function(0))
+	gob.Register(Call{})
+}
+
 // InstructionsSet holds instructions for the virtual machine. It is pretty
 // much a post-order AST.
 type InstructionsSet struct {

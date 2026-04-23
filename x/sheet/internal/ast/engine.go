@@ -26,3 +26,6 @@ func (Engine) Calculate(data any, refcal func(string) (float64, error)) (float64
 		return 0, fmt.Errorf("unsupported IR - %T", ir)
 	}
 }
+
+// WriteIR disables intermediate representation in the Sheet write/read state.
+func (Engine) WriteIR() bool { return false }
