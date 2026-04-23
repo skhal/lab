@@ -19,6 +19,14 @@ import (
 	"github.com/skhal/lab/x/sheet/internal/sheet"
 )
 
+var (
+	engine  = flag.String("eng", "ast", "engine to use: ast, vm")
+	engines = map[string]sheet.Option{
+		"ast": sheet.WithASTEngine(),
+		"vm":  sheet.WithVMEngine(),
+	}
+)
+
 func main() {
 	flag.Parse()
 	if err := run(); err != nil {
@@ -57,7 +65,13 @@ func run() (err error) {
 }
 
 func create() ([]byte, error) {
-	s := sheet.New()
+	var opts []sheet.Option
+	if eng, ok := engines[*engine]; !ok {
+		panic(fmt.Errorf("unsupported engine"))
+	} else {
+		opts = append(opts, eng)
+	}
+	s := sheet.New(opts...)
 	must(s.Set("A1", "5"))
 	must(s.Set("A2", "10"))
 	must(s.Set("A3", "12"))

@@ -17,7 +17,71 @@ import (
 	"github.com/skhal/lab/x/sheet/internal/sheet"
 )
 
-func TestSheet_Set(t *testing.T) {
+var engines = []struct {
+	name string
+	opt  sheet.Option
+}{
+	{
+		name: "ast",
+		opt:  sheet.WithASTEngine(),
+	},
+	{
+		name: "vm",
+		opt:  sheet.WithVMEngine(),
+	},
+}
+
+func TestSheet(t *testing.T) {
+	for _, eng := range engines {
+		t.Run(eng.name, func(t *testing.T) {
+			testSuite(t, eng.opt)
+		})
+	}
+}
+
+func testSuite(t *testing.T, opts ...sheet.Option) {
+	t.Helper()
+	tests := []struct {
+		name string
+		f    func(*testing.T, ...sheet.Option)
+	}{
+		{
+			name: "Set",
+			f:    testSheet_Set,
+		},
+		{
+			name: "VisitAll",
+			f:    testSheet_VisitAll,
+		},
+		{
+			name: "VisitAll_collectFew",
+			f:    testSheet_VisitAll_collectFew,
+		},
+		{
+			name: "Collect",
+			f:    testSheet_Calculate,
+		},
+		{
+			name: "Write",
+			f:    testSheet_Write,
+		},
+		{
+			name: "Read",
+			f:    testSheet_Read,
+		},
+		{
+			name: "Read_resetsSheet",
+			f:    testSheet_Read_resetsSheet,
+		},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			test.f(t, opts...)
+		})
+	}
+}
+
+func testSheet_Set(t *testing.T, opts ...sheet.Option) {
 	tt := []struct {
 		name string
 		text string
@@ -35,7 +99,7 @@ func TestSheet_Set(t *testing.T) {
 	}
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
-			s := sheet.New()
+			s := sheet.New(opts...)
 
 			err := s.Set("A1", tc.text)
 
@@ -46,7 +110,7 @@ func TestSheet_Set(t *testing.T) {
 	}
 }
 
-func TestSheet_VisitAll(t *testing.T) {
+func testSheet_VisitAll(t *testing.T, opts ...sheet.Option) {
 	tt := []struct {
 		name  string
 		cells map[string]string
@@ -78,7 +142,7 @@ func TestSheet_VisitAll(t *testing.T) {
 	}
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
-			s := newSheet(t, tc.cells)
+			s := newSheet(t, tc.cells, opts...)
 			s.Calculate()
 
 			cells := collectCells(t, s)
@@ -90,7 +154,7 @@ func TestSheet_VisitAll(t *testing.T) {
 	}
 }
 
-func TestSheet_VisitAll_collectFew(t *testing.T) {
+func testSheet_VisitAll_collectFew(t *testing.T, opts ...sheet.Option) {
 	tt := []struct {
 		name  string
 		cells map[string]string
@@ -124,7 +188,7 @@ func TestSheet_VisitAll_collectFew(t *testing.T) {
 	}
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
-			s := newSheet(t, tc.cells)
+			s := newSheet(t, tc.cells, opts...)
 			s.Calculate()
 
 			cells := make(map[string]string)
@@ -141,7 +205,7 @@ func TestSheet_VisitAll_collectFew(t *testing.T) {
 	}
 }
 
-func TestSheet_Calculate(t *testing.T) {
+func testSheet_Calculate(t *testing.T, opts ...sheet.Option) {
 	tt := []struct {
 		name    string
 		cells   map[string]string
@@ -239,7 +303,7 @@ func TestSheet_Calculate(t *testing.T) {
 	}
 	for _, tc := range tt {
 		t.Run(tc.name, func(t *testing.T) {
-			s := newSheet(t, tc.cells)
+			s := newSheet(t, tc.cells, opts...)
 
 			err := s.Calculate()
 			cells := collectCellResults(t, s)
@@ -258,7 +322,7 @@ func TestSheet_Calculate(t *testing.T) {
 	}
 }
 
-func TestSheet_Write(t *testing.T) {
+func testSheet_Write(t *testing.T, opts ...sheet.Option) {
 	tests := []struct {
 		name    string
 		cells   map[string]string
@@ -276,7 +340,7 @@ func TestSheet_Write(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			s := newSheet(t, tc.cells)
+			s := newSheet(t, tc.cells, opts...)
 			var buf bytes.Buffer
 
 			err := s.Write(&buf)
@@ -288,7 +352,7 @@ func TestSheet_Write(t *testing.T) {
 	}
 }
 
-func TestSheet_Read(t *testing.T) {
+func testSheet_Read(t *testing.T, opts ...sheet.Option) {
 	tests := []struct {
 		name    string
 		cells   map[string]string
@@ -310,7 +374,7 @@ func TestSheet_Read(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			b := writeSheet(t, tc.cells)
+			b := writeSheet(t, tc.cells, opts...)
 			s := sheet.New()
 
 			err := s.Read(bytes.NewReader(b))
@@ -326,13 +390,13 @@ func TestSheet_Read(t *testing.T) {
 	}
 }
 
-func TestSheet_Read_resetsSheet(t *testing.T) {
+func testSheet_Read_resetsSheet(t *testing.T, opts ...sheet.Option) {
 	b := writeSheet(t, map[string]string{
 		"A1": "123",
 	})
 	s := newSheet(t, map[string]string{
 		"B1": "567",
-	})
+	}, opts...)
 	want := map[string]string{
 		"A1": "123",
 	}
@@ -349,8 +413,39 @@ func TestSheet_Read_resetsSheet(t *testing.T) {
 }
 
 func BenchmarkSheet(b *testing.B) {
+	for _, eng := range engines {
+		b.Run(eng.name, func(b *testing.B) {
+			benchmarkSuite(b, eng.opt)
+		})
+	}
+}
+
+func benchmarkSuite(b *testing.B, opts ...sheet.Option) {
+	b.Helper()
+	benchmarks := []struct {
+		name string
+		f    func(*testing.B, ...sheet.Option)
+	}{
+		{
+			name: "mem",
+			f:    benchmarkSheet_mem,
+		},
+		{
+			name: "read",
+			f:    benchmarkSheet_read,
+		},
+	}
+	for _, bm := range benchmarks {
+		b.Run(bm.name, func(b *testing.B) {
+			bm.f(b, opts...)
+		})
+	}
+}
+
+func benchmarkSheet_mem(b *testing.B, opts ...sheet.Option) {
+	b.Helper()
 	for b.Loop() {
-		s := sheet.New()
+		s := sheet.New(opts...)
 		s.Set("A1", "1")
 		s.Set("A2", "2")
 		s.Set("A3", "3")
@@ -361,9 +456,10 @@ func BenchmarkSheet(b *testing.B) {
 	}
 }
 
-func BenchmarkSheetRead(b *testing.B) {
+func benchmarkSheet_read(b *testing.B, opts ...sheet.Option) {
+	b.Helper()
 	buf := func() []byte {
-		s := sheet.New()
+		s := sheet.New(opts...)
 		s.Set("A1", "1")
 		s.Set("A2", "2")
 		s.Set("A3", "3")
@@ -383,13 +479,14 @@ func BenchmarkSheetRead(b *testing.B) {
 	}
 }
 
-func ExampleSheet() {
-	s := sheet.New()
-	// ignore-error start
+func ExampleSheet_ast() { exampleSheet(sheet.WithASTEngine()) }
+func ExampleSheet_vm()  { exampleSheet(sheet.WithVMEngine()) }
+
+func exampleSheet(opts ...sheet.Option) {
+	s := sheet.New(opts...)
 	s.Set("A1", "1")
 	s.Set("B1", "=SUM(A1:A5, 7-6)")
 	s.Calculate()
-	// ignore-error end
 	s.VisitAll(func(id, val string, res float64) bool {
 		fmt.Printf("%s %3.1f\t%s\n", id, res, val)
 		return true
@@ -399,9 +496,17 @@ func ExampleSheet() {
 	// B1 2.0	=SUM(A1:A5, 7-6)
 }
 
-func ExampleSheet_writeRead() {
+func ExampleSheet_writeRead_ast() {
+	exampleSheet_writeRead(sheet.WithASTEngine())
+}
+
+func ExampleSheet_writeRead_vm() {
+	exampleSheet_writeRead(sheet.WithVMEngine())
+}
+
+func exampleSheet_writeRead(opts ...sheet.Option) {
 	b := func() []byte {
-		s := sheet.New()
+		s := sheet.New(opts...)
 		s.Set("A1", "1")
 		s.Set("B1", "=SUM(A1:A5, 7-6)")
 		var b bytes.Buffer
@@ -429,9 +534,9 @@ func ExampleSheet_writeRead() {
 	// B1 2.0	=SUM(A1:A5, 7-6)
 }
 
-func newSheet(t *testing.T, cells map[string]string) *sheet.Sheet {
+func newSheet(t *testing.T, cells map[string]string, opts ...sheet.Option) *sheet.Sheet {
 	t.Helper()
-	s := sheet.New()
+	s := sheet.New(opts...)
 	for id, val := range cells {
 		if err := s.Set(id, val); err != nil {
 			t.Fatalf("Set() unexpected error %v", err)
@@ -440,9 +545,9 @@ func newSheet(t *testing.T, cells map[string]string) *sheet.Sheet {
 	return s
 }
 
-func writeSheet(t *testing.T, cells map[string]string) []byte {
+func writeSheet(t *testing.T, cells map[string]string, opts ...sheet.Option) []byte {
 	t.Helper()
-	s := newSheet(t, cells)
+	s := newSheet(t, cells, opts...)
 	var buf bytes.Buffer
 	if err := s.Write(&buf); err != nil {
 		t.Fatalf("Write() unexpected error %v", err)

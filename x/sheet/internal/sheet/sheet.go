@@ -49,13 +49,25 @@ type cell struct {
 // Option represents a configuration option for the Sheets table.
 type Option func(*Sheet)
 
-// WithASTEngine makes Sheets table use AST engine.
+// WithASTEngine configures Sheet to use an AST for intermediate
+// representation.
 func WithASTEngine() Option {
 	return func(s *Sheet) {
 		if s.eng != nil {
 			panic("engine is already set")
 		}
 		s.eng = engine.NewAST()
+	}
+}
+
+// WithVMEngine configures Sheet to use a Virtual Machine engine with bytecode
+// for parsed cells intermediate representation.
+func WithVMEngine() Option {
+	return func(s *Sheet) {
+		if s.eng != nil {
+			panic("engine is already set")
+		}
+		s.eng = engine.NewVirtualMachine()
 	}
 }
 

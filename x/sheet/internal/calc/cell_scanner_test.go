@@ -36,6 +36,18 @@ func TestCellScanner_new(t *testing.T) {
 			wantErr: calc.ErrCellRange,
 		},
 		{
+			name:    "from has no row",
+			from:    "A",
+			to:      "A2",
+			wantErr: calc.ErrCellRange,
+		},
+		{
+			name:    "to has no row",
+			from:    "A1",
+			to:      "A",
+			wantErr: calc.ErrCellRange,
+		},
+		{
 			name: "valid range",
 			from: "A1",
 			to:   "A3",

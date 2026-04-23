@@ -41,7 +41,12 @@ func NewCellScanner(from, to string) (*CellScanner, error) {
 			err = fmt.Errorf("invalid column in %s", s)
 			return
 		}
-		row, _ := strconv.Atoi(strings.TrimLeftFunc(s, unicode.IsLetter))
+		rs := strings.TrimLeftFunc(s, unicode.IsLetter)
+		if rs == "" {
+			err = fmt.Errorf("invalid row in %s", s)
+			return
+		}
+		row, _ := strconv.Atoi(rs)
 		c = cell{col[0], row}
 		return
 	}
