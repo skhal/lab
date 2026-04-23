@@ -64,7 +64,7 @@ func (c *compiler) compileNumber(num *ast.NumberNode) error {
 	if err != nil {
 		return err
 	}
-	c.push(&Number{Val: n})
+	c.push(Number(n))
 	return nil
 }
 
@@ -81,10 +81,10 @@ func (c *compiler) compileBinOp(op *ast.BinOpNode) error {
 	)
 	switch op.Op {
 	case plus:
-		c.push(&BinOp{Op: OpPlus})
+		c.push(BinOpPlus)
 		return nil
 	case minus:
-		c.push(&BinOp{Op: OpMinus})
+		c.push(BinOpMinus)
 		return nil
 	}
 	return fmt.Errorf("unsupported binary operator %s", op.Op)
@@ -111,7 +111,7 @@ func (c *compiler) compileCall(call *ast.CallNode) error {
 	if !ok {
 		return fmt.Errorf("unsupported call %s", call.Name)
 	}
-	c.push(&Call{Func: fn, Args: args})
+	c.push(Call{Func: fn, Args: args})
 	return nil
 }
 
@@ -121,13 +121,13 @@ func (c *compiler) compileRange(n *ast.RangeNode) (int, error) {
 		return 0, err
 	}
 	for id := range cr.Scan() {
-		c.push(&Ref{Cell: id})
+		c.push(Ref(id))
 	}
 	return cr.Len(), nil
 }
 
 func (c *compiler) compileRef(ref *ast.RefNode) error {
-	c.push(&Ref{Cell: ref.Ref})
+	c.push(Ref(ref.Ref))
 	return nil
 }
 

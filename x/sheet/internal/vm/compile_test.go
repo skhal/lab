@@ -30,7 +30,7 @@ func TestCompile_nonFormula(t *testing.T) {
 			ast:  &ast.NumberNode{Number: "123"},
 			want: &vm.InstructionsSet{
 				Instructions: []any{
-					&vm.Number{Val: 123},
+					vm.Number(123),
 				},
 			},
 		},
@@ -39,7 +39,7 @@ func TestCompile_nonFormula(t *testing.T) {
 			ast:  &ast.NumberNode{Number: "1.23"},
 			want: &vm.InstructionsSet{
 				Instructions: []any{
-					&vm.Number{Val: 1.23},
+					vm.Number(1.23),
 				},
 			},
 		},
@@ -79,9 +79,9 @@ func TestCompile_formula(t *testing.T) {
 			},
 			want: &vm.InstructionsSet{
 				Instructions: []any{
-					&vm.Number{Val: 1},
-					&vm.Number{Val: 2},
-					&vm.BinOp{Op: vm.OpPlus},
+					vm.Number(1),
+					vm.Number(2),
+					vm.BinOpPlus,
 				},
 			},
 		},
@@ -94,9 +94,9 @@ func TestCompile_formula(t *testing.T) {
 			},
 			want: &vm.InstructionsSet{
 				Instructions: []any{
-					&vm.Number{Val: 1},
-					&vm.Number{Val: 2},
-					&vm.BinOp{Op: vm.OpMinus},
+					vm.Number(1),
+					vm.Number(2),
+					vm.BinOpMinus,
 				},
 			},
 		},
@@ -132,7 +132,7 @@ func TestCompile_formula(t *testing.T) {
 			ast:  &ast.RefNode{Ref: "ABC123"},
 			want: &vm.InstructionsSet{
 				Instructions: []any{
-					&vm.Ref{Cell: "ABC123"},
+					vm.Ref("ABC123"),
 				},
 			},
 		},
@@ -146,7 +146,7 @@ func TestCompile_formula(t *testing.T) {
 			ast:  &ast.CallNode{Name: "SUM"},
 			want: &vm.InstructionsSet{
 				Instructions: []any{
-					&vm.Call{Func: vm.FuncSum},
+					vm.Call{Func: vm.FuncSum},
 				},
 			},
 		},
@@ -165,8 +165,8 @@ func TestCompile_formula(t *testing.T) {
 			},
 			want: &vm.InstructionsSet{
 				Instructions: []any{
-					&vm.Number{Val: 123},
-					&vm.Call{Func: vm.FuncSum, Args: 1},
+					vm.Number(123),
+					vm.Call{Func: vm.FuncSum, Args: 1},
 				},
 			},
 		},
@@ -191,9 +191,9 @@ func TestCompile_formula(t *testing.T) {
 			},
 			want: &vm.InstructionsSet{
 				Instructions: []any{
-					&vm.Number{Val: 1},
-					&vm.Number{Val: 2},
-					&vm.Call{Func: vm.FuncSum, Args: 2},
+					vm.Number(1),
+					vm.Number(2),
+					vm.Call{Func: vm.FuncSum, Args: 2},
 				},
 			},
 		},
@@ -211,10 +211,10 @@ func TestCompile_formula(t *testing.T) {
 			},
 			want: &vm.InstructionsSet{
 				Instructions: []any{
-					&vm.Number{Val: 1},
-					&vm.Number{Val: 2},
-					&vm.BinOp{Op: vm.OpPlus},
-					&vm.Call{Func: vm.FuncSum, Args: 1},
+					vm.Number(1),
+					vm.Number(2),
+					vm.BinOpPlus,
+					vm.Call{Func: vm.FuncSum, Args: 1},
 				},
 			},
 		},
@@ -237,13 +237,13 @@ func TestCompile_formula(t *testing.T) {
 			},
 			want: &vm.InstructionsSet{
 				Instructions: []any{
-					&vm.Number{Val: 1},
-					&vm.Number{Val: 2},
-					&vm.BinOp{Op: vm.OpPlus},
-					&vm.Number{Val: 3},
-					&vm.Number{Val: 4},
-					&vm.BinOp{Op: vm.OpMinus},
-					&vm.Call{Func: vm.FuncSum, Args: 2},
+					vm.Number(1),
+					vm.Number(2),
+					vm.BinOpPlus,
+					vm.Number(3),
+					vm.Number(4),
+					vm.BinOpMinus,
+					vm.Call{Func: vm.FuncSum, Args: 2},
 				},
 			},
 		},
@@ -257,10 +257,10 @@ func TestCompile_formula(t *testing.T) {
 			},
 			want: &vm.InstructionsSet{
 				Instructions: []any{
-					&vm.Ref{Cell: "A1"},
-					&vm.Ref{Cell: "A2"},
-					&vm.Ref{Cell: "A3"},
-					&vm.Call{Func: vm.FuncSum, Args: 3},
+					vm.Ref("A1"),
+					vm.Ref("A2"),
+					vm.Ref("A3"),
+					vm.Call{Func: vm.FuncSum, Args: 3},
 				},
 			},
 		},

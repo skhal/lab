@@ -55,23 +55,23 @@ func (r *runner) Run(bc *InstructionsSet) (_ float64, err error) {
 
 func (r *runner) run(bc *InstructionsSet) error {
 	for _, instruction := range bc.Instructions {
-		switch o := instruction.(type) {
-		case *Number:
-			r.push(o.Val)
-		case *BinOp:
-			n, err := r.runBinOp(o)
+		switch v := instruction.(type) {
+		case Number:
+			r.push(float64(v))
+		case BinOp:
+			n, err := r.runBinOp(v)
 			if err != nil {
 				return err
 			}
 			r.push(n)
-		case *Ref:
-			n, err := r.refcal(o.Cell)
+		case Ref:
+			n, err := r.refcal(string(v))
 			if err != nil {
 				return err
 			}
 			r.push(n)
-		case *Call:
-			n, err := r.runCall(o)
+		case Call:
+			n, err := r.runCall(&v)
 			if err != nil {
 				return err
 			}
@@ -81,16 +81,16 @@ func (r *runner) run(bc *InstructionsSet) error {
 	return nil
 }
 
-func (r *runner) runBinOp(op *BinOp) (float64, error) {
+func (r *runner) runBinOp(op BinOp) (float64, error) {
 	y := r.pop()
 	x := r.pop()
-	switch op.Op {
-	case OpPlus:
+	switch op {
+	case BinOpPlus:
 		return x + y, nil
-	case OpMinus:
+	case BinOpMinus:
 		return x - y, nil
 	}
-	return 0, fmt.Errorf("unsupported operation %s", op.Op)
+	return 0, fmt.Errorf("unsupported operation %s", op)
 }
 
 func (r *runner) pop() float64 {

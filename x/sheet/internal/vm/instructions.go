@@ -12,32 +12,23 @@ type InstructionsSet struct {
 }
 
 // Number is a floating precision number.
-type Number struct {
-	Val float64 // number value
-}
+type Number float64
 
-// Operator enumerates supported binary operators.
+// BinOp enumerates supported binary operators.
 //
-//go:generate stringer -type=Operator -linecomment
-type Operator int
+//go:generate stringer -type=BinOp -linecomment
+type BinOp int
 
 const (
-	_ Operator = iota
+	_ BinOp = iota
 	// keep-sorted start
-	OpMinus // minus
-	OpPlus  // plus
+	BinOpMinus // minus
+	BinOpPlus  // plus
 	// keep-sorted end
 )
 
-// BinOp is a binary operator. It expects two operands.
-type BinOp struct {
-	Op Operator // the operator
-}
-
 // Ref is a cell reference.
-type Ref struct {
-	Cell string // cell identifier, e.g. "A1"
-}
+type Ref string
 
 // Function enumerates supported functions.
 //
