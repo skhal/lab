@@ -92,7 +92,12 @@ func TestParse_formula(t *testing.T) {
 			wantErr: ast.ErrParse,
 		},
 		{
-			name: "operator plus",
+			name:    "missing operator",
+			s:       "=1 2",
+			wantErr: ast.ErrParse,
+		},
+		{
+			name: "plus",
 			s:    "=1+2",
 			wantNode: &ast.BinOpNode{
 				Op:    "+",
@@ -101,23 +106,42 @@ func TestParse_formula(t *testing.T) {
 			},
 		},
 		{
-			name:    "missing operator",
-			s:       "=1 2",
-			wantErr: ast.ErrParse,
-		},
-		{
-			name:    "plus misses left operand",
+			name:    "plus no left operand",
 			s:       "=+ 2",
 			wantErr: ast.ErrParse,
 		},
 		{
-			name:    "plus misses right operand",
+			name:    "plus no right operand",
 			s:       "=1 +",
 			wantErr: ast.ErrParse,
 		},
 		{
-			name:    "invalid left operand",
+			name:    "plus invalid right operand",
 			s:       "=1 + +",
+			wantErr: ast.ErrParse,
+		},
+		{
+			name: "minus",
+			s:    "=1-2",
+			wantNode: &ast.BinOpNode{
+				Op:    "-",
+				Left:  &ast.NumberNode{Number: "1"},
+				Right: &ast.NumberNode{Number: "2"},
+			},
+		},
+		{
+			name:    "minus no left operand",
+			s:       "=- 2",
+			wantErr: ast.ErrParse,
+		},
+		{
+			name:    "minus no right operand",
+			s:       "=1 -",
+			wantErr: ast.ErrParse,
+		},
+		{
+			name:    "minus invalid right operand",
+			s:       "=1 - -",
 			wantErr: ast.ErrParse,
 		},
 		{
