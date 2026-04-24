@@ -29,18 +29,18 @@ conform.setup({
 	},
 	formatters_by_ft = {
 		-- keep-sorted start
-		bzl = { "buildifier" },
-		c = { "clang-format" },
-		cpp = { "clang-format" },
-		go = { "goimports" },
+		bzl = { "buildifier", "keep-sorted" },
+		c = { "clang-format", "keep-sorted" },
+		cpp = { "clang-format", "keep-sorted" },
+		go = { "goimports", "keep-sorted" },
 		html = { "prettier" },
 		json = { "prettier" },
-		lua = { "stylua" },
+		lua = { "stylua", "keep-sorted" },
 		markdown = { "markdownfmt" },
 		pbtxt = { "txtpbfmt" },
-		proto = { "clang-format" },
-		sh = { "shfmt" },
-		yaml = { "yamlfmt" },
+		proto = { "clang-format", "keep-sorted" },
+		sh = { "shfmt", "keep-sorted" },
+		yaml = { "yamlfmt", "keep-sorted" },
 		-- keep-sorted end
 	},
 })
