@@ -31,7 +31,7 @@ func Compile(n ast.Node) (InstructionsSet, error) {
 
 // compiler generates the instructions set for IR.
 type compiler struct {
-	iset []any // instructions set
+	iset []Inst // instructions set
 }
 
 // Compile converts an Abstract Syntax Tree (AST) to the instructions set.
@@ -64,7 +64,7 @@ func (c *compiler) compileNumber(num *ast.NumberNode) error {
 	if err != nil {
 		return err
 	}
-	c.push(Number(n))
+	c.push(Inst{Type: InstTypeNumber, Number: n})
 	return nil
 }
 
@@ -81,10 +81,10 @@ func (c *compiler) compileBinOp(op *ast.BinOpNode) error {
 	)
 	switch op.Op {
 	case plus:
-		c.push(BinOpPlus)
+		c.push(Inst{Type: InstTypeBinOp, BinOp: BinOpPlus})
 		return nil
 	case minus:
-		c.push(BinOpMinus)
+		c.push(Inst{Type: InstTypeBinOp, BinOp: BinOpMinus})
 		return nil
 	}
 	return fmt.Errorf("unsupported binary operator %s", op.Op)
@@ -111,7 +111,7 @@ func (c *compiler) compileCall(call *ast.CallNode) error {
 	if !ok {
 		return fmt.Errorf("unsupported call %s", call.Name)
 	}
-	c.push(Call{Func: fn, Args: args})
+	c.push(Inst{Type: InstTypeCall, Call: &Call{Func: fn, Args: args}})
 	return nil
 }
 
@@ -121,16 +121,16 @@ func (c *compiler) compileRange(n *ast.RangeNode) (int, error) {
 		return 0, err
 	}
 	for id := range cr.Scan() {
-		c.push(Ref(id))
+		c.push(Inst{Type: InstTypeRef, Ref: id})
 	}
 	return cr.Len(), nil
 }
 
 func (c *compiler) compileRef(ref *ast.RefNode) error {
-	c.push(Ref(ref.Ref))
+	c.push(Inst{Type: InstTypeRef, Ref: ref.Ref})
 	return nil
 }
 
-func (c *compiler) push(x any) {
-	c.iset = append(c.iset, x)
+func (c *compiler) push(v Inst) {
+	c.iset = append(c.iset, v)
 }

@@ -18,7 +18,7 @@ import (
 func TestRun_number(t *testing.T) {
 	tests := []struct {
 		name    string
-		iset    []any
+		iset    []vm.Inst
 		want    float64
 		wantErr error
 	}{
@@ -28,8 +28,8 @@ func TestRun_number(t *testing.T) {
 		},
 		{
 			name: "number",
-			iset: []any{
-				vm.Number(1.23),
+			iset: []vm.Inst{
+				newNumber(t, 1.23),
 			},
 			want: 1.23,
 		},
@@ -54,25 +54,25 @@ func TestRun_number(t *testing.T) {
 func TestRun_operator(t *testing.T) {
 	tests := []struct {
 		name    string
-		iset    []any
+		iset    []vm.Inst
 		want    float64
 		wantErr error
 	}{
 		{
 			name: "operator plus",
-			iset: []any{
-				vm.Number(1),
-				vm.Number(2),
-				vm.BinOpPlus,
+			iset: []vm.Inst{
+				newNumber(t, 1),
+				newNumber(t, 2),
+				newBinOp(t, vm.BinOpPlus),
 			},
 			want: 3,
 		},
 		{
 			name: "operator minus",
-			iset: []any{
-				vm.Number(1),
-				vm.Number(2),
-				vm.BinOpMinus,
+			iset: []vm.Inst{
+				newNumber(t, 1),
+				newNumber(t, 2),
+				newBinOp(t, vm.BinOpMinus),
 			},
 			want: -1,
 		},
@@ -97,15 +97,15 @@ func TestRun_operator(t *testing.T) {
 func TestRun_reference(t *testing.T) {
 	tests := []struct {
 		name    string
-		iset    []any
+		iset    []vm.Inst
 		refs    map[string]float64
 		want    float64
 		wantErr error
 	}{
 		{
 			name: "reference",
-			iset: []any{
-				vm.Ref("A1"),
+			iset: []vm.Inst{
+				newRef(t, "A1"),
 			},
 			refs: map[string]float64{
 				"A1": 1,
@@ -114,17 +114,17 @@ func TestRun_reference(t *testing.T) {
 		},
 		{
 			name: "missing reference",
-			iset: []any{
-				vm.Ref("A1"),
+			iset: []vm.Inst{
+				newRef(t, "A1"),
 			},
 			wantErr: vm.ErrRun,
 		},
 		{
 			name: "operator plus left operand reference",
-			iset: []any{
-				vm.Ref("A1"),
-				vm.Number(2),
-				vm.BinOpPlus,
+			iset: []vm.Inst{
+				newRef(t, "A1"),
+				newNumber(t, 2),
+				newBinOp(t, vm.BinOpPlus),
 			},
 			refs: map[string]float64{
 				"A1": 1,
@@ -133,10 +133,10 @@ func TestRun_reference(t *testing.T) {
 		},
 		{
 			name: "operator plus right operand reference",
-			iset: []any{
-				vm.Number(1),
-				vm.Ref("A2"),
-				vm.BinOpPlus,
+			iset: []vm.Inst{
+				newNumber(t, 1),
+				newRef(t, "A2"),
+				newBinOp(t, vm.BinOpPlus),
 			},
 			refs: map[string]float64{
 				"A2": 2,
@@ -164,40 +164,40 @@ func TestRun_reference(t *testing.T) {
 func TestRun_call(t *testing.T) {
 	tests := []struct {
 		name    string
-		iset    []any
+		iset    []vm.Inst
 		refs    map[string]float64
 		want    float64
 		wantErr error
 	}{
 		{
 			name: "sum no args",
-			iset: []any{
-				vm.Call{Func: vm.FuncSum},
+			iset: []vm.Inst{
+				newCall(t, vm.Call{Func: vm.FuncSum}),
 			},
 			want: 0,
 		},
 		{
 			name: "sum one arg",
-			iset: []any{
-				vm.Number(1),
-				vm.Call{Func: vm.FuncSum, Args: 1},
+			iset: []vm.Inst{
+				newNumber(t, 1),
+				newCall(t, vm.Call{Func: vm.FuncSum, Args: 1}),
 			},
 			want: 1,
 		},
 		{
 			name: "sum two args",
-			iset: []any{
-				vm.Number(1),
-				vm.Number(2),
-				vm.Call{Func: vm.FuncSum, Args: 2},
+			iset: []vm.Inst{
+				newNumber(t, 1),
+				newNumber(t, 2),
+				newCall(t, vm.Call{Func: vm.FuncSum, Args: 2}),
 			},
 			want: 3,
 		},
 		{
 			name: "sum one reference",
-			iset: []any{
-				vm.Ref("A1"),
-				vm.Call{Func: vm.FuncSum, Args: 1},
+			iset: []vm.Inst{
+				newRef(t, "A1"),
+				newCall(t, vm.Call{Func: vm.FuncSum, Args: 1}),
 			},
 			refs: map[string]float64{
 				"A1": 1,
@@ -206,10 +206,10 @@ func TestRun_call(t *testing.T) {
 		},
 		{
 			name: "sum multiple refs",
-			iset: []any{
-				vm.Ref("A1"),
-				vm.Ref("A2"),
-				vm.Call{Func: vm.FuncSum, Args: 2},
+			iset: []vm.Inst{
+				newRef(t, "A1"),
+				newRef(t, "A2"),
+				newCall(t, vm.Call{Func: vm.FuncSum, Args: 2}),
 			},
 			refs: map[string]float64{
 				"A1": 1,
@@ -219,10 +219,10 @@ func TestRun_call(t *testing.T) {
 		},
 		{
 			name: "sum reference and number",
-			iset: []any{
-				vm.Ref("A1"),
-				vm.Number(2),
-				vm.Call{Func: vm.FuncSum, Args: 2},
+			iset: []vm.Inst{
+				newRef(t, "A1"),
+				newNumber(t, 2),
+				newCall(t, vm.Call{Func: vm.FuncSum, Args: 2}),
 			},
 			refs: map[string]float64{
 				"A1": 1,
@@ -231,10 +231,10 @@ func TestRun_call(t *testing.T) {
 		},
 		{
 			name: "sum number and a reference",
-			iset: []any{
-				vm.Number(2),
-				vm.Ref("A1"),
-				vm.Call{Func: vm.FuncSum, Args: 2},
+			iset: []vm.Inst{
+				newNumber(t, 2),
+				newRef(t, "A1"),
+				newCall(t, vm.Call{Func: vm.FuncSum, Args: 2}),
 			},
 			refs: map[string]float64{
 				"A1": 1,

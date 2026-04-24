@@ -15,9 +15,9 @@ var ErrRun = errors.New("run error")
 
 // Run executes the instructions set using a virtual machine (VM).
 // Is uses refcal to calculate references.
-func Run(bc *InstructionsSet, refcal func(string) (float64, error)) (float64, error) {
+func Run(iset *InstructionsSet, refcal func(string) (float64, error)) (float64, error) {
 	r := runner{refcal: refcal}
-	n, err := r.Run(bc)
+	n, err := r.Run(iset)
 	if err != nil {
 		return 0, fmt.Errorf("%w: %s", ErrRun, err)
 	}
@@ -31,7 +31,7 @@ type runner struct {
 }
 
 // Run executes the instructions set.
-func (r *runner) Run(bc *InstructionsSet) (_ float64, err error) {
+func (r *runner) Run(iset *InstructionsSet) (_ float64, err error) {
 	defer func() {
 		r := recover()
 		if r == nil {
@@ -43,8 +43,8 @@ func (r *runner) Run(bc *InstructionsSet) (_ float64, err error) {
 		}
 		err = e
 	}()
-	r.stack = make([]float64, 0, len(bc.Instructions))
-	if err := r.run(bc); err != nil {
+	r.stack = make([]float64, 0, len(iset.Instructions))
+	if err := r.run(iset); err != nil {
 		return 0, err
 	}
 	if len(r.stack) != 1 {
@@ -53,25 +53,25 @@ func (r *runner) Run(bc *InstructionsSet) (_ float64, err error) {
 	return r.pop(), nil
 }
 
-func (r *runner) run(bc *InstructionsSet) error {
-	for _, instruction := range bc.Instructions {
-		switch v := instruction.(type) {
-		case Number:
-			r.push(float64(v))
-		case BinOp:
-			n, err := r.runBinOp(v)
+func (r *runner) run(iset *InstructionsSet) error {
+	for _, inst := range iset.Instructions {
+		switch inst.Type {
+		case InstTypeNumber:
+			r.push(inst.Number)
+		case InstTypeBinOp:
+			n, err := r.runBinOp(inst.BinOp)
 			if err != nil {
 				return err
 			}
 			r.push(n)
-		case Ref:
-			n, err := r.refcal(string(v))
+		case InstTypeRef:
+			n, err := r.refcal(inst.Ref)
 			if err != nil {
 				return err
 			}
 			r.push(n)
-		case Call:
-			n, err := r.runCall(&v)
+		case InstTypeCall:
+			n, err := r.runCall(inst.Call)
 			if err != nil {
 				return err
 			}

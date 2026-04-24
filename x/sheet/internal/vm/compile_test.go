@@ -29,8 +29,8 @@ func TestCompile_nonFormula(t *testing.T) {
 			name: "integer",
 			ast:  &ast.NumberNode{Number: "123"},
 			want: vm.InstructionsSet{
-				Instructions: []any{
-					vm.Number(123),
+				Instructions: []vm.Inst{
+					newNumber(t, 123),
 				},
 			},
 		},
@@ -38,8 +38,8 @@ func TestCompile_nonFormula(t *testing.T) {
 			name: "float",
 			ast:  &ast.NumberNode{Number: "1.23"},
 			want: vm.InstructionsSet{
-				Instructions: []any{
-					vm.Number(1.23),
+				Instructions: []vm.Inst{
+					newNumber(t, 1.23),
 				},
 			},
 		},
@@ -78,10 +78,10 @@ func TestCompile_formula(t *testing.T) {
 				Right: &ast.NumberNode{Number: "2"},
 			},
 			want: vm.InstructionsSet{
-				Instructions: []any{
-					vm.Number(1),
-					vm.Number(2),
-					vm.BinOpPlus,
+				Instructions: []vm.Inst{
+					newNumber(t, 1),
+					newNumber(t, 2),
+					newBinOp(t, vm.BinOpPlus),
 				},
 			},
 		},
@@ -93,10 +93,10 @@ func TestCompile_formula(t *testing.T) {
 				Right: &ast.NumberNode{Number: "2"},
 			},
 			want: vm.InstructionsSet{
-				Instructions: []any{
-					vm.Number(1),
-					vm.Number(2),
-					vm.BinOpMinus,
+				Instructions: []vm.Inst{
+					newNumber(t, 1),
+					newNumber(t, 2),
+					newBinOp(t, vm.BinOpMinus),
 				},
 			},
 		},
@@ -131,8 +131,8 @@ func TestCompile_formula(t *testing.T) {
 			name: "identifier",
 			ast:  &ast.RefNode{Ref: "ABC123"},
 			want: vm.InstructionsSet{
-				Instructions: []any{
-					vm.Ref("ABC123"),
+				Instructions: []vm.Inst{
+					newRef(t, "ABC123"),
 				},
 			},
 		},
@@ -145,8 +145,8 @@ func TestCompile_formula(t *testing.T) {
 			name: "call no args",
 			ast:  &ast.CallNode{Name: "SUM"},
 			want: vm.InstructionsSet{
-				Instructions: []any{
-					vm.Call{Func: vm.FuncSum},
+				Instructions: []vm.Inst{
+					newCall(t, vm.Call{Func: vm.FuncSum}),
 				},
 			},
 		},
@@ -164,9 +164,9 @@ func TestCompile_formula(t *testing.T) {
 				},
 			},
 			want: vm.InstructionsSet{
-				Instructions: []any{
-					vm.Number(123),
-					vm.Call{Func: vm.FuncSum, Args: 1},
+				Instructions: []vm.Inst{
+					newNumber(t, 123),
+					newCall(t, vm.Call{Func: vm.FuncSum, Args: 1}),
 				},
 			},
 		},
@@ -190,10 +190,10 @@ func TestCompile_formula(t *testing.T) {
 				},
 			},
 			want: vm.InstructionsSet{
-				Instructions: []any{
-					vm.Number(1),
-					vm.Number(2),
-					vm.Call{Func: vm.FuncSum, Args: 2},
+				Instructions: []vm.Inst{
+					newNumber(t, 1),
+					newNumber(t, 2),
+					newCall(t, vm.Call{Func: vm.FuncSum, Args: 2}),
 				},
 			},
 		},
@@ -210,11 +210,11 @@ func TestCompile_formula(t *testing.T) {
 				},
 			},
 			want: vm.InstructionsSet{
-				Instructions: []any{
-					vm.Number(1),
-					vm.Number(2),
-					vm.BinOpPlus,
-					vm.Call{Func: vm.FuncSum, Args: 1},
+				Instructions: []vm.Inst{
+					newNumber(t, 1),
+					newNumber(t, 2),
+					newBinOp(t, vm.BinOpPlus),
+					newCall(t, vm.Call{Func: vm.FuncSum, Args: 1}),
 				},
 			},
 		},
@@ -236,14 +236,14 @@ func TestCompile_formula(t *testing.T) {
 				},
 			},
 			want: vm.InstructionsSet{
-				Instructions: []any{
-					vm.Number(1),
-					vm.Number(2),
-					vm.BinOpPlus,
-					vm.Number(3),
-					vm.Number(4),
-					vm.BinOpMinus,
-					vm.Call{Func: vm.FuncSum, Args: 2},
+				Instructions: []vm.Inst{
+					newNumber(t, 1),
+					newNumber(t, 2),
+					newBinOp(t, vm.BinOpPlus),
+					newNumber(t, 3),
+					newNumber(t, 4),
+					newBinOp(t, vm.BinOpMinus),
+					newCall(t, vm.Call{Func: vm.FuncSum, Args: 2}),
 				},
 			},
 		},
@@ -256,11 +256,11 @@ func TestCompile_formula(t *testing.T) {
 				},
 			},
 			want: vm.InstructionsSet{
-				Instructions: []any{
-					vm.Ref("A1"),
-					vm.Ref("A2"),
-					vm.Ref("A3"),
-					vm.Call{Func: vm.FuncSum, Args: 3},
+				Instructions: []vm.Inst{
+					newRef(t, "A1"),
+					newRef(t, "A2"),
+					newRef(t, "A3"),
+					newCall(t, vm.Call{Func: vm.FuncSum, Args: 3}),
 				},
 			},
 		},
@@ -290,4 +290,24 @@ func TestCompile_formula(t *testing.T) {
 			}
 		})
 	}
+}
+
+func newNumber(t *testing.T, n float64) vm.Inst {
+	t.Helper()
+	return vm.Inst{Type: vm.InstTypeNumber, Number: n}
+}
+
+func newBinOp(t *testing.T, op vm.BinOp) vm.Inst {
+	t.Helper()
+	return vm.Inst{Type: vm.InstTypeBinOp, BinOp: op}
+}
+
+func newRef(t *testing.T, ref string) vm.Inst {
+	t.Helper()
+	return vm.Inst{Type: vm.InstTypeRef, Ref: ref}
+}
+
+func newCall(t *testing.T, c vm.Call) vm.Inst {
+	t.Helper()
+	return vm.Inst{Type: vm.InstTypeCall, Call: &c}
 }
