@@ -23,11 +23,13 @@ func isWhitespace(r rune) bool { return bytes.ContainsRune(whitespace, r) }
 func scanState(lx *lexer) stateFunc {
 	const (
 		// keep-sorted start
-		comma = ','
-		lpar  = '('
-		minus = '-'
-		plus  = '+'
-		rpar  = ')'
+		comma    = ','
+		divide   = '/'
+		lpar     = '('
+		minus    = '-'
+		multiply = '*'
+		plus     = '+'
+		rpar     = ')'
 		// keep-sorted end
 	)
 	lx.ScanFunc(isWhitespace)
@@ -44,10 +46,14 @@ func scanState(lx *lexer) stateFunc {
 	// keep-sorted start
 	case r == comma:
 		return genState(TokenComma)
+	case r == divide:
+		return genState(TokenDivide)
 	case r == lpar:
 		return genState(TokenLpar)
 	case r == minus:
 		return genState(TokenMinus)
+	case r == multiply:
+		return genState(TokenMultiply)
 	case r == plus:
 		return genState(TokenPlus)
 	case r == rpar:

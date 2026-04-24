@@ -9,19 +9,21 @@ func _() {
 	// Re-run the stringer command to generate them again.
 	var x [1]struct{}
 	_ = x[TokenComma-1]
-	_ = x[TokenError-2]
-	_ = x[TokenIdent-3]
-	_ = x[TokenLpar-4]
-	_ = x[TokenMinus-5]
-	_ = x[TokenNumber-6]
-	_ = x[TokenPlus-7]
-	_ = x[TokenRange-8]
-	_ = x[TokenRpar-9]
+	_ = x[TokenDivide-2]
+	_ = x[TokenError-3]
+	_ = x[TokenIdent-4]
+	_ = x[TokenLpar-5]
+	_ = x[TokenMinus-6]
+	_ = x[TokenMultiply-7]
+	_ = x[TokenNumber-8]
+	_ = x[TokenPlus-9]
+	_ = x[TokenRange-10]
+	_ = x[TokenRpar-11]
 }
 
-const _tokenType_name = "commaerroridentifierrparminusnumberplusrangelpar"
+const _tokenType_name = "commadivideerroridentifierrparminusmultiplynumberplusrangelpar"
 
-var _tokenType_index = [...]uint8{0, 5, 10, 20, 24, 29, 35, 39, 44, 48}
+var _tokenType_index = [...]uint8{0, 5, 11, 16, 26, 30, 35, 43, 49, 53, 58, 62}
 
 func (i tokenType) String() string {
 	idx := int(i) - 1

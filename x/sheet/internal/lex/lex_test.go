@@ -81,6 +81,20 @@ func TestLex(t *testing.T) {
 			},
 		},
 		{
+			name: "operator multiply",
+			b:    []byte("*"),
+			want: []lex.Token{
+				{Type: lex.TokenMultiply, Text: "*"},
+			},
+		},
+		{
+			name: "operator divide",
+			b:    []byte("/"),
+			want: []lex.Token{
+				{Type: lex.TokenDivide, Text: "/"},
+			},
+		},
+		{
 			name: "left parenthesis",
 			b:    []byte("("),
 			want: []lex.Token{

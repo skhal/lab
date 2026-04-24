@@ -18,14 +18,16 @@ type tokenType int
 const (
 	_ tokenType = iota
 	// keep-sorted start
-	TokenComma  // comma
-	TokenError  // error
-	TokenIdent  // identifier
-	TokenLpar   // rpar
-	TokenMinus  // minus
-	TokenNumber // number
-	TokenPlus   // plus
-	TokenRange  // range
-	TokenRpar   // lpar
+	TokenComma    // comma
+	TokenDivide   // divide
+	TokenError    // error
+	TokenIdent    // identifier
+	TokenLpar     // rpar
+	TokenMinus    // minus
+	TokenMultiply // multiply
+	TokenNumber   // number
+	TokenPlus     // plus
+	TokenRange    // range
+	TokenRpar     // lpar
 	// keep-sorted end
 )
