@@ -101,6 +101,24 @@ vim.keymap.set("n", "<localleader>rd", RelatedFile.doc, { buffer = true })
 vim.keymap.set("n", "<localleader>rs", RelatedFile.source, { buffer = true })
 vim.keymap.set("n", "<localleader>rt", RelatedFile.test, { buffer = true })
 
+-- Go automates execution of different Go commands such as generate.
+local Go = {
+	-- generate runs `go generate` on current buffer. It reports and error if
+	-- go-generate fails.
+	generate = function()
+		local f = vim.fn.expand("%")
+		local cmd = { "go", "generate", f }
+		local obj = vim.system(cmd, { text = true }):wait()
+		if obj.code ~= 0 then
+			error(("go generate %s: failed: %s"):format(f, obj.stderr))
+			return
+		end
+		vim.notify(("go generate %s: done"):format(f))
+	end,
+}
+
+vim.keymap.set("n", "<localleader>gen", Go.generate, { buffer = true })
+
 -- LocationTree is a hierarchy of location items with structure fields and
 -- methods stored in a structure block. It helps group methods by structure
 -- type in method declaration order, see [LocationTree.Add].
