@@ -19,14 +19,26 @@ import (
 //
 //	Expr       = Operand | BinaryExpr
 //
-//	Operand    = Number | Identifier | Range | Call | "(" Expr ")"
-//	Identifier = Letter Digit
-//	Range      = Identifier ":" Identifier
+//	Operand    = Number | Reference | Range | Call | Group
+//
+//	Number     = Digit { Digit } [ "." { Digit } ]
+//	Digit      = "0" .. "9"
+//
+//	Reference  = Letter Digit
+//	Letter     = "A" .. "Z"
+//
+//	Range      = Reference ":" Reference
+//
 //	Call       = Identifier "(" [ ArgList ] ")"
+//	Identifier = Letter { Letter }
 //	ArgList    = Expr { "," ArgsList }
 //
+//	Group      =  "(" Expr ")"
+//
 //	BinaryExpr = Expr Op Expr
-//	Op         = "+" | "-" | "*" | "/"
+//	Op         = AddOp | MulOp
+//	AddOp      = "+" | "-"
+//	MulOp      = "*" | "/"
 type formulaParser struct {
 	next func() (lex.Token, bool)
 	peek func() (lex.Token, bool)
