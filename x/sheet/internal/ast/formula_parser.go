@@ -24,7 +24,7 @@ import (
 //	Number     = Digit { Digit } [ "." { Digit } ]
 //	Digit      = "0" .. "9"
 //
-//	Reference  = Letter Digit
+//	Reference  = Letter Digit { Digit }
 //	Letter     = "A" .. "Z"
 //
 //	Range      = Reference ":" Reference
@@ -109,18 +109,11 @@ func (p *formulaParser) parseOperand() (Node, error) {
 		if ok && next.Type == lex.TokenLpar {
 			return p.parseCall(tok)
 		}
-		return p.parseIdentifier(tok)
-	case lex.TokenLpar: // an expression in parentheses
-		n, err := p.parseExpr()
-		if err != nil {
-			return nil, err
-		}
-		if tok, ok = p.next(); !ok || tok.Type != lex.TokenRpar {
-			return nil, fmt.Errorf("unbalanced parentheses")
-		}
-		return n, nil
+		return p.parseReference(tok)
+	case lex.TokenLpar:
+		return p.parseGroup()
 	case lex.TokenNumber:
-		return &NumberNode{Number: tok.Text}, nil
+		return p.parseNumber(tok)
 	case lex.TokenRange:
 		return p.parseRange(tok)
 		// keep-sorted end
@@ -128,11 +121,29 @@ func (p *formulaParser) parseOperand() (Node, error) {
 	return nil, fmt.Errorf("invalid token - %s", tok.Type)
 }
 
-func (p *formulaParser) parseIdentifier(ident lex.Token) (Node, error) {
+func (p *formulaParser) parseReference(ident lex.Token) (Node, error) {
 	if !refRx.MatchString(ident.Text) {
 		return nil, fmt.Errorf("invalid identifier %s", ident.Text)
 	}
 	return &RefNode{Ref: ident.Text}, nil
+}
+
+func (p *formulaParser) parseGroup() (Node, error) {
+	n, err := p.parseExpr()
+	if err != nil {
+		return nil, err
+	}
+	if tok, ok := p.next(); !ok || tok.Type != lex.TokenRpar {
+		return nil, fmt.Errorf("unbalanced parentheses")
+	}
+	return n, nil
+}
+
+func (p *formulaParser) parseNumber(tok lex.Token) (Node, error) {
+	if !numRx.MatchString(tok.Text) {
+		return nil, fmt.Errorf("not a number %q", tok.Text)
+	}
+	return &NumberNode{Number: tok.Text}, nil
 }
 
 func (p *formulaParser) parseRange(tok lex.Token) (Node, error) {
@@ -184,7 +195,7 @@ func (p *formulaParser) parseArgs() ([]Node, error) {
 }
 
 func (p *formulaParser) parseBinaryExpr(lhs Node) (Node, error) {
-	op, _ := p.next()
+	op, _ := p.next() // the operator is guaranteed by the called
 	opNext, okNext := p.peek()
 	rhs, err := p.parseExpr()
 	if err != nil {

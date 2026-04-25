@@ -34,9 +34,9 @@ func Parse(s string) (Node, error) {
 }
 
 var (
-	cellRx = regexp.MustCompile(`^\d+(?:\.\d*)?$`)   // numbers only
-	refRx  = regexp.MustCompile(`^[[:upper:]]+\d+$`) // ref: ABC123
-	callRx = regexp.MustCompile(`^[[:upper:]]+$`)    // f-n name: ABC
+	numRx  = regexp.MustCompile(`^\d+(?:\.\d*)?$`)  // numbers only
+	refRx  = regexp.MustCompile(`^[[:upper:]]\d+$`) // reference: A123
+	callRx = regexp.MustCompile(`^[[:upper:]]+$`)   // f-n name: ABC
 )
 
 // parseCell parses a cell without formula.
@@ -44,7 +44,7 @@ func parseCell(s string) (Node, error) {
 	if len(s) == 0 {
 		return nil, fmt.Errorf("empty cell")
 	}
-	if !cellRx.MatchString(s) {
+	if !numRx.MatchString(s) {
 		return nil, fmt.Errorf("not a number %q", s)
 	}
 	return &NumberNode{Number: s}, nil

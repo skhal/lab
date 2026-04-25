@@ -281,8 +281,13 @@ func TestParse_formula(t *testing.T) {
 		},
 		{
 			name:     "identifier",
-			s:        "=ABC123",
-			wantNode: &ast.RefNode{Ref: "ABC123"},
+			s:        "=A123",
+			wantNode: &ast.RefNode{Ref: "A123"},
+		},
+		{
+			name:    "invalid identifier",
+			s:       "=ABC123",
+			wantErr: ast.ErrParse,
 		},
 		{
 			name:    "identifier must has upper case",
