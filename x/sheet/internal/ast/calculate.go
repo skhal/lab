@@ -60,18 +60,29 @@ func (c *calculator) calcBinOp(n *BinOpNode) (_ float64, err error) {
 		err = fmt.Errorf("%w: %s", ErrCalculate, e)
 	}()
 	const (
-		opPlus  = "+"
-		opMinus = "-"
+		// keep-sorted start
+		opDivide   = "/"
+		opMinus    = "-"
+		opMultiply = "*"
+		opPlus     = "+"
+		// keep-sorted end
 	)
 	switch n.Op {
-	case opPlus:
-		op := newBinaryOperator(c, plus, n.Left, n.Right)
+	// keep-sorted start
+	case opDivide:
+		op := newBinaryOperator(c, divide, n.Left, n.Right)
 		return op.Calculate(), nil
 	case opMinus:
 		op := newBinaryOperator(c, minus, n.Left, n.Right)
 		return op.Calculate(), nil
+	case opMultiply:
+		op := newBinaryOperator(c, multiply, n.Left, n.Right)
+		return op.Calculate(), nil
+	case opPlus:
+		op := newBinaryOperator(c, plus, n.Left, n.Right)
+		return op.Calculate(), nil
+		// keep-sorted end
 	}
-
 	return 0, fmt.Errorf("%w: unsupported operator %q", ErrCalculate, n.Op)
 }
 
@@ -90,12 +101,20 @@ func (op *binaryOperator) Calculate() float64 {
 	return op.f(must(op.c.Calculate(op.lhs)), must(op.c.Calculate(op.rhs)))
 }
 
-func plus(x, y float64) float64 {
-	return x + y
+func divide(x, y float64) float64 {
+	return x / y
 }
 
 func minus(x, y float64) float64 {
 	return x - y
+}
+
+func multiply(x, y float64) float64 {
+	return x * y
+}
+
+func plus(x, y float64) float64 {
+	return x + y
 }
 
 func must(n float64, err error) float64 {

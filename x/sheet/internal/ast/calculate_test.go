@@ -247,6 +247,202 @@ func TestCalculate_minus(t *testing.T) {
 	}
 }
 
+func TestCalculate_multiply(t *testing.T) {
+	tests := []struct {
+		name    string
+		node    ast.Node
+		want    float64
+		wantErr error
+	}{
+		{
+			name: "operator multiply",
+			node: &ast.BinOpNode{
+				Op:    "*",
+				Left:  &ast.NumberNode{Number: "2"},
+				Right: &ast.NumberNode{Number: "3"},
+			},
+			want: 6,
+		},
+		{
+			name: "operator multiply no operands",
+			node: &ast.BinOpNode{
+				Op: "*",
+			},
+			wantErr: ast.ErrCalculate,
+		},
+		{
+			name: "operator multiply one operand",
+			node: &ast.BinOpNode{
+				Op:   "*",
+				Left: &ast.NumberNode{Number: "1"},
+			},
+			wantErr: ast.ErrCalculate,
+		},
+		{
+			name: "operator multiply recurse first",
+			node: &ast.BinOpNode{
+				Op: "*",
+				Left: &ast.BinOpNode{
+					Op:    "+",
+					Left:  &ast.NumberNode{Number: "1"},
+					Right: &ast.NumberNode{Number: "2"},
+				},
+				Right: &ast.NumberNode{Number: "3"},
+			},
+			want: 9,
+		},
+		{
+			name: "operator multiply recurse first fails",
+			node: &ast.BinOpNode{
+				Op: "*",
+				Left: &ast.BinOpNode{
+					Op:    invalidOperator,
+					Left:  &ast.NumberNode{Number: "1"},
+					Right: &ast.NumberNode{Number: "2"},
+				},
+				Right: &ast.NumberNode{Number: "3"},
+			},
+			wantErr: ast.ErrCalculate,
+		},
+		{
+			name: "operator multiply recurse second",
+			node: &ast.BinOpNode{
+				Op:   "*",
+				Left: &ast.NumberNode{Number: "4"},
+				Right: &ast.BinOpNode{
+					Op:    "+",
+					Left:  &ast.NumberNode{Number: "2"},
+					Right: &ast.NumberNode{Number: "3"},
+				},
+			},
+			want: 20,
+		},
+		{
+			name: "operator multiply recurse second fails",
+			node: &ast.BinOpNode{
+				Op:   "*",
+				Left: &ast.NumberNode{Number: "1"},
+				Right: &ast.BinOpNode{
+					Op:    invalidOperator,
+					Left:  &ast.NumberNode{Number: "2"},
+					Right: &ast.NumberNode{Number: "3"},
+				},
+			},
+			wantErr: ast.ErrCalculate,
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			got, err := ast.Calculate(tc.node, newTestRefCalculator(t, nil))
+
+			if !errors.Is(err, tc.wantErr) {
+				t.Errorf("Calculate() = _, %v; want %v", err, tc.wantErr)
+			}
+			if got != tc.want {
+				t.Errorf("Calculate() = %f, _; want %f", got, tc.want)
+			}
+		})
+	}
+}
+
+func TestCalculate_divide(t *testing.T) {
+	tests := []struct {
+		name    string
+		node    ast.Node
+		want    float64
+		wantErr error
+	}{
+		{
+			name: "operator divide",
+			node: &ast.BinOpNode{
+				Op:    "/",
+				Left:  &ast.NumberNode{Number: "3"},
+				Right: &ast.NumberNode{Number: "2"},
+			},
+			want: 1.5,
+		},
+		{
+			name: "operator divide no operands",
+			node: &ast.BinOpNode{
+				Op: "/",
+			},
+			wantErr: ast.ErrCalculate,
+		},
+		{
+			name: "operator divide one operand",
+			node: &ast.BinOpNode{
+				Op:   "/",
+				Left: &ast.NumberNode{Number: "1"},
+			},
+			wantErr: ast.ErrCalculate,
+		},
+		{
+			name: "operator divide recurse first",
+			node: &ast.BinOpNode{
+				Op: "/",
+				Left: &ast.BinOpNode{
+					Op:    "+",
+					Left:  &ast.NumberNode{Number: "1"},
+					Right: &ast.NumberNode{Number: "2"},
+				},
+				Right: &ast.NumberNode{Number: "2"},
+			},
+			want: 1.5,
+		},
+		{
+			name: "operator divide recurse first fails",
+			node: &ast.BinOpNode{
+				Op: "/",
+				Left: &ast.BinOpNode{
+					Op:    invalidOperator,
+					Left:  &ast.NumberNode{Number: "1"},
+					Right: &ast.NumberNode{Number: "2"},
+				},
+				Right: &ast.NumberNode{Number: "3"},
+			},
+			wantErr: ast.ErrCalculate,
+		},
+		{
+			name: "operator divide recurse second",
+			node: &ast.BinOpNode{
+				Op:   "/",
+				Left: &ast.NumberNode{Number: "4"},
+				Right: &ast.BinOpNode{
+					Op:    "+",
+					Left:  &ast.NumberNode{Number: "1"},
+					Right: &ast.NumberNode{Number: "1"},
+				},
+			},
+			want: 2,
+		},
+		{
+			name: "operator divide recurse second fails",
+			node: &ast.BinOpNode{
+				Op:   "/",
+				Left: &ast.NumberNode{Number: "1"},
+				Right: &ast.BinOpNode{
+					Op:    invalidOperator,
+					Left:  &ast.NumberNode{Number: "2"},
+					Right: &ast.NumberNode{Number: "3"},
+				},
+			},
+			wantErr: ast.ErrCalculate,
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			got, err := ast.Calculate(tc.node, newTestRefCalculator(t, nil))
+
+			if !errors.Is(err, tc.wantErr) {
+				t.Errorf("Calculate() = _, %v; want %v", err, tc.wantErr)
+			}
+			if got != tc.want {
+				t.Errorf("Calculate() = %f, _; want %f", got, tc.want)
+			}
+		})
+	}
+}
+
 func TestCalculate_reference(t *testing.T) {
 	tests := []struct {
 		name    string

@@ -119,6 +119,36 @@ func TestCompile_formula(t *testing.T) {
 			wantErr: vm.ErrCompile,
 		},
 		{
+			name: "operator multiply",
+			ast: &ast.BinOpNode{
+				Op:    "*",
+				Left:  &ast.NumberNode{Number: "1"},
+				Right: &ast.NumberNode{Number: "2"},
+			},
+			want: vm.InstructionsSet{
+				Instructions: []vm.Inst{
+					newNumber(t, 1),
+					newNumber(t, 2),
+					newBinOp(t, vm.BinOpMultiply),
+				},
+			},
+		},
+		{
+			name: "operator divide",
+			ast: &ast.BinOpNode{
+				Op:    "/",
+				Left:  &ast.NumberNode{Number: "1"},
+				Right: &ast.NumberNode{Number: "2"},
+			},
+			want: vm.InstructionsSet{
+				Instructions: []vm.Inst{
+					newNumber(t, 1),
+					newNumber(t, 2),
+					newBinOp(t, vm.BinOpDivide),
+				},
+			},
+		},
+		{
 			name: "unsupported binary operator",
 			ast: &ast.BinOpNode{
 				Op:    "test",

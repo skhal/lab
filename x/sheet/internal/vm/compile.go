@@ -76,16 +76,28 @@ func (c *compiler) compileBinOp(op *ast.BinOpNode) error {
 		return err
 	}
 	const (
-		plus  = "+"
-		minus = "-"
+		// keep-sorted start
+		divide   = "/"
+		minus    = "-"
+		multiply = "*"
+		plus     = "+"
+		// keep-sorted end
 	)
 	switch op.Op {
-	case plus:
-		c.push(Inst{Type: InstTypeBinOp, BinOp: BinOpPlus})
+	// keep-sorted start
+	case divide:
+		c.push(Inst{Type: InstTypeBinOp, BinOp: BinOpDivide})
 		return nil
 	case minus:
 		c.push(Inst{Type: InstTypeBinOp, BinOp: BinOpMinus})
 		return nil
+	case multiply:
+		c.push(Inst{Type: InstTypeBinOp, BinOp: BinOpMultiply})
+		return nil
+	case plus:
+		c.push(Inst{Type: InstTypeBinOp, BinOp: BinOpPlus})
+		return nil
+		// keep-sorted end
 	}
 	return fmt.Errorf("unsupported binary operator %s", op.Op)
 }

@@ -58,8 +58,10 @@ type BinOp int
 const (
 	_ BinOp = iota
 	// keep-sorted start
-	BinOpMinus // minus
-	BinOpPlus  // plus
+	BinOpDivide   // dividie
+	BinOpMinus    // minus
+	BinOpMultiply // multiply
+	BinOpPlus     // plus
 	// keep-sorted end
 )
 

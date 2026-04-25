@@ -85,10 +85,16 @@ func (r *runner) runBinOp(op BinOp) (float64, error) {
 	y := r.pop()
 	x := r.pop()
 	switch op {
-	case BinOpPlus:
-		return x + y, nil
+	// keep-sorted start
+	case BinOpDivide:
+		return x / y, nil
 	case BinOpMinus:
 		return x - y, nil
+	case BinOpMultiply:
+		return x * y, nil
+	case BinOpPlus:
+		return x + y, nil
+		// keep-sorted end
 	}
 	return 0, fmt.Errorf("unsupported operation %s", op)
 }

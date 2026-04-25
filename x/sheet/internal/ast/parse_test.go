@@ -145,6 +145,106 @@ func TestParse_formula(t *testing.T) {
 			wantErr: ast.ErrParse,
 		},
 		{
+			name: "multiply",
+			s:    "=1*2",
+			wantNode: &ast.BinOpNode{
+				Op:    "*",
+				Left:  &ast.NumberNode{Number: "1"},
+				Right: &ast.NumberNode{Number: "2"},
+			},
+		},
+		{
+			name:    "multiply no left operand",
+			s:       "=* 2",
+			wantErr: ast.ErrParse,
+		},
+		{
+			name:    "multiply no right operand",
+			s:       "=1 *",
+			wantErr: ast.ErrParse,
+		},
+		{
+			name:    "multiply invalid right operand",
+			s:       "=1 * *",
+			wantErr: ast.ErrParse,
+		},
+		{
+			name: "divide",
+			s:    "=1/2",
+			wantNode: &ast.BinOpNode{
+				Op:    "/",
+				Left:  &ast.NumberNode{Number: "1"},
+				Right: &ast.NumberNode{Number: "2"},
+			},
+		},
+		{
+			name:    "divide no left operand",
+			s:       "=/ 2",
+			wantErr: ast.ErrParse,
+		},
+		{
+			name:    "divide no right operand",
+			s:       "=1 /",
+			wantErr: ast.ErrParse,
+		},
+		{
+			name:    "divide invalid right operand",
+			s:       "=1 / /",
+			wantErr: ast.ErrParse,
+		},
+		{
+			name: "multiply then plus",
+			s:    "=1 * 2 + 3",
+			wantNode: &ast.BinOpNode{
+				Op: "+",
+				Left: &ast.BinOpNode{
+					Op:    "*",
+					Left:  &ast.NumberNode{Number: "1"},
+					Right: &ast.NumberNode{Number: "2"},
+				},
+				Right: &ast.NumberNode{Number: "3"},
+			},
+		},
+		{
+			name: "multiply then parenthesized plus",
+			s:    "=1 * (2 + 3)",
+			wantNode: &ast.BinOpNode{
+				Op:   "*",
+				Left: &ast.NumberNode{Number: "1"},
+				Right: &ast.BinOpNode{
+					Op:    "+",
+					Left:  &ast.NumberNode{Number: "2"},
+					Right: &ast.NumberNode{Number: "3"},
+				},
+			},
+		},
+		{
+			name: "plus then multiply",
+			s:    "=1 + 2 * 3",
+			wantNode: &ast.BinOpNode{
+				Op:   "+",
+				Left: &ast.NumberNode{Number: "1"},
+				Right: &ast.BinOpNode{
+					Op:    "*",
+					Left:  &ast.NumberNode{Number: "2"},
+					Right: &ast.NumberNode{Number: "3"},
+				},
+			},
+		},
+		{
+			name: "parenthesized plus then multiply",
+			s:    "=(1 + 2) * 3",
+			wantNode: &ast.BinOpNode{
+				Op: "*",
+				Left: &ast.BinOpNode{
+					Op:    "+",
+					Left:  &ast.NumberNode{Number: "1"},
+					Right: &ast.NumberNode{Number: "2"},
+				},
+				Right: &ast.NumberNode{Number: "3"},
+			},
+		},
+		{
 			name:     "parentheses",
 			s:        "=(1)",
 			wantNode: &ast.NumberNode{Number: "1"},

@@ -79,9 +79,14 @@ func create() ([]byte, error) {
 	must(s.Set("C1", "=1+3"))
 	must(s.Set("C2", "=1-3"))
 	must(s.Set("C3", "=1-3+5"))
+	must(s.Set("C4", "=2*3"))
+	must(s.Set("C5", "=2*3+4"))
+	must(s.Set("C6", "=2+3*4"))
 	must(s.Set("D1", "=(1+3)"))
 	must(s.Set("D2", "=1-(2+3)"))
 	must(s.Set("D3", "=1-(2-3)"))
+	must(s.Set("D4", "=2*(3+4)"))
+	must(s.Set("D5", "=(2+3)*4"))
 	must(s.Set("E1", "=A1"))
 	must(s.Set("E2", "=B1"))
 	must(s.Set("E3", "=C1"))
@@ -96,7 +101,7 @@ func create() ([]byte, error) {
 	must(s.Set("F4", "=SUM(A1, SUM(A2, A3))"))
 	must(s.Set("G1", "=SUM(A1:A3)"))
 	must(s.Set("G2", "=SUM(A1:A3, 5-7)"))
-	must(s.Set("G3", "=SUM(A1:A5, 1+(9-7+(2+3)), B1:B5, C1:C5, D1:D5, E1:E5, 1+(2-3))"))
+	must(s.Set("G3", "=SUM(A1:A5, 1+(9-7+(2+3)), 2+4*(6-2)/(3-1)-5, B1:B5, C1:C5, D1:D5, E1:E5, 1+(2-3))"))
 
 	var b bytes.Buffer
 	must(s.Write(&b))

@@ -26,7 +26,7 @@ import (
 //	ArgList    = Expr { "," ArgsList }
 //
 //	BinaryExpr = Expr Op Expr
-//	Op         = "+" | "-"
+//	Op         = "+" | "-" | "*" | "/"
 type formulaParser struct {
 	next func() (lex.Token, bool)
 	peek func() (lex.Token, bool)
@@ -77,7 +77,7 @@ func (p *formulaParser) parseExpr() (Node, error) {
 		return lhs, nil
 	}
 	switch op.Type {
-	case lex.TokenPlus, lex.TokenMinus:
+	case lex.TokenPlus, lex.TokenMinus, lex.TokenMultiply, lex.TokenDivide:
 		return p.parseBinaryExpr(lhs)
 	}
 	return lhs, nil
@@ -173,13 +173,31 @@ func (p *formulaParser) parseArgs() ([]Node, error) {
 
 func (p *formulaParser) parseBinaryExpr(lhs Node) (Node, error) {
 	op, _ := p.next()
+	opNext, okNext := p.peek()
 	rhs, err := p.parseExpr()
 	if err != nil {
 		return nil, err
 	}
-	return &BinOpNode{
+	n := &BinOpNode{
 		Op:    op.Text,
 		Left:  lhs,
 		Right: rhs,
-	}, nil
+	}
+	switch op.Type {
+	case lex.TokenMultiply, lex.TokenDivide:
+		if okNext && opNext.Type == lex.TokenLpar {
+			break
+		}
+		return rotateLeft(n), nil
+	}
+	return n, nil
+}
+
+func rotateLeft(n *BinOpNode) Node {
+	rhs, ok := n.Right.(*BinOpNode)
+	if !ok {
+		return n
+	}
+	n.Right, rhs.Left = rhs.Left, n
+	return rhs
 }

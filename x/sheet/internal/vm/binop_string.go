@@ -8,13 +8,15 @@ func _() {
 	// An "invalid array index" compiler error signifies that the constant values have changed.
 	// Re-run the stringer command to generate them again.
 	var x [1]struct{}
-	_ = x[BinOpMinus-1]
-	_ = x[BinOpPlus-2]
+	_ = x[BinOpDivide-1]
+	_ = x[BinOpMinus-2]
+	_ = x[BinOpMultiply-3]
+	_ = x[BinOpPlus-4]
 }
 
-const _BinOp_name = "minusplus"
+const _BinOp_name = "dividieminusmultiplyplus"
 
-var _BinOp_index = [...]uint8{0, 5, 9}
+var _BinOp_index = [...]uint8{0, 7, 12, 20, 24}
 
 func (i BinOp) String() string {
 	idx := int(i) - 1
