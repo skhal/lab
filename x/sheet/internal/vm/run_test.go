@@ -76,6 +76,33 @@ func TestRun_operator(t *testing.T) {
 			},
 			want: -1,
 		},
+		{
+			name: "operator multiply",
+			iset: []vm.Inst{
+				newNumber(t, 2),
+				newNumber(t, 3),
+				newBinOp(t, vm.BinOpMultiply),
+			},
+			want: 6,
+		},
+		{
+			name: "operator divide",
+			iset: []vm.Inst{
+				newNumber(t, 3),
+				newNumber(t, 2),
+				newBinOp(t, vm.BinOpDivide),
+			},
+			want: 1.5,
+		},
+		{
+			name: "operator unsupported",
+			iset: []vm.Inst{
+				newNumber(t, 3),
+				newNumber(t, 2),
+				newBinOp(t, vm.BinOp(-1)),
+			},
+			wantErr: vm.ErrRun,
+		},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
@@ -177,6 +204,15 @@ func TestRun_call(t *testing.T) {
 			want: 0,
 		},
 		{
+			name: "sum insufficient args on stack",
+			iset: []vm.Inst{
+				newNumber(t, 1),
+				// missing argument 2
+				newCall(t, vm.Call{Func: vm.FuncSum, Args: 2}),
+			},
+			wantErr: vm.ErrRun,
+		},
+		{
 			name: "sum one arg",
 			iset: []vm.Inst{
 				newNumber(t, 1),
@@ -240,6 +276,14 @@ func TestRun_call(t *testing.T) {
 				"A1": 1,
 			},
 			want: 3,
+		},
+		{
+			name: "unsupported operator",
+			iset: []vm.Inst{
+				newNumber(t, 1),
+				newCall(t, vm.Call{Func: vm.Function(-1), Args: 1}),
+			},
+			wantErr: vm.ErrRun,
 		},
 	}
 	for _, tc := range tests {
