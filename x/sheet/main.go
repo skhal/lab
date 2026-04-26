@@ -3,11 +3,46 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Sheet demonstrates a cells table engine.
+// Sheet demonstrates an Excel-like engine to drive a table of cells.
 //
 // SYNOPSIS
 //
-//	sheet
+//	sheet [-engine (ast|vm)]
+//
+// # DESCRIPTION
+//
+// Sheet is a table of cells. Every cell has a floating point number value or
+// a formula. The formula can be a binary operation "=1+3" with grouping using
+// parenthesis "=2 * (3 + 4)", a function call with references, ranges,
+// expressions or even if-logic "=SUM(IF(A3 > 4, B2, B6), C3:C5)".
+//
+// Sheets eagerly parse cell contents but only calculate formulas in
+// [sheet.Sheet.Calculate].
+//
+// There are two engines to drive parsing and calculation:
+//
+//   - AST: parse formulas into Abstract Syntax Tree (AST). Calculate formulas
+//     by walking AST in post-traverse order.
+//
+//   - VM: parse formulas into AST, then compile it into an instructions set.
+//     Use Virtual Machine (VM) to run the instructions.
+//
+// Sheet treats all values of float64 for the sake of simplicity (it is a demo
+// project, actual product should support booleans, text, etc.). As such, the
+// comparison operators, e.g. equal "==" and not equal "!=", use precision-based
+// comparison - it checks that relative difference between two numbers is within
+// pre-compiled relative value (say, 0.1%).
+//
+// EXAMPLE
+//
+//	// create an empty spreadsheet
+//	s := sheet.New()
+//	// fill in data
+//	s.Set("A1", "123")
+//	s.Set("B2", "=IF(A1 > 100, C1, D1)")
+//	...
+//	// calculate values, i.e. run formulas
+//	s.Calculate()
 package main
 
 import (

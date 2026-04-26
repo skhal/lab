@@ -498,13 +498,11 @@ func benchmarkSheet_read(b *testing.B, opts ...sheet.Option) {
 	}
 }
 
-func ExampleSheet_ast() { exampleSheet(sheet.WithASTEngine()) }
-func ExampleSheet_vm()  { exampleSheet(sheet.WithVMEngine()) }
-
-func exampleSheet(opts ...sheet.Option) {
-	s := sheet.New(opts...)
+func ExampleSheet_ast() {
+	s := sheet.New(sheet.WithASTEngine())
 	s.Set("A1", "1")
 	s.Set("B1", "=SUM(A1:A5, 7-6)")
+	s.Set("B3", "=IF(B1 > 3, 10, 20)")
 	s.Calculate()
 	s.VisitAll(func(id, val string, res float64) bool {
 		fmt.Printf("%s %3.1f\t%s\n", id, res, val)
@@ -513,21 +511,31 @@ func exampleSheet(opts ...sheet.Option) {
 	// Output:
 	// A1 1.0	1
 	// B1 2.0	=SUM(A1:A5, 7-6)
+	// B3 20.0	=IF(B1 > 3, 10, 20)
+}
+
+func ExampleSheet_vm() {
+	s := sheet.New(sheet.WithVMEngine())
+	s.Set("A1", "1")
+	s.Set("B1", "=SUM(A1:A5, 7-6)")
+	s.Set("B3", "=IF(B1 > 3, 10, 20)")
+	s.Calculate()
+	s.VisitAll(func(id, val string, res float64) bool {
+		fmt.Printf("%s %3.1f\t%s\n", id, res, val)
+		return true
+	})
+	// Output:
+	// A1 1.0	1
+	// B1 2.0	=SUM(A1:A5, 7-6)
+	// B3 20.0	=IF(B1 > 3, 10, 20)
 }
 
 func ExampleSheet_writeRead_ast() {
-	exampleSheet_writeRead(sheet.WithASTEngine())
-}
-
-func ExampleSheet_writeRead_vm() {
-	exampleSheet_writeRead(sheet.WithVMEngine())
-}
-
-func exampleSheet_writeRead(opts ...sheet.Option) {
 	b := func() []byte {
-		s := sheet.New(opts...)
+		s := sheet.New(sheet.WithASTEngine())
 		s.Set("A1", "1")
 		s.Set("B1", "=SUM(A1:A5, 7-6)")
+		s.Set("B3", "=IF(B1 > 3, 10, 20)")
 		var b bytes.Buffer
 		if err := s.Write(&b); err != nil {
 			fmt.Println(err)
@@ -551,6 +559,39 @@ func exampleSheet_writeRead(opts ...sheet.Option) {
 	// Output:
 	// A1 1.0	1
 	// B1 2.0	=SUM(A1:A5, 7-6)
+	// B3 20.0	=IF(B1 > 3, 10, 20)
+}
+
+func ExampleSheet_writeRead_vm() {
+	b := func() []byte {
+		s := sheet.New(sheet.WithVMEngine())
+		s.Set("A1", "1")
+		s.Set("B1", "=SUM(A1:A5, 7-6)")
+		s.Set("B3", "=IF(B1 > 3, 10, 20)")
+		var b bytes.Buffer
+		if err := s.Write(&b); err != nil {
+			fmt.Println(err)
+			return nil
+		}
+		return b.Bytes()
+	}()
+	s := sheet.New()
+	if err := s.Read(bytes.NewReader(b)); err != nil {
+		fmt.Println(err)
+		return
+	}
+	if err := s.Calculate(); err != nil {
+		fmt.Println(err)
+		return
+	}
+	s.VisitAll(func(id, val string, res float64) bool {
+		fmt.Printf("%s %3.1f\t%s\n", id, res, val)
+		return true
+	})
+	// Output:
+	// A1 1.0	1
+	// B1 2.0	=SUM(A1:A5, 7-6)
+	// B3 20.0	=IF(B1 > 3, 10, 20)
 }
 
 func newSheet(t *testing.T, cells map[string]string, opts ...sheet.Option) *sheet.Sheet {

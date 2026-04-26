@@ -5,16 +5,15 @@
   license that can be found in the LICENSE file.
 -->
 
-Name
-====
+# Name
 
 **x** - experimental area
 
-Description
-===========
+# Description
 
 The x/ package holds experiments that didn't graduate yet to the root of the repository.
 
 Projects:
 
--	[feed/](./feed/): a streaming feed reader (RSS, Atom, etc.) inspired by [Advanced Concurrency Patterns](https://go.dev/blog/io2013-talk-concurrency).
+- [Feed](./feed/): a streaming feed reader (RSS, Atom, etc.) inspired by [Advanced Concurrency Patterns](https://go.dev/blog/io2013-talk-concurrency).
+- [Sheet](./sheet/): a spreadsheet engine inspired by [GopherCon 2020 - Optimizing Performance](https://speakerdeck.com/therealtravissmith/optimizing-performance-using-a-vm-and-go-plugins). It supports AST and VM engines.
