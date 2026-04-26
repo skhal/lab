@@ -16,22 +16,27 @@ type stateFunc func(*lexer) stateFunc
 
 var whitespace = []byte(` \t`)
 
+const (
+	// keep-sorted start
+	runeComma       = ','
+	runeDivide      = '/'
+	runeEqual       = '='
+	runeExclamation = '!'
+	runeGreater     = '>'
+	runeLess        = '<'
+	runeLpar        = '('
+	runeMinus       = '-'
+	runeMultiply    = '*'
+	runePlus        = '+'
+	runeRpar        = ')'
+	// keep-sorted end
+)
+
 func isWhitespace(r rune) bool { return bytes.ContainsRune(whitespace, r) }
 
 // scanState is the default state of the scanner. It skips whitespace and
 // advances to the next supported state.
 func scanState(lx *lexer) stateFunc {
-	const (
-		// keep-sorted start
-		comma    = ','
-		divide   = '/'
-		lpar     = '('
-		minus    = '-'
-		multiply = '*'
-		plus     = '+'
-		rpar     = ')'
-		// keep-sorted end
-	)
 	lx.ScanFunc(isWhitespace)
 	lx.Ignore()
 	switch r, err := lx.Peek(); {
@@ -44,19 +49,27 @@ func scanState(lx *lexer) stateFunc {
 	case unicode.IsLetter(r):
 		return identifierState
 	// keep-sorted start
-	case r == comma:
+	case r == runeComma:
 		return genState(TokenComma)
-	case r == divide:
+	case r == runeDivide:
 		return genState(TokenDivide)
-	case r == lpar:
+	case r == runeEqual:
+		return equalState
+	case r == runeExclamation:
+		return notEqualState
+	case r == runeGreater:
+		return greaterState
+	case r == runeLess:
+		return lessState
+	case r == runeLpar:
 		return genState(TokenLpar)
-	case r == minus:
+	case r == runeMinus:
 		return genState(TokenMinus)
-	case r == multiply:
+	case r == runeMultiply:
 		return genState(TokenMultiply)
-	case r == plus:
+	case r == runePlus:
 		return genState(TokenPlus)
-	case r == rpar:
+	case r == runeRpar:
 		return genState(TokenRpar)
 	// keep-sorted end
 	default:
@@ -119,12 +132,60 @@ func identifierState(lx *lexer) stateFunc {
 	return scanState
 }
 
-func genState(tok tokenType) stateFunc {
+func genState(tok TokenType) stateFunc {
 	return func(lx *lexer) stateFunc {
 		lx.Read()
 		lx.Emit(tok)
 		return scanState
 	}
+}
+
+func equalState(lx *lexer) stateFunc {
+	lx.Read() // ignore the equal sign
+	switch r, err := lx.Read(); {
+	case err != nil:
+		return errorState(err)
+	case r != runeEqual:
+		err := fmt.Errorf("unexpected '=%v', want ==", r)
+		return errorState(err)
+	}
+	lx.Emit(TokenEqual)
+	return scanState
+}
+
+func notEqualState(lx *lexer) stateFunc {
+	lx.Read() // ignore the exclamation mark
+	switch r, err := lx.Read(); {
+	case err != nil:
+		return errorState(err)
+	case r != runeEqual:
+		err := fmt.Errorf("unexpected '!%v', want !=", r)
+		return errorState(err)
+	}
+	lx.Emit(TokenNotEqual)
+	return scanState
+}
+
+func lessState(lx *lexer) stateFunc {
+	lx.Read() // ignore the less sign
+	if r, err := lx.Peek(); err != nil || r != runeEqual {
+		lx.Emit(TokenLess)
+		return scanState
+	}
+	lx.Read() // ignore the equal sign
+	lx.Emit(TokenLessOrEqual)
+	return scanState
+}
+
+func greaterState(lx *lexer) stateFunc {
+	lx.Read() // ignore the greater sign
+	if r, err := lx.Peek(); err != nil || r != runeEqual {
+		lx.Emit(TokenGreater)
+		return scanState
+	}
+	lx.Read() // ignore the equal sign
+	lx.Emit(TokenGreaterOrEqual)
+	return scanState
 }
 
 // errorState emits an error token and advances to eofState.

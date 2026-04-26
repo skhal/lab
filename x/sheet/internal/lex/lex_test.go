@@ -165,6 +165,62 @@ func TestLex(t *testing.T) {
 				{Type: lex.TokenError, Err: lex.ErrLex},
 			},
 		},
+		{
+			name: "compare equal",
+			b:    []byte("=="),
+			want: []lex.Token{
+				{Type: lex.TokenEqual, Text: "=="},
+			},
+		},
+		{
+			name: "assignment",
+			b:    []byte("="),
+			want: []lex.Token{
+				{Type: lex.TokenError, Err: lex.ErrLex},
+			},
+		},
+		{
+			name: "compare not equal",
+			b:    []byte("!="),
+			want: []lex.Token{
+				{Type: lex.TokenNotEqual, Text: "!="},
+			},
+		},
+		{
+			name: "negation",
+			b:    []byte("!"),
+			want: []lex.Token{
+				{Type: lex.TokenError, Err: lex.ErrLex},
+			},
+		},
+		{
+			name: "compare less",
+			b:    []byte("<"),
+			want: []lex.Token{
+				{Type: lex.TokenLess, Text: "<"},
+			},
+		},
+		{
+			name: "compare less or equal",
+			b:    []byte("<="),
+			want: []lex.Token{
+				{Type: lex.TokenLessOrEqual, Text: "<="},
+			},
+		},
+		{
+			name: "compare greater",
+			b:    []byte(">"),
+			want: []lex.Token{
+				{Type: lex.TokenGreater, Text: ">"},
+			},
+		},
+		{
+			name: "compare greater or equal",
+			b:    []byte(">="),
+			want: []lex.Token{
+				{Type: lex.TokenGreaterOrEqual, Text: ">="},
+			},
+		},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {

@@ -7,27 +7,35 @@ package lex
 
 // Token is a single item in the formula.
 type Token struct {
-	Type tokenType // token type
+	Type TokenType // token type
 	Text string    // token value
 	Err  error     // only set for TokenError
 }
 
-//go:generate stringer -type tokenType -linecomment
-type tokenType int
+// TokenType enumerates different tokens.
+//
+//go:generate stringer -type TokenType -linecomment
+type TokenType int
 
 const (
-	_ tokenType = iota
+	_ TokenType = iota
 	// keep-sorted start
-	TokenComma    // comma
-	TokenDivide   // divide
-	TokenError    // error
-	TokenIdent    // identifier
-	TokenLpar     // rpar
-	TokenMinus    // minus
-	TokenMultiply // multiply
-	TokenNumber   // number
-	TokenPlus     // plus
-	TokenRange    // range
-	TokenRpar     // lpar
+	TokenComma          // comma
+	TokenDivide         // divide
+	TokenEqual          // equal
+	TokenError          // error
+	TokenGreater        // greater
+	TokenGreaterOrEqual // greaterorequal
+	TokenIdent          // identifier
+	TokenLess           // less
+	TokenLessOrEqual    // lessorequal
+	TokenLpar           // rpar
+	TokenMinus          // minus
+	TokenMultiply       // multiply
+	TokenNotEqual       // notequal
+	TokenNumber         // number
+	TokenPlus           // plus
+	TokenRange          // range
+	TokenRpar           // lpar
 	// keep-sorted end
 )

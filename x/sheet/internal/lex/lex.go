@@ -94,7 +94,7 @@ func (lx *lexer) Stop() {
 
 // Emit creates a token and sends it on the tokkens channel. It blocks until
 // token receiver reads the token or if [lexer.Stop] called.
-func (lx *lexer) Emit(tk tokenType) {
+func (lx *lexer) Emit(tk TokenType) {
 	var tok Token
 	switch tk {
 	case TokenError:

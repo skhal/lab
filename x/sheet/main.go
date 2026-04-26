@@ -58,7 +58,7 @@ func run() (err error) {
 	must(s.Read(bytes.NewReader(b)))
 	must(s.Calculate())
 	s.VisitAll(func(id, cell string, n float64) bool {
-		fmt.Printf("%s %q = %.2f\n", id, cell, n)
+		fmt.Printf("%s %q = %.1f\n", id, cell, n)
 		return true
 	})
 	return nil
@@ -76,6 +76,7 @@ func create() ([]byte, error) {
 	must(s.Set("A2", "10"))
 	must(s.Set("A3", "12"))
 	must(s.Set("B1", "=123"))
+	must(s.Set("B2", "=321"))
 	must(s.Set("C1", "=1+3"))
 	must(s.Set("C2", "=1-3"))
 	must(s.Set("C3", "=1-3+5"))
@@ -102,6 +103,11 @@ func create() ([]byte, error) {
 	must(s.Set("G1", "=SUM(A1:A3)"))
 	must(s.Set("G2", "=SUM(A1:A3, 5-7)"))
 	must(s.Set("G3", "=SUM(A1:A5, 1+(9-7+(2+3)), 2+4*(6-2)/(3-1)-5, B1:B5, C1:C5, D1:D5, E1:E5, 1+(2-3))"))
+	must(s.Set("H1", "=IF(A1 < 10, 1, 2)"))
+	must(s.Set("H2", "=IF(A1 + 5 < 10 +5, 1, 2)"))
+	must(s.Set("H3", "=IF(A1 + 5 < 10 +5, 1 * (3+4), 2 +3*2)"))
+	must(s.Set("H4", "=IF(A1 + 5 < 10 +5, B1, B2)"))
+	must(s.Set("H5", "=2*IF(A1 + 5 < 10 +5, B1, B2)"))
 
 	var b bytes.Buffer
 	must(s.Write(&b))

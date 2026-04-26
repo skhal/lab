@@ -610,6 +610,110 @@ func TestCalculate_call(t *testing.T) {
 	}
 }
 
+func TestCalculate_ifCall(t *testing.T) {
+	tests := []struct {
+		name    string
+		node    ast.Node
+		refs    map[string]testCell
+		want    float64
+		wantErr bool
+	}{
+		{
+			name: "if equal",
+			node: &ast.IfNode{
+				Cond: &ast.RelOpNode{
+					Op:    "==",
+					Left:  &ast.NumberNode{Number: "1"},
+					Right: &ast.NumberNode{Number: "2"},
+				},
+				IfPass: &ast.NumberNode{Number: "3"},
+				IfFail: &ast.NumberNode{Number: "4"},
+			},
+			want: 4,
+		},
+		{
+			name: "if not equal",
+			node: &ast.IfNode{
+				Cond: &ast.RelOpNode{
+					Op:    "!=",
+					Left:  &ast.NumberNode{Number: "1"},
+					Right: &ast.NumberNode{Number: "2"},
+				},
+				IfPass: &ast.NumberNode{Number: "3"},
+				IfFail: &ast.NumberNode{Number: "4"},
+			},
+			want: 3,
+		},
+		{
+			name: "if less",
+			node: &ast.IfNode{
+				Cond: &ast.RelOpNode{
+					Op:    "<",
+					Left:  &ast.NumberNode{Number: "1"},
+					Right: &ast.NumberNode{Number: "2"},
+				},
+				IfPass: &ast.NumberNode{Number: "3"},
+				IfFail: &ast.NumberNode{Number: "4"},
+			},
+			want: 3,
+		},
+		{
+			name: "if less or equal",
+			node: &ast.IfNode{
+				Cond: &ast.RelOpNode{
+					Op:    "<=",
+					Left:  &ast.NumberNode{Number: "1"},
+					Right: &ast.NumberNode{Number: "1"},
+				},
+				IfPass: &ast.NumberNode{Number: "3"},
+				IfFail: &ast.NumberNode{Number: "4"},
+			},
+			want: 3,
+		},
+		{
+			name: "if greater",
+			node: &ast.IfNode{
+				Cond: &ast.RelOpNode{
+					Op:    ">",
+					Left:  &ast.NumberNode{Number: "1"},
+					Right: &ast.NumberNode{Number: "2"},
+				},
+				IfPass: &ast.NumberNode{Number: "3"},
+				IfFail: &ast.NumberNode{Number: "4"},
+			},
+			want: 4,
+		},
+		{
+			name: "if greater or equal",
+			node: &ast.IfNode{
+				Cond: &ast.RelOpNode{
+					Op:    ">=",
+					Left:  &ast.NumberNode{Number: "1"},
+					Right: &ast.NumberNode{Number: "2"},
+				},
+				IfPass: &ast.NumberNode{Number: "3"},
+				IfFail: &ast.NumberNode{Number: "4"},
+			},
+			want: 4,
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			got, err := ast.Calculate(tc.node, newTestRefCalculator(t, tc.refs))
+
+			switch {
+			case tc.wantErr && err == nil:
+				t.Error("Calculate() missing error")
+			case !tc.wantErr && err != nil:
+				t.Errorf("Calculate() unexpected error: %v", err)
+			}
+			if got != tc.want {
+				t.Errorf("Calculate() = %f, _; want %f", got, tc.want)
+			}
+		})
+	}
+}
+
 var errTest = errors.New("test error")
 
 type testCell struct {

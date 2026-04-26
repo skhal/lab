@@ -19,7 +19,7 @@ import (
 //
 //	Expr       = Operand | BinaryExpr
 //
-//	Operand    = Number | Reference | Range | Call | Group
+//	Operand    = Number | Reference | Range | Call | IfCall | Group
 //
 //	Number     = Digit { Digit } [ "." { Digit } ]
 //	Digit      = "0" .. "9"
@@ -32,6 +32,11 @@ import (
 //	Call       = Identifier "(" [ ArgList ] ")"
 //	Identifier = Letter { Letter }
 //	ArgList    = Expr { "," ArgsList }
+//
+//	IfCall     = "IF" "(" IfArgs ")"
+//	IfArgs     = RelExpr "," Expr "," Expr
+//	RelExpr    = Expr RelOp Expr
+//	RelOp      = "==" | "!=" | "<" | "<=" | ">" | ">="
 //
 //	Group      =  "(" Expr ")"
 //
@@ -160,6 +165,14 @@ func (p *formulaParser) parseCall(ident lex.Token) (Node, error) {
 	if !callRx.MatchString(ident.Text) {
 		return nil, fmt.Errorf("invalid function name %s", ident.Text)
 	}
+	const ifCall = "IF"
+	if ident.Text == ifCall {
+		return p.parseIfCall()
+	}
+	return p.parseFuncCall(ident)
+}
+
+func (p *formulaParser) parseFuncCall(ident lex.Token) (Node, error) {
 	p.next() // ignore left-parenthesis
 	var args []Node
 	if tok, ok := p.peek(); ok && tok.Type != lex.TokenRpar {
@@ -218,6 +231,69 @@ func (p *formulaParser) parseGroup() (Node, error) {
 	}
 	if tok, ok := p.next(); !ok || tok.Type != lex.TokenRpar {
 		return nil, fmt.Errorf("unbalanced parentheses")
+	}
+	return n, nil
+}
+
+func (p *formulaParser) parseIfCall() (Node, error) {
+	p.next() // ignore left-parenthesis
+	cond, ifPass, ifFail, err := p.parseIfArgs()
+	if err != nil {
+		return nil, err
+	}
+	if tok, ok := p.next(); !ok || tok.Type != lex.TokenRpar {
+		return nil, fmt.Errorf("if: unbalanced parentheses")
+	}
+	return &IfNode{Cond: cond, IfPass: ifPass, IfFail: ifFail}, nil
+}
+
+func (p *formulaParser) parseIfArgs() (*RelOpNode, Node, Node, error) {
+	cond, err := p.parseRelExpr()
+	if err != nil {
+		return nil, nil, nil, fmt.Errorf("if condition: %s", err)
+	}
+	if tok, ok := p.next(); !ok || tok.Type != lex.TokenComma {
+		return nil, nil, nil, fmt.Errorf("missing comma after if condition")
+	}
+	ifPass, err := p.parseExpr()
+	if err != nil {
+		return nil, nil, nil, fmt.Errorf("if pass branch: %s", err)
+	}
+	if tok, ok := p.next(); !ok || tok.Type != lex.TokenComma {
+		return nil, nil, nil, fmt.Errorf("missing comma after if pass branch")
+	}
+	ifFail, err := p.parseExpr()
+	if err != nil {
+		return nil, nil, nil, fmt.Errorf("if fail branch: %s", err)
+	}
+	return cond, ifPass, ifFail, nil
+}
+
+func (p *formulaParser) parseRelExpr() (*RelOpNode, error) {
+	lhs, err := p.parseExpr()
+	if err != nil {
+		return nil, err
+	}
+	op, ok := p.next()
+	if !ok {
+		return nil, fmt.Errorf("missing operator in binary expression")
+	}
+	switch op.Type {
+	case lex.TokenEqual, lex.TokenNotEqual:
+	case lex.TokenLess, lex.TokenLessOrEqual:
+	case lex.TokenGreater, lex.TokenGreaterOrEqual:
+	default:
+		err := fmt.Errorf("unexpected operator %s - want compare operator", op.Type)
+		return nil, err
+	}
+	rhs, err := p.parseExpr()
+	if err != nil {
+		return nil, err
+	}
+	n := &RelOpNode{
+		Op:    op.Text,
+		Left:  lhs,
+		Right: rhs,
 	}
 	return n, nil
 }

@@ -345,7 +345,12 @@ func TestParse_formula(t *testing.T) {
 			},
 		},
 		{
-			name:    "call with invalid expr args",
+			name:    "call arg invalid expression",
+			s:       "=SUM(+ 2)",
+			wantErr: ast.ErrParse,
+		},
+		{
+			name:    "call missing comma",
 			s:       "=SUM(1 2)",
 			wantErr: ast.ErrParse,
 		},
@@ -362,6 +367,124 @@ func TestParse_formula(t *testing.T) {
 		{
 			name:    "range misses second identifier",
 			s:       "=A1:",
+			wantErr: ast.ErrParse,
+		},
+		{
+			name: "if call",
+			s:    "=IF(1 < 2, 3, 4)",
+			wantNode: &ast.IfNode{
+				Cond: &ast.RelOpNode{
+					Op:    "<",
+					Left:  &ast.NumberNode{Number: "1"},
+					Right: &ast.NumberNode{Number: "2"},
+				},
+				IfPass: &ast.NumberNode{Number: "3"},
+				IfFail: &ast.NumberNode{Number: "4"},
+			},
+		},
+		{
+			name: "if call cond expression",
+			s:    "=IF(1 + 2 < 3 * 4, 5, 6)",
+			wantNode: &ast.IfNode{
+				Cond: &ast.RelOpNode{
+					Op: "<",
+					Left: &ast.BinOpNode{
+						Op:    "+",
+						Left:  &ast.NumberNode{Number: "1"},
+						Right: &ast.NumberNode{Number: "2"},
+					},
+					Right: &ast.BinOpNode{
+						Op:    "*",
+						Left:  &ast.NumberNode{Number: "3"},
+						Right: &ast.NumberNode{Number: "4"},
+					},
+				},
+				IfPass: &ast.NumberNode{Number: "5"},
+				IfFail: &ast.NumberNode{Number: "6"},
+			},
+		},
+		{
+			name: "if call pass expression",
+			s:    "=IF(1 < 2, 3 + 4, 5)",
+			wantNode: &ast.IfNode{
+				Cond: &ast.RelOpNode{
+					Op:    "<",
+					Left:  &ast.NumberNode{Number: "1"},
+					Right: &ast.NumberNode{Number: "2"},
+				},
+				IfPass: &ast.BinOpNode{
+					Op:    "+",
+					Left:  &ast.NumberNode{Number: "3"},
+					Right: &ast.NumberNode{Number: "4"},
+				},
+				IfFail: &ast.NumberNode{Number: "5"},
+			},
+		},
+		{
+			name: "if call fail expression",
+			s:    "=IF(1 < 2, 3, 4 + 5)",
+			wantNode: &ast.IfNode{
+				Cond: &ast.RelOpNode{
+					Op:    "<",
+					Left:  &ast.NumberNode{Number: "1"},
+					Right: &ast.NumberNode{Number: "2"},
+				},
+				IfPass: &ast.NumberNode{Number: "3"},
+				IfFail: &ast.BinOpNode{
+					Op:    "+",
+					Left:  &ast.NumberNode{Number: "4"},
+					Right: &ast.NumberNode{Number: "5"},
+				},
+			},
+		},
+		{
+			name:    "if call cond is not comparison",
+			s:       "=IF(1 + 2, 3, 4)",
+			wantErr: ast.ErrParse,
+		},
+		{
+			name:    "if call cond missing left operand",
+			s:       "=IF(< 2, 3, 4)",
+			wantErr: ast.ErrParse,
+		},
+		{
+			name:    "if call incomplete cond stop short",
+			s:       "=IF(1",
+			wantErr: ast.ErrParse,
+		},
+		{
+			name:    "if call cond missing right operand",
+			s:       "=IF(1 < , 3, 4)",
+			wantErr: ast.ErrParse,
+		},
+		{
+			name:    "if call cond only",
+			s:       "=IF(1 < 2)",
+			wantErr: ast.ErrParse,
+		},
+		{
+			name:    "if call invalid pass expression",
+			s:       "=IF(1 < 2, + 3)",
+			wantErr: ast.ErrParse,
+		},
+		{
+			name:    "if call incomplete stop after pass expression",
+			s:       "=IF(1 < 2, 3",
+			wantErr: ast.ErrParse,
+		},
+		{
+			name:    "if call missing fail expression",
+			s:       "=IF(1 < 2, 3)",
+			wantErr: ast.ErrParse,
+		},
+		{
+			name:    "if call invalid fail expression",
+			s:       "=IF(1 < 2, 3, + 4)",
+			wantErr: ast.ErrParse,
+		},
+		{
+			name:    "if call incomplete stop after fail expression",
+			s:       "=IF(1 < 2, 3, 4",
 			wantErr: ast.ErrParse,
 		},
 	}
