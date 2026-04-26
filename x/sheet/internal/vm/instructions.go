@@ -14,6 +14,7 @@ func init() {
 	gob.Register(BinOp(0))
 	gob.Register(Function(0))
 	gob.Register(Call{})
+	gob.Register(IfCall{})
 }
 
 // InstructionsSet holds instructions for the virtual machine. It is pretty
@@ -32,6 +33,8 @@ const (
 	// keep-sorted start
 	InstTypeBinOp  // operator
 	InstTypeCall   // function
+	InstTypeIfCall // if
+	InstTypeJump   // jump
 	InstTypeNumber // number
 	InstTypeRef    // reference
 	// keep-sorted end
@@ -40,12 +43,17 @@ const (
 // Inst is an instruction. It acts like a union: only one field is set
 // depending on the instruction type.
 type Inst struct {
-	Type   InstType // instruction type
-	Number float64  // number literal
-	BinOp           // binary operator
-	Ref    string   // cell reference
-	*Call           // function call
+	Type       InstType // instruction type
+	Number     float64  // number literal
+	BinOp               // binary operator
+	Ref        string   // cell reference
+	*Call               // function call
+	*IfCall             // if
+	JumpOffset          // jump offset
 }
+
+// JumpOffset is the number of instructions to skip.
+type JumpOffset int
 
 // Number is a floating precision number.
 type Number float64
@@ -88,4 +96,27 @@ var calls = map[string]Function{
 type Call struct {
 	Func Function // function identifier
 	Args int      // the number of arguments
+}
+
+// RelOp enumerates comparison operators.
+//
+//go:generate stringer -type=RelOp -linecomment
+type RelOp int
+
+const (
+	_ RelOp = iota
+	// keep-sorted start
+	RelOpEqual          // equal
+	RelOpGreater        // greater
+	RelOpGreaterOrEqual // greaterorequal
+	RelOpLess           // less
+	RelOpLessOrEqual    // lessorequal
+	RelOpNotEqual       // notequal
+	// keep-sorted end
+)
+
+// IfCall represents if-condition.
+type IfCall struct {
+	RelOp             // comparison operator used in the condition.
+	IfFail JumpOffset // jump instructions to reach fail-operand.
 }

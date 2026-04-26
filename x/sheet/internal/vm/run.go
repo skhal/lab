@@ -8,6 +8,8 @@ package vm
 import (
 	"errors"
 	"fmt"
+
+	"github.com/skhal/lab/x/sheet/internal/ast"
 )
 
 // ErrRun means error running the virtual machine on the instructions set.
@@ -28,6 +30,8 @@ func Run(iset *InstructionsSet, refcal func(string) (float64, error)) (float64, 
 type runner struct {
 	refcal func(string) (float64, error)
 	stack  []float64
+	ip     int // instruction position
+	iplen  int
 }
 
 // Run executes the instructions set.
@@ -47,14 +51,15 @@ func (r *runner) Run(iset *InstructionsSet) (_ float64, err error) {
 	if err := r.run(iset); err != nil {
 		return 0, err
 	}
-	if len(r.stack) != 1 {
-		return 0, fmt.Errorf("invalid instructions set - stack size %d", len(r.stack))
+	if len(r.stack) == 0 {
+		return 0, fmt.Errorf("empty stack")
 	}
 	return r.pop(), nil
 }
 
 func (r *runner) run(iset *InstructionsSet) error {
-	for _, inst := range iset.Instructions {
+	for r.ip, r.iplen = 0, len(iset.Instructions); r.ip < r.iplen; r.ip++ {
+		inst := iset.Instructions[r.ip]
 		switch inst.Type {
 		case InstTypeNumber:
 			r.push(inst.Number)
@@ -76,6 +81,14 @@ func (r *runner) run(iset *InstructionsSet) error {
 				return err
 			}
 			r.push(n)
+		case InstTypeIfCall:
+			if err := r.runIfCall(inst.IfCall); err != nil {
+				return err
+			}
+		case InstTypeJump:
+			if err := r.runJump(inst.JumpOffset); err != nil {
+				return err
+			}
 		}
 	}
 	return nil
@@ -130,4 +143,34 @@ func sum(nn ...float64) float64 {
 		res += n
 	}
 	return res
+}
+
+var relOps = map[RelOp]func(x, y float64) bool{
+	RelOpEqual:          ast.Equal,
+	RelOpNotEqual:       func(x, y float64) bool { return !ast.Equal(x, y) },
+	RelOpLess:           func(x, y float64) bool { return x < y },
+	RelOpLessOrEqual:    func(x, y float64) bool { return x <= y },
+	RelOpGreater:        func(x, y float64) bool { return x > y },
+	RelOpGreaterOrEqual: func(x, y float64) bool { return x >= y },
+}
+
+func (r *runner) runIfCall(ifc *IfCall) error {
+	y := r.pop()
+	x := r.pop()
+	op, ok := relOps[ifc.RelOp]
+	if !ok {
+		return fmt.Errorf("unsupported comparison operator %s", ifc.RelOp)
+	}
+	if op(x, y) {
+		return nil
+	}
+	return r.runJump(ifc.IfFail)
+}
+
+func (r *runner) runJump(offset JumpOffset) error {
+	if offset == 0 {
+		return fmt.Errorf("empty jump offset")
+	}
+	r.ip += int(offset)
+	return nil
 }

@@ -10,13 +10,15 @@ func _() {
 	var x [1]struct{}
 	_ = x[InstTypeBinOp-1]
 	_ = x[InstTypeCall-2]
-	_ = x[InstTypeNumber-3]
-	_ = x[InstTypeRef-4]
+	_ = x[InstTypeIfCall-3]
+	_ = x[InstTypeJump-4]
+	_ = x[InstTypeNumber-5]
+	_ = x[InstTypeRef-6]
 }
 
-const _InstType_name = "operatorfunctionnumberreference"
+const _InstType_name = "operatorfunctionifjumpnumberreference"
 
-var _InstType_index = [...]uint8{0, 8, 16, 22, 31}
+var _InstType_index = [...]uint8{0, 8, 16, 18, 22, 28, 37}
 
 func (i InstType) String() string {
 	idx := int(i) - 1

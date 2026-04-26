@@ -307,6 +307,203 @@ func TestCompile_formula(t *testing.T) {
 			},
 			wantErr: vm.ErrCompile,
 		},
+		{
+			name: "if equal",
+			ast: &ast.IfNode{
+				Cond: &ast.RelOpNode{
+					Op:    "==",
+					Left:  &ast.NumberNode{Number: "1"},
+					Right: &ast.NumberNode{Number: "2"},
+				},
+				IfPass: &ast.NumberNode{Number: "3"},
+				IfFail: &ast.NumberNode{Number: "4"},
+			},
+			want: vm.InstructionsSet{
+				Instructions: []vm.Inst{
+					newNumber(t, 1),
+					newNumber(t, 2),
+					newIf(t, vm.RelOpEqual, 2),
+					newNumber(t, 3),
+					newJump(t, 1),
+					newNumber(t, 4),
+				},
+			},
+		},
+		{
+			name: "if not equal",
+			ast: &ast.IfNode{
+				Cond: &ast.RelOpNode{
+					Op:    "!=",
+					Left:  &ast.NumberNode{Number: "1"},
+					Right: &ast.NumberNode{Number: "2"},
+				},
+				IfPass: &ast.NumberNode{Number: "3"},
+				IfFail: &ast.NumberNode{Number: "4"},
+			},
+			want: vm.InstructionsSet{
+				Instructions: []vm.Inst{
+					newNumber(t, 1),
+					newNumber(t, 2),
+					newIf(t, vm.RelOpNotEqual, 2),
+					newNumber(t, 3),
+					newJump(t, 1),
+					newNumber(t, 4),
+				},
+			},
+		},
+		{
+			name: "if less",
+			ast: &ast.IfNode{
+				Cond: &ast.RelOpNode{
+					Op:    "<",
+					Left:  &ast.NumberNode{Number: "1"},
+					Right: &ast.NumberNode{Number: "2"},
+				},
+				IfPass: &ast.NumberNode{Number: "3"},
+				IfFail: &ast.NumberNode{Number: "4"},
+			},
+			want: vm.InstructionsSet{
+				Instructions: []vm.Inst{
+					newNumber(t, 1),
+					newNumber(t, 2),
+					newIf(t, vm.RelOpLess, 2),
+					newNumber(t, 3),
+					newJump(t, 1),
+					newNumber(t, 4),
+				},
+			},
+		},
+		{
+			name: "if less or equal",
+			ast: &ast.IfNode{
+				Cond: &ast.RelOpNode{
+					Op:    "<=",
+					Left:  &ast.NumberNode{Number: "1"},
+					Right: &ast.NumberNode{Number: "2"},
+				},
+				IfPass: &ast.NumberNode{Number: "3"},
+				IfFail: &ast.NumberNode{Number: "4"},
+			},
+			want: vm.InstructionsSet{
+				Instructions: []vm.Inst{
+					newNumber(t, 1),
+					newNumber(t, 2),
+					newIf(t, vm.RelOpLessOrEqual, 2),
+					newNumber(t, 3),
+					newJump(t, 1),
+					newNumber(t, 4),
+				},
+			},
+		},
+		{
+			name: "if greater",
+			ast: &ast.IfNode{
+				Cond: &ast.RelOpNode{
+					Op:    ">",
+					Left:  &ast.NumberNode{Number: "1"},
+					Right: &ast.NumberNode{Number: "2"},
+				},
+				IfPass: &ast.NumberNode{Number: "3"},
+				IfFail: &ast.NumberNode{Number: "4"},
+			},
+			want: vm.InstructionsSet{
+				Instructions: []vm.Inst{
+					newNumber(t, 1),
+					newNumber(t, 2),
+					newIf(t, vm.RelOpGreater, 2),
+					newNumber(t, 3),
+					newJump(t, 1),
+					newNumber(t, 4),
+				},
+			},
+		},
+		{
+			name: "if greater or equal",
+			ast: &ast.IfNode{
+				Cond: &ast.RelOpNode{
+					Op:    ">=",
+					Left:  &ast.NumberNode{Number: "1"},
+					Right: &ast.NumberNode{Number: "2"},
+				},
+				IfPass: &ast.NumberNode{Number: "3"},
+				IfFail: &ast.NumberNode{Number: "4"},
+			},
+			want: vm.InstructionsSet{
+				Instructions: []vm.Inst{
+					newNumber(t, 1),
+					newNumber(t, 2),
+					newIf(t, vm.RelOpGreaterOrEqual, 2),
+					newNumber(t, 3),
+					newJump(t, 1),
+					newNumber(t, 4),
+				},
+			},
+		},
+		{
+			name: "if invalid comparator",
+			ast: &ast.IfNode{
+				Cond: &ast.RelOpNode{
+					Op:    "<>",
+					Left:  &ast.NumberNode{Number: "1"},
+					Right: &ast.NumberNode{Number: "2"},
+				},
+				IfPass: &ast.NumberNode{Number: "3"},
+				IfFail: &ast.NumberNode{Number: "4"},
+			},
+			wantErr: vm.ErrCompile,
+		},
+		{
+			name: "if condition invalid left operand",
+			ast: &ast.IfNode{
+				Cond: &ast.RelOpNode{
+					Op:    "==",
+					Left:  &ast.NumberNode{Number: "test"},
+					Right: &ast.NumberNode{Number: "2"},
+				},
+				IfPass: &ast.NumberNode{Number: "3"},
+				IfFail: &ast.NumberNode{Number: "4"},
+			},
+			wantErr: vm.ErrCompile,
+		},
+		{
+			name: "if condition invalid right operand",
+			ast: &ast.IfNode{
+				Cond: &ast.RelOpNode{
+					Op:    "==",
+					Left:  &ast.NumberNode{Number: "1"},
+					Right: &ast.NumberNode{Number: "test"},
+				},
+				IfPass: &ast.NumberNode{Number: "3"},
+				IfFail: &ast.NumberNode{Number: "4"},
+			},
+			wantErr: vm.ErrCompile,
+		},
+		{
+			name: "if invalid ifpass",
+			ast: &ast.IfNode{
+				Cond: &ast.RelOpNode{
+					Op:    "==",
+					Left:  &ast.NumberNode{Number: "1"},
+					Right: &ast.NumberNode{Number: "2"},
+				},
+				IfPass: &ast.NumberNode{Number: "test"},
+				IfFail: &ast.NumberNode{Number: "4"},
+			},
+			wantErr: vm.ErrCompile,
+		},
+		{
+			name: "if invalid iffail",
+			ast: &ast.IfNode{
+				Cond: &ast.RelOpNode{
+					Op:    "==",
+					Left:  &ast.NumberNode{Number: "1"},
+					Right: &ast.NumberNode{Number: "2"},
+				},
+				IfPass: &ast.NumberNode{Number: "3"},
+				IfFail: &ast.NumberNode{Number: "test"},
+			},
+			wantErr: vm.ErrCompile,
+		},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
@@ -340,4 +537,15 @@ func newRef(t *testing.T, ref string) vm.Inst {
 func newCall(t *testing.T, c vm.Call) vm.Inst {
 	t.Helper()
 	return vm.Inst{Type: vm.InstTypeCall, Call: &c}
+}
+
+func newIf(t *testing.T, op vm.RelOp, ifFail int) vm.Inst {
+	t.Helper()
+	ifCall := &vm.IfCall{RelOp: op, IfFail: vm.JumpOffset(ifFail)}
+	return vm.Inst{Type: vm.InstTypeIfCall, IfCall: ifCall}
+}
+
+func newJump(t *testing.T, offset int) vm.Inst {
+	t.Helper()
+	return vm.Inst{Type: vm.InstTypeJump, JumpOffset: vm.JumpOffset(offset)}
 }

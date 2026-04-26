@@ -49,6 +49,8 @@ func (c *compiler) compile(node ast.Node) error {
 		return c.compileBinOp(n)
 	case *ast.CallNode:
 		return c.compileCall(n)
+	case *ast.IfNode:
+		return c.compileIf(n)
 	case *ast.NumberNode:
 		return c.compileNumber(n)
 	case *ast.RefNode:
@@ -136,6 +138,64 @@ func (c *compiler) compileRange(n *ast.RangeNode) (int, error) {
 		c.push(Inst{Type: InstTypeRef, Ref: id})
 	}
 	return cr.Len(), nil
+}
+
+func (c *compiler) compileIf(n *ast.IfNode) error {
+	if err := c.compileIfCond(n.Cond); err != nil {
+		return err
+	}
+	ipIfCall := newInstructionPointer(c)
+	if err := c.compile(n.IfPass); err != nil {
+		return err
+	}
+	c.push(Inst{Type: InstTypeJump})
+	ipJump := newInstructionPointer(c)
+	c.iset[ipIfCall].IfFail = ipJump.Diff(ipIfCall)
+	if err := c.compile(n.IfFail); err != nil {
+		return err
+	}
+	ipNext := newInstructionPointer(c)
+	c.iset[ipJump].JumpOffset = ipNext.Diff(ipJump)
+	return nil
+}
+
+type instructionPointer int
+
+func newInstructionPointer(c *compiler) instructionPointer {
+	return instructionPointer(len(c.iset) - 1)
+}
+
+// Diff calculates the distance between two instruction pointers.
+func (ip instructionPointer) Diff(other instructionPointer) JumpOffset {
+	return JumpOffset(max(ip, other) - min(ip, other))
+}
+
+func (c *compiler) compileIfCond(n *ast.RelOpNode) error {
+	var op RelOp
+	switch n.Op {
+	case "==":
+		op = RelOpEqual
+	case "!=":
+		op = RelOpNotEqual
+	case "<":
+		op = RelOpLess
+	case "<=":
+		op = RelOpLessOrEqual
+	case ">":
+		op = RelOpGreater
+	case ">=":
+		op = RelOpGreaterOrEqual
+	default:
+		return fmt.Errorf("unsupported comparison operator %s", n.Op)
+	}
+	if err := c.compile(n.Left); err != nil {
+		return err
+	}
+	if err := c.compile(n.Right); err != nil {
+		return err
+	}
+	c.push(Inst{Type: InstTypeIfCall, IfCall: &IfCall{RelOp: op}})
+	return nil
 }
 
 func (c *compiler) compileRef(ref *ast.RefNode) error {

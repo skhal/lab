@@ -105,9 +105,10 @@ func create() ([]byte, error) {
 	must(s.Set("G3", "=SUM(A1:A5, 1+(9-7+(2+3)), 2+4*(6-2)/(3-1)-5, B1:B5, C1:C5, D1:D5, E1:E5, 1+(2-3))"))
 	must(s.Set("H1", "=IF(A1 < 10, 1, 2)"))
 	must(s.Set("H2", "=IF(A1 + 5 < 10 +5, 1, 2)"))
-	must(s.Set("H3", "=IF(A1 + 5 < 10 +5, 1 * (3+4), 2 +3*2)"))
-	must(s.Set("H4", "=IF(A1 + 5 < 10 +5, B1, B2)"))
-	must(s.Set("H5", "=2*IF(A1 + 5 < 10 +5, B1, B2)"))
+	must(s.Set("H3", "=IF(1 < 2, 1, 1 + 2)"))
+	must(s.Set("H4", "=IF(A1 + 5 < 10 +5, 1 * (3+4), 2 +3*2)"))
+	must(s.Set("H5", "=IF(A1 + 5 < 10 +5, B1, B2)"))
+	must(s.Set("H6", "=2*IF(A1 + 5 < 10 +5, B1, B2)"))
 
 	var b bytes.Buffer
 	must(s.Write(&b))

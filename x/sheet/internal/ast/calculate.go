@@ -8,16 +8,11 @@ package ast
 import (
 	"errors"
 	"fmt"
-	"math"
 	"strconv"
 )
 
 // ErrCalculate means the AST has an error can can't be calculated.
 var ErrCalculate = errors.New("calculate error")
-
-// floatEqPrecision defines max per-cent difference allowed to treat two values
-// equal.
-const floatEqPrecision = 0.001 // 0.1%
 
 // Calculate evaluates a formula node and skips other types of nodes. It
 // returns an error if evaluation fails.
@@ -212,31 +207,10 @@ func (c *calculator) calcRelOp(n *RelOpNode) (bool, error) {
 }
 
 var relOp = map[string]func(x, y float64) bool{
-	"==": equal,
-	"!=": notEqual,
-	"<":  less,
-	"<=": lessOrEqual,
-	">":  greater,
-	">=": greaterOrEqual,
+	"==": Equal,
+	"!=": func(x, y float64) bool { return !Equal(x, y) },
+	"<":  func(x, y float64) bool { return x < y },
+	"<=": func(x, y float64) bool { return x <= y },
+	">":  func(x, y float64) bool { return x > y },
+	">=": func(x, y float64) bool { return x >= y },
 }
-
-func equal(x, y float64) bool {
-	x, y = math.Min(x, y), math.Max(x, y)
-	absDiff := math.Abs(y - x)
-	absMean := math.Abs(x + absDiff/2)
-	var relChange float64
-	if absMean != 0 {
-		relChange = absDiff / absMean
-	}
-	return relChange <= floatEqPrecision
-}
-
-func notEqual(x, y float64) bool { return !equal(x, y) }
-
-func less(x, y float64) bool { return x < y }
-
-func lessOrEqual(x, y float64) bool { return x <= y }
-
-func greater(x, y float64) bool { return x > y }
-
-func greaterOrEqual(x, y float64) bool { return x >= y }

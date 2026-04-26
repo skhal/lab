@@ -259,6 +259,146 @@ func TestRun_call(t *testing.T) {
 	}
 }
 
+func TestRun_ifCall(t *testing.T) {
+	tests := []struct {
+		name    string
+		iset    []vm.Inst
+		refs    map[string]float64
+		want    float64
+		wantErr error
+	}{
+		{
+			name: "if equal",
+			iset: []vm.Inst{
+				newNumber(t, 1),
+				newNumber(t, 2),
+				newIf(t, vm.RelOpEqual, 2),
+				newNumber(t, 3),
+				newJump(t, 1),
+				newNumber(t, 4),
+			},
+			want: 4,
+		},
+		{
+			name: "if not equal",
+			iset: []vm.Inst{
+				newNumber(t, 1),
+				newNumber(t, 2),
+				newIf(t, vm.RelOpNotEqual, 2),
+				newNumber(t, 3),
+				newJump(t, 1),
+				newNumber(t, 4),
+			},
+			want: 3,
+		},
+		{
+			name: "if less",
+			iset: []vm.Inst{
+				newNumber(t, 1),
+				newNumber(t, 2),
+				newIf(t, vm.RelOpLess, 2),
+				newNumber(t, 3),
+				newJump(t, 1),
+				newNumber(t, 4),
+			},
+			want: 3,
+		},
+		{
+			name: "if less or equal",
+			iset: []vm.Inst{
+				newNumber(t, 1),
+				newNumber(t, 2),
+				newIf(t, vm.RelOpLessOrEqual, 2),
+				newNumber(t, 3),
+				newJump(t, 1),
+				newNumber(t, 4),
+			},
+			want: 3,
+		},
+		{
+			name: "if greater",
+			iset: []vm.Inst{
+				newNumber(t, 1),
+				newNumber(t, 2),
+				newIf(t, vm.RelOpGreater, 2),
+				newNumber(t, 3),
+				newJump(t, 1),
+				newNumber(t, 4),
+			},
+			want: 4,
+		},
+		{
+			name: "if greater or equal",
+			iset: []vm.Inst{
+				newNumber(t, 1),
+				newNumber(t, 2),
+				newIf(t, vm.RelOpGreaterOrEqual, 2),
+				newNumber(t, 3),
+				newJump(t, 1),
+				newNumber(t, 4),
+			},
+			want: 4,
+		},
+		{
+			name: "if invalid comparator",
+			iset: []vm.Inst{
+				newNumber(t, 1),
+				newNumber(t, 2),
+				newIf(t, vm.RelOp(0), 2),
+				newNumber(t, 3),
+				newJump(t, 1),
+				newNumber(t, 4),
+			},
+			wantErr: vm.ErrRun,
+		},
+		{
+			name: "if invalid iffalse offset",
+			iset: []vm.Inst{
+				newNumber(t, 1),
+				newNumber(t, 2),
+				newIf(t, vm.RelOpEqual, 0),
+				newNumber(t, 3),
+				newJump(t, 1),
+				newNumber(t, 4),
+			},
+			wantErr: vm.ErrRun,
+		},
+		{
+			name: "jump",
+			iset: []vm.Inst{
+				newJump(t, 1),
+				newNumber(t, 1),
+				newNumber(t, 2),
+			},
+			want: 2,
+		},
+		{
+			name: "jump empty offset",
+			iset: []vm.Inst{
+				newJump(t, 0),
+				newNumber(t, 1),
+				newNumber(t, 2),
+			},
+			wantErr: vm.ErrRun,
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			iset := &vm.InstructionsSet{Instructions: tc.iset}
+			refcal := newTestRefCalculator(t, tc.refs)
+
+			got, err := vm.Run(iset, refcal)
+
+			if !errors.Is(err, tc.wantErr) {
+				t.Errorf("Run() unexpected error: %v; want %v", err, tc.wantErr)
+			}
+			if diff := cmp.Diff(tc.want, got, cmpopts.EquateApprox(0.001, 0)); diff != "" {
+				t.Errorf("Run() mismatch (-want +got):\n%s", diff)
+			}
+		})
+	}
+}
+
 type testRefCalculator struct {
 	refs map[string]float64
 }
