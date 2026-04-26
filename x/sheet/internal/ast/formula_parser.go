@@ -136,9 +136,8 @@ func (p *formulaParser) parseOperand() (Node, error) {
 		return nil, tok.Err
 	case lex.TokenNumber:
 		return p.parseNumber(tok)
-	case lex.TokenIdent: // identifier or a function call
-		next, ok := p.peek()
-		if ok && next.Type == lex.TokenLpar {
+	case lex.TokenIdent:
+		if next, ok := p.peek(); ok && next.Type == lex.TokenLpar {
 			return p.parseCall(tok)
 		}
 		return p.parseReference(tok)
