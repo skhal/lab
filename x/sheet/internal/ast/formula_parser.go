@@ -95,48 +95,59 @@ func (p *formulaParser) parseExpr() (Node, error) {
 	return lhs, nil
 }
 
+func (p *formulaParser) parseBinaryExpr(lhs Node) (Node, error) {
+	op, _ := p.next() // the operator is guaranteed by the called
+	opNext, okNext := p.peek()
+	rhs, err := p.parseExpr()
+	if err != nil {
+		return nil, err
+	}
+	n := &BinOpNode{
+		Op:    op.Text,
+		Left:  lhs,
+		Right: rhs,
+	}
+	switch op.Type {
+	case lex.TokenMultiply, lex.TokenDivide:
+		if okNext && opNext.Type == lex.TokenLpar {
+			break
+		}
+		return rotateLeft(n), nil
+	}
+	return n, nil
+}
+
+func rotateLeft(n *BinOpNode) Node {
+	rhs, ok := n.Right.(*BinOpNode)
+	if !ok {
+		return n
+	}
+	n.Right, rhs.Left = rhs.Left, n
+	return rhs
+}
+
 func (p *formulaParser) parseOperand() (Node, error) {
 	tok, ok := p.next()
 	if !ok {
 		return nil, fmt.Errorf("expected operand")
 	}
 	switch tok.Type {
-	// keep-sorted start
 	case lex.TokenError:
 		return nil, tok.Err
+	case lex.TokenNumber:
+		return p.parseNumber(tok)
 	case lex.TokenIdent: // identifier or a function call
 		next, ok := p.peek()
 		if ok && next.Type == lex.TokenLpar {
 			return p.parseCall(tok)
 		}
 		return p.parseReference(tok)
-	case lex.TokenLpar:
-		return p.parseGroup()
-	case lex.TokenNumber:
-		return p.parseNumber(tok)
 	case lex.TokenRange:
 		return p.parseRange(tok)
-		// keep-sorted end
+	case lex.TokenLpar:
+		return p.parseGroup()
 	}
 	return nil, fmt.Errorf("invalid token - %s", tok.Type)
-}
-
-func (p *formulaParser) parseReference(ident lex.Token) (Node, error) {
-	if !refRx.MatchString(ident.Text) {
-		return nil, fmt.Errorf("invalid identifier %s", ident.Text)
-	}
-	return &RefNode{Ref: ident.Text}, nil
-}
-
-func (p *formulaParser) parseGroup() (Node, error) {
-	n, err := p.parseExpr()
-	if err != nil {
-		return nil, err
-	}
-	if tok, ok := p.next(); !ok || tok.Type != lex.TokenRpar {
-		return nil, fmt.Errorf("unbalanced parentheses")
-	}
-	return n, nil
 }
 
 func (p *formulaParser) parseNumber(tok lex.Token) (Node, error) {
@@ -144,19 +155,6 @@ func (p *formulaParser) parseNumber(tok lex.Token) (Node, error) {
 		return nil, fmt.Errorf("not a number %q", tok.Text)
 	}
 	return &NumberNode{Number: tok.Text}, nil
-}
-
-func (p *formulaParser) parseRange(tok lex.Token) (Node, error) {
-	const (
-		sep    = ":"
-		fields = 2
-	)
-	items := strings.SplitN(tok.Text, sep, fields)
-	if len(items) != fields {
-		// should not happen as long as the lexer and the parser are in sync.
-		return nil, fmt.Errorf("invalid range %s", tok.Text)
-	}
-	return &RangeNode{From: items[0], To: items[1]}, nil
 }
 
 func (p *formulaParser) parseCall(ident lex.Token) (Node, error) {
@@ -194,33 +192,33 @@ func (p *formulaParser) parseArgs() ([]Node, error) {
 	return args, nil
 }
 
-func (p *formulaParser) parseBinaryExpr(lhs Node) (Node, error) {
-	op, _ := p.next() // the operator is guaranteed by the called
-	opNext, okNext := p.peek()
-	rhs, err := p.parseExpr()
+func (p *formulaParser) parseReference(ident lex.Token) (Node, error) {
+	if !refRx.MatchString(ident.Text) {
+		return nil, fmt.Errorf("invalid identifier %s", ident.Text)
+	}
+	return &RefNode{Ref: ident.Text}, nil
+}
+
+func (p *formulaParser) parseRange(tok lex.Token) (Node, error) {
+	const (
+		sep    = ":"
+		fields = 2
+	)
+	items := strings.SplitN(tok.Text, sep, fields)
+	if len(items) != fields {
+		// should not happen as long as the lexer and the parser are in sync.
+		return nil, fmt.Errorf("invalid range %s", tok.Text)
+	}
+	return &RangeNode{From: items[0], To: items[1]}, nil
+}
+
+func (p *formulaParser) parseGroup() (Node, error) {
+	n, err := p.parseExpr()
 	if err != nil {
 		return nil, err
 	}
-	n := &BinOpNode{
-		Op:    op.Text,
-		Left:  lhs,
-		Right: rhs,
-	}
-	switch op.Type {
-	case lex.TokenMultiply, lex.TokenDivide:
-		if okNext && opNext.Type == lex.TokenLpar {
-			break
-		}
-		return rotateLeft(n), nil
+	if tok, ok := p.next(); !ok || tok.Type != lex.TokenRpar {
+		return nil, fmt.Errorf("unbalanced parentheses")
 	}
 	return n, nil
-}
-
-func rotateLeft(n *BinOpNode) Node {
-	rhs, ok := n.Right.(*BinOpNode)
-	if !ok {
-		return n
-	}
-	n.Right, rhs.Left = rhs.Left, n
-	return rhs
 }
