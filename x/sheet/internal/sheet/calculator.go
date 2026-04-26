@@ -56,12 +56,6 @@ func (calc *Calculator) CalculateReference(id string) (float64, error) {
 		// circular dependency
 		return 0, fmt.Errorf("circular dependency - %v", calc.path)
 	}
-	calc.seen[id] = true
-	calc.path = append(calc.path, id)
-	defer func() {
-		calc.path = calc.path[:len(calc.path)-1]
-		calc.seen[id] = false
-	}()
 	c, ok := calc.s.data[id]
 	if !ok {
 		return 0, nil
