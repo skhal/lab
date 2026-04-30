@@ -12,9 +12,12 @@ GOVERSION = ${go env GOVERSION:L:sh:C,\.[0-9]+$,,}
 
 install: hello.wasm .PHONY
 
-hello.wasm: wasm_exec.js *.go
+hello.wasm: wasm_exec.js.gz *.go
 	@echo ".. compile ${.TARGET}"; \
 		env GOOS=js GOARCH=wasm go build -o ${.TARGET} .
+
+wasm_exec.js.gz: wasm_exec.js
+	@gzip ${.TARGET:C,.gz$,,}
 
 wasm_exec.js:
 	@if [ -e "${GOROOT}/lib/wasm/${.TARGET}" ]; then \
