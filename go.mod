@@ -6,6 +6,7 @@ require (
 	github.com/bufbuild/protocompile v0.14.1
 	github.com/gomarkdown/markdown v0.0.0-20250810172220-2e2c11897d1a
 	github.com/google/go-cmp v0.7.0
+	github.com/lpar/gzipped/v2 v2.1.0
 	github.com/mmcdole/gofeed v1.3.0
 	github.com/protocolbuffers/txtpbfmt v0.0.0-20251016062345-16587c79cd91
 	google.golang.org/grpc v1.75.1
@@ -20,6 +21,7 @@ require (
 	github.com/google/pprof v0.0.0-20260402051712-545e8a4df936 // indirect
 	github.com/ianlancetaylor/demangle v0.0.0-20250417193237-f615e6bd150b // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
+	github.com/kevinpollet/nego v0.0.0-20200324111829-b3061ca9dd9d // indirect
 	github.com/mitchellh/go-wordwrap v1.0.1 // indirect
 	github.com/mmcdole/goxpp v1.1.1-0.20240225020742-a0c311522b23 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect

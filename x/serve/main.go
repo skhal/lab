@@ -16,6 +16,8 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+
+	"github.com/lpar/gzipped/v2"
 )
 
 var (
@@ -50,5 +52,5 @@ func run() error {
 		return err
 	}
 	fmt.Printf("serve %s at %s\n", path, *addr)
-	return http.ListenAndServe(*addr, http.FileServer(http.Dir(".")))
+	return http.ListenAndServe(*addr, gzipped.FileServer(gzipped.Dir(".")))
 }
