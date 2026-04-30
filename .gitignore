@@ -1,3 +1,8 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
 # If you prefer the allow list template instead of the deny list, see community template:
 # https://github.com/github/gitignore/blob/main/community/Golang/Go.AllowList.gitignore
 #
@@ -63,3 +68,7 @@ tags
 # https://github.com/github/gitignore/blob/fc6ce5da28a8c3480cc8a5acad050449f72a9261/community/Bazel.gitignore
 # Bazel-build
 bazel-*
+
+# WebAssembly
+*.wasm
+wasm_exec.js
