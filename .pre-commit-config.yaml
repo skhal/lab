@@ -172,12 +172,9 @@ repos:
   - id: make-lint
     name: "Make lint"
     description: "lint Makefiles on FreeBSD"
-    entry: make
+    entry: ./check/make-lint
     language: system
     types_or: [makefile]
-    args:
-    - "-N"
-    - "-f"
     exclude: |
       (?x)^(
         book/ostep/.*/Makefile

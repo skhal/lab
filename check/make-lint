@@ -1,0 +1,20 @@
+#!/bin/sh
+#
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+# make-lint runs make(1) in noop mode to validate Makefile.
+#
+# SYNOPSIS
+#
+#   make-lint file
+
+set -e
+
+for f in "$@"; do
+  name=$(basename ${f})
+  dir=$(dirname ${f})
+  make -N -C ${dir} -f ${name}
+done
