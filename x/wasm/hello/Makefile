@@ -10,14 +10,21 @@ GOROOT = ${go env GOROOT:L:sh}
 GOVERSION = ${go env GOVERSION:L:sh:C,\.[0-9]+$,,}
 # keep-sorted end
 
-install: hello.wasm .PHONY
+M_zipsrc = C,.gz$$,,
 
-hello.wasm: wasm_exec.js.gz *.go
+COMPRESS_TARGET: .NOTMAIN .USE
+	@echo ".. compress ${.TARGET:${M_zipsrc}}"; \
+		gzip --keep ${.TARGET:${M_zipsrc}}
+
+install: hello.wasm.gz wasm_exec.js.gz .PHONY
+
+hello.wasm.gz: hello.wasm COMPRESS_TARGET
+
+hello.wasm: *.go
 	@echo ".. compile ${.TARGET}"; \
 		env GOOS=js GOARCH=wasm go build -o ${.TARGET} .
 
-wasm_exec.js.gz: wasm_exec.js
-	@gzip ${.TARGET:C,.gz$,,}
+wasm_exec.js.gz: wasm_exec.js COMPRESS_TARGET
 
 wasm_exec.js:
 	@if [ -e "${GOROOT}/lib/wasm/${.TARGET}" ]; then \
