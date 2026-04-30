@@ -71,6 +71,5 @@ bazel-*
 
 # WebAssembly
 *.wasm
-*.wasm.gz
 wasm_exec.js
-wasm_exec.js.gz
+*.gz
