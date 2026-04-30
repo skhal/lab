@@ -1,0 +1,44 @@
+<!--
+  Copyright 2026 Samvel Khalatyan. All rights reserved.
+
+  Use of this source code is governed by a BSD-style
+  license that can be found in the LICENSE file.
+-->
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <script src="wasm_exec.js" type="text/javascript"></script>
+    <script>
+      const go = new Go();
+      WebAssembly.instantiateStreaming(
+        fetch("sheet.wasm"),
+        go.importObject,
+      ).then((result) => {
+        go.run(result.instance);
+      });
+    </script>
+  </head>
+  <body>
+    <textarea id="input" name="sheet" cols="80" rows="20"></textarea>
+    <br />
+    <input
+      id="calculate"
+      type="click"
+      name="calculate"
+      value="calculate"
+      onclick="sheet.calculate(input.value)"
+    />
+    <br />
+    <textarea id="output" name="sheet" cols="80" rows="20"></textarea>
+  </body>
+  <script>
+    class Sheet {
+      constructor() {}
+      calculate(input) {
+        output.value = run(input);
+      }
+    }
+    const sheet = new Sheet();
+  </script>
+</html>
