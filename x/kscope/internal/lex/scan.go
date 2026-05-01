@@ -29,12 +29,29 @@ func scan(rd *bufReader) (*Token, scanFunc, error) {
 	if !ok {
 		return nil, nil, nil
 	}
+	// keep-sorted start skip_lines=1,-1
 	switch {
 	case unicode.IsDigit(r), r == runeDot:
 		return scanNumber(rd)
+	case unicode.IsLetter(r):
+		return scanIdentifier(rd)
 	}
+	// keep-sorted end
 	err := fmt.Errorf("%w: %d: unsupported character '%v'", ErrScan, rd.Pos(), r)
 	return nil, nil, err
+}
+
+// scanIdentifier scans an identifier.
+//
+//	ident  = letter [ alnum ]
+//	letter = "a" .. "z" | "A" .. "Z"
+//	alnum  = letter | digit
+func scanIdentifier(rd *bufReader) (*Token, scanFunc, error) {
+	readWhile(rd, unicode.IsLetter)
+	readWhile(rd, func(r rune) bool {
+		return unicode.IsLetter(r) || unicode.IsDigit(r)
+	})
+	return genToken(rd, TokIdent), scan, nil
 }
 
 // scanNumber scans a number token.
@@ -52,6 +69,13 @@ func scanNumber(rd *bufReader) (*Token, scanFunc, error) {
 	s, start, end := rd.Text()
 	tok := &Token{Kind: TokNum, Val: s, Pos: Position{Start: start, End: end}}
 	return tok, scan, nil
+}
+
+// genToken generates a token of specified kind using test and position from
+// the reader.
+func genToken(rd *bufReader, tk TokenKind) *Token {
+	s, start, end := rd.Text()
+	return &Token{Kind: tk, Val: s, Pos: Position{Start: start, End: end}}
 }
 
 // ignoreWhile ignores consecutive characters for which predicate f returns

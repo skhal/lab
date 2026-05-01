@@ -18,8 +18,11 @@ type Token struct {
 type TokenKind int8
 
 const (
-	_      TokenKind = iota
-	TokNum           // number
+	_ TokenKind = iota
+	// keep-sorted start
+	TokIdent // identifier
+	TokNum   // number
+	// keep-sorted end
 )
 
 // Position identifies the location of token in the input string. It holds the

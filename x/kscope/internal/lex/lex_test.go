@@ -27,8 +27,8 @@ func TestLex(t *testing.T) {
 			name: "empty",
 		},
 		{
-			name:    "not number",
-			s:       "abc",
+			name:    "invalid token",
+			s:       "+",
 			wantErr: lex.ErrScan,
 		},
 	}
@@ -82,6 +82,66 @@ func TestLex_number(t *testing.T) {
 				{Kind: lex.TokNum, Val: "3", Pos: lex.Position{4, 5}},
 				{Kind: lex.TokNum, Val: "4.", Pos: lex.Position{7, 9}},
 				{Kind: lex.TokNum, Val: ".5", Pos: lex.Position{10, 12}},
+			},
+		},
+	}
+	testLex(t, tests)
+}
+
+func TestLex_ident(t *testing.T) {
+	tests := []testCase{
+		{
+			name: "letter",
+			s:    "a",
+			want: []lex.Token{
+				{Kind: lex.TokIdent, Val: "a", Pos: lex.Position{0, 1}},
+			},
+		},
+		{
+			name: "letters",
+			s:    "abc",
+			want: []lex.Token{
+				{Kind: lex.TokIdent, Val: "abc", Pos: lex.Position{0, 3}},
+			},
+		},
+		{
+			name: "alnum",
+			s:    "a1b2",
+			want: []lex.Token{
+				{Kind: lex.TokIdent, Val: "a1b2", Pos: lex.Position{0, 4}},
+			},
+		},
+		{
+			name: "space prefix",
+			s:    "\t a1",
+			want: []lex.Token{
+				{Kind: lex.TokIdent, Val: "a1", Pos: lex.Position{2, 4}},
+			},
+		},
+		{
+			name: "multiple",
+			//  0    5    10  <- index
+			//  |    |    |
+			s: "a a1 a2b a34b5",
+			want: []lex.Token{
+				{Kind: lex.TokIdent, Val: "a", Pos: lex.Position{0, 1}},
+				{Kind: lex.TokIdent, Val: "a1", Pos: lex.Position{2, 4}},
+				{Kind: lex.TokIdent, Val: "a2b", Pos: lex.Position{5, 8}},
+				{Kind: lex.TokIdent, Val: "a34b5", Pos: lex.Position{9, 14}},
+			},
+		},
+	}
+	testLex(t, tests)
+}
+
+func TestLex_mix(t *testing.T) {
+	tests := []testCase{
+		{
+			name: "number and identifier",
+			s:    "1.2 a3",
+			want: []lex.Token{
+				{Kind: lex.TokNum, Val: "1.2", Pos: lex.Position{0, 3}},
+				{Kind: lex.TokIdent, Val: "a3", Pos: lex.Position{4, 6}},
 			},
 		},
 	}
