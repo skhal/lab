@@ -41,6 +41,8 @@ func scan(rd *bufReader) (*Token, scanFunc, error) {
 	return nil, nil, err
 }
 
+const strDef = "def"
+
 // scanIdentifier scans an identifier.
 //
 //	ident  = letter [ alnum ]
@@ -51,7 +53,12 @@ func scanIdentifier(rd *bufReader) (*Token, scanFunc, error) {
 	readWhile(rd, func(r rune) bool {
 		return unicode.IsLetter(r) || unicode.IsDigit(r)
 	})
-	return genToken(rd, TokIdent), scan, nil
+	tok := genToken(rd, TokIdent)
+	switch tok.Val {
+	case strDef:
+		tok.Kind = TokDef
+	}
+	return tok, scan, nil
 }
 
 // scanNumber scans a number token.

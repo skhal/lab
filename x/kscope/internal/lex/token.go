@@ -19,6 +19,11 @@ type TokenKind int8
 
 const (
 	_ TokenKind = iota
+
+	// commands
+	TokDef // definition
+
+	// primary
 	// keep-sorted start
 	TokIdent // identifier
 	TokNum   // number

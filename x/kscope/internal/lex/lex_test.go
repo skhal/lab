@@ -148,6 +148,19 @@ func TestLex_mix(t *testing.T) {
 	testLex(t, tests)
 }
 
+func TestLex_commands(t *testing.T) {
+	tests := []testCase{
+		{
+			name: "def",
+			s:    "def",
+			want: []lex.Token{
+				{Kind: lex.TokDef, Val: "def", Pos: lex.Position{0, 3}},
+			},
+		},
+	}
+	testLex(t, tests)
+}
+
 func testLex(t *testing.T, tests []testCase) {
 	t.Helper()
 	for _, tc := range tests {
