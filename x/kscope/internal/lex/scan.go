@@ -41,7 +41,10 @@ func scan(rd *bufReader) (*Token, scanFunc, error) {
 	return nil, nil, err
 }
 
-const strDef = "def"
+var commands = map[string]TokenKind{
+	"def":    TokDef,
+	"extern": TokExt,
+}
 
 // scanIdentifier scans an identifier.
 //
@@ -54,9 +57,8 @@ func scanIdentifier(rd *bufReader) (*Token, scanFunc, error) {
 		return unicode.IsLetter(r) || unicode.IsDigit(r)
 	})
 	tok := genToken(rd, TokIdent)
-	switch tok.Val {
-	case strDef:
-		tok.Kind = TokDef
+	if kind, ok := commands[tok.Val]; ok {
+		tok.Kind = kind
 	}
 	return tok, scan, nil
 }

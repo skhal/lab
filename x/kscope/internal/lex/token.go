@@ -21,7 +21,10 @@ const (
 	_ TokenKind = iota
 
 	// commands
+	// keep-sorted start
 	TokDef // definition
+	TokExt // extern
+	// keep-sorted end
 
 	// primary
 	// keep-sorted start

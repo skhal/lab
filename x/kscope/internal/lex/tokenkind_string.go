@@ -9,13 +9,14 @@ func _() {
 	// Re-run the stringer command to generate them again.
 	var x [1]struct{}
 	_ = x[TokDef-1]
-	_ = x[TokIdent-2]
-	_ = x[TokNum-3]
+	_ = x[TokExt-2]
+	_ = x[TokIdent-3]
+	_ = x[TokNum-4]
 }
 
-const _TokenKind_name = "definitionidentifiernumber"
+const _TokenKind_name = "definitionexternidentifiernumber"
 
-var _TokenKind_index = [...]uint8{0, 10, 20, 26}
+var _TokenKind_index = [...]uint8{0, 10, 16, 26, 32}
 
 func (i TokenKind) String() string {
 	idx := int(i) - 1

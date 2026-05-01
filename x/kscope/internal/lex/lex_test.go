@@ -157,6 +157,13 @@ func TestLex_commands(t *testing.T) {
 				{Kind: lex.TokDef, Val: "def", Pos: lex.Position{0, 3}},
 			},
 		},
+		{
+			name: "extern",
+			s:    "extern",
+			want: []lex.Token{
+				{Kind: lex.TokExt, Val: "extern", Pos: lex.Position{0, 6}},
+			},
+		},
 	}
 	testLex(t, tests)
 }
