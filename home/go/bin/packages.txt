@@ -22,7 +22,7 @@ github.com/google/codesearch/cmd/cgrep@b34f2a0c5ce12be3c9dc28038640afece6bee523
 github.com/google/codesearch/cmd/cindex@b34f2a0c5ce12be3c9dc28038640afece6bee523
 github.com/google/codesearch/cmd/csearch@b34f2a0c5ce12be3c9dc28038640afece6bee523
 github.com/google/codesearch/cmd/csweb@b34f2a0c5ce12be3c9dc28038640afece6bee523
-github.com/google/keep-sorted@latest
+github.com/google/keep-sorted@38613f5110f7fb5088d9ad68722e4018a11bc039
 github.com/google/yamlfmt/cmd/yamlfmt@latest
 github.com/jstemmer/gotags@latest
 github.com/protocolbuffers/txtpbfmt/cmd/txtpbfmt@latest
