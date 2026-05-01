@@ -132,6 +132,17 @@ repos:
          .*\.pb\.go
         |nvim/plugin/lab-skeleton/share/new.*
       )$
+  - id: go-fieldalignment
+    name: "Go align fields"
+    description: "align structure fields to take less memory x/tools/go/analysis/passes/fieldalignment"
+    entry: ./check/go-fieldalignment
+    language: system
+    types_or: [go]
+    exclude: |
+      (?x)^(
+         .*\.pb\.go
+        |nvim/plugin/lab-skeleton/share/new.*
+      )$
   - id: go-test
     name: "Go test"
     description: "run Go tests for changes packages"

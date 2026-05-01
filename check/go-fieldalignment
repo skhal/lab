@@ -1,0 +1,38 @@
+#!/bin/sh
+#
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+# go-fieldalignment is a pre-commit hook to run [staticheck][1] on staged packages.
+# It extracts packages from Go-files passed as arguments.
+#
+# SYNOPSIS
+#
+#   go-fieldalignment file [file ...]
+#
+# REFERENCES
+#
+# [1]: https://cs.opensource.google/go/x/tools/+/master:go/analysis/passes/fieldalignment/;drc=3051e4586b905f3a4cadcca11c95b8da67c00078
+
+set -e
+
+packages=
+for src; do
+  pkg=$(dirname "$src")
+  case "$packages" in
+    *:$pkg:*)
+      continue
+      ;;
+  esac
+  packages="$packages:$pkg:"
+done
+
+IFS=:
+for pkg in $packages; do
+  if [ -z "$pkg" ]; then
+    continue
+  fi
+  fieldalignment -fix ./"$pkg"/...
+done
