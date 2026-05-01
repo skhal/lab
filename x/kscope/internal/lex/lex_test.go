@@ -11,7 +11,7 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/skhal/lab/x/kaleidoscope/internal/lex"
+	"github.com/skhal/lab/x/kscope/internal/lex"
 )
 
 type testCase struct {
