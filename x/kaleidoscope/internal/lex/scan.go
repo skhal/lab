@@ -1,0 +1,77 @@
+// Copyright 2026 Samvel Khalatyan. All rights reserved.
+//
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
+package lex
+
+import (
+	"errors"
+	"fmt"
+	"unicode"
+)
+
+// ErrScan means error scanning next token.
+var ErrScan = errors.New("scan error")
+
+const runeDot = '.'
+
+// scanFunc is a scan state. It reads data from the reader and returns parsed
+// token along with the next scan state to process.
+//
+// It should return an error along with nil token and next state in case of a
+// scan error.
+type scanFunc func(rd *bufReader) (*Token, scanFunc, error)
+
+func scan(rd *bufReader) (*Token, scanFunc, error) {
+	ignoreWhile(rd, unicode.IsSpace)
+	r, ok := rd.Peek()
+	if !ok {
+		return nil, nil, nil
+	}
+	switch {
+	case unicode.IsDigit(r), r == runeDot:
+		return scanNumber(rd)
+	}
+	err := fmt.Errorf("%w: %d: unsupported character '%v'", ErrScan, rd.Pos(), r)
+	return nil, nil, err
+}
+
+// scanNumber scans a number token.
+//
+//	number = int | float
+//	int    = digit { digit }
+//	float  = int "." [ int ] | "." int
+//	digit  = "0" .. "9"
+func scanNumber(rd *bufReader) (*Token, scanFunc, error) {
+	readWhile(rd, unicode.IsDigit)
+	if r, ok := rd.Peek(); ok && r == runeDot {
+		rd.Read() // skip dot
+		readWhile(rd, unicode.IsDigit)
+	}
+	s, start, end := rd.Text()
+	tok := &Token{Kind: TokNum, Val: s, Pos: Position{Start: start, End: end}}
+	return tok, scan, nil
+}
+
+// ignoreWhile ignores consecutive characters for which predicate f returns
+// true.
+func ignoreWhile(rc *bufReader, f func(rune) bool) {
+	readWhile(rc, f)
+	rc.Ignore()
+}
+
+// readWhile reads consecutive characters for which predicate f returns true.
+// end of stream.
+func readWhile(rd *bufReader, f func(rune) bool) {
+	for {
+		r, ok := rd.Read()
+		if !ok {
+			break
+		}
+		if !f(r) {
+			rd.Unread()
+			break
+		}
+	}
+}
