@@ -7,11 +7,11 @@
 
 # NAME
 
-**kaleidoscope** - compiler frontend
+**kscope** - compiler frontend
 
 # DESCRIPTION
 
-Kaleidoscope implements a compiler frontend for a toy language *kaleidoscope*.
+Kscope implements a compiler frontend for a toy language *kaleidoscope*.
 The project follows
 [LLVM tutorial](https://llvm.org/docs/tutorial/MyFirstLanguageFrontend/index.html)
 on the subject.

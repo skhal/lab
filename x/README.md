@@ -17,7 +17,7 @@ Projects:
 
 <!-- keep-sorted start -->
 - [Feed](./feed/): a streaming feed reader (RSS, Atom, etc.) inspired by [Advanced Concurrency Patterns](https://go.dev/blog/io2013-talk-concurrency).
-- [Kaleidoscope](./kaleidoscope/): a compiler frontend
+- [Kscope](./kscope/): a compiler frontend
 - [Sheet](./sheet/): a spreadsheet engine inspired by [GopherCon 2020 - Optimizing Performance](https://speakerdeck.com/therealtravissmith/optimizing-performance-using-a-vm-and-go-plugins). It supports AST and VM engines.
 - [Wasm](./wasm/): WebAssembly prototypes
 <!-- keep-sorted end -->
