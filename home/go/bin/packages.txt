@@ -39,6 +39,7 @@ github.com/skhal/lab/iq/cmd/iq@latest
 github.com/skhal/lab/x/compdb/cmd/compdb@latest
 github.com/skhal/lab/x/htmlview@latest
 github.com/skhal/lab/x/mdview@latest
+github.com/skhal/lab/x/serve@latest
 golang.org/x/pkgsite/cmd/pkgsite@latest
 golang.org/x/tools/cmd/goimports@latest
 golang.org/x/tools/cmd/present@latest
