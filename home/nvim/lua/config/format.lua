@@ -40,6 +40,7 @@ conform.setup({
 		pbtxt = { "txtpbfmt" },
 		proto = { "clang-format", "keep-sorted" },
 		sh = { "shfmt", "keep-sorted" },
+		text = { "keep-sorted" },
 		yaml = { "yamlfmt", "keep-sorted" },
 		-- keep-sorted end
 	},
