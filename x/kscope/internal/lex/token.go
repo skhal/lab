@@ -20,14 +20,10 @@ type TokenKind int8
 const (
 	_ TokenKind = iota
 
-	// commands
 	// keep-sorted start
-	TokDef // definition
-	TokExt // extern
-	// keep-sorted end
-
-	// primary
-	// keep-sorted start
+	TokComm  // comment
+	TokDef   // definition
+	TokExt   // extern
 	TokIdent // identifier
 	TokNum   // number
 	// keep-sorted end

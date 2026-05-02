@@ -8,15 +8,16 @@ func _() {
 	// An "invalid array index" compiler error signifies that the constant values have changed.
 	// Re-run the stringer command to generate them again.
 	var x [1]struct{}
-	_ = x[TokDef-1]
-	_ = x[TokExt-2]
-	_ = x[TokIdent-3]
-	_ = x[TokNum-4]
+	_ = x[TokComm-1]
+	_ = x[TokDef-2]
+	_ = x[TokExt-3]
+	_ = x[TokIdent-4]
+	_ = x[TokNum-5]
 }
 
-const _TokenKind_name = "definitionexternidentifiernumber"
+const _TokenKind_name = "commentdefinitionexternidentifiernumber"
 
-var _TokenKind_index = [...]uint8{0, 10, 16, 26, 32}
+var _TokenKind_index = [...]uint8{0, 7, 17, 23, 33, 39}
 
 func (i TokenKind) String() string {
 	idx := int(i) - 1

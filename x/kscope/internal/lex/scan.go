@@ -14,7 +14,11 @@ import (
 // ErrScan means error scanning next token.
 var ErrScan = errors.New("scan error")
 
-const runeDot = '.'
+const (
+	runeDot  = '.'
+	runeHash = '#'
+	runeEOL  = '\n'
+)
 
 // scanFunc is a scan state. It reads data from the reader and returns parsed
 // token along with the next scan state to process.
@@ -31,6 +35,8 @@ func scan(rd *bufReader) (*Token, scanFunc, error) {
 	}
 	// keep-sorted start skip_lines=1,-1
 	switch {
+	case r == runeHash:
+		return scanComment(rd)
 	case unicode.IsDigit(r), r == runeDot:
 		return scanNumber(rd)
 	case unicode.IsLetter(r):
@@ -39,6 +45,13 @@ func scan(rd *bufReader) (*Token, scanFunc, error) {
 	// keep-sorted end
 	err := fmt.Errorf("%w: %d: unsupported character '%v'", ErrScan, rd.Pos(), r)
 	return nil, nil, err
+}
+
+func scanComment(rd *bufReader) (*Token, scanFunc, error) {
+	readWhile(rd, func(r rune) bool {
+		return r != runeEOL
+	})
+	return genToken(rd, TokComm), scan, nil
 }
 
 var commands = map[string]TokenKind{

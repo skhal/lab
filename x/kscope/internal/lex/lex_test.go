@@ -144,6 +144,29 @@ func TestLex_mix(t *testing.T) {
 				{Kind: lex.TokIdent, Val: "a3", Pos: lex.Position{4, 6}},
 			},
 		},
+		{
+			name: "comment",
+			s:    "# test",
+			want: []lex.Token{
+				{Kind: lex.TokComm, Val: "# test", Pos: lex.Position{0, 6}},
+			},
+		},
+		{
+			name: "comment multi-line",
+			s:    "# test a\n# test b",
+			want: []lex.Token{
+				{Kind: lex.TokComm, Val: "# test a", Pos: lex.Position{0, 8}},
+				{Kind: lex.TokComm, Val: "# test b", Pos: lex.Position{9, 17}},
+			},
+		},
+		{
+			name: "number and comment",
+			s:    "123 # test",
+			want: []lex.Token{
+				{Kind: lex.TokNum, Val: "123", Pos: lex.Position{0, 3}},
+				{Kind: lex.TokComm, Val: "# test", Pos: lex.Position{4, 10}},
+			},
+		},
 	}
 	testLex(t, tests)
 }
