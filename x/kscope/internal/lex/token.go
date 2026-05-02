@@ -5,11 +5,18 @@
 
 package lex
 
+import "fmt"
+
 // Token is the smallest unit of input.
 type Token struct {
 	Val  string    // token value
 	Pos  Position  // token position in the text
 	Kind TokenKind // token kind
+}
+
+// String prints the token.
+func (t Token) String() string {
+	return fmt.Sprintf("%s: %s %s", t.Pos, t.Kind, t.Val)
 }
 
 // TokenKind identifies the kind of a token.
@@ -37,4 +44,9 @@ const (
 type Position struct {
 	Start int // location of the token
 	End   int // location of the past last symbol of the token
+}
+
+// String prints the position.
+func (p Position) String() string {
+	return fmt.Sprintf("%d..%d", p.Start, p.End)
 }
