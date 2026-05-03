@@ -69,6 +69,22 @@ func (p *parser) parse() (ast.Node, error) {
 
 // parseExpression parses an expression.
 func (p *parser) parseExpression() (ast.Node, error) {
+	lhs, err := p.parseOperand()
+	if err != nil {
+		return nil, err
+	}
+	tok, ok := p.r.Peek()
+	if !ok {
+		return lhs, nil
+	}
+	switch tok.Kind {
+	case lex.TokPlus, lex.TokMinus:
+		return p.parseBinExpr(lhs)
+	}
+	return nil, fmt.Errorf("unsupported token %s", tok)
+}
+
+func (p *parser) parseOperand() (ast.Node, error) {
 	tok, ok := p.r.Read()
 	if !ok {
 		return nil, fmt.Errorf("missing expression")
@@ -78,6 +94,27 @@ func (p *parser) parseExpression() (ast.Node, error) {
 		return parseNumber(tok)
 	}
 	return nil, fmt.Errorf("unsupported token %s", tok)
+}
+
+var binOps = map[lex.TokenKind]ast.BinOp{
+	lex.TokPlus:  ast.BinOpPlus,
+	lex.TokMinus: ast.BinOpMinus,
+}
+
+func (p *parser) parseBinExpr(lhs ast.Node) (ast.Node, error) {
+	tok, ok := p.r.Read()
+	if !ok {
+		return nil, fmt.Errorf("missing binary operator")
+	}
+	op, ok := binOps[tok.Kind]
+	if !ok {
+		return nil, fmt.Errorf("unsupported binary operator %s", tok)
+	}
+	rhs, err := p.parseOperand()
+	if err != nil {
+		return nil, fmt.Errorf("operator %s: right operand: %s", tok, err)
+	}
+	return ast.BinExpr{Op: op, Left: lhs, Right: rhs}, nil
 }
 
 // parseNumber parses token as a numbee

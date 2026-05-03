@@ -32,7 +32,9 @@ const (
 	TokDef   // definition
 	TokExt   // extern
 	TokIdent // identifier
+	TokMinus // minus
 	TokNum   // number
+	TokPlus  // plus
 	// keep-sorted end
 )
 

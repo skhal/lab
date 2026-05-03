@@ -41,6 +41,50 @@ func TestParser_Parse(t *testing.T) {
 	testParser_Parse(t, tests)
 }
 
+func TestParser_binop(t *testing.T) {
+	tests := []testCase{
+		{
+			name: "plus",
+			text: "1 + 2",
+			want: ast.BinExpr{
+				Op:    ast.BinOpPlus,
+				Left:  ast.Number{Val: 1},
+				Right: ast.Number{Val: 2},
+			},
+		},
+		{
+			name:    "plus misses left operand",
+			text:    "+ 2",
+			wantErr: parse.ErrParse,
+		},
+		{
+			name:    "plus misses right operand",
+			text:    "1 +",
+			wantErr: parse.ErrParse,
+		},
+		{
+			name: "minus",
+			text: "1 - 2",
+			want: ast.BinExpr{
+				Op:    ast.BinOpMinus,
+				Left:  ast.Number{Val: 1},
+				Right: ast.Number{Val: 2},
+			},
+		},
+		{
+			name:    "minus misses left operand",
+			text:    "- 2",
+			wantErr: parse.ErrParse,
+		},
+		{
+			name:    "minus misses right operand",
+			text:    "1 -",
+			wantErr: parse.ErrParse,
+		},
+	}
+	testParser_Parse(t, tests)
+}
+
 func testParser_Parse(t *testing.T, tests []testCase) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {

@@ -28,7 +28,7 @@ func TestLex(t *testing.T) {
 		},
 		{
 			name:    "invalid token",
-			s:       "+",
+			s:       "*",
 			wantErr: lex.ErrScan,
 		},
 	}
@@ -82,6 +82,26 @@ func TestLex_number(t *testing.T) {
 				{Kind: lex.TokNum, Val: "3", Pos: lex.Position{4, 5}},
 				{Kind: lex.TokNum, Val: "4.", Pos: lex.Position{7, 9}},
 				{Kind: lex.TokNum, Val: ".5", Pos: lex.Position{10, 12}},
+			},
+		},
+	}
+	testLex(t, tests)
+}
+
+func TestLex_binop(t *testing.T) {
+	tests := []testCase{
+		{
+			name: "plus",
+			s:    "+",
+			want: []lex.Token{
+				{Kind: lex.TokPlus, Val: "+", Pos: lex.Position{0, 1}},
+			},
+		},
+		{
+			name: "minus",
+			s:    "-",
+			want: []lex.Token{
+				{Kind: lex.TokMinus, Val: "-", Pos: lex.Position{0, 1}},
 			},
 		},
 	}

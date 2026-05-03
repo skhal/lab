@@ -17,3 +17,29 @@ type Number struct {
 
 // String prints the number.
 func (n Number) String() string { return fmt.Sprintf("%.1f", n.Val) }
+
+// BinExpr describes a binary expression: left op right.
+type BinExpr struct {
+	Left  Node  // left operand
+	Right Node  // right operand
+	Op    BinOp // operator
+}
+
+// BinOp enumerates binary operators
+//
+//go:generate stringer -type=BinOp -linecomment
+type BinOp int8
+
+const (
+	_ BinOp = iota
+
+	// keep-sorted start
+	BinOpMinus // -
+	BinOpPlus  // +
+	// keep-sorted end
+)
+
+// String prints binary expression.
+func (expr BinExpr) String() string {
+	return fmt.Sprintf("%s %v %s", expr.Left, expr.Op, expr.Right)
+}

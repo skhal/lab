@@ -8,7 +8,12 @@
 //
 // # Context Free Grammar
 //
-// statement = expression
+// Statement = Expr
 //
-// expression = number
+// Expr = Operand | BinExpr
+//
+// Operand = Number
+// BinExpr = Expr Op Expr
+// Op      = AddOp
+// AddOp   = "+" | "-"
 package parse

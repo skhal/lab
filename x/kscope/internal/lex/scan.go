@@ -15,9 +15,13 @@ import (
 var ErrScan = errors.New("scan error")
 
 const (
-	runeDot  = '.'
-	runeHash = '#'
-	runeEOL  = '\n'
+	// keep-sorted start
+	runeDot   = '.'
+	runeEOL   = '\n'
+	runeHash  = '#'
+	runeMinus = '-'
+	runePlus  = '+'
+	// keep-sorted end
 )
 
 // scanFunc is a scan state. It reads data from the reader and returns parsed
@@ -27,16 +31,29 @@ const (
 // scan error.
 type scanFunc func(rd *bufReader) (*Token, scanFunc, error)
 
+var scanners map[rune]scanFunc
+
+func init() {
+	scanners = map[rune]scanFunc{
+		// keep-sorted start
+		runeHash:  scanComment,
+		runeMinus: genCharScanner(TokMinus),
+		runePlus:  genCharScanner(TokPlus),
+		// keep-sorted end
+	}
+}
+
 func scan(rd *bufReader) (*Token, scanFunc, error) {
 	ignoreWhile(rd, unicode.IsSpace)
 	r, ok := rd.Peek()
 	if !ok {
 		return nil, nil, nil
 	}
+	if scanner, ok := scanners[r]; ok {
+		return scanner(rd)
+	}
 	// keep-sorted start skip_lines=1,-1
 	switch {
-	case r == runeHash:
-		return scanComment(rd)
 	case unicode.IsDigit(r), r == runeDot:
 		return scanNumber(rd)
 	case unicode.IsLetter(r):
@@ -52,6 +69,13 @@ func scanComment(rd *bufReader) (*Token, scanFunc, error) {
 		return r != runeEOL
 	})
 	return genToken(rd, TokComm), scan, nil
+}
+
+func genCharScanner(tok TokenKind) scanFunc {
+	return func(rd *bufReader) (*Token, scanFunc, error) {
+		rd.Read() // consume the character
+		return genToken(rd, tok), scan, nil
+	}
 }
 
 var commands = map[string]TokenKind{

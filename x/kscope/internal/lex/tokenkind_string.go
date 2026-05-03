@@ -12,12 +12,14 @@ func _() {
 	_ = x[TokDef-2]
 	_ = x[TokExt-3]
 	_ = x[TokIdent-4]
-	_ = x[TokNum-5]
+	_ = x[TokMinus-5]
+	_ = x[TokNum-6]
+	_ = x[TokPlus-7]
 }
 
-const _TokenKind_name = "commentdefinitionexternidentifiernumber"
+const _TokenKind_name = "commentdefinitionexternidentifierminusnumberplus"
 
-var _TokenKind_index = [...]uint8{0, 7, 17, 23, 33, 39}
+var _TokenKind_index = [...]uint8{0, 7, 17, 23, 33, 38, 44, 48}
 
 func (i TokenKind) String() string {
 	idx := int(i) - 1
