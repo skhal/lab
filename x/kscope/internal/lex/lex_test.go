@@ -28,7 +28,7 @@ func TestLex(t *testing.T) {
 		},
 		{
 			name:    "invalid token",
-			s:       "*",
+			s:       "%",
 			wantErr: lex.ErrScan,
 		},
 	}
@@ -102,6 +102,20 @@ func TestLex_binop(t *testing.T) {
 			s:    "-",
 			want: []lex.Token{
 				{Kind: lex.TokMinus, Val: "-", Pos: lex.Position{0, 1}},
+			},
+		},
+		{
+			name: "multiply",
+			s:    "*",
+			want: []lex.Token{
+				{Kind: lex.TokMul, Val: "*", Pos: lex.Position{0, 1}},
+			},
+		},
+		{
+			name: "divide",
+			s:    "/",
+			want: []lex.Token{
+				{Kind: lex.TokDiv, Val: "/", Pos: lex.Position{0, 1}},
 			},
 		},
 	}

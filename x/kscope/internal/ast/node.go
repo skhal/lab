@@ -34,7 +34,9 @@ const (
 	_ BinOp = iota
 
 	// keep-sorted start
+	BinOpDiv   // /
 	BinOpMinus // -
+	BinOpMul   // *
 	BinOpPlus  // +
 	// keep-sorted end
 )

@@ -16,10 +16,12 @@ var ErrScan = errors.New("scan error")
 
 const (
 	// keep-sorted start
+	runeDiv   = '/'
 	runeDot   = '.'
 	runeEOL   = '\n'
 	runeHash  = '#'
 	runeMinus = '-'
+	runeMul   = '*'
 	runePlus  = '+'
 	// keep-sorted end
 )
@@ -36,8 +38,10 @@ var scanners map[rune]scanFunc
 func init() {
 	scanners = map[rune]scanFunc{
 		// keep-sorted start
+		runeDiv:   genCharScanner(TokDiv),
 		runeHash:  scanComment,
 		runeMinus: genCharScanner(TokMinus),
+		runeMul:   genCharScanner(TokMul),
 		runePlus:  genCharScanner(TokPlus),
 		// keep-sorted end
 	}

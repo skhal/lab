@@ -30,9 +30,11 @@ const (
 	// keep-sorted start
 	TokComm  // comment
 	TokDef   // definition
+	TokDiv   // divide
 	TokExt   // extern
 	TokIdent // identifier
 	TokMinus // minus
+	TokMul   // multiply
 	TokNum   // number
 	TokPlus  // plus
 	// keep-sorted end

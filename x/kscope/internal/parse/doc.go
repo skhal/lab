@@ -14,6 +14,7 @@
 //
 // Operand = Number
 // BinExpr = Expr Op Expr
-// Op      = AddOp
+// Op      = AddOp | MulOp
 // AddOp   = "+" | "-"
+// MulOp   = "*" | "/"
 package parse

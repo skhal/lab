@@ -78,7 +78,7 @@ func (p *parser) parseExpression() (ast.Node, error) {
 		return lhs, nil
 	}
 	switch tok.Kind {
-	case lex.TokPlus, lex.TokMinus:
+	case lex.TokPlus, lex.TokMinus, lex.TokMul, lex.TokDiv:
 		return p.parseBinExpr(lhs)
 	}
 	return nil, fmt.Errorf("unsupported token %s", tok)
@@ -97,8 +97,12 @@ func (p *parser) parseOperand() (ast.Node, error) {
 }
 
 var binOps = map[lex.TokenKind]ast.BinOp{
-	lex.TokPlus:  ast.BinOpPlus,
+	// keep-sorted start
+	lex.TokDiv:   ast.BinOpDiv,
 	lex.TokMinus: ast.BinOpMinus,
+	lex.TokMul:   ast.BinOpMul,
+	lex.TokPlus:  ast.BinOpPlus,
+	// keep-sorted end
 }
 
 func (p *parser) parseBinExpr(lhs ast.Node) (ast.Node, error) {
@@ -110,11 +114,31 @@ func (p *parser) parseBinExpr(lhs ast.Node) (ast.Node, error) {
 	if !ok {
 		return nil, fmt.Errorf("unsupported binary operator %s", tok)
 	}
-	rhs, err := p.parseOperand()
+	rhs, err := p.parseExpression()
 	if err != nil {
 		return nil, fmt.Errorf("operator %s: right operand: %s", tok, err)
 	}
-	return ast.BinExpr{Op: op, Left: lhs, Right: rhs}, nil
+	n := ast.BinExpr{Op: op, Left: lhs, Right: rhs}
+	if op == ast.BinOpDiv || op == ast.BinOpMul {
+		// give preference to the first operator op1 in "a op1 b op2 c", e.g.:
+		// "1 * 2 + 3" becomes {Op:Plus Left:{Op:Mul Left:1 Right:2} Right:3}
+		// "1 * 2 / 3" becomes {Op:Div Left:{Op:Mul Left:1 Right:2} Right:3}
+		n = rotateLeft(n)
+	}
+	return n, nil
+}
+
+// rotateLeft rotates nodes in a binary expression counter-clockwise
+// (aka right-hand rule) to make BinExpr.Right root node if is it a binary
+// expression.
+func rotateLeft(n ast.BinExpr) ast.BinExpr {
+	right, ok := n.Right.(ast.BinExpr)
+	if !ok {
+		return n
+	}
+	n.Right = right.Left
+	right.Left = n
+	return right
 }
 
 // parseNumber parses token as a numbee

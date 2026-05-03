@@ -10,16 +10,18 @@ func _() {
 	var x [1]struct{}
 	_ = x[TokComm-1]
 	_ = x[TokDef-2]
-	_ = x[TokExt-3]
-	_ = x[TokIdent-4]
-	_ = x[TokMinus-5]
-	_ = x[TokNum-6]
-	_ = x[TokPlus-7]
+	_ = x[TokDiv-3]
+	_ = x[TokExt-4]
+	_ = x[TokIdent-5]
+	_ = x[TokMinus-6]
+	_ = x[TokMul-7]
+	_ = x[TokNum-8]
+	_ = x[TokPlus-9]
 }
 
-const _TokenKind_name = "commentdefinitionexternidentifierminusnumberplus"
+const _TokenKind_name = "commentdefinitiondivideexternidentifierminusmultiplynumberplus"
 
-var _TokenKind_index = [...]uint8{0, 7, 17, 23, 33, 38, 44, 48}
+var _TokenKind_index = [...]uint8{0, 7, 17, 23, 29, 39, 44, 52, 58, 62}
 
 func (i TokenKind) String() string {
 	idx := int(i) - 1
