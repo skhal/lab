@@ -88,9 +88,7 @@ func scanNumber(rd *bufReader) (*Token, scanFunc, error) {
 		rd.Read() // skip dot
 		readWhile(rd, unicode.IsDigit)
 	}
-	s, start, end := rd.Text()
-	tok := &Token{Kind: TokNum, Val: s, Pos: Position{Start: start, End: end}}
-	return tok, scan, nil
+	return genToken(rd, TokNum), scan, nil
 }
 
 // genToken generates a token of specified kind using test and position from
