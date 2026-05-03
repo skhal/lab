@@ -35,7 +35,7 @@ import (
 	"path/filepath"
 )
 
-var httpAddr = flag.String("http", ":8080", "http server address")
+var addr = flag.String("http", ":8080", "http server address")
 
 func init() {
 	flag.Usage = func() {
@@ -54,7 +54,8 @@ func main() {
 	http.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
 		http.ServeFile(w, req, file)
 	})
-	if err := http.ListenAndServe(*httpAddr, nil); err != nil {
+	fmt.Printf("serve on %s\n", *addr)
+	if err := http.ListenAndServe(*addr, nil); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
