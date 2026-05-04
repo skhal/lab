@@ -602,7 +602,12 @@ func testParser_Parse(t *testing.T, tests []testCase) {
 
 func ExampleParse() {
 	const s = `
-var x = 123
+var a = 1
+var b = a + 22
+def c()
+	a + b * 2
+def d(x, y)
+  x * c() + a
 `
 	n, err := parse.Parse(s)
 	if err != nil {
@@ -611,7 +616,12 @@ var x = 123
 	}
 	fmt.Println(n)
 	// Output:
-	// var x = 123.0
+	// var a = 1.0
+	// var b = a + 22.0
+	// def c()
+	//   a + b * 2.0
+	// def d(x, y)
+	//   x * c() + a
 }
 
 func newASTFile(t *testing.T, nn ...ast.Node) *ast.File {

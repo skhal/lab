@@ -21,8 +21,11 @@ type File struct {
 // String prints the file.
 func (f File) String() string {
 	var s strings.Builder
-	for _, d := range f.Decls {
-		fmt.Fprintln(&s, d)
+	for i, d := range f.Decls {
+		if i > 0 {
+			fmt.Fprintln(&s)
+		}
+		fmt.Fprint(&s, d)
 	}
 	return s.String()
 }
@@ -56,8 +59,11 @@ func (f Func) String() string {
 		fmt.Fprintf(&s, "%s", p)
 	}
 	fmt.Fprintln(&s, ")")
-	for _, n := range f.Body {
-		fmt.Fprintf(&s, "  %s\n", n)
+	for i, n := range f.Body {
+		if i > 0 {
+			fmt.Fprintln(&s)
+		}
+		fmt.Fprintf(&s, "  %s", n)
 	}
 	return s.String()
 }
