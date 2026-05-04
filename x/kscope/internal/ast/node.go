@@ -46,6 +46,14 @@ type Number struct {
 // String prints the number.
 func (n Number) String() string { return fmt.Sprintf("%.1f", n.Val) }
 
+// Ident is an identifier used in an expression, e.g. a variable in "x + 3"
+type Ident struct {
+	Name string // identifier name
+}
+
+// String prints the identifier.
+func (i Ident) String() string { return i.Name }
+
 // BinExpr describes a binary expression: left op right.
 type BinExpr struct {
 	Left  Node  // left operand

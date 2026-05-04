@@ -37,6 +37,11 @@ func TestParser_Parse(t *testing.T) {
 			text: "12.3",
 			want: ast.Number{Val: 12.3},
 		},
+		{
+			name: "identifier",
+			text: "x",
+			want: ast.Ident{Name: "x"},
+		},
 	}
 	testParser_Parse(t, tests)
 }
@@ -347,6 +352,24 @@ func TestParser_expr(t *testing.T) {
 					Left:  ast.Number{Val: 2},
 					Right: ast.Number{Val: 3},
 				},
+			},
+		},
+		{
+			name: "lhs is identifier",
+			text: "x + 1",
+			want: ast.BinExpr{
+				Op:    ast.BinOpPlus,
+				Left:  ast.Ident{Name: "x"},
+				Right: ast.Number{Val: 1},
+			},
+		},
+		{
+			name: "rhs is identifier",
+			text: "1 + x",
+			want: ast.BinExpr{
+				Op:    ast.BinOpPlus,
+				Left:  ast.Number{Val: 1},
+				Right: ast.Ident{Name: "x"},
 			},
 		},
 	}

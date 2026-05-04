@@ -144,10 +144,10 @@ func (p *parser) parseOperand() (ast.Node, error) {
 	// keep-sorted start skip_lines=1,-1
 	switch tok.Kind {
 	case lex.TokIdent:
-		if next, ok := p.r.Peek(); !ok || next.Kind != lex.TokLpar {
-			break
+		if next, ok := p.r.Peek(); ok && next.Kind == lex.TokLpar {
+			return p.parseCall(tok)
 		}
-		return p.parseCall(tok)
+		return ast.Ident{Name: tok.Val}, nil
 	case lex.TokLpar:
 		return p.parseGroup(tok)
 	case lex.TokNum:

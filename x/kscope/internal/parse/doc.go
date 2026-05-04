@@ -20,11 +20,11 @@
 //
 // Expr = Operand | BinExpr
 //
-// Operand = Number | Call | Group
+// Operand = Number | Identifier | Group | Call
 // Number  = Digit [ "." { Digit } ] | "." Digit
+// Group   = "(" Expr ")"
 // Call    = Ident "(" [ Args ] ")"
 // Args    = Expr { "," Expr }
-// Group   = "(" Expr ")"
 //
 // BinExpr = Expr Op Expr
 // Op      = AddOp | MulOp
