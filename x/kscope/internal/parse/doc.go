@@ -13,21 +13,23 @@
 // Func       = "def" Identifier "(" [ Params ] ")" Expr
 // Identifier = Letter { ( Letter | Digit ) }
 // Letter     = "a" .. "z" | "A" .. "Z"
+// Digit      = "0" .. "9"
 // Params     = Identifier { "," Identifier }
 //
 // Var = Identifier "=" Expr
 //
 // Expr = Operand | BinExpr
 //
-// Operand = Number | Call
+// Operand = Number | Call | Group
+// Number  = Digit [ "." { Digit } ] | "." Digit
+// Call    = Ident "(" [ Args ] ")"
+// Args    = Expr { "," Expr }
+// Group   = "(" Expr ")"
 //
 // BinExpr = Expr Op Expr
 // Op      = AddOp | MulOp
 // AddOp   = "+" | "-"
 // MulOp   = "*" | "/"
-//
-// Call = Ident "(" [ Args ] ")"
-// Args = Expr { "," Expr }
 //
 // EXAMPLE
 //

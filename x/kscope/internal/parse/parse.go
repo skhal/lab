@@ -141,15 +141,19 @@ func (p *parser) parseOperand() (ast.Node, error) {
 	if !ok {
 		return nil, fmt.Errorf("missing expression")
 	}
+	// keep-sorted start skip_lines=1,-1
 	switch tok.Kind {
 	case lex.TokIdent:
 		if next, ok := p.r.Peek(); !ok || next.Kind != lex.TokLpar {
 			break
 		}
 		return p.parseCall(tok)
+	case lex.TokLpar:
+		return p.parseGroup(tok)
 	case lex.TokNum:
 		return parseNumber(tok)
 	}
+	// keep-sorted end
 	return nil, fmt.Errorf("unsupported token %s", tok)
 }
 
@@ -200,18 +204,26 @@ func (p *parser) parseBinExpr(lhs ast.Node) (ast.Node, error) {
 	if !ok {
 		return nil, fmt.Errorf("unsupported binary operator %s", tok)
 	}
+	next, ok := p.r.Peek()
+	if !ok {
+		return nil, fmt.Errorf("missing right operand")
+	}
 	rhs, err := p.parseExpression()
 	if err != nil {
 		return nil, fmt.Errorf("operator %s: right operand: %s", tok, err)
 	}
 	n := ast.BinExpr{Op: op, Left: lhs, Right: rhs}
-	if op == ast.BinOpDiv || op == ast.BinOpMul {
-		// give preference to the first operator op1 in "a op1 b op2 c", e.g.:
-		// "1 * 2 + 3" becomes {Op:Plus Left:{Op:Mul Left:1 Right:2} Right:3}
-		// "1 * 2 / 3" becomes {Op:Div Left:{Op:Mul Left:1 Right:2} Right:3}
+	if shouldRotateLeft(tok, next) {
 		n = rotateLeft(n)
 	}
 	return n, nil
+}
+
+func shouldRotateLeft(tok, next lex.Token) bool {
+	if next.Kind == lex.TokLpar {
+		return false
+	}
+	return tok.Kind == lex.TokDiv || tok.Kind == lex.TokMul
 }
 
 // rotateLeft rotates nodes in a binary expression counter-clockwise
@@ -234,6 +246,17 @@ func parseNumber(tok lex.Token) (ast.Node, error) {
 		return nil, fmt.Errorf("failed to parse number - %s", tok)
 	}
 	return ast.Number{Val: v}, nil
+}
+
+func (p *parser) parseGroup(lpar lex.Token) (ast.Node, error) {
+	expr, err := p.parseExpression()
+	if err != nil {
+		return nil, err
+	}
+	if tok, ok := p.r.Read(); !ok || tok.Kind != lex.TokRpar {
+		return nil, fmt.Errorf("missing right paraenthesis")
+	}
+	return expr, nil
 }
 
 func (p *parser) parseVar() (ast.Node, error) {

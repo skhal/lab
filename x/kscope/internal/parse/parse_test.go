@@ -41,7 +41,7 @@ func TestParser_Parse(t *testing.T) {
 	testParser_Parse(t, tests)
 }
 
-func TestParser_binop(t *testing.T) {
+func TestParser_expr(t *testing.T) {
 	tests := []testCase{
 		{
 			name: "plus",
@@ -325,6 +325,28 @@ func TestParser_binop(t *testing.T) {
 					Right: ast.Number{Val: 2},
 				},
 				Right: ast.Number{Val: 3},
+			},
+		},
+		{
+			name: "group plus",
+			text: "(1 + 2)",
+			want: ast.BinExpr{
+				Op:    ast.BinOpPlus,
+				Left:  ast.Number{Val: 1},
+				Right: ast.Number{Val: 2},
+			},
+		},
+		{
+			name: "group prioritizes",
+			text: "1 * (2 + 3)",
+			want: ast.BinExpr{
+				Op:   ast.BinOpMul,
+				Left: ast.Number{Val: 1},
+				Right: ast.BinExpr{
+					Op:    ast.BinOpPlus,
+					Left:  ast.Number{Val: 2},
+					Right: ast.Number{Val: 3},
+				},
 			},
 		},
 	}
