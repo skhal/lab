@@ -203,15 +203,15 @@ func TestLex_mix(t *testing.T) {
 			name: "comment",
 			s:    "# test",
 			want: []lex.Token{
-				{Kind: lex.TokComm, Val: "# test", Pos: lex.Position{0, 6}},
+				{Kind: lex.TokComment, Val: "# test", Pos: lex.Position{0, 6}},
 			},
 		},
 		{
 			name: "comment multi-line",
 			s:    "# test a\n# test b",
 			want: []lex.Token{
-				{Kind: lex.TokComm, Val: "# test a", Pos: lex.Position{0, 8}},
-				{Kind: lex.TokComm, Val: "# test b", Pos: lex.Position{9, 17}},
+				{Kind: lex.TokComment, Val: "# test a", Pos: lex.Position{0, 8}},
+				{Kind: lex.TokComment, Val: "# test b", Pos: lex.Position{9, 17}},
 			},
 		},
 		{
@@ -219,7 +219,7 @@ func TestLex_mix(t *testing.T) {
 			s:    "123 # test",
 			want: []lex.Token{
 				{Kind: lex.TokNum, Val: "123", Pos: lex.Position{0, 3}},
-				{Kind: lex.TokComm, Val: "# test", Pos: lex.Position{4, 10}},
+				{Kind: lex.TokComment, Val: "# test", Pos: lex.Position{4, 10}},
 			},
 		},
 	}
@@ -239,7 +239,7 @@ func TestLex_commands(t *testing.T) {
 			name: "extern",
 			s:    "extern",
 			want: []lex.Token{
-				{Kind: lex.TokExt, Val: "extern", Pos: lex.Position{0, 6}},
+				{Kind: lex.TokExtern, Val: "extern", Pos: lex.Position{0, 6}},
 			},
 		},
 	}

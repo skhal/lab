@@ -78,7 +78,7 @@ func scanComment(rd *bufReader) (*Token, scanFunc, error) {
 	readWhile(rd, func(r rune) bool {
 		return r != runeEOL
 	})
-	return genToken(rd, TokComm), scan, nil
+	return genToken(rd, TokComment), scan, nil
 }
 
 func genCharScanner(tok TokenKind) scanFunc {
@@ -90,7 +90,7 @@ func genCharScanner(tok TokenKind) scanFunc {
 
 var commands = map[string]TokenKind{
 	"def":    TokDef,
-	"extern": TokExt,
+	"extern": TokExtern,
 }
 
 // scanIdentifier scans an identifier.
