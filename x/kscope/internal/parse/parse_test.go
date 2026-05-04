@@ -459,6 +459,28 @@ func TestParser_func(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "one param",
+			text: "def test(a) 1",
+			want: ast.Func{
+				Name:   "test",
+				Params: []string{"a"},
+				Body: []ast.Node{
+					ast.Number{Val: 1},
+				},
+			},
+		},
+		{
+			name: "two params",
+			text: "def test(a, b) 1",
+			want: ast.Func{
+				Name:   "test",
+				Params: []string{"a", "b"},
+				Body: []ast.Node{
+					ast.Number{Val: 1},
+				},
+			},
+		},
 	}
 	testParser_Parse(t, tests)
 }

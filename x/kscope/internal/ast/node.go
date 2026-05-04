@@ -16,14 +16,22 @@ type Node any
 // Func is a function definition. It consists of a name and a body, represented
 // by a set of statements.
 type Func struct {
-	Name string // function name
-	Body []Node // function body
+	Name   string   // function name
+	Params []string // parameter names
+	Body   []Node   // function body
 }
 
 // String prints the function.
 func (f Func) String() string {
 	var s strings.Builder
-	fmt.Fprintf(&s, "def %s()\n", f.Name)
+	fmt.Fprintf(&s, "def %s(", f.Name)
+	for i, p := range f.Params {
+		if i > 0 {
+			fmt.Fprintf(&s, ", ")
+		}
+		fmt.Fprintf(&s, "%s", p)
+	}
+	fmt.Fprintln(&s, ")")
 	for _, n := range f.Body {
 		fmt.Fprintf(&s, "  %s\n", n)
 	}

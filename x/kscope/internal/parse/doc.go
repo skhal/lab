@@ -10,9 +10,10 @@
 //
 // Goal = Expr | Func | Var
 //
-// Func       = "def" Identifier "(" ")" Expr
+// Func       = "def" Identifier "(" [ Params ] ")" Expr
 // Identifier = Letter { ( Letter | Digit ) }
 // Letter     = "a" .. "z" | "A" .. "Z"
+// Params     = Identifier { "," Identifier }
 //
 // Var = Identifier "=" Expr
 //

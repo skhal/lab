@@ -44,14 +44,15 @@ func ExampleCall_String() {
 
 func ExampleFunc_String() {
 	var n ast.Node = ast.Func{
-		Name: "demo",
+		Name:   "demo",
+		Params: []string{"a", "b"},
 		Body: []ast.Node{
 			ast.Number{Val: 1},
 		},
 	}
 	fmt.Println(n)
 	// Output:
-	// def demo()
+	// def demo(a, b)
 	//   1.0
 }
 

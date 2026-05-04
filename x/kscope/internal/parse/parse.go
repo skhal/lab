@@ -86,6 +86,20 @@ func (p *parser) parseFunc() (ast.Node, error) {
 	if tok, ok := p.r.Read(); !ok || tok.Kind != lex.TokLpar {
 		return nil, fmt.Errorf("func %s: missing args left parenthesis", ident.Val)
 	}
+	var params []string
+	for pnum := 1; ; pnum++ {
+		if tok, ok := p.r.Peek(); !ok || tok.Kind == lex.TokRpar {
+			break
+		}
+		par, ok := p.r.Read()
+		if !ok || par.Kind != lex.TokIdent {
+			return nil, fmt.Errorf("func %s: parse param %d: missing name", ident.Val, pnum)
+		}
+		params = append(params, par.Val)
+		if tok, ok := p.r.Peek(); ok && tok.Kind == lex.TokComma {
+			p.r.Read()
+		}
+	}
 	if tok, ok := p.r.Read(); !ok || tok.Kind != lex.TokRpar {
 		return nil, fmt.Errorf("func %s: missing args right parenthesis", ident.Val)
 	}
@@ -98,6 +112,9 @@ func (p *parser) parseFunc() (ast.Node, error) {
 		Body: []ast.Node{
 			body,
 		},
+	}
+	if len(params) != 0 {
+		n.Params = params
 	}
 	return n, nil
 }
@@ -152,7 +169,6 @@ func (p *parser) parseCall(ident lex.Token) (ast.Node, error) {
 		}
 		args = append(args, arg)
 		if tok, ok := p.r.Peek(); ok && tok.Kind == lex.TokComma {
-			// ignore comma
 			p.r.Read()
 		}
 	}
