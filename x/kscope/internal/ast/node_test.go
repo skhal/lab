@@ -54,3 +54,13 @@ func ExampleFunc_String() {
 	// def demo()
 	//   1.0
 }
+
+func ExampleVar_String() {
+	var n ast.Node = ast.Var{
+		Name: "demo",
+		Val:  ast.Number{Val: 1},
+	}
+	fmt.Println(n)
+	// Output:
+	// var demo = 1.0
+}

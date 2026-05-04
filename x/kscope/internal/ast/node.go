@@ -85,3 +85,14 @@ func (c Call) String() string {
 	fmt.Fprint(&s, ")")
 	return s.String()
 }
+
+// Var is a variable definition, e.g. "var name = 1 + 3".
+type Var struct {
+	Val  Node   // value expression
+	Name string // variable name
+}
+
+// String prints the variable.
+func (v Var) String() string {
+	return fmt.Sprintf("var %s = %s", v.Name, v.Val)
+}

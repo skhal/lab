@@ -463,6 +463,47 @@ func TestParser_func(t *testing.T) {
 	testParser_Parse(t, tests)
 }
 
+func TestParser_var(t *testing.T) {
+	tests := []testCase{
+		{
+			name: "number",
+			text: "var x = 1",
+			want: ast.Var{
+				Name: "x",
+				Val:  ast.Number{Val: 1},
+			},
+		},
+		{
+			name:    "no identifier",
+			text:    "var = 1",
+			wantErr: parse.ErrParse,
+		},
+		{
+			name:    "no assignment",
+			text:    "var x 1",
+			wantErr: parse.ErrParse,
+		},
+		{
+			name:    "no value",
+			text:    "var x =",
+			wantErr: parse.ErrParse,
+		},
+		{
+			name: "binary expression",
+			text: "var x = 1 + 2",
+			want: ast.Var{
+				Name: "x",
+				Val: ast.BinExpr{
+					Op:    ast.BinOpPlus,
+					Left:  ast.Number{Val: 1},
+					Right: ast.Number{Val: 2},
+				},
+			},
+		},
+	}
+	testParser_Parse(t, tests)
+}
+
 func testParser_Parse(t *testing.T, tests []testCase) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {

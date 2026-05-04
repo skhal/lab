@@ -60,13 +60,19 @@ func (p *parser) Parse() (ast.Node, error) {
 }
 
 func (p *parser) parse() (ast.Node, error) {
-	switch tok, ok := p.r.Peek(); {
-	case !ok:
+	tok, ok := p.r.Peek()
+	if !ok {
 		// end of stream
 		return nil, nil
-	case tok.Kind == lex.TokDef:
-		return p.parseFunc()
 	}
+	// keep-sorted start skip_lines=1,-1
+	switch tok.Kind {
+	case lex.TokDef:
+		return p.parseFunc()
+	case lex.TokVar:
+		return p.parseVar()
+	}
+	// keep-sorted end
 	return p.parseExpression()
 }
 
@@ -212,4 +218,21 @@ func parseNumber(tok lex.Token) (ast.Node, error) {
 		return nil, fmt.Errorf("failed to parse number - %s", tok)
 	}
 	return ast.Number{Val: v}, nil
+}
+
+func (p *parser) parseVar() (ast.Node, error) {
+	p.r.Read() // skip TokVar
+	ident, ok := p.r.Read()
+	if !ok || ident.Kind != lex.TokIdent {
+		return nil, fmt.Errorf("missing variable identifier")
+	}
+	if tok, ok := p.r.Read(); !ok || tok.Kind != lex.TokAssign {
+		return nil, fmt.Errorf("var %s: missing assignment", ident.Val)
+	}
+	val, err := p.parseExpression()
+	if err != nil {
+		return nil, fmt.Errorf("var %s: parse value: %s", ident.Val, err)
+	}
+	n := ast.Var{Name: ident.Val, Val: val}
+	return n, nil
 }

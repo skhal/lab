@@ -28,6 +28,7 @@ const (
 	_ TokenKind = iota
 
 	// keep-sorted start
+	TokAssign  // assign
 	TokComma   // comma
 	TokComment // comment
 	TokDef     // definition
@@ -40,6 +41,7 @@ const (
 	TokNum     // number
 	TokPlus    // plus
 	TokRpar    // right-parenthesis
+	TokVar     // variable
 	// keep-sorted end
 )
 

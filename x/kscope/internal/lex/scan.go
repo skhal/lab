@@ -20,6 +20,7 @@ const (
 	runeDiv   = '/'
 	runeDot   = '.'
 	runeEOL   = '\n'
+	runeEq    = '='
 	runeHash  = '#'
 	runeLpar  = '('
 	runeMinus = '-'
@@ -43,6 +44,7 @@ func init() {
 		// keep-sorted start
 		runeComma: genCharScanner(TokComma),
 		runeDiv:   genCharScanner(TokDiv),
+		runeEq:    genCharScanner(TokAssign),
 		runeHash:  scanComment,
 		runeLpar:  genCharScanner(TokLpar),
 		runeMinus: genCharScanner(TokMinus),
@@ -91,6 +93,7 @@ func genCharScanner(tok TokenKind) scanFunc {
 var commands = map[string]TokenKind{
 	"def":    TokDef,
 	"extern": TokExtern,
+	"var":    TokVar,
 }
 
 // scanIdentifier scans an identifier.

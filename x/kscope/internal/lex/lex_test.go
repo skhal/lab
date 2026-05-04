@@ -28,7 +28,7 @@ func TestLex(t *testing.T) {
 		},
 		{
 			name:    "invalid token",
-			s:       "%",
+			s:       "%", // pick any unused token character
 			wantErr: lex.ErrScan,
 		},
 		{
@@ -50,6 +50,13 @@ func TestLex(t *testing.T) {
 			s:    ",",
 			want: []lex.Token{
 				{Kind: lex.TokComma, Val: ",", Pos: lex.Position{0, 1}},
+			},
+		},
+		{
+			name: "assign",
+			s:    "=",
+			want: []lex.Token{
+				{Kind: lex.TokAssign, Val: "=", Pos: lex.Position{0, 1}},
 			},
 		},
 	}
@@ -240,6 +247,13 @@ func TestLex_commands(t *testing.T) {
 			s:    "extern",
 			want: []lex.Token{
 				{Kind: lex.TokExtern, Val: "extern", Pos: lex.Position{0, 6}},
+			},
+		},
+		{
+			name: "var",
+			s:    "var",
+			want: []lex.Token{
+				{Kind: lex.TokVar, Val: "var", Pos: lex.Position{0, 3}},
 			},
 		},
 	}
