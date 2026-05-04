@@ -331,6 +331,88 @@ func TestParser_binop(t *testing.T) {
 	testParser_Parse(t, tests)
 }
 
+func TestParser_call(t *testing.T) {
+	tests := []testCase{
+		{
+			name: "no args",
+			text: "test()",
+			want: ast.Call{
+				Name: "test",
+			},
+		},
+		{
+			name:    "no right parenthesis",
+			text:    "test(",
+			wantErr: parse.ErrParse,
+		},
+		{
+			name: "one arg",
+			text: "test(1)",
+			want: ast.Call{
+				Name: "test",
+				Args: []ast.Node{
+					ast.Number{Val: 1},
+				},
+			},
+		},
+		{
+			name:    "one arg no right parenthesis",
+			text:    "test(1",
+			wantErr: parse.ErrParse,
+		},
+		{
+			name: "one arg expression",
+			text: "test(1 + 2)",
+			want: ast.Call{
+				Name: "test",
+				Args: []ast.Node{
+					ast.BinExpr{
+						Op:    ast.BinOpPlus,
+						Left:  ast.Number{Val: 1},
+						Right: ast.Number{Val: 2},
+					},
+				},
+			},
+		},
+		{
+			name: "two args",
+			text: "test(1, 2)",
+			want: ast.Call{
+				Name: "test",
+				Args: []ast.Node{
+					ast.Number{Val: 1},
+					ast.Number{Val: 2},
+				},
+			},
+		},
+		{
+			name:    "two args no right parenthesis",
+			text:    "test(1, 2",
+			wantErr: parse.ErrParse,
+		},
+		{
+			name: "two arg expressions",
+			text: "test(1 + 2, 3 * 4)",
+			want: ast.Call{
+				Name: "test",
+				Args: []ast.Node{
+					ast.BinExpr{
+						Op:    ast.BinOpPlus,
+						Left:  ast.Number{Val: 1},
+						Right: ast.Number{Val: 2},
+					},
+					ast.BinExpr{
+						Op:    ast.BinOpMul,
+						Left:  ast.Number{Val: 3},
+						Right: ast.Number{Val: 4},
+					},
+				},
+			},
+		},
+	}
+	testParser_Parse(t, tests)
+}
+
 func testParser_Parse(t *testing.T, tests []testCase) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {

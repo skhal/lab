@@ -29,14 +29,17 @@ const (
 
 	// keep-sorted start
 	TokComm  // comment
+	TokComma // comma
 	TokDef   // definition
 	TokDiv   // divide
 	TokExt   // extern
 	TokIdent // identifier
+	TokLpar  // left-parenthesis
 	TokMinus // minus
 	TokMul   // multiply
 	TokNum   // number
 	TokPlus  // plus
+	TokRpar  // right-parenthesis
 	// keep-sorted end
 )
 

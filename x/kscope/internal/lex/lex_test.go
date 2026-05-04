@@ -31,6 +31,27 @@ func TestLex(t *testing.T) {
 			s:       "%",
 			wantErr: lex.ErrScan,
 		},
+		{
+			name: "left parenthesis",
+			s:    "(",
+			want: []lex.Token{
+				{Kind: lex.TokLpar, Val: "(", Pos: lex.Position{0, 1}},
+			},
+		},
+		{
+			name: "right parenthesis",
+			s:    ")",
+			want: []lex.Token{
+				{Kind: lex.TokRpar, Val: ")", Pos: lex.Position{0, 1}},
+			},
+		},
+		{
+			name: "comma",
+			s:    ",",
+			want: []lex.Token{
+				{Kind: lex.TokComma, Val: ",", Pos: lex.Position{0, 1}},
+			},
+		},
 	}
 	testLex(t, tests)
 }

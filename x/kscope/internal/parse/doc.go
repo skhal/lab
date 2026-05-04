@@ -12,9 +12,13 @@
 //
 // Expr = Operand | BinExpr
 //
-// Operand = Number
+// Operand = Number | Call
+//
 // BinExpr = Expr Op Expr
 // Op      = AddOp | MulOp
 // AddOp   = "+" | "-"
 // MulOp   = "*" | "/"
+//
+// Call = Ident "(" [ Args ] ")"
+// Args = Expr { "," Expr }
 package parse

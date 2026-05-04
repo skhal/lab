@@ -5,7 +5,10 @@
 
 package ast
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 // Node is any AST node.
 type Node any
@@ -44,4 +47,24 @@ const (
 // String prints binary expression.
 func (expr BinExpr) String() string {
 	return fmt.Sprintf("%s %v %s", expr.Left, expr.Op, expr.Right)
+}
+
+// Call is a function call.
+type Call struct {
+	Name string // function name
+	Args []Node // arguments
+}
+
+// String prints a function call.
+func (c Call) String() string {
+	var s strings.Builder
+	fmt.Fprintf(&s, "%s(", c.Name)
+	for i, arg := range c.Args {
+		if i > 0 {
+			fmt.Fprint(&s, ", ")
+		}
+		fmt.Fprint(&s, arg)
+	}
+	fmt.Fprint(&s, ")")
+	return s.String()
 }

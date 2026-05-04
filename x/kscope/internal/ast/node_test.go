@@ -28,3 +28,16 @@ func ExampleBinExpr_String() {
 	// Output:
 	// 1.0 + 2.0
 }
+
+func ExampleCall_String() {
+	var n ast.Node = ast.Call{
+		Name: "demo",
+		Args: []ast.Node{
+			ast.Number{Val: 1},
+			ast.Number{Val: 2},
+		},
+	}
+	fmt.Println(n)
+	// Output:
+	// demo(1.0, 2.0)
+}

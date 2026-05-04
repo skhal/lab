@@ -81,7 +81,7 @@ func (p *parser) parseExpression() (ast.Node, error) {
 	case lex.TokPlus, lex.TokMinus, lex.TokMul, lex.TokDiv:
 		return p.parseBinExpr(lhs)
 	}
-	return nil, fmt.Errorf("unsupported token %s", tok)
+	return lhs, nil
 }
 
 func (p *parser) parseOperand() (ast.Node, error) {
@@ -90,10 +90,45 @@ func (p *parser) parseOperand() (ast.Node, error) {
 		return nil, fmt.Errorf("missing expression")
 	}
 	switch tok.Kind {
+	case lex.TokIdent:
+		if next, ok := p.r.Peek(); !ok || next.Kind != lex.TokLpar {
+			break
+		}
+		return p.parseCall(tok)
 	case lex.TokNum:
 		return parseNumber(tok)
 	}
 	return nil, fmt.Errorf("unsupported token %s", tok)
+}
+
+func (p *parser) parseCall(ident lex.Token) (ast.Node, error) {
+	// left parenthesis
+	if _, ok := p.r.Read(); !ok {
+		return nil, fmt.Errorf("call %s: missing left parenthesis", ident.Val)
+	}
+	var args []ast.Node
+	for {
+		if tok, ok := p.r.Peek(); !ok || tok.Kind == lex.TokRpar {
+			break
+		}
+		arg, err := p.parseExpression()
+		if err != nil {
+			return nil, fmt.Errorf("call %s: %s", ident.Val, err)
+		}
+		args = append(args, arg)
+		if tok, ok := p.r.Peek(); ok && tok.Kind == lex.TokComma {
+			// ignore comma
+			p.r.Read()
+		}
+	}
+	if tok, ok := p.r.Read(); !ok || tok.Kind != lex.TokRpar {
+		return nil, fmt.Errorf("call %s: missing right parenthesis", ident.Val)
+	}
+	n := ast.Call{
+		Name: ident.Val,
+		Args: args,
+	}
+	return n, nil
 }
 
 var binOps = map[lex.TokenKind]ast.BinOp{

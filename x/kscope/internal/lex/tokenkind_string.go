@@ -9,19 +9,22 @@ func _() {
 	// Re-run the stringer command to generate them again.
 	var x [1]struct{}
 	_ = x[TokComm-1]
-	_ = x[TokDef-2]
-	_ = x[TokDiv-3]
-	_ = x[TokExt-4]
-	_ = x[TokIdent-5]
-	_ = x[TokMinus-6]
-	_ = x[TokMul-7]
-	_ = x[TokNum-8]
-	_ = x[TokPlus-9]
+	_ = x[TokComma-2]
+	_ = x[TokDef-3]
+	_ = x[TokDiv-4]
+	_ = x[TokExt-5]
+	_ = x[TokIdent-6]
+	_ = x[TokLpar-7]
+	_ = x[TokMinus-8]
+	_ = x[TokMul-9]
+	_ = x[TokNum-10]
+	_ = x[TokPlus-11]
+	_ = x[TokRpar-12]
 }
 
-const _TokenKind_name = "commentdefinitiondivideexternidentifierminusmultiplynumberplus"
+const _TokenKind_name = "commentcommadefinitiondivideexternidentifierleft-parenthesisminusmultiplynumberplusright-parenthesis"
 
-var _TokenKind_index = [...]uint8{0, 7, 17, 23, 29, 39, 44, 52, 58, 62}
+var _TokenKind_index = [...]uint8{0, 7, 12, 22, 28, 34, 44, 60, 65, 73, 79, 83, 100}
 
 func (i TokenKind) String() string {
 	idx := int(i) - 1
