@@ -60,11 +60,40 @@ func (p *parser) Parse() (ast.Node, error) {
 }
 
 func (p *parser) parse() (ast.Node, error) {
-	if _, ok := p.r.Peek(); !ok {
+	switch tok, ok := p.r.Peek(); {
+	case !ok:
 		// end of stream
 		return nil, nil
+	case tok.Kind == lex.TokDef:
+		return p.parseFunc()
 	}
 	return p.parseExpression()
+}
+
+// parseFunc parses a function definition.
+func (p *parser) parseFunc() (ast.Node, error) {
+	p.r.Read() // skip TokDef
+	ident, ok := p.r.Read()
+	if !ok || ident.Kind != lex.TokIdent {
+		return nil, fmt.Errorf("missing function identifier")
+	}
+	if tok, ok := p.r.Read(); !ok || tok.Kind != lex.TokLpar {
+		return nil, fmt.Errorf("func %s: missing args left parenthesis", ident.Val)
+	}
+	if tok, ok := p.r.Read(); !ok || tok.Kind != lex.TokRpar {
+		return nil, fmt.Errorf("func %s: missing args right parenthesis", ident.Val)
+	}
+	body, err := p.parseExpression()
+	if err != nil {
+		return nil, fmt.Errorf("func %s: parse body: %s", ident.Val, err)
+	}
+	n := ast.Func{
+		Name: ident.Val,
+		Body: []ast.Node{
+			body,
+		},
+	}
+	return n, nil
 }
 
 // parseExpression parses an expression.

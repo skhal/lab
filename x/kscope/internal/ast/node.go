@@ -13,6 +13,23 @@ import (
 // Node is any AST node.
 type Node any
 
+// Func is a function definition. It consists of a name and a body, represented
+// by a set of statements.
+type Func struct {
+	Name string // function name
+	Body []Node // function body
+}
+
+// String prints the function.
+func (f Func) String() string {
+	var s strings.Builder
+	fmt.Fprintf(&s, "def %s()\n", f.Name)
+	for _, n := range f.Body {
+		fmt.Fprintf(&s, "  %s\n", n)
+	}
+	return s.String()
+}
+
 // Number is a number literal node.
 type Number struct {
 	Val float64 // parsed value of the number.

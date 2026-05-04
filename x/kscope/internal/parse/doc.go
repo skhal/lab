@@ -8,7 +8,11 @@
 //
 // # Context Free Grammar
 //
-// Statement = Expr
+// Goal = Expr | Func
+//
+// Func       = "def" Identifier "(" ")" Expr
+// Identifier = Letter { ( Letter | Digit ) }
+// Letter     = "a" .. "z" | "A" .. "Z"
 //
 // Expr = Operand | BinExpr
 //

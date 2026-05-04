@@ -413,6 +413,56 @@ func TestParser_call(t *testing.T) {
 	testParser_Parse(t, tests)
 }
 
+func TestParser_func(t *testing.T) {
+	tests := []testCase{
+		{
+			name: "body is a number",
+			text: "def test() 1",
+			want: ast.Func{
+				Name: "test",
+				Body: []ast.Node{
+					ast.Number{Val: 1},
+				},
+			},
+		},
+		{
+			name:    "no identifier",
+			text:    "def () 1",
+			wantErr: parse.ErrParse,
+		},
+		{
+			name:    "no left parenthesis",
+			text:    "def test) 1",
+			wantErr: parse.ErrParse,
+		},
+		{
+			name:    "no right parenthesis",
+			text:    "def test( 1",
+			wantErr: parse.ErrParse,
+		},
+		{
+			name:    "no body",
+			text:    "def test()",
+			wantErr: parse.ErrParse,
+		},
+		{
+			name: "body is a binary expression",
+			text: "def test() 1 + 2",
+			want: ast.Func{
+				Name: "test",
+				Body: []ast.Node{
+					ast.BinExpr{
+						Op:    ast.BinOpPlus,
+						Left:  ast.Number{Val: 1},
+						Right: ast.Number{Val: 2},
+					},
+				},
+			},
+		},
+	}
+	testParser_Parse(t, tests)
+}
+
 func testParser_Parse(t *testing.T, tests []testCase) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {

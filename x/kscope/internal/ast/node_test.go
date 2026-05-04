@@ -41,3 +41,16 @@ func ExampleCall_String() {
 	// Output:
 	// demo(1.0, 2.0)
 }
+
+func ExampleFunc_String() {
+	var n ast.Node = ast.Func{
+		Name: "demo",
+		Body: []ast.Node{
+			ast.Number{Val: 1},
+		},
+	}
+	fmt.Println(n)
+	// Output:
+	// def demo()
+	//   1.0
+}
