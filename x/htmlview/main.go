@@ -40,7 +40,10 @@ var addr = flag.String("http", ":8080", "http server address")
 func init() {
 	flag.Usage = func() {
 		w := flag.CommandLine.Output()
-		fmt.Fprintf(w, "%s file", filepath.Base(os.Args[0]))
+		fmt.Fprintf(w, "%s file\n", filepath.Base(os.Args[0]))
+		fmt.Fprintln(w)
+		fmt.Fprintln(w, "flags:")
+		flag.PrintDefaults()
 	}
 }
 
