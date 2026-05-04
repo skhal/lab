@@ -412,11 +412,14 @@ function LocationList.highlight(bufnr)
 			syn match		qfSub			/^\s\+\w \l\w*$/
 			syn match		qfSubExp	/^\s\+\w \u\w*$/
 
-			hi def link qfTop	Comment
-			hi def link qfSub	Comment
+			hi def link qfUnexported NonText
+			hi def link qfExported Normal
 
-			hi def link qfTopExp Normal
-			hi def link qfSubExp Normal
+			hi def link qfTop	qfUnexported
+			hi def link qfSub	qfUnexported
+
+			hi def link qfTopExp qfExported
+			hi def link qfSubExp qfExported
 		]])
 	end)
 end
