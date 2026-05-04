@@ -21,7 +21,7 @@ import (
 const diffFloatFractionPcent = 0.001
 
 type testCase struct {
-	want    ast.Node
+	want    *ast.File
 	wantErr error
 	name    string
 	text    string
@@ -32,16 +32,6 @@ func TestParser_Parse(t *testing.T) {
 		{
 			name: "empty",
 		},
-		{
-			name: "number",
-			text: "12.3",
-			want: ast.Number{Val: 12.3},
-		},
-		{
-			name: "identifier",
-			text: "x",
-			want: ast.Ident{Name: "x"},
-		},
 	}
 	testParser_Parse(t, tests)
 }
@@ -50,327 +40,370 @@ func TestParser_expr(t *testing.T) {
 	tests := []testCase{
 		{
 			name: "plus",
-			text: "1 + 2",
-			want: ast.BinExpr{
-				Op:    ast.BinOpPlus,
-				Left:  ast.Number{Val: 1},
-				Right: ast.Number{Val: 2},
-			},
+			text: "var x = 1 + 2",
+			want: newASTFile(t, ast.Var{
+				Name: "x",
+				Val: ast.BinExpr{
+					Op:    ast.BinOpPlus,
+					Left:  ast.Number{Val: 1},
+					Right: ast.Number{Val: 2},
+				},
+			}),
 		},
 		{
 			name:    "plus misses left operand",
-			text:    "+ 2",
+			text:    "var x = + 2",
 			wantErr: parse.ErrParse,
 		},
 		{
 			name:    "plus misses right operand",
-			text:    "1 +",
+			text:    "var x = 1 +",
 			wantErr: parse.ErrParse,
 		},
 		{
 			name: "minus",
-			text: "1 - 2",
-			want: ast.BinExpr{
-				Op:    ast.BinOpMinus,
-				Left:  ast.Number{Val: 1},
-				Right: ast.Number{Val: 2},
-			},
-		},
-		{
-			name:    "minus misses left operand",
-			text:    "- 2",
-			wantErr: parse.ErrParse,
-		},
-		{
-			name:    "minus misses right operand",
-			text:    "1 -",
-			wantErr: parse.ErrParse,
+			text: "var x = 1 - 2",
+			want: newASTFile(t, ast.Var{
+				Name: "x",
+				Val: ast.BinExpr{
+					Op:    ast.BinOpMinus,
+					Left:  ast.Number{Val: 1},
+					Right: ast.Number{Val: 2},
+				},
+			}),
 		},
 		{
 			name: "multiply",
-			text: "1 * 2",
-			want: ast.BinExpr{
-				Op:    ast.BinOpMul,
-				Left:  ast.Number{Val: 1},
-				Right: ast.Number{Val: 2},
-			},
-		},
-		{
-			name:    "multiply misses left operand",
-			text:    "* 2",
-			wantErr: parse.ErrParse,
-		},
-		{
-			name:    "multiply misses right operand",
-			text:    "1 *",
-			wantErr: parse.ErrParse,
+			text: "var x = 1 * 2",
+			want: newASTFile(t, ast.Var{
+				Name: "x",
+				Val: ast.BinExpr{
+					Op:    ast.BinOpMul,
+					Left:  ast.Number{Val: 1},
+					Right: ast.Number{Val: 2},
+				},
+			}),
 		},
 		{
 			name: "divide",
-			text: "1 / 2",
-			want: ast.BinExpr{
-				Op:    ast.BinOpDiv,
-				Left:  ast.Number{Val: 1},
-				Right: ast.Number{Val: 2},
-			},
+			text: "var x = 1 / 2",
+			want: newASTFile(t, ast.Var{
+				Name: "x",
+				Val: ast.BinExpr{
+					Op:    ast.BinOpDiv,
+					Left:  ast.Number{Val: 1},
+					Right: ast.Number{Val: 2},
+				},
+			}),
 		},
-		{
-			name:    "divide misses left operand",
-			text:    "/ 2",
-			wantErr: parse.ErrParse,
-		},
-		{
-			name:    "divide misses right operand",
-			text:    "1 /",
-			wantErr: parse.ErrParse,
-		},
+		// same order
 		{
 			name: "plus and plus",
-			text: "1 + 2 + 3",
-			want: ast.BinExpr{
-				Op:   ast.BinOpPlus,
-				Left: ast.Number{Val: 1},
-				Right: ast.BinExpr{
-					Op:    ast.BinOpPlus,
-					Left:  ast.Number{Val: 2},
-					Right: ast.Number{Val: 3},
+			text: "var x = 1 + 2 + 3",
+			want: newASTFile(t, ast.Var{
+				Name: "x",
+				Val: ast.BinExpr{
+					Op:   ast.BinOpPlus,
+					Left: ast.Number{Val: 1},
+					Right: ast.BinExpr{
+						Op:    ast.BinOpPlus,
+						Left:  ast.Number{Val: 2},
+						Right: ast.Number{Val: 3},
+					},
 				},
-			},
+			}),
 		},
 		{
 			name: "plus and minus",
-			text: "1 + 2 - 3",
-			want: ast.BinExpr{
-				Op:   ast.BinOpPlus,
-				Left: ast.Number{Val: 1},
-				Right: ast.BinExpr{
-					Op:    ast.BinOpMinus,
-					Left:  ast.Number{Val: 2},
-					Right: ast.Number{Val: 3},
+			text: "var x = 1 + 2 - 3",
+			want: newASTFile(t, ast.Var{
+				Name: "x",
+				Val: ast.BinExpr{
+					Op:   ast.BinOpPlus,
+					Left: ast.Number{Val: 1},
+					Right: ast.BinExpr{
+						Op:    ast.BinOpMinus,
+						Left:  ast.Number{Val: 2},
+						Right: ast.Number{Val: 3},
+					},
 				},
-			},
+			}),
 		},
 		{
 			name: "plus and multiply",
-			text: "1 + 2 * 3",
-			want: ast.BinExpr{
-				Op:   ast.BinOpPlus,
-				Left: ast.Number{Val: 1},
-				Right: ast.BinExpr{
-					Op:    ast.BinOpMul,
-					Left:  ast.Number{Val: 2},
-					Right: ast.Number{Val: 3},
+			text: "var x = 1 + 2 * 3",
+			want: newASTFile(t, ast.Var{
+				Name: "x",
+				Val: ast.BinExpr{
+					Op:   ast.BinOpPlus,
+					Left: ast.Number{Val: 1},
+					Right: ast.BinExpr{
+						Op:    ast.BinOpMul,
+						Left:  ast.Number{Val: 2},
+						Right: ast.Number{Val: 3},
+					},
 				},
-			},
+			}),
 		},
 		{
 			name: "plus and divide",
-			text: "1 + 2 / 3",
-			want: ast.BinExpr{
-				Op:   ast.BinOpPlus,
-				Left: ast.Number{Val: 1},
-				Right: ast.BinExpr{
-					Op:    ast.BinOpDiv,
-					Left:  ast.Number{Val: 2},
-					Right: ast.Number{Val: 3},
+			text: "var x = 1 + 2 / 3",
+			want: newASTFile(t, ast.Var{
+				Name: "x",
+				Val: ast.BinExpr{
+					Op:   ast.BinOpPlus,
+					Left: ast.Number{Val: 1},
+					Right: ast.BinExpr{
+						Op:    ast.BinOpDiv,
+						Left:  ast.Number{Val: 2},
+						Right: ast.Number{Val: 3},
+					},
 				},
-			},
+			}),
 		},
 		{
 			name: "minus and plus",
-			text: "1 - 2 + 3",
-			want: ast.BinExpr{
-				Op:   ast.BinOpMinus,
-				Left: ast.Number{Val: 1},
-				Right: ast.BinExpr{
-					Op:    ast.BinOpPlus,
-					Left:  ast.Number{Val: 2},
-					Right: ast.Number{Val: 3},
+			text: "var x = 1 - 2 + 3",
+			want: newASTFile(t, ast.Var{
+				Name: "x",
+				Val: ast.BinExpr{
+					Op:   ast.BinOpMinus,
+					Left: ast.Number{Val: 1},
+					Right: ast.BinExpr{
+						Op:    ast.BinOpPlus,
+						Left:  ast.Number{Val: 2},
+						Right: ast.Number{Val: 3},
+					},
 				},
-			},
+			}),
 		},
 		{
 			name: "minus and minus",
-			text: "1 - 2 - 3",
-			want: ast.BinExpr{
-				Op:   ast.BinOpMinus,
-				Left: ast.Number{Val: 1},
-				Right: ast.BinExpr{
-					Op:    ast.BinOpMinus,
-					Left:  ast.Number{Val: 2},
-					Right: ast.Number{Val: 3},
+			text: "var x = 1 - 2 - 3",
+			want: newASTFile(t, ast.Var{
+				Name: "x",
+				Val: ast.BinExpr{
+					Op:   ast.BinOpMinus,
+					Left: ast.Number{Val: 1},
+					Right: ast.BinExpr{
+						Op:    ast.BinOpMinus,
+						Left:  ast.Number{Val: 2},
+						Right: ast.Number{Val: 3},
+					},
 				},
-			},
+			}),
 		},
 		{
 			name: "minus and multiply",
-			text: "1 - 2 * 3",
-			want: ast.BinExpr{
-				Op:   ast.BinOpMinus,
-				Left: ast.Number{Val: 1},
-				Right: ast.BinExpr{
-					Op:    ast.BinOpMul,
-					Left:  ast.Number{Val: 2},
-					Right: ast.Number{Val: 3},
+			text: "var x = 1 - 2 * 3",
+			want: newASTFile(t, ast.Var{
+				Name: "x",
+				Val: ast.BinExpr{
+					Op:   ast.BinOpMinus,
+					Left: ast.Number{Val: 1},
+					Right: ast.BinExpr{
+						Op:    ast.BinOpMul,
+						Left:  ast.Number{Val: 2},
+						Right: ast.Number{Val: 3},
+					},
 				},
-			},
+			}),
 		},
 		{
 			name: "minus and divide",
-			text: "1 - 2 / 3",
-			want: ast.BinExpr{
-				Op:   ast.BinOpMinus,
-				Left: ast.Number{Val: 1},
-				Right: ast.BinExpr{
-					Op:    ast.BinOpDiv,
-					Left:  ast.Number{Val: 2},
-					Right: ast.Number{Val: 3},
+			text: "var x = 1 - 2 / 3",
+			want: newASTFile(t, ast.Var{
+				Name: "x",
+				Val: ast.BinExpr{
+					Op:   ast.BinOpMinus,
+					Left: ast.Number{Val: 1},
+					Right: ast.BinExpr{
+						Op:    ast.BinOpDiv,
+						Left:  ast.Number{Val: 2},
+						Right: ast.Number{Val: 3},
+					},
 				},
-			},
+			}),
 		},
 		{
 			name: "multiply and plus",
-			text: "1 * 2 + 3",
-			want: ast.BinExpr{
-				Op: ast.BinOpPlus,
-				Left: ast.BinExpr{
-					Op:    ast.BinOpMul,
-					Left:  ast.Number{Val: 1},
-					Right: ast.Number{Val: 2},
+			text: "var x = 1 * 2 + 3",
+			want: newASTFile(t, ast.Var{
+				Name: "x",
+				Val: ast.BinExpr{
+					Op: ast.BinOpPlus,
+					Left: ast.BinExpr{
+						Op:    ast.BinOpMul,
+						Left:  ast.Number{Val: 1},
+						Right: ast.Number{Val: 2},
+					},
+					Right: ast.Number{Val: 3},
 				},
-				Right: ast.Number{Val: 3},
-			},
+			}),
 		},
 		{
 			name: "multiply and minus",
-			text: "1 * 2 - 3",
-			want: ast.BinExpr{
-				Op: ast.BinOpMinus,
-				Left: ast.BinExpr{
-					Op:    ast.BinOpMul,
-					Left:  ast.Number{Val: 1},
-					Right: ast.Number{Val: 2},
+			text: "var x = 1 * 2 - 3",
+			want: newASTFile(t, ast.Var{
+				Name: "x",
+				Val: ast.BinExpr{
+					Op: ast.BinOpMinus,
+					Left: ast.BinExpr{
+						Op:    ast.BinOpMul,
+						Left:  ast.Number{Val: 1},
+						Right: ast.Number{Val: 2},
+					},
+					Right: ast.Number{Val: 3},
 				},
-				Right: ast.Number{Val: 3},
-			},
+			}),
 		},
 		{
 			name: "multiply and multiply",
-			text: "1 * 2 * 3",
-			want: ast.BinExpr{
-				Op: ast.BinOpMul,
-				Left: ast.BinExpr{
-					Op:    ast.BinOpMul,
-					Left:  ast.Number{Val: 1},
-					Right: ast.Number{Val: 2},
+			text: "var x = 1 * 2 * 3",
+			want: newASTFile(t, ast.Var{
+				Name: "x",
+				Val: ast.BinExpr{
+					Op: ast.BinOpMul,
+					Left: ast.BinExpr{
+						Op:    ast.BinOpMul,
+						Left:  ast.Number{Val: 1},
+						Right: ast.Number{Val: 2},
+					},
+					Right: ast.Number{Val: 3},
 				},
-				Right: ast.Number{Val: 3},
-			},
+			}),
 		},
 		{
 			name: "multiply and divide",
-			text: "1 * 2 / 3",
-			want: ast.BinExpr{
-				Op: ast.BinOpDiv,
-				Left: ast.BinExpr{
-					Op:    ast.BinOpMul,
-					Left:  ast.Number{Val: 1},
-					Right: ast.Number{Val: 2},
+			text: "var x = 1 * 2 / 3",
+			want: newASTFile(t, ast.Var{
+				Name: "x",
+				Val: ast.BinExpr{
+					Op: ast.BinOpDiv,
+					Left: ast.BinExpr{
+						Op:    ast.BinOpMul,
+						Left:  ast.Number{Val: 1},
+						Right: ast.Number{Val: 2},
+					},
+					Right: ast.Number{Val: 3},
 				},
-				Right: ast.Number{Val: 3},
-			},
+			}),
 		},
 		{
 			name: "divide and plus",
-			text: "1 / 2 + 3",
-			want: ast.BinExpr{
-				Op: ast.BinOpPlus,
-				Left: ast.BinExpr{
-					Op:    ast.BinOpDiv,
-					Left:  ast.Number{Val: 1},
-					Right: ast.Number{Val: 2},
+			text: "var x = 1 / 2 + 3",
+			want: newASTFile(t, ast.Var{
+				Name: "x",
+				Val: ast.BinExpr{
+					Op: ast.BinOpPlus,
+					Left: ast.BinExpr{
+						Op:    ast.BinOpDiv,
+						Left:  ast.Number{Val: 1},
+						Right: ast.Number{Val: 2},
+					},
+					Right: ast.Number{Val: 3},
 				},
-				Right: ast.Number{Val: 3},
-			},
+			}),
 		},
 		{
 			name: "divide and minus",
-			text: "1 / 2 - 3",
-			want: ast.BinExpr{
-				Op: ast.BinOpMinus,
-				Left: ast.BinExpr{
-					Op:    ast.BinOpDiv,
-					Left:  ast.Number{Val: 1},
-					Right: ast.Number{Val: 2},
+			text: "var x = 1 / 2 - 3",
+			want: newASTFile(t, ast.Var{
+				Name: "x",
+				Val: ast.BinExpr{
+					Op: ast.BinOpMinus,
+					Left: ast.BinExpr{
+						Op:    ast.BinOpDiv,
+						Left:  ast.Number{Val: 1},
+						Right: ast.Number{Val: 2},
+					},
+					Right: ast.Number{Val: 3},
 				},
-				Right: ast.Number{Val: 3},
-			},
+			}),
 		},
 		{
 			name: "divide and multiply",
-			text: "1 / 2 * 3",
-			want: ast.BinExpr{
-				Op: ast.BinOpMul,
-				Left: ast.BinExpr{
-					Op:    ast.BinOpDiv,
-					Left:  ast.Number{Val: 1},
-					Right: ast.Number{Val: 2},
+			text: "var x = 1 / 2 * 3",
+			want: newASTFile(t, ast.Var{
+				Name: "x",
+				Val: ast.BinExpr{
+					Op: ast.BinOpMul,
+					Left: ast.BinExpr{
+						Op:    ast.BinOpDiv,
+						Left:  ast.Number{Val: 1},
+						Right: ast.Number{Val: 2},
+					},
+					Right: ast.Number{Val: 3},
 				},
-				Right: ast.Number{Val: 3},
-			},
+			}),
 		},
 		{
 			name: "divide and divide",
-			text: "1 / 2 / 3",
-			want: ast.BinExpr{
-				Op: ast.BinOpDiv,
-				Left: ast.BinExpr{
-					Op:    ast.BinOpDiv,
-					Left:  ast.Number{Val: 1},
-					Right: ast.Number{Val: 2},
+			text: "var x = 1 / 2 / 3",
+			want: newASTFile(t, ast.Var{
+				Name: "x",
+				Val: ast.BinExpr{
+					Op: ast.BinOpDiv,
+					Left: ast.BinExpr{
+						Op:    ast.BinOpDiv,
+						Left:  ast.Number{Val: 1},
+						Right: ast.Number{Val: 2},
+					},
+					Right: ast.Number{Val: 3},
 				},
-				Right: ast.Number{Val: 3},
-			},
+			}),
 		},
 		{
 			name: "group plus",
-			text: "(1 + 2)",
-			want: ast.BinExpr{
-				Op:    ast.BinOpPlus,
-				Left:  ast.Number{Val: 1},
-				Right: ast.Number{Val: 2},
-			},
+			text: "var x = (1 + 2)",
+			want: newASTFile(t, ast.Var{
+				Name: "x",
+				Val: ast.BinExpr{
+					Op:    ast.BinOpPlus,
+					Left:  ast.Number{Val: 1},
+					Right: ast.Number{Val: 2},
+				},
+			}),
 		},
 		{
 			name: "group prioritizes",
-			text: "1 * (2 + 3)",
-			want: ast.BinExpr{
-				Op:   ast.BinOpMul,
-				Left: ast.Number{Val: 1},
-				Right: ast.BinExpr{
-					Op:    ast.BinOpPlus,
-					Left:  ast.Number{Val: 2},
-					Right: ast.Number{Val: 3},
+			text: "var x = 1 * (2 + 3)",
+			want: newASTFile(t, ast.Var{
+				Name: "x",
+				Val: ast.BinExpr{
+					Op:   ast.BinOpMul,
+					Left: ast.Number{Val: 1},
+					Right: ast.BinExpr{
+						Op:    ast.BinOpPlus,
+						Left:  ast.Number{Val: 2},
+						Right: ast.Number{Val: 3},
+					},
 				},
-			},
+			}),
 		},
 		{
 			name: "lhs is identifier",
-			text: "x + 1",
-			want: ast.BinExpr{
-				Op:    ast.BinOpPlus,
-				Left:  ast.Ident{Name: "x"},
-				Right: ast.Number{Val: 1},
-			},
+			text: "var x = x + 1",
+			want: newASTFile(t, ast.Var{
+				Name: "x",
+				Val: ast.BinExpr{
+					Op:    ast.BinOpPlus,
+					Left:  ast.Ident{Name: "x"},
+					Right: ast.Number{Val: 1},
+				},
+			}),
 		},
 		{
 			name: "rhs is identifier",
-			text: "1 + x",
-			want: ast.BinExpr{
-				Op:    ast.BinOpPlus,
-				Left:  ast.Number{Val: 1},
-				Right: ast.Ident{Name: "x"},
-			},
+			text: "var x = 1 + x",
+			want: newASTFile(t, ast.Var{
+				Name: "x",
+				Val: ast.BinExpr{
+					Op:    ast.BinOpPlus,
+					Left:  ast.Number{Val: 1},
+					Right: ast.Ident{Name: "x"},
+				},
+			}),
 		},
 	}
 	testParser_Parse(t, tests)
@@ -380,79 +413,67 @@ func TestParser_call(t *testing.T) {
 	tests := []testCase{
 		{
 			name: "no args",
-			text: "test()",
-			want: ast.Call{
-				Name: "test",
-			},
+			text: "var x = test()",
+			want: newASTFile(t, ast.Var{
+				Name: "x",
+				Val:  ast.Call{Name: "test"},
+			}),
 		},
 		{
 			name:    "no right parenthesis",
-			text:    "test(",
+			text:    "var x = test(",
 			wantErr: parse.ErrParse,
 		},
 		{
 			name: "one arg",
-			text: "test(1)",
-			want: ast.Call{
-				Name: "test",
-				Args: []ast.Node{
-					ast.Number{Val: 1},
+			text: "var x = test(1)",
+			want: newASTFile(t, ast.Var{
+				Name: "x",
+				Val: ast.Call{
+					Name: "test",
+					Args: []ast.Node{ast.Number{Val: 1}},
 				},
-			},
+			}),
 		},
 		{
 			name:    "one arg no right parenthesis",
-			text:    "test(1",
+			text:    "var x = test(1",
 			wantErr: parse.ErrParse,
-		},
-		{
+		}, {
 			name: "one arg expression",
-			text: "test(1 + 2)",
-			want: ast.Call{
-				Name: "test",
-				Args: []ast.Node{
-					ast.BinExpr{
-						Op:    ast.BinOpPlus,
-						Left:  ast.Number{Val: 1},
-						Right: ast.Number{Val: 2},
+			text: "var x = test(1 + 2)",
+			want: newASTFile(t, ast.Var{
+				Name: "x",
+				Val: ast.Call{
+					Name: "test",
+					Args: []ast.Node{
+						ast.BinExpr{
+							Op:    ast.BinOpPlus,
+							Left:  ast.Number{Val: 1},
+							Right: ast.Number{Val: 2},
+						},
 					},
 				},
-			},
+			}),
 		},
 		{
 			name: "two args",
-			text: "test(1, 2)",
-			want: ast.Call{
-				Name: "test",
-				Args: []ast.Node{
-					ast.Number{Val: 1},
-					ast.Number{Val: 2},
+			text: "var x = test(1, 2)",
+			want: newASTFile(t, ast.Var{
+				Name: "x",
+				Val: ast.Call{
+					Name: "test",
+					Args: []ast.Node{
+						ast.Number{Val: 1},
+						ast.Number{Val: 2},
+					},
 				},
-			},
+			}),
 		},
 		{
 			name:    "two args no right parenthesis",
-			text:    "test(1, 2",
+			text:    "var x = test(1, 2",
 			wantErr: parse.ErrParse,
-		},
-		{
-			name: "two arg expressions",
-			text: "test(1 + 2, 3 * 4)",
-			want: ast.Call{
-				Name: "test",
-				Args: []ast.Node{
-					ast.BinExpr{
-						Op:    ast.BinOpPlus,
-						Left:  ast.Number{Val: 1},
-						Right: ast.Number{Val: 2},
-					},
-					ast.BinExpr{
-						Op:    ast.BinOpMul,
-						Left:  ast.Number{Val: 3},
-						Right: ast.Number{Val: 4},
-					},
-				},
-			},
 		},
 	}
 	testParser_Parse(t, tests)
@@ -463,12 +484,12 @@ func TestParser_func(t *testing.T) {
 		{
 			name: "body is a number",
 			text: "def test() 1",
-			want: ast.Func{
+			want: newASTFile(t, ast.Func{
 				Name: "test",
 				Body: []ast.Node{
 					ast.Number{Val: 1},
 				},
-			},
+			}),
 		},
 		{
 			name:    "no identifier",
@@ -491,9 +512,31 @@ func TestParser_func(t *testing.T) {
 			wantErr: parse.ErrParse,
 		},
 		{
+			name: "one param",
+			text: "def test(a) 1",
+			want: newASTFile(t, ast.Func{
+				Name:   "test",
+				Params: []string{"a"},
+				Body: []ast.Node{
+					ast.Number{Val: 1},
+				},
+			}),
+		},
+		{
+			name: "two params",
+			text: "def test(a, b) 1",
+			want: newASTFile(t, ast.Func{
+				Name:   "test",
+				Params: []string{"a", "b"},
+				Body: []ast.Node{
+					ast.Number{Val: 1},
+				},
+			}),
+		},
+		{
 			name: "body is a binary expression",
 			text: "def test() 1 + 2",
-			want: ast.Func{
+			want: newASTFile(t, ast.Func{
 				Name: "test",
 				Body: []ast.Node{
 					ast.BinExpr{
@@ -502,29 +545,7 @@ func TestParser_func(t *testing.T) {
 						Right: ast.Number{Val: 2},
 					},
 				},
-			},
-		},
-		{
-			name: "one param",
-			text: "def test(a) 1",
-			want: ast.Func{
-				Name:   "test",
-				Params: []string{"a"},
-				Body: []ast.Node{
-					ast.Number{Val: 1},
-				},
-			},
-		},
-		{
-			name: "two params",
-			text: "def test(a, b) 1",
-			want: ast.Func{
-				Name:   "test",
-				Params: []string{"a", "b"},
-				Body: []ast.Node{
-					ast.Number{Val: 1},
-				},
-			},
+			}),
 		},
 	}
 	testParser_Parse(t, tests)
@@ -535,10 +556,10 @@ func TestParser_var(t *testing.T) {
 		{
 			name: "number",
 			text: "var x = 1",
-			want: ast.Var{
+			want: newASTFile(t, ast.Var{
 				Name: "x",
 				Val:  ast.Number{Val: 1},
-			},
+			}),
 		},
 		{
 			name:    "no identifier",
@@ -554,18 +575,6 @@ func TestParser_var(t *testing.T) {
 			name:    "no value",
 			text:    "var x =",
 			wantErr: parse.ErrParse,
-		},
-		{
-			name: "binary expression",
-			text: "var x = 1 + 2",
-			want: ast.Var{
-				Name: "x",
-				Val: ast.BinExpr{
-					Op:    ast.BinOpPlus,
-					Left:  ast.Number{Val: 1},
-					Right: ast.Number{Val: 2},
-				},
-			},
 		},
 	}
 	testParser_Parse(t, tests)
@@ -593,7 +602,7 @@ func testParser_Parse(t *testing.T, tests []testCase) {
 
 func ExampleParse() {
 	const s = `
-123
+var x = 123
 `
 	n, err := parse.Parse(s)
 	if err != nil {
@@ -602,5 +611,14 @@ func ExampleParse() {
 	}
 	fmt.Println(n)
 	// Output:
-	// 123.0
+	// var x = 123.0
+}
+
+func newASTFile(t *testing.T, nn ...ast.Node) *ast.File {
+	t.Helper()
+	decls := make([]*ast.Decl, 0, len(nn))
+	for _, n := range nn {
+		decls = append(decls, &ast.Decl{Node: n})
+	}
+	return &ast.File{Decls: decls}
 }

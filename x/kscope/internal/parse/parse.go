@@ -8,6 +8,7 @@ package parse
 import (
 	"errors"
 	"fmt"
+	"io"
 	"iter"
 	"strconv"
 
@@ -19,20 +20,20 @@ import (
 var ErrParse = errors.New("parse error")
 
 // Parse returns an Abstract Syntax Tree (AST) representing parsed string s.
-func Parse(s string) (ast.Node, error) {
+func Parse(s string) (*ast.File, error) {
 	var lx lex.Lexer
 	next, stop := iter.Pull(lx.Lex(s))
 	defer stop()
 	r := &peekerReader{reader: readerFunc(next)}
 	par := &parser{r: r}
-	n, err := par.Parse()
+	f, err := par.Parse()
 	if err != nil {
 		return nil, err
 	}
 	if lx.Err() != nil {
 		return nil, lx.Err()
 	}
-	return n, nil
+	return f, nil
 }
 
 // readerFunc adopts a function that returns next token to the [reader]
@@ -51,19 +52,38 @@ type parser struct {
 }
 
 // Parse parses tokens into an AST.
-func (p *parser) Parse() (ast.Node, error) {
-	n, err := p.parse()
+func (p *parser) Parse() (*ast.File, error) {
+	f, err := p.parseFile()
 	if err != nil {
 		return nil, fmt.Errorf("%w: %s", ErrParse, err)
 	}
-	return n, nil
+	return f, nil
 }
 
-func (p *parser) parse() (ast.Node, error) {
+func (p *parser) parseFile() (*ast.File, error) {
+	var decls []*ast.Decl
+	for {
+		n, err := p.parseDecl()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return nil, err
+		}
+		decls = append(decls, &ast.Decl{Node: n})
+	}
+	var f *ast.File
+	if len(decls) != 0 {
+		f = &ast.File{Decls: decls}
+	}
+	return f, nil
+}
+
+func (p *parser) parseDecl() (ast.Node, error) {
 	tok, ok := p.r.Peek()
 	if !ok {
 		// end of stream
-		return nil, nil
+		return nil, io.EOF
 	}
 	// keep-sorted start skip_lines=1,-1
 	switch tok.Kind {
@@ -73,7 +93,7 @@ func (p *parser) parse() (ast.Node, error) {
 		return p.parseVar()
 	}
 	// keep-sorted end
-	return p.parseExpression()
+	return nil, fmt.Errorf("unsupported top-level token %s", tok)
 }
 
 // parseFunc parses a function definition.
@@ -248,7 +268,7 @@ func parseNumber(tok lex.Token) (ast.Node, error) {
 	return ast.Number{Val: v}, nil
 }
 
-func (p *parser) parseGroup(lpar lex.Token) (ast.Node, error) {
+func (p *parser) parseGroup(_ lex.Token) (ast.Node, error) {
 	expr, err := p.parseExpression()
 	if err != nil {
 		return nil, err
