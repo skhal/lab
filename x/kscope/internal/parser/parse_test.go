@@ -3,7 +3,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package parse_test
+package parser_test
 
 import (
 	"errors"
@@ -13,7 +13,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/skhal/lab/x/kscope/internal/ast"
-	"github.com/skhal/lab/x/kscope/internal/parse"
+	"github.com/skhal/lab/x/kscope/internal/parser"
 )
 
 // diffFloatFractionPcent is a relative difference (RD) of two floating numbers.
@@ -50,12 +50,12 @@ func TestParser_expr(t *testing.T) {
 		{
 			name:    "plus misses left operand",
 			text:    "+ 2",
-			wantErr: parse.ErrParse,
+			wantErr: parser.ErrParse,
 		},
 		{
 			name:    "plus misses right operand",
 			text:    "1 +",
-			wantErr: parse.ErrParse,
+			wantErr: parser.ErrParse,
 		},
 		{
 			name: "minus",
@@ -347,7 +347,7 @@ func TestParser_call(t *testing.T) {
 		{
 			name:    "no right parenthesis",
 			text:    "test(",
-			wantErr: parse.ErrParse,
+			wantErr: parser.ErrParse,
 		},
 		{
 			name: "one arg",
@@ -360,7 +360,7 @@ func TestParser_call(t *testing.T) {
 		{
 			name:    "one arg no right parenthesis",
 			text:    "test(1",
-			wantErr: parse.ErrParse,
+			wantErr: parser.ErrParse,
 		}, {
 			name: "one arg expression",
 			text: "test(1 + 2)",
@@ -389,7 +389,7 @@ func TestParser_call(t *testing.T) {
 		{
 			name:    "two args no right parenthesis",
 			text:    "test(1, 2",
-			wantErr: parse.ErrParse,
+			wantErr: parser.ErrParse,
 		},
 	}
 	testParser_Parse(t, tests)
@@ -410,22 +410,22 @@ func TestParser_func(t *testing.T) {
 		{
 			name:    "no identifier",
 			text:    "def () 1",
-			wantErr: parse.ErrParse,
+			wantErr: parser.ErrParse,
 		},
 		{
 			name:    "no left parenthesis",
 			text:    "def test) 1",
-			wantErr: parse.ErrParse,
+			wantErr: parser.ErrParse,
 		},
 		{
 			name:    "no right parenthesis",
 			text:    "def test( 1",
-			wantErr: parse.ErrParse,
+			wantErr: parser.ErrParse,
 		},
 		{
 			name:    "no body",
 			text:    "def test()",
-			wantErr: parse.ErrParse,
+			wantErr: parser.ErrParse,
 		},
 		{
 			name: "one param",
@@ -480,17 +480,17 @@ func TestParser_var(t *testing.T) {
 		{
 			name:    "no identifier",
 			text:    "var = 1",
-			wantErr: parse.ErrParse,
+			wantErr: parser.ErrParse,
 		},
 		{
 			name:    "no assignment",
 			text:    "var x 1",
-			wantErr: parse.ErrParse,
+			wantErr: parser.ErrParse,
 		},
 		{
 			name:    "no value",
 			text:    "var x =",
-			wantErr: parse.ErrParse,
+			wantErr: parser.ErrParse,
 		},
 	}
 	testParser_Parse(t, tests)
@@ -499,7 +499,7 @@ func TestParser_var(t *testing.T) {
 func testParser_Parse(t *testing.T, tests []testCase) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			got, err := parse.ParseExpr(tc.text)
+			got, err := parser.ParseExpr(tc.text)
 
 			if !errors.Is(err, tc.wantErr) {
 				t.Errorf("unexpected error %v; want %v", err, tc.wantErr)
@@ -525,7 +525,7 @@ def c()
 def d(x, y)
   x * c() + a
 `
-	n, err := parse.Parse(s)
+	n, err := parser.Parse(s)
 	if err != nil {
 		fmt.Println(err)
 		return

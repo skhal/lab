@@ -17,7 +17,7 @@ import (
 	"path/filepath"
 
 	"github.com/skhal/lab/x/kscope/internal/ast"
-	"github.com/skhal/lab/x/kscope/internal/parse"
+	"github.com/skhal/lab/x/kscope/internal/parser"
 )
 
 func init() {
@@ -53,7 +53,7 @@ func parseFile(name string) (ast.Node, error) {
 	if err != nil {
 		return nil, err
 	}
-	n, err := parse.Parse(string(b))
+	n, err := parser.Parse(string(b))
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", name, err)
 	}
