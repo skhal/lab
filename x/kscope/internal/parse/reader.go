@@ -32,6 +32,10 @@ type tokenReader struct {
 	}
 }
 
+func newTokenReader(r reader) *tokenReader {
+	return &tokenReader{reader: r}
+}
+
 // Peek retrieves the next token. It returns a second parameter to indicate
 // whether the next token exists.
 //
