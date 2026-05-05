@@ -22,7 +22,8 @@ var ErrParse = errors.New("parse error")
 // Parse returns an Abstract Syntax Tree (AST) representing parsed string s.
 func Parse(s string) (*ast.File, error) {
 	var lx lex.Lexer
-	next, stop := iter.Pull(lx.Lex(s))
+	toks, _ := lx.Lex(s)
+	next, stop := iter.Pull(toks)
 	defer stop()
 	r := &peekerReader{reader: readerFunc(next)}
 	par := &parser{r: r}

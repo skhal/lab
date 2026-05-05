@@ -72,7 +72,7 @@ func scan(rd *bufReader) (*Token, scanFunc, error) {
 		return scanIdentifier(rd)
 	}
 	// keep-sorted end
-	err := fmt.Errorf("%w: %d: unsupported character '%v'", ErrScan, rd.Pos(), r)
+	err := fmt.Errorf("%s: %w: unsupported character '%v'", rd.Pos(), ErrScan, r)
 	return nil, nil, err
 }
 
@@ -131,8 +131,8 @@ func scanNumber(rd *bufReader) (*Token, scanFunc, error) {
 // genToken generates a token of specified kind using test and position from
 // the reader.
 func genToken(rd *bufReader, tk TokenKind) *Token {
-	s, start, end := rd.Text()
-	return &Token{Kind: tk, Val: s, Pos: Position{Start: start, End: end}}
+	s, pos := rd.Text()
+	return &Token{Kind: tk, Val: s, pos: pos}
 }
 
 // ignoreWhile ignores consecutive characters for which predicate f returns

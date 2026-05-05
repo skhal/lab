@@ -11,6 +11,7 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
+	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/skhal/lab/x/kscope/internal/lex"
 )
 
@@ -35,28 +36,28 @@ func TestLex(t *testing.T) {
 			name: "left parenthesis",
 			s:    "(",
 			want: []lex.Token{
-				{Kind: lex.TokLpar, Val: "(", Pos: lex.Position{0, 1}},
+				{Kind: lex.TokLpar, Val: "("},
 			},
 		},
 		{
 			name: "right parenthesis",
 			s:    ")",
 			want: []lex.Token{
-				{Kind: lex.TokRpar, Val: ")", Pos: lex.Position{0, 1}},
+				{Kind: lex.TokRpar, Val: ")"},
 			},
 		},
 		{
 			name: "comma",
 			s:    ",",
 			want: []lex.Token{
-				{Kind: lex.TokComma, Val: ",", Pos: lex.Position{0, 1}},
+				{Kind: lex.TokComma, Val: ","},
 			},
 		},
 		{
 			name: "assign",
 			s:    "=",
 			want: []lex.Token{
-				{Kind: lex.TokAssign, Val: "=", Pos: lex.Position{0, 1}},
+				{Kind: lex.TokAssign, Val: "="},
 			},
 		},
 	}
@@ -69,35 +70,35 @@ func TestLex_number(t *testing.T) {
 			name: "integer",
 			s:    "123",
 			want: []lex.Token{
-				{Kind: lex.TokNum, Val: "123", Pos: lex.Position{0, 3}},
+				{Kind: lex.TokNum, Val: "123"},
 			},
 		},
 		{
 			name: "float",
 			s:    "1.2",
 			want: []lex.Token{
-				{Kind: lex.TokNum, Val: "1.2", Pos: lex.Position{0, 3}},
+				{Kind: lex.TokNum, Val: "1.2"},
 			},
 		},
 		{
 			name: "float no fractional part",
 			s:    "12.",
 			want: []lex.Token{
-				{Kind: lex.TokNum, Val: "12.", Pos: lex.Position{0, 3}},
+				{Kind: lex.TokNum, Val: "12."},
 			},
 		},
 		{
 			name: "float no integral part",
 			s:    ".12",
 			want: []lex.Token{
-				{Kind: lex.TokNum, Val: ".12", Pos: lex.Position{0, 3}},
+				{Kind: lex.TokNum, Val: ".12"},
 			},
 		},
 		{
 			name: "space prefix",
 			s:    "\t 1.2",
 			want: []lex.Token{
-				{Kind: lex.TokNum, Val: "1.2", Pos: lex.Position{2, 5}},
+				{Kind: lex.TokNum, Val: "1.2"},
 			},
 		},
 		{
@@ -106,10 +107,10 @@ func TestLex_number(t *testing.T) {
 			//  |    |    |
 			s: "1.2 3  4. .5",
 			want: []lex.Token{
-				{Kind: lex.TokNum, Val: "1.2", Pos: lex.Position{0, 3}},
-				{Kind: lex.TokNum, Val: "3", Pos: lex.Position{4, 5}},
-				{Kind: lex.TokNum, Val: "4.", Pos: lex.Position{7, 9}},
-				{Kind: lex.TokNum, Val: ".5", Pos: lex.Position{10, 12}},
+				{Kind: lex.TokNum, Val: "1.2"},
+				{Kind: lex.TokNum, Val: "3"},
+				{Kind: lex.TokNum, Val: "4."},
+				{Kind: lex.TokNum, Val: ".5"},
 			},
 		},
 	}
@@ -122,28 +123,28 @@ func TestLex_binop(t *testing.T) {
 			name: "plus",
 			s:    "+",
 			want: []lex.Token{
-				{Kind: lex.TokPlus, Val: "+", Pos: lex.Position{0, 1}},
+				{Kind: lex.TokPlus, Val: "+"},
 			},
 		},
 		{
 			name: "minus",
 			s:    "-",
 			want: []lex.Token{
-				{Kind: lex.TokMinus, Val: "-", Pos: lex.Position{0, 1}},
+				{Kind: lex.TokMinus, Val: "-"},
 			},
 		},
 		{
 			name: "multiply",
 			s:    "*",
 			want: []lex.Token{
-				{Kind: lex.TokMul, Val: "*", Pos: lex.Position{0, 1}},
+				{Kind: lex.TokMul, Val: "*"},
 			},
 		},
 		{
 			name: "divide",
 			s:    "/",
 			want: []lex.Token{
-				{Kind: lex.TokDiv, Val: "/", Pos: lex.Position{0, 1}},
+				{Kind: lex.TokDiv, Val: "/"},
 			},
 		},
 	}
@@ -156,28 +157,28 @@ func TestLex_ident(t *testing.T) {
 			name: "letter",
 			s:    "a",
 			want: []lex.Token{
-				{Kind: lex.TokIdent, Val: "a", Pos: lex.Position{0, 1}},
+				{Kind: lex.TokIdent, Val: "a"},
 			},
 		},
 		{
 			name: "letters",
 			s:    "abc",
 			want: []lex.Token{
-				{Kind: lex.TokIdent, Val: "abc", Pos: lex.Position{0, 3}},
+				{Kind: lex.TokIdent, Val: "abc"},
 			},
 		},
 		{
 			name: "alnum",
 			s:    "a1b2",
 			want: []lex.Token{
-				{Kind: lex.TokIdent, Val: "a1b2", Pos: lex.Position{0, 4}},
+				{Kind: lex.TokIdent, Val: "a1b2"},
 			},
 		},
 		{
 			name: "space prefix",
 			s:    "\t a1",
 			want: []lex.Token{
-				{Kind: lex.TokIdent, Val: "a1", Pos: lex.Position{2, 4}},
+				{Kind: lex.TokIdent, Val: "a1"},
 			},
 		},
 		{
@@ -186,10 +187,10 @@ func TestLex_ident(t *testing.T) {
 			//  |    |    |
 			s: "a a1 a2b a34b5",
 			want: []lex.Token{
-				{Kind: lex.TokIdent, Val: "a", Pos: lex.Position{0, 1}},
-				{Kind: lex.TokIdent, Val: "a1", Pos: lex.Position{2, 4}},
-				{Kind: lex.TokIdent, Val: "a2b", Pos: lex.Position{5, 8}},
-				{Kind: lex.TokIdent, Val: "a34b5", Pos: lex.Position{9, 14}},
+				{Kind: lex.TokIdent, Val: "a"},
+				{Kind: lex.TokIdent, Val: "a1"},
+				{Kind: lex.TokIdent, Val: "a2b"},
+				{Kind: lex.TokIdent, Val: "a34b5"},
 			},
 		},
 	}
@@ -202,31 +203,31 @@ func TestLex_mix(t *testing.T) {
 			name: "number and identifier",
 			s:    "1.2 a3",
 			want: []lex.Token{
-				{Kind: lex.TokNum, Val: "1.2", Pos: lex.Position{0, 3}},
-				{Kind: lex.TokIdent, Val: "a3", Pos: lex.Position{4, 6}},
+				{Kind: lex.TokNum, Val: "1.2"},
+				{Kind: lex.TokIdent, Val: "a3"},
 			},
 		},
 		{
 			name: "comment",
 			s:    "# test",
 			want: []lex.Token{
-				{Kind: lex.TokComment, Val: "# test", Pos: lex.Position{0, 6}},
+				{Kind: lex.TokComment, Val: "# test"},
 			},
 		},
 		{
 			name: "comment multi-line",
 			s:    "# test a\n# test b",
 			want: []lex.Token{
-				{Kind: lex.TokComment, Val: "# test a", Pos: lex.Position{0, 8}},
-				{Kind: lex.TokComment, Val: "# test b", Pos: lex.Position{9, 17}},
+				{Kind: lex.TokComment, Val: "# test a"},
+				{Kind: lex.TokComment, Val: "# test b"},
 			},
 		},
 		{
 			name: "number and comment",
 			s:    "123 # test",
 			want: []lex.Token{
-				{Kind: lex.TokNum, Val: "123", Pos: lex.Position{0, 3}},
-				{Kind: lex.TokComment, Val: "# test", Pos: lex.Position{4, 10}},
+				{Kind: lex.TokNum, Val: "123"},
+				{Kind: lex.TokComment, Val: "# test"},
 			},
 		},
 	}
@@ -239,21 +240,21 @@ func TestLex_commands(t *testing.T) {
 			name: "def",
 			s:    "def",
 			want: []lex.Token{
-				{Kind: lex.TokDef, Val: "def", Pos: lex.Position{0, 3}},
+				{Kind: lex.TokDef, Val: "def"},
 			},
 		},
 		{
 			name: "extern",
 			s:    "extern",
 			want: []lex.Token{
-				{Kind: lex.TokExtern, Val: "extern", Pos: lex.Position{0, 6}},
+				{Kind: lex.TokExtern, Val: "extern"},
 			},
 		},
 		{
 			name: "var",
 			s:    "var",
 			want: []lex.Token{
-				{Kind: lex.TokVar, Val: "var", Pos: lex.Position{0, 3}},
+				{Kind: lex.TokVar, Val: "var"},
 			},
 		},
 	}
@@ -266,13 +267,14 @@ func testLex(t *testing.T, tests []testCase) {
 		t.Run(tc.name, func(t *testing.T) {
 			var lx lex.Lexer
 
-			got := slices.Collect(lx.Lex(tc.s))
+			seq, _ := lx.Lex(tc.s)
+			got := slices.Collect(seq)
 			err := lx.Err()
 
 			if !errors.Is(err, tc.wantErr) {
 				t.Errorf("Lex(%q) error %v; want %v", tc.s, err, tc.wantErr)
 			}
-			if d := cmp.Diff(tc.want, got); d != "" {
+			if d := cmp.Diff(tc.want, got, cmpopts.IgnoreUnexported(lex.Token{})); d != "" {
 				t.Errorf("Lex(%q) mismatch (-want +got):\n%s", tc.s, d)
 			}
 		})

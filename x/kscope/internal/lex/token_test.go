@@ -15,9 +15,8 @@ func ExampleToken_String() {
 	t := lex.Token{
 		Kind: lex.TokNum,
 		Val:  "12.3",
-		Pos:  lex.Position{Start: 1, End: 5},
 	}
 	fmt.Println(t)
 	// Output:
-	// 1..5: number 12.3
+	// number "12.3"
 }

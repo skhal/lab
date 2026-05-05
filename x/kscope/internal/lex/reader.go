@@ -18,13 +18,16 @@ import "unicode/utf8"
 //	r.Read() // ('c', true)
 //	r.Text() // ("abc", 0, 3)
 type bufReader struct {
-	str   string
-	start int
-	end   int
+	pos *Positioner
+	str string
+
+	// state
+	start int // token index
+	end   int // current position
 }
 
-func newBufReader(s string) *bufReader {
-	return &bufReader{str: s}
+func newBufReader(s string, pos *Positioner) *bufReader {
+	return &bufReader{str: s, pos: pos}
 }
 
 // Ignore resets current block.
@@ -43,8 +46,8 @@ func (br *bufReader) Peek() (rune, bool) {
 }
 
 // Pos returns current position in the read buffer.
-func (br *bufReader) Pos() int {
-	return br.end
+func (br *bufReader) Pos() Position {
+	return br.pos.PosIndex(br.end)
 }
 
 // Read returns the next next and advances the position of last rune in the
@@ -54,22 +57,25 @@ func (br *bufReader) Read() (rune, bool) {
 	if sz == 0 {
 		return 0, false
 	}
+	if r == runeEOL {
+		br.pos.push(br.end)
+	}
 	br.end += sz
 	return r, true
 }
 
 // Text returns the text of the current block and resets the block, ready to
 // read the next one.
-func (br *bufReader) Text() (s string, low, high int) {
-	low, high = br.start, br.end
-	br.Ignore()
-	return br.str[low:high], low, high
+func (br *bufReader) Text() (s string, pos int) {
+	defer br.Ignore()
+	return br.str[br.start:br.end], br.start
 }
 
 // Unread unreads the last rune in the block. It is a noop operation if the
 // block is empty.
 func (br *bufReader) Unread() {
 	if br.start == br.end {
+		// can't unread beyond the beginning of the token
 		return
 	}
 	r, sz := utf8.DecodeLastRuneInString(br.str[:br.end])
@@ -78,6 +84,9 @@ func (br *bufReader) Unread() {
 	}
 	if sz == 1 && r == utf8.RuneError {
 		return
+	}
+	if r == runeEOL {
+		br.pos.pop()
 	}
 	br.end -= sz
 }
