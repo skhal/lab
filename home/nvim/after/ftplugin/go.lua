@@ -37,6 +37,9 @@ local function select_source(file)
 		if item:find("_test%.go$") then
 			return false
 		end
+		if item:find("_string%.go$") then
+			return false
+		end
 		return true
 	end, files)
 	if not next(files) then
