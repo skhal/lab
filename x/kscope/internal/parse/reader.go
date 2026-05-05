@@ -14,6 +14,15 @@ type reader interface {
 	Read() (lex.Token, bool)
 }
 
+// readerFunc adopts a function that returns next token to the [reader]
+// interface.
+type readerFunc func() (lex.Token, bool)
+
+// Read returns the next token and a flag to indicate whether a token exists.
+func (f readerFunc) Read() (lex.Token, bool) {
+	return f()
+}
+
 // peekerReader is a tokens reader that can read or peek the next token.
 type peekerReader struct {
 	reader

@@ -36,15 +36,6 @@ func Parse(s string) (*ast.File, error) {
 	return f, nil
 }
 
-// readerFunc adopts a function that returns next token to the [reader]
-// interface.
-type readerFunc func() (lex.Token, bool)
-
-// Read returns the next token and a flag to indicate whether a token exists.
-func (f readerFunc) Read() (lex.Token, bool) {
-	return f()
-}
-
 // parser is a Recursive Descent Parser (RDP) to parse a sequence of tokens
 // into an AST.
 type parser struct {
