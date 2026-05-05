@@ -7,78 +7,102 @@ package lex
 
 import "unicode/utf8"
 
-// bufReader is a buffered reader. It supports scan a string by runes - read,
-// unread, peek next - and get a block of at once.
+// blockReader is a text block reader. A text block is a slice of string,
+// [start:end]. Use [Read] to grow the block, the end-index, then call [Text]
+// to retrieve the block and reset the block indices to read the next block.
+//
+// blockReader also supports retrieval of the next rune without advancing the
+// current position, [Peek].
+//
+// The [Unread] call decreases the block size - it drops the last rune in the
+// block. It become noop if current block's size becomes zero.
 //
 // EXAMPLE
 //
 //	r := newBufReader("abc def")
-//	r.Read() // ('a', true)
-//	r.Read() // ('b', true)
-//	r.Read() // ('c', true)
-//	r.Text() // ("abc", 0, 3)
-type bufReader struct {
-	pos *Positioner
-	str string
-
-	// state
-	start int // token index
-	end   int // current position
+//	r.Read()   // ('a', true) start:0 end:1
+//	r.Read()   // ('b', true) start:0 end:2
+//	r.Read()   // ('c', true) start:0 end:3
+//	r.Peek()   // (' ', true) start:0 end:3
+//	r.Unread() // start: 0 end:2
+//	r.Text()   // ("ab", 0)
+type blockReader struct {
+	pos   *Positioner
+	str   string
+	block block
 }
 
-func newBufReader(s string, pos *Positioner) *bufReader {
-	return &bufReader{str: s, pos: pos}
+type block struct {
+	start int
+	end   int
 }
 
-// Ignore resets current block.
-func (br *bufReader) Ignore() {
-	br.start = br.end
+// Empty returns true if the block is empty, e.g. the start and end indices are
+// equal.
+func (b *block) Empty() bool {
+	return b.start == b.end
 }
 
-// Peek returns the next next without advancing the position of last rune in the
-// block. It returns a boolean flag to indicate whether the read was successful.
-func (br *bufReader) Peek() (rune, bool) {
-	r, sz := utf8.DecodeRuneInString(br.str[br.end:])
+func newBlockReader(s string, pos *Positioner) *blockReader {
+	return &blockReader{str: s, pos: pos}
+}
+
+// Ignore resets current block. It sets block's start position to the end. This
+// effectively skips the block and make the reader ready to read the next
+// block.
+func (br *blockReader) Ignore() {
+	br.block.start = br.block.end
+}
+
+// Peek returns the next rune but does not advance the read-position. It
+// returns a second parameter to indicate whether the read was successful.
+func (br *blockReader) Peek() (rune, bool) {
+	r, sz := utf8.DecodeRuneInString(br.str[br.block.end:])
 	if sz == 0 {
+		return 0, false
+	}
+	if sz == 1 && r == utf8.RuneError {
 		return 0, false
 	}
 	return r, true
 }
 
-// Pos returns current position in the read buffer.
-func (br *bufReader) Pos() Position {
-	return br.pos.PosIndex(br.end)
+// Pos returns current read-position.
+func (br *blockReader) Pos() Position {
+	return br.pos.PosIndex(br.block.end)
 }
 
-// Read returns the next next and advances the position of last rune in the
-// block. It returns a boolean flag to indicate whether the read was successful.
-func (br *bufReader) Read() (rune, bool) {
-	r, sz := utf8.DecodeRuneInString(br.str[br.end:])
+// Read returns the next rune and advances the read-position. It returns a
+// second parameter to indicate whether the read was successful.
+func (br *blockReader) Read() (rune, bool) {
+	r, sz := utf8.DecodeRuneInString(br.str[br.block.end:])
 	if sz == 0 {
+		return 0, false
+	}
+	if sz == 1 && r == utf8.RuneError {
 		return 0, false
 	}
 	if r == runeEOL {
-		br.pos.push(br.end)
+		br.pos.push(br.block.end)
 	}
-	br.end += sz
+	br.block.end += sz
 	return r, true
 }
 
-// Text returns the text of the current block and resets the block, ready to
-// read the next one.
-func (br *bufReader) Text() (s string, pos int) {
+// Text returns current block and its position. After the call, the reader is
+// ready to read the next block.
+func (br *blockReader) Text() (s string, pos int) {
 	defer br.Ignore()
-	return br.str[br.start:br.end], br.start
+	return br.str[br.block.start:br.block.end], br.block.start
 }
 
-// Unread unreads the last rune in the block. It is a noop operation if the
+// Unread reduces current block by one rune. It is a noop operation if the
 // block is empty.
-func (br *bufReader) Unread() {
-	if br.start == br.end {
-		// can't unread beyond the beginning of the token
+func (br *blockReader) Unread() {
+	if br.block.Empty() {
 		return
 	}
-	r, sz := utf8.DecodeLastRuneInString(br.str[:br.end])
+	r, sz := utf8.DecodeLastRuneInString(br.str[:br.block.end])
 	if sz == 0 {
 		return
 	}
@@ -88,5 +112,5 @@ func (br *bufReader) Unread() {
 	if r == runeEOL {
 		br.pos.pop()
 	}
-	br.end -= sz
+	br.block.end -= sz
 }

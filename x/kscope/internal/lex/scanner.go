@@ -6,13 +6,13 @@
 package lex
 
 type scanner struct {
-	r     *bufReader
+	r     *blockReader
 	state scanFunc
 	tok   *Token
 	err   error
 }
 
-func newScanner(r *bufReader) *scanner {
+func newScanner(r *blockReader) *scanner {
 	return &scanner{r: r, state: scan}
 }
 

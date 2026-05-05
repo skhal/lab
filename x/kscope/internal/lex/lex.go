@@ -25,7 +25,7 @@ func (lx *Lexer) Lex(s string) (iter.Seq[Token], *Positioner) {
 
 func (lx *Lexer) lex(s string) iter.Seq[Token] {
 	return func(yield func(Token) bool) {
-		sc := newScanner(newBufReader(s, lx.pos))
+		sc := newScanner(newBlockReader(s, lx.pos))
 		for sc.Scan() {
 			if !yield(*sc.Token()) {
 				break

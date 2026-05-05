@@ -35,7 +35,7 @@ const (
 //
 // It should return an error along with nil token and next state in case of a
 // scan error.
-type scanFunc func(rd *bufReader) (*Token, scanFunc, error)
+type scanFunc func(rd *blockReader) (*Token, scanFunc, error)
 
 var scanners map[rune]scanFunc
 
@@ -55,7 +55,7 @@ func init() {
 	}
 }
 
-func scan(rd *bufReader) (*Token, scanFunc, error) {
+func scan(rd *blockReader) (*Token, scanFunc, error) {
 	ignoreWhile(rd, unicode.IsSpace)
 	r, ok := rd.Peek()
 	if !ok {
@@ -76,7 +76,7 @@ func scan(rd *bufReader) (*Token, scanFunc, error) {
 	return nil, nil, err
 }
 
-func scanComment(rd *bufReader) (*Token, scanFunc, error) {
+func scanComment(rd *blockReader) (*Token, scanFunc, error) {
 	readWhile(rd, func(r rune) bool {
 		return r != runeEOL
 	})
@@ -84,7 +84,7 @@ func scanComment(rd *bufReader) (*Token, scanFunc, error) {
 }
 
 func genCharScanner(tok TokenKind) scanFunc {
-	return func(rd *bufReader) (*Token, scanFunc, error) {
+	return func(rd *blockReader) (*Token, scanFunc, error) {
 		rd.Read() // consume the character
 		return genToken(rd, tok), scan, nil
 	}
@@ -101,7 +101,7 @@ var commands = map[string]TokenKind{
 //	ident  = letter [ alnum ]
 //	letter = "a" .. "z" | "A" .. "Z"
 //	alnum  = letter | digit
-func scanIdentifier(rd *bufReader) (*Token, scanFunc, error) {
+func scanIdentifier(rd *blockReader) (*Token, scanFunc, error) {
 	readWhile(rd, unicode.IsLetter)
 	readWhile(rd, func(r rune) bool {
 		return unicode.IsLetter(r) || unicode.IsDigit(r)
@@ -119,7 +119,7 @@ func scanIdentifier(rd *bufReader) (*Token, scanFunc, error) {
 //	int    = digit { digit }
 //	float  = int "." [ int ] | "." int
 //	digit  = "0" .. "9"
-func scanNumber(rd *bufReader) (*Token, scanFunc, error) {
+func scanNumber(rd *blockReader) (*Token, scanFunc, error) {
 	readWhile(rd, unicode.IsDigit)
 	if r, ok := rd.Peek(); ok && r == runeDot {
 		rd.Read() // skip dot
@@ -130,21 +130,21 @@ func scanNumber(rd *bufReader) (*Token, scanFunc, error) {
 
 // genToken generates a token of specified kind using test and position from
 // the reader.
-func genToken(rd *bufReader, tk TokenKind) *Token {
+func genToken(rd *blockReader, tk TokenKind) *Token {
 	s, pos := rd.Text()
 	return &Token{Kind: tk, Val: s, pos: pos}
 }
 
 // ignoreWhile ignores consecutive characters for which predicate f returns
 // true.
-func ignoreWhile(rc *bufReader, f func(rune) bool) {
+func ignoreWhile(rc *blockReader, f func(rune) bool) {
 	readWhile(rc, f)
 	rc.Ignore()
 }
 
 // readWhile reads consecutive characters for which predicate f returns true.
 // end of stream.
-func readWhile(rd *bufReader, f func(rune) bool) {
+func readWhile(rd *blockReader, f func(rune) bool) {
 	for {
 		r, ok := rd.Read()
 		if !ok {
