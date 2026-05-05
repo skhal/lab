@@ -11,7 +11,7 @@ import (
 	"unicode"
 )
 
-// ErrScan means error scanning next token.
+// ErrScan means error scanning the next token.
 var ErrScan = errors.New("scan error")
 
 const (
@@ -30,70 +30,77 @@ const (
 	// keep-sorted end
 )
 
-// scanFunc is a scan state. It reads data from the reader and returns parsed
-// token along with the next scan state to process.
+// scanFunc is a scan state. Every scan state uses low-level read from the
+// blockReader to scan the text to get the token and return the next expected
+// scan state.
 //
-// It should return an error along with nil token and next state in case of a
-// scan error.
-type scanFunc func(rd *blockReader) (*Token, scanFunc, error)
+// A scan state returns an error with nil token and nil next scan state upon
+// error.
+type scanFunc func(br *blockReader) (*Token, scanFunc, error)
 
-var scanners map[rune]scanFunc
+// singleRuneScanners maps single-run tokens to scan states.
+var singleRuneScanners map[rune]scanFunc
 
 func init() {
-	scanners = map[rune]scanFunc{
+	singleRuneScanners = map[rune]scanFunc{
 		// keep-sorted start
-		runeComma: genCharScanner(TokComma),
-		runeDiv:   genCharScanner(TokDiv),
-		runeEq:    genCharScanner(TokAssign),
+		runeComma: singleRuneScanner(TokComma),
+		runeDiv:   singleRuneScanner(TokDiv),
+		runeEq:    singleRuneScanner(TokAssign),
 		runeHash:  scanComment,
-		runeLpar:  genCharScanner(TokLpar),
-		runeMinus: genCharScanner(TokMinus),
-		runeMul:   genCharScanner(TokMul),
-		runePlus:  genCharScanner(TokPlus),
-		runeRpar:  genCharScanner(TokRpar),
+		runeLpar:  singleRuneScanner(TokLpar),
+		runeMinus: singleRuneScanner(TokMinus),
+		runeMul:   singleRuneScanner(TokMul),
+		runePlus:  singleRuneScanner(TokPlus),
+		runeRpar:  singleRuneScanner(TokRpar),
 		// keep-sorted end
 	}
 }
 
-func scan(rd *blockReader) (*Token, scanFunc, error) {
-	ignoreWhile(rd, unicode.IsSpace)
-	r, ok := rd.Peek()
+// scan is the initial and general state that skips whitespace and scans the
+// next token.
+func scan(br *blockReader) (*Token, scanFunc, error) {
+	ignoreWhile(br, unicode.IsSpace)
+	r, ok := br.Peek()
 	if !ok {
 		return nil, nil, nil
 	}
-	if scanner, ok := scanners[r]; ok {
-		return scanner(rd)
+	if scanner, ok := singleRuneScanners[r]; ok {
+		return scanner(br)
 	}
 	// keep-sorted start skip_lines=1,-1
 	switch {
 	case unicode.IsDigit(r), r == runeDot:
-		return scanNumber(rd)
+		return scanNumber(br)
 	case unicode.IsLetter(r):
-		return scanIdentifier(rd)
+		return scanIdentifier(br)
 	}
 	// keep-sorted end
-	err := fmt.Errorf("%s: %w: unsupported character '%v'", rd.Pos(), ErrScan, r)
+	err := fmt.Errorf("%s: %w: unsupported character '%v'", br.Pos(), ErrScan, r)
 	return nil, nil, err
 }
 
-func scanComment(rd *blockReader) (*Token, scanFunc, error) {
-	readWhile(rd, func(r rune) bool {
+// scanComment reads a comment token starting from current position to the end
+// of the line.
+func scanComment(br *blockReader) (*Token, scanFunc, error) {
+	readWhile(br, func(r rune) bool {
 		return r != runeEOL
 	})
-	return genToken(rd, TokComment), scan, nil
+	return genToken(br, TokComment), scan, nil
 }
 
-func genCharScanner(tok TokenKind) scanFunc {
-	return func(rd *blockReader) (*Token, scanFunc, error) {
-		rd.Read() // consume the character
-		return genToken(rd, tok), scan, nil
+func singleRuneScanner(tok TokenKind) scanFunc {
+	return func(br *blockReader) (*Token, scanFunc, error) {
+		br.Read() // consume the next rune
+		return genToken(br, tok), scan, nil
 	}
 }
 
+// reserved words.
 var commands = map[string]TokenKind{
-	"def":    TokDef,
+	"def":    TokDef, // function declaration
 	"extern": TokExtern,
-	"var":    TokVar,
+	"var":    TokVar, // variable declaration
 }
 
 // scanIdentifier scans an identifier.
@@ -101,12 +108,13 @@ var commands = map[string]TokenKind{
 //	ident  = letter [ alnum ]
 //	letter = "a" .. "z" | "A" .. "Z"
 //	alnum  = letter | digit
-func scanIdentifier(rd *blockReader) (*Token, scanFunc, error) {
-	readWhile(rd, unicode.IsLetter)
-	readWhile(rd, func(r rune) bool {
+//	digit  = "0" .. "9"
+func scanIdentifier(br *blockReader) (*Token, scanFunc, error) {
+	readWhile(br, unicode.IsLetter)
+	readWhile(br, func(r rune) bool {
 		return unicode.IsLetter(r) || unicode.IsDigit(r)
 	})
-	tok := genToken(rd, TokIdent)
+	tok := genToken(br, TokIdent)
 	if kind, ok := commands[tok.Val]; ok {
 		tok.Kind = kind
 	}
@@ -119,39 +127,36 @@ func scanIdentifier(rd *blockReader) (*Token, scanFunc, error) {
 //	int    = digit { digit }
 //	float  = int "." [ int ] | "." int
 //	digit  = "0" .. "9"
-func scanNumber(rd *blockReader) (*Token, scanFunc, error) {
-	readWhile(rd, unicode.IsDigit)
-	if r, ok := rd.Peek(); ok && r == runeDot {
-		rd.Read() // skip dot
-		readWhile(rd, unicode.IsDigit)
+func scanNumber(br *blockReader) (*Token, scanFunc, error) {
+	readWhile(br, unicode.IsDigit)
+	if r, ok := br.Peek(); ok && r == runeDot {
+		br.Read() // skip the dot
+		readWhile(br, unicode.IsDigit)
 	}
-	return genToken(rd, TokNum), scan, nil
+	return genToken(br, TokNum), scan, nil
 }
 
-// genToken generates a token of specified kind using test and position from
-// the reader.
-func genToken(rd *blockReader, tk TokenKind) *Token {
-	s, pos := rd.Text()
+// genToken generates a token for current text block of kind tk.
+func genToken(br *blockReader, tk TokenKind) *Token {
+	s, pos := br.Text()
 	return &Token{Kind: tk, Val: s, pos: pos}
 }
 
-// ignoreWhile ignores consecutive characters for which predicate f returns
-// true.
-func ignoreWhile(rc *blockReader, f func(rune) bool) {
-	readWhile(rc, f)
-	rc.Ignore()
+// ignoreWhile ignores a block of consecutive characters that pass predicate f.
+func ignoreWhile(br *blockReader, f func(rune) bool) {
+	defer br.Ignore()
+	readWhile(br, f)
 }
 
-// readWhile reads consecutive characters for which predicate f returns true.
-// end of stream.
-func readWhile(rd *blockReader, f func(rune) bool) {
+// readWhile reads consecutive characters that pass predicate f.
+func readWhile(br *blockReader, f func(rune) bool) {
 	for {
-		r, ok := rd.Read()
+		r, ok := br.Read()
 		if !ok {
 			break
 		}
 		if !f(r) {
-			rd.Unread()
+			br.Unread()
 			break
 		}
 	}
