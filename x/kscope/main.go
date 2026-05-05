@@ -24,21 +24,16 @@ func main() {
 		flag.Usage()
 		os.Exit(2)
 	}
-	if err := run(); err != nil {
+	if err := run(flag.Arg(0)); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 }
 
-func run() error {
-	fname := flag.Arg(0)
-	b, err := os.ReadFile(fname)
+func run(fname string) error {
+	f, err := parse.ParseFile(fname)
 	if err != nil {
 		return err
-	}
-	f, err := parse.Parse(string(b))
-	if err != nil {
-		return fmt.Errorf("%s %s", fname, err)
 	}
 	fmt.Println(f)
 	return nil

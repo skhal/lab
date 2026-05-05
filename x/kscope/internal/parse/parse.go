@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"io"
 	"iter"
+	"os"
 	"strconv"
 
 	"github.com/skhal/lab/x/kscope/internal/ast"
@@ -33,6 +34,28 @@ func Parse(s string) (*ast.File, error) {
 	}
 	if lx.Err() != nil {
 		return nil, lx.Err()
+	}
+	return f, nil
+}
+
+// ParseFile reads and parses a file with a given name.
+func ParseFile(name string) (*ast.File, error) {
+	b, err := os.ReadFile(name)
+	if err != nil {
+		return nil, err
+	}
+	var lx lex.Lexer
+	toks, _ := lx.Lex(string(b))
+	next, stop := iter.Pull(toks)
+	defer stop()
+	r := &peekerReader{reader: readerFunc(next)}
+	par := &parser{r: r}
+	f, err := par.Parse()
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", name, err)
+	}
+	if lx.Err() != nil {
+		return nil, fmt.Errorf("%s: %w", name, lx.Err())
 	}
 	return f, nil
 }
