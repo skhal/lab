@@ -23,7 +23,7 @@ var errRootToken = errors.New("invalid root token") // NOEXPORT
 
 // Parse parses the code s as a file content with all declarations.
 func Parse(s string) (ast.Node, error) {
-	return parse(s, (*parser).ParseFile)
+	return parse(s, (*parser).ParseCode)
 }
 
 // ParseExpr parses a single expression, e.g. a declaration, binary expression,
@@ -54,16 +54,16 @@ type parser struct {
 	r *peekerReader
 }
 
-// ParseFile parses tokens into an AST.
-func (p *parser) ParseFile() (ast.Node, error) {
-	f, err := p.parseFile()
+// ParseCode parses tokens into an AST.
+func (p *parser) ParseCode() (ast.Node, error) {
+	f, err := p.parseCode()
 	if err != nil {
 		return nil, fmt.Errorf("%w: %s", ErrParse, err)
 	}
 	return f, nil
 }
 
-func (p *parser) parseFile() (*ast.File, error) {
+func (p *parser) parseCode() (*ast.Code, error) {
 	var decls []*ast.Decl
 	for {
 		n, err := p.parseDecl()
@@ -75,9 +75,9 @@ func (p *parser) parseFile() (*ast.File, error) {
 		}
 		decls = append(decls, &ast.Decl{Node: n})
 	}
-	var f *ast.File
+	var f *ast.Code
 	if len(decls) != 0 {
-		f = &ast.File{Decls: decls}
+		f = &ast.Code{Decls: decls}
 	}
 	return f, nil
 }

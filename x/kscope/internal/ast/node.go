@@ -13,13 +13,13 @@ import (
 // Node is any AST node.
 type Node any
 
-// File is the top-level container for declarations.
-type File struct {
-	Decls []*Decl // top-declarations in the file.
+// Code is the top-level container to represent a code segment.
+type Code struct {
+	Decls []*Decl // top-level declarations
 }
 
-// String prints the file.
-func (f File) String() string {
+// String prints the code segment.
+func (f Code) String() string {
 	var s strings.Builder
 	for i, d := range f.Decls {
 		if i > 0 {
@@ -40,8 +40,7 @@ func (d Decl) String() string {
 	return fmt.Sprintf("%s", d.Node)
 }
 
-// Func is a function definition. It consists of a name and a body, represented
-// by a set of statements.
+// Func is a function definition.
 type Func struct {
 	Name   string   // function name
 	Params []string // parameter names

@@ -3,5 +3,5 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Package ast holds descriptions of Abstract Syntax Tree (AST) nodes.
+// Package ast describes Abstract Syntax Tree (AST) nodes.
 package ast
