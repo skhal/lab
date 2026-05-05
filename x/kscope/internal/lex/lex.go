@@ -9,20 +9,27 @@ import (
 	"iter"
 )
 
-// Lexer parses a string into a sequence of tokens. A zero value lexer is ready
-// to parse a string.
+// Lexer converts a string into a sequence of tokens. A zero value Lexer is
+// ready to use.
 type Lexer struct {
 	err error
 	pos *Positioner
 }
 
-// Lex parses a string s into a sequence of tokens.
+// Lex runs lexical tokenization on a string s. It returns a sequence of tokens
+// and a [Positioner] to convert token positions to line and column.
 func (lx *Lexer) Lex(s string) (iter.Seq[Token], *Positioner) {
-	lx.err = nil
-	lx.pos = new(Positioner)
+	lx.reset()
 	return lx.lex(s), lx.pos
 }
 
+// reset resets the Lexer state.
+func (lx *Lexer) reset() {
+	lx.err = nil
+	lx.pos = new(Positioner)
+}
+
+// lex converts the string into a sequence of tokens.
 func (lx *Lexer) lex(s string) iter.Seq[Token] {
 	return func(yield func(Token) bool) {
 		sc := newScanner(newBlockReader(s, lx.pos))
@@ -35,7 +42,7 @@ func (lx *Lexer) lex(s string) iter.Seq[Token] {
 	}
 }
 
-// Err last parse error if any.
+// Err returns the last encountered error if any.
 func (lx *Lexer) Err() error {
 	return lx.err
 }
