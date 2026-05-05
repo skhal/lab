@@ -14,10 +14,18 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/skhal/lab/x/kscope/internal/ast"
 	"github.com/skhal/lab/x/kscope/internal/parse"
 )
+
+func init() {
+	flag.Usage = func() {
+		w := flag.CommandLine.Output()
+		fmt.Fprintf(w, "usage: %s file\n", filepath.Base(os.Args[0]))
+	}
+}
 
 func main() {
 	flag.Parse()
