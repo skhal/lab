@@ -5,19 +5,22 @@
 
 package lex
 
+// scanner scans for tokens using blockReader.
 type scanner struct {
 	r     *blockReader
-	state scanFunc
-	tok   *Token
+	state scanFunc // current state, can be nil.
+	tok   *Token   // last token
 	err   error
 }
 
+// newScanner creates a token scanner with provided blockReader.
 func newScanner(r *blockReader) *scanner {
 	return &scanner{r: r, state: scan}
 }
 
-// Scan scans for the next token and returns true upon finding one, otherwise
-// false.
+// Scan extracts the next token and returns true if the extraction was
+// successful. It is noop if the last call to Scan resulted in an error or
+// the internal scan state is EOF, represented by nil state.
 func (sc *scanner) Scan() bool {
 	if sc.err != nil || sc.state == nil {
 		return false
@@ -26,12 +29,12 @@ func (sc *scanner) Scan() bool {
 	return sc.tok != nil
 }
 
-// Token returns last parsed token.
+// Token returns last extracted token.
 func (sc *scanner) Token() *Token {
 	return sc.tok
 }
 
-// Err returns last parse error if any.
+// Err returns last extraction error if any.
 func (sc *scanner) Err() error {
 	return sc.err
 }
