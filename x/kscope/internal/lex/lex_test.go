@@ -7,6 +7,7 @@ package lex_test
 
 import (
 	"errors"
+	"fmt"
 	"slices"
 	"testing"
 
@@ -279,4 +280,18 @@ func testLex(t *testing.T, tests []testCase) {
 			}
 		})
 	}
+}
+
+func ExampleLexer_Lex() {
+	s := `1 2
+name 3`
+	seq, positioner := (&lex.Lexer{}).Lex(s)
+	for tk := range seq {
+		fmt.Printf("%s %s\n", positioner.Pos(tk), tk)
+	}
+	// Output:
+	// 1:1 number "1"
+	// 1:3 number "2"
+	// 2:1 identifier "name"
+	// 2:6 number "3"
 }
