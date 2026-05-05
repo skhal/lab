@@ -145,9 +145,7 @@ func (p *parser) parseFunc() (ast.Node, error) {
 		Body: []ast.Node{
 			body,
 		},
-	}
-	if len(params) != 0 {
-		node.Params = params
+		Params: params,
 	}
 	return node, nil
 }
@@ -191,10 +189,13 @@ func isBinExprOperator(tok lex.Token) bool {
 	return false
 }
 
+// parseOperand parses an operand of an expression. It might be a number,
+// identifier, a function call, or a grouped expression enclosed in
+// parentheses.
 func (p *parser) parseOperand() (ast.Node, error) {
 	tok, ok := p.tr.Read()
 	if !ok {
-		return nil, fmt.Errorf("missing expression")
+		return nil, fmt.Errorf("missing operand")
 	}
 	// keep-sorted start skip_lines=1,-1
 	switch tok.Kind {
@@ -209,14 +210,31 @@ func (p *parser) parseOperand() (ast.Node, error) {
 		return parseNumber(tok)
 	}
 	// keep-sorted end
-	return nil, fmt.Errorf("unsupported token %s", tok)
+	return nil, fmt.Errorf("unsupported operand token %s", tok)
 }
 
+// parseCall parses a function call.
 func (p *parser) parseCall(ident lex.Token) (ast.Node, error) {
 	// left parenthesis
 	if _, ok := p.tr.Read(); !ok {
 		return nil, fmt.Errorf("call %s: missing left parenthesis", ident.Val)
 	}
+	args, err := p.parseCallArgs()
+	if err != nil {
+		return nil, fmt.Errorf("call %s: %s", ident.Val, err)
+	}
+	if tok, ok := p.tr.Read(); !ok || tok.Kind != lex.TokRpar {
+		return nil, fmt.Errorf("call %s: missing right parenthesis", ident.Val)
+	}
+	node := ast.Call{
+		Name: ident.Val,
+		Args: args,
+	}
+	return node, nil
+}
+
+// parseCallArgs parses a function call arguments
+func (p *parser) parseCallArgs() ([]ast.Node, error) {
 	var args []ast.Node
 	for {
 		if tok, ok := p.tr.Peek(); !ok || tok.Kind == lex.TokRpar {
@@ -224,21 +242,14 @@ func (p *parser) parseCall(ident lex.Token) (ast.Node, error) {
 		}
 		arg, err := p.parseExpression()
 		if err != nil {
-			return nil, fmt.Errorf("call %s: %s", ident.Val, err)
+			return nil, err
 		}
 		args = append(args, arg)
 		if tok, ok := p.tr.Peek(); ok && tok.Kind == lex.TokComma {
 			p.tr.Read()
 		}
 	}
-	if tok, ok := p.tr.Read(); !ok || tok.Kind != lex.TokRpar {
-		return nil, fmt.Errorf("call %s: missing right parenthesis", ident.Val)
-	}
-	n := ast.Call{
-		Name: ident.Val,
-		Args: args,
-	}
-	return n, nil
+	return args, nil
 }
 
 var binOps = map[lex.TokenKind]ast.BinOp{
