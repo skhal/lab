@@ -98,9 +98,8 @@ func singleRuneScanner(tok TokenKind) scanFunc {
 
 // reserved words.
 var commands = map[string]TokenKind{
-	"def":    TokDef, // function declaration
-	"extern": TokExtern,
-	"var":    TokVar, // variable declaration
+	"def": TokDef, // function declaration
+	"var": TokVar, // variable declaration
 }
 
 // scanIdentifier scans an identifier.

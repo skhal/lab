@@ -13,20 +13,19 @@ func _() {
 	_ = x[TokComment-3]
 	_ = x[TokDef-4]
 	_ = x[TokDiv-5]
-	_ = x[TokExtern-6]
-	_ = x[TokIdent-7]
-	_ = x[TokLpar-8]
-	_ = x[TokMinus-9]
-	_ = x[TokMul-10]
-	_ = x[TokNum-11]
-	_ = x[TokPlus-12]
-	_ = x[TokRpar-13]
-	_ = x[TokVar-14]
+	_ = x[TokIdent-6]
+	_ = x[TokLpar-7]
+	_ = x[TokMinus-8]
+	_ = x[TokMul-9]
+	_ = x[TokNum-10]
+	_ = x[TokPlus-11]
+	_ = x[TokRpar-12]
+	_ = x[TokVar-13]
 }
 
-const _TokenKind_name = "assigncommacommentdefinitiondivideexternidentifierleft-parenthesisminusmultiplynumberplusright-parenthesisvariable"
+const _TokenKind_name = "assigncommacommentdefinitiondivideidentifierleft-parenthesisminusmultiplynumberplusright-parenthesisvariable"
 
-var _TokenKind_index = [...]uint8{0, 6, 11, 18, 28, 34, 40, 50, 66, 71, 79, 85, 89, 106, 114}
+var _TokenKind_index = [...]uint8{0, 6, 11, 18, 28, 34, 44, 60, 65, 73, 79, 83, 100, 108}
 
 func (i TokenKind) String() string {
 	idx := int(i) - 1

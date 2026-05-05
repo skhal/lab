@@ -33,7 +33,6 @@ const (
 	TokComment // comment
 	TokDef     // definition
 	TokDiv     // divide
-	TokExtern  // extern
 	TokIdent   // identifier
 	TokLpar    // left-parenthesis
 	TokMinus   // minus

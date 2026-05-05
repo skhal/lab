@@ -245,13 +245,6 @@ func TestLex_commands(t *testing.T) {
 			},
 		},
 		{
-			name: "extern",
-			s:    "extern",
-			want: []lex.Token{
-				{Kind: lex.TokExtern, Val: "extern"},
-			},
-		},
-		{
 			name: "var",
 			s:    "var",
 			want: []lex.Token{
