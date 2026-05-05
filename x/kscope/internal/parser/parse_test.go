@@ -41,10 +41,10 @@ func TestParser_expr(t *testing.T) {
 		{
 			name: "plus",
 			text: "1 + 2",
-			want: ast.BinExpr{
+			want: &ast.BinExpr{
 				Op:    ast.BinOpPlus,
-				Left:  ast.Number{Val: 1},
-				Right: ast.Number{Val: 2},
+				Left:  &ast.Number{Val: 1},
+				Right: &ast.Number{Val: 2},
 			},
 		},
 		{
@@ -60,277 +60,277 @@ func TestParser_expr(t *testing.T) {
 		{
 			name: "minus",
 			text: "1 - 2",
-			want: ast.BinExpr{
+			want: &ast.BinExpr{
 				Op:    ast.BinOpMinus,
-				Left:  ast.Number{Val: 1},
-				Right: ast.Number{Val: 2},
+				Left:  &ast.Number{Val: 1},
+				Right: &ast.Number{Val: 2},
 			},
 		},
 		{
 			name: "multiply",
 			text: "1 * 2",
-			want: ast.BinExpr{
+			want: &ast.BinExpr{
 				Op:    ast.BinOpMul,
-				Left:  ast.Number{Val: 1},
-				Right: ast.Number{Val: 2},
+				Left:  &ast.Number{Val: 1},
+				Right: &ast.Number{Val: 2},
 			},
 		},
 		{
 			name: "divide",
 			text: "1 / 2",
-			want: ast.BinExpr{
+			want: &ast.BinExpr{
 				Op:    ast.BinOpDiv,
-				Left:  ast.Number{Val: 1},
-				Right: ast.Number{Val: 2},
+				Left:  &ast.Number{Val: 1},
+				Right: &ast.Number{Val: 2},
 			},
 		},
 		// same order
 		{
 			name: "plus and plus",
 			text: "1 + 2 + 3",
-			want: ast.BinExpr{
+			want: &ast.BinExpr{
 				Op:   ast.BinOpPlus,
-				Left: ast.Number{Val: 1},
-				Right: ast.BinExpr{
+				Left: &ast.Number{Val: 1},
+				Right: &ast.BinExpr{
 					Op:    ast.BinOpPlus,
-					Left:  ast.Number{Val: 2},
-					Right: ast.Number{Val: 3},
+					Left:  &ast.Number{Val: 2},
+					Right: &ast.Number{Val: 3},
 				},
 			},
 		},
 		{
 			name: "plus and minus",
 			text: "1 + 2 - 3",
-			want: ast.BinExpr{
+			want: &ast.BinExpr{
 				Op:   ast.BinOpPlus,
-				Left: ast.Number{Val: 1},
-				Right: ast.BinExpr{
+				Left: &ast.Number{Val: 1},
+				Right: &ast.BinExpr{
 					Op:    ast.BinOpMinus,
-					Left:  ast.Number{Val: 2},
-					Right: ast.Number{Val: 3},
+					Left:  &ast.Number{Val: 2},
+					Right: &ast.Number{Val: 3},
 				},
 			},
 		},
 		{
 			name: "plus and multiply",
 			text: "1 + 2 * 3",
-			want: ast.BinExpr{
+			want: &ast.BinExpr{
 				Op:   ast.BinOpPlus,
-				Left: ast.Number{Val: 1},
-				Right: ast.BinExpr{
+				Left: &ast.Number{Val: 1},
+				Right: &ast.BinExpr{
 					Op:    ast.BinOpMul,
-					Left:  ast.Number{Val: 2},
-					Right: ast.Number{Val: 3},
+					Left:  &ast.Number{Val: 2},
+					Right: &ast.Number{Val: 3},
 				},
 			},
 		},
 		{
 			name: "plus and divide",
 			text: "1 + 2 / 3",
-			want: ast.BinExpr{
+			want: &ast.BinExpr{
 				Op:   ast.BinOpPlus,
-				Left: ast.Number{Val: 1},
-				Right: ast.BinExpr{
+				Left: &ast.Number{Val: 1},
+				Right: &ast.BinExpr{
 					Op:    ast.BinOpDiv,
-					Left:  ast.Number{Val: 2},
-					Right: ast.Number{Val: 3},
+					Left:  &ast.Number{Val: 2},
+					Right: &ast.Number{Val: 3},
 				},
 			},
 		},
 		{
 			name: "minus and plus",
 			text: "1 - 2 + 3",
-			want: ast.BinExpr{
+			want: &ast.BinExpr{
 				Op:   ast.BinOpMinus,
-				Left: ast.Number{Val: 1},
-				Right: ast.BinExpr{
+				Left: &ast.Number{Val: 1},
+				Right: &ast.BinExpr{
 					Op:    ast.BinOpPlus,
-					Left:  ast.Number{Val: 2},
-					Right: ast.Number{Val: 3},
+					Left:  &ast.Number{Val: 2},
+					Right: &ast.Number{Val: 3},
 				},
 			},
 		},
 		{
 			name: "minus and minus",
 			text: "1 - 2 - 3",
-			want: ast.BinExpr{
+			want: &ast.BinExpr{
 				Op:   ast.BinOpMinus,
-				Left: ast.Number{Val: 1},
-				Right: ast.BinExpr{
+				Left: &ast.Number{Val: 1},
+				Right: &ast.BinExpr{
 					Op:    ast.BinOpMinus,
-					Left:  ast.Number{Val: 2},
-					Right: ast.Number{Val: 3},
+					Left:  &ast.Number{Val: 2},
+					Right: &ast.Number{Val: 3},
 				},
 			},
 		},
 		{
 			name: "minus and multiply",
 			text: "1 - 2 * 3",
-			want: ast.BinExpr{
+			want: &ast.BinExpr{
 				Op:   ast.BinOpMinus,
-				Left: ast.Number{Val: 1},
-				Right: ast.BinExpr{
+				Left: &ast.Number{Val: 1},
+				Right: &ast.BinExpr{
 					Op:    ast.BinOpMul,
-					Left:  ast.Number{Val: 2},
-					Right: ast.Number{Val: 3},
+					Left:  &ast.Number{Val: 2},
+					Right: &ast.Number{Val: 3},
 				},
 			},
 		},
 		{
 			name: "minus and divide",
 			text: "1 - 2 / 3",
-			want: ast.BinExpr{
+			want: &ast.BinExpr{
 				Op:   ast.BinOpMinus,
-				Left: ast.Number{Val: 1},
-				Right: ast.BinExpr{
+				Left: &ast.Number{Val: 1},
+				Right: &ast.BinExpr{
 					Op:    ast.BinOpDiv,
-					Left:  ast.Number{Val: 2},
-					Right: ast.Number{Val: 3},
+					Left:  &ast.Number{Val: 2},
+					Right: &ast.Number{Val: 3},
 				},
 			},
 		},
 		{
 			name: "multiply and plus",
 			text: "1 * 2 + 3",
-			want: ast.BinExpr{
+			want: &ast.BinExpr{
 				Op: ast.BinOpPlus,
-				Left: ast.BinExpr{
+				Left: &ast.BinExpr{
 					Op:    ast.BinOpMul,
-					Left:  ast.Number{Val: 1},
-					Right: ast.Number{Val: 2},
+					Left:  &ast.Number{Val: 1},
+					Right: &ast.Number{Val: 2},
 				},
-				Right: ast.Number{Val: 3},
+				Right: &ast.Number{Val: 3},
 			},
 		},
 		{
 			name: "multiply and minus",
 			text: "1 * 2 - 3",
-			want: ast.BinExpr{
+			want: &ast.BinExpr{
 				Op: ast.BinOpMinus,
-				Left: ast.BinExpr{
+				Left: &ast.BinExpr{
 					Op:    ast.BinOpMul,
-					Left:  ast.Number{Val: 1},
-					Right: ast.Number{Val: 2},
+					Left:  &ast.Number{Val: 1},
+					Right: &ast.Number{Val: 2},
 				},
-				Right: ast.Number{Val: 3},
+				Right: &ast.Number{Val: 3},
 			},
 		},
 		{
 			name: "multiply and multiply",
 			text: "1 * 2 * 3",
-			want: ast.BinExpr{
+			want: &ast.BinExpr{
 				Op: ast.BinOpMul,
-				Left: ast.BinExpr{
+				Left: &ast.BinExpr{
 					Op:    ast.BinOpMul,
-					Left:  ast.Number{Val: 1},
-					Right: ast.Number{Val: 2},
+					Left:  &ast.Number{Val: 1},
+					Right: &ast.Number{Val: 2},
 				},
-				Right: ast.Number{Val: 3},
+				Right: &ast.Number{Val: 3},
 			},
 		},
 		{
 			name: "multiply and divide",
 			text: "1 * 2 / 3",
-			want: ast.BinExpr{
+			want: &ast.BinExpr{
 				Op: ast.BinOpDiv,
-				Left: ast.BinExpr{
+				Left: &ast.BinExpr{
 					Op:    ast.BinOpMul,
-					Left:  ast.Number{Val: 1},
-					Right: ast.Number{Val: 2},
+					Left:  &ast.Number{Val: 1},
+					Right: &ast.Number{Val: 2},
 				},
-				Right: ast.Number{Val: 3},
+				Right: &ast.Number{Val: 3},
 			},
 		},
 		{
 			name: "divide and plus",
 			text: "1 / 2 + 3",
-			want: ast.BinExpr{
+			want: &ast.BinExpr{
 				Op: ast.BinOpPlus,
-				Left: ast.BinExpr{
+				Left: &ast.BinExpr{
 					Op:    ast.BinOpDiv,
-					Left:  ast.Number{Val: 1},
-					Right: ast.Number{Val: 2},
+					Left:  &ast.Number{Val: 1},
+					Right: &ast.Number{Val: 2},
 				},
-				Right: ast.Number{Val: 3},
+				Right: &ast.Number{Val: 3},
 			},
 		},
 		{
 			name: "divide and minus",
 			text: "1 / 2 - 3",
-			want: ast.BinExpr{
+			want: &ast.BinExpr{
 				Op: ast.BinOpMinus,
-				Left: ast.BinExpr{
+				Left: &ast.BinExpr{
 					Op:    ast.BinOpDiv,
-					Left:  ast.Number{Val: 1},
-					Right: ast.Number{Val: 2},
+					Left:  &ast.Number{Val: 1},
+					Right: &ast.Number{Val: 2},
 				},
-				Right: ast.Number{Val: 3},
+				Right: &ast.Number{Val: 3},
 			},
 		},
 		{
 			name: "divide and multiply",
 			text: "1 / 2 * 3",
-			want: ast.BinExpr{
+			want: &ast.BinExpr{
 				Op: ast.BinOpMul,
-				Left: ast.BinExpr{
+				Left: &ast.BinExpr{
 					Op:    ast.BinOpDiv,
-					Left:  ast.Number{Val: 1},
-					Right: ast.Number{Val: 2},
+					Left:  &ast.Number{Val: 1},
+					Right: &ast.Number{Val: 2},
 				},
-				Right: ast.Number{Val: 3},
+				Right: &ast.Number{Val: 3},
 			},
 		},
 		{
 			name: "divide and divide",
 			text: "1 / 2 / 3",
-			want: ast.BinExpr{
+			want: &ast.BinExpr{
 				Op: ast.BinOpDiv,
-				Left: ast.BinExpr{
+				Left: &ast.BinExpr{
 					Op:    ast.BinOpDiv,
-					Left:  ast.Number{Val: 1},
-					Right: ast.Number{Val: 2},
+					Left:  &ast.Number{Val: 1},
+					Right: &ast.Number{Val: 2},
 				},
-				Right: ast.Number{Val: 3},
+				Right: &ast.Number{Val: 3},
 			},
 		},
 		{
 			name: "group plus",
 			text: "(1 + 2)",
-			want: ast.BinExpr{
+			want: &ast.BinExpr{
 				Op:    ast.BinOpPlus,
-				Left:  ast.Number{Val: 1},
-				Right: ast.Number{Val: 2},
+				Left:  &ast.Number{Val: 1},
+				Right: &ast.Number{Val: 2},
 			},
 		},
 		{
 			name: "group prioritizes",
 			text: "1 * (2 + 3)",
-			want: ast.BinExpr{
+			want: &ast.BinExpr{
 				Op:   ast.BinOpMul,
-				Left: ast.Number{Val: 1},
-				Right: ast.BinExpr{
+				Left: &ast.Number{Val: 1},
+				Right: &ast.BinExpr{
 					Op:    ast.BinOpPlus,
-					Left:  ast.Number{Val: 2},
-					Right: ast.Number{Val: 3},
+					Left:  &ast.Number{Val: 2},
+					Right: &ast.Number{Val: 3},
 				},
 			},
 		},
 		{
 			name: "lhs is identifier",
 			text: "x + 1",
-			want: ast.BinExpr{
+			want: &ast.BinExpr{
 				Op:    ast.BinOpPlus,
-				Left:  ast.Ident{Name: "x"},
-				Right: ast.Number{Val: 1},
+				Left:  &ast.Ident{Name: "x"},
+				Right: &ast.Number{Val: 1},
 			},
 		},
 		{
 			name: "rhs is identifier",
 			text: "1 + x",
-			want: ast.BinExpr{
+			want: &ast.BinExpr{
 				Op:    ast.BinOpPlus,
-				Left:  ast.Number{Val: 1},
-				Right: ast.Ident{Name: "x"},
+				Left:  &ast.Number{Val: 1},
+				Right: &ast.Ident{Name: "x"},
 			},
 		},
 	}
@@ -342,7 +342,7 @@ func TestParser_call(t *testing.T) {
 		{
 			name: "no args",
 			text: "test()",
-			want: ast.Call{Name: "test"},
+			want: &ast.Call{Name: "test"},
 		},
 		{
 			name:    "no right parenthesis",
@@ -352,9 +352,9 @@ func TestParser_call(t *testing.T) {
 		{
 			name: "one arg",
 			text: "test(1)",
-			want: ast.Call{
+			want: &ast.Call{
 				Name: "test",
-				Args: []ast.Node{ast.Number{Val: 1}},
+				Args: []ast.Node{&ast.Number{Val: 1}},
 			},
 		},
 		{
@@ -364,13 +364,13 @@ func TestParser_call(t *testing.T) {
 		}, {
 			name: "one arg expression",
 			text: "test(1 + 2)",
-			want: ast.Call{
+			want: &ast.Call{
 				Name: "test",
 				Args: []ast.Node{
-					ast.BinExpr{
+					&ast.BinExpr{
 						Op:    ast.BinOpPlus,
-						Left:  ast.Number{Val: 1},
-						Right: ast.Number{Val: 2},
+						Left:  &ast.Number{Val: 1},
+						Right: &ast.Number{Val: 2},
 					},
 				},
 			},
@@ -378,11 +378,11 @@ func TestParser_call(t *testing.T) {
 		{
 			name: "two args",
 			text: "test(1, 2)",
-			want: ast.Call{
+			want: &ast.Call{
 				Name: "test",
 				Args: []ast.Node{
-					ast.Number{Val: 1},
-					ast.Number{Val: 2},
+					&ast.Number{Val: 1},
+					&ast.Number{Val: 2},
 				},
 			},
 		},
@@ -400,11 +400,9 @@ func TestParser_func(t *testing.T) {
 		{
 			name: "body is a number",
 			text: "def test() 1",
-			want: ast.Func{
+			want: &ast.Func{
 				Name: "test",
-				Body: []ast.Node{
-					ast.Number{Val: 1},
-				},
+				Body: []ast.Node{&ast.Number{Val: 1}},
 			},
 		},
 		{
@@ -430,35 +428,31 @@ func TestParser_func(t *testing.T) {
 		{
 			name: "one param",
 			text: "def test(a) 1",
-			want: ast.Func{
+			want: &ast.Func{
 				Name:   "test",
 				Params: []string{"a"},
-				Body: []ast.Node{
-					ast.Number{Val: 1},
-				},
+				Body:   []ast.Node{&ast.Number{Val: 1}},
 			},
 		},
 		{
 			name: "two params",
 			text: "def test(a, b) 1",
-			want: ast.Func{
+			want: &ast.Func{
 				Name:   "test",
 				Params: []string{"a", "b"},
-				Body: []ast.Node{
-					ast.Number{Val: 1},
-				},
+				Body:   []ast.Node{&ast.Number{Val: 1}},
 			},
 		},
 		{
 			name: "body is a binary expression",
 			text: "def test() 1 + 2",
-			want: ast.Func{
+			want: &ast.Func{
 				Name: "test",
 				Body: []ast.Node{
-					ast.BinExpr{
+					&ast.BinExpr{
 						Op:    ast.BinOpPlus,
-						Left:  ast.Number{Val: 1},
-						Right: ast.Number{Val: 2},
+						Left:  &ast.Number{Val: 1},
+						Right: &ast.Number{Val: 2},
 					},
 				},
 			},
@@ -472,9 +466,9 @@ func TestParser_var(t *testing.T) {
 		{
 			name: "number",
 			text: "var x = 1",
-			want: ast.Var{
+			want: &ast.Var{
 				Name: "x",
-				Val:  ast.Number{Val: 1},
+				Val:  &ast.Number{Val: 1},
 			},
 		},
 		{

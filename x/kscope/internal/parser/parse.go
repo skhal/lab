@@ -140,7 +140,7 @@ func (p *parser) parseFunc() (ast.Node, error) {
 	if err != nil {
 		return nil, fmt.Errorf("func %s: parse body: %s", ident.Val, err)
 	}
-	node := ast.Func{
+	node := &ast.Func{
 		Name: ident.Val,
 		Body: []ast.Node{
 			body,
@@ -203,7 +203,7 @@ func (p *parser) parseOperand() (ast.Node, error) {
 		if next, ok := p.tr.Peek(); ok && next.Kind == lex.TokLpar {
 			return p.parseCall(tok)
 		}
-		return ast.Ident{Name: tok.Val}, nil
+		return &ast.Ident{Name: tok.Val}, nil
 	case lex.TokLpar:
 		return p.parseGroup(tok)
 	case lex.TokNum:
@@ -226,7 +226,7 @@ func (p *parser) parseCall(ident lex.Token) (ast.Node, error) {
 	if tok, ok := p.tr.Read(); !ok || tok.Kind != lex.TokRpar {
 		return nil, fmt.Errorf("call %s: missing right parenthesis", ident.Val)
 	}
-	node := ast.Call{
+	node := &ast.Call{
 		Name: ident.Val,
 		Args: args,
 	}
@@ -278,7 +278,7 @@ func (p *parser) parseBinExpr(lhs ast.Node) (ast.Node, error) {
 	if err != nil {
 		return nil, fmt.Errorf("operator %s: right operand: %s", tok, err)
 	}
-	n := ast.BinExpr{Op: op, Left: lhs, Right: rhs}
+	n := &ast.BinExpr{Op: op, Left: lhs, Right: rhs}
 	if shouldRotateLeft(tok, next) {
 		n = rotateLeft(n)
 	}
@@ -295,8 +295,8 @@ func shouldRotateLeft(tok, next lex.Token) bool {
 // rotateLeft rotates nodes in a binary expression counter-clockwise
 // (aka right-hand rule) to make BinExpr.Right root node if is it a binary
 // expression.
-func rotateLeft(n ast.BinExpr) ast.BinExpr {
-	right, ok := n.Right.(ast.BinExpr)
+func rotateLeft(n *ast.BinExpr) *ast.BinExpr {
+	right, ok := n.Right.(*ast.BinExpr)
 	if !ok {
 		return n
 	}
@@ -311,7 +311,7 @@ func parseNumber(tok lex.Token) (ast.Node, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse number - %s", tok)
 	}
-	return ast.Number{Val: v}, nil
+	return &ast.Number{Val: v}, nil
 }
 
 func (p *parser) parseGroup(_ lex.Token) (ast.Node, error) {
@@ -338,6 +338,6 @@ func (p *parser) parseVar() (ast.Node, error) {
 	if err != nil {
 		return nil, fmt.Errorf("var %s: parse value: %s", ident.Val, err)
 	}
-	n := ast.Var{Name: ident.Val, Val: val}
+	n := &ast.Var{Name: ident.Val, Val: val}
 	return n, nil
 }
