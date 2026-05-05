@@ -129,19 +129,9 @@ func (p *parser) parseFunc() (ast.Node, error) {
 	if tok, ok := p.tr.Read(); !ok || tok.Kind != lex.TokLpar {
 		return nil, fmt.Errorf("func %s: missing args left parenthesis", ident.Val)
 	}
-	var params []string
-	for pnum := 1; ; pnum++ {
-		if tok, ok := p.tr.Peek(); !ok || tok.Kind == lex.TokRpar {
-			break
-		}
-		par, ok := p.tr.Read()
-		if !ok || par.Kind != lex.TokIdent {
-			return nil, fmt.Errorf("func %s: parse param %d: missing name", ident.Val, pnum)
-		}
-		params = append(params, par.Val)
-		if tok, ok := p.tr.Peek(); ok && tok.Kind == lex.TokComma {
-			p.tr.Read()
-		}
+	params, err := p.parseFuncParams()
+	if err != nil {
+		return nil, fmt.Errorf("func %s: %s", ident.Val, err)
 	}
 	if tok, ok := p.tr.Read(); !ok || tok.Kind != lex.TokRpar {
 		return nil, fmt.Errorf("func %s: missing args right parenthesis", ident.Val)
@@ -150,16 +140,35 @@ func (p *parser) parseFunc() (ast.Node, error) {
 	if err != nil {
 		return nil, fmt.Errorf("func %s: parse body: %s", ident.Val, err)
 	}
-	n := ast.Func{
+	node := ast.Func{
 		Name: ident.Val,
 		Body: []ast.Node{
 			body,
 		},
 	}
 	if len(params) != 0 {
-		n.Params = params
+		node.Params = params
 	}
-	return n, nil
+	return node, nil
+}
+
+// parseFuncParams parses function parameters
+func (p *parser) parseFuncParams() ([]string, error) {
+	var params []string
+	for pnum := 1; ; pnum++ {
+		if tok, ok := p.tr.Peek(); !ok || tok.Kind == lex.TokRpar {
+			break
+		}
+		par, ok := p.tr.Read()
+		if !ok || par.Kind != lex.TokIdent {
+			return nil, fmt.Errorf("param %d: missing name", pnum)
+		}
+		params = append(params, par.Val)
+		if tok, ok := p.tr.Peek(); ok && tok.Kind == lex.TokComma {
+			p.tr.Read()
+		}
+	}
+	return params, nil
 }
 
 // parseExpression parses an expression.
