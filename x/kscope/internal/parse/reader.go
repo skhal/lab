@@ -9,50 +9,57 @@ import (
 	"github.com/skhal/lab/x/kscope/internal/lex"
 )
 
+// reader returns the next token.
 type reader interface {
-	// Read returns the next token and a flag to indicate whether a token exists.
-	Read() (lex.Token, bool)
+	Read() (lex.Token, bool) // return the next token and ok boolean flag.
 }
 
-// readerFunc adopts a function that returns next token to the [reader]
-// interface.
+// readerFunc adopts a function to the [reader] interface.
 type readerFunc func() (lex.Token, bool)
 
-// Read returns the next token and a flag to indicate whether a token exists.
+// Read implements [reader] interface.
 func (f readerFunc) Read() (lex.Token, bool) {
 	return f()
 }
 
-// peekerReader is a tokens reader that can read or peek the next token.
-type peekerReader struct {
+// tokenReader is a token reader. It can peek and reed the next token.
+type tokenReader struct {
 	reader
-	// next is the next token, cached by the last [Peek] call, and reset by
-	// the next call to [Read].
+	// next caches the next token retrieved by the last call to [Peek].
 	next *struct {
 		tok lex.Token
 		ok  bool
 	}
 }
 
-// Peek returns the next token after last [Read] and a flag to indicate whether
-// a token exists. Repeated calls return the same next token.
-func (r *peekerReader) Peek() (lex.Token, bool) {
-	if r.next == nil {
-		tok, ok := r.reader.Read()
-		r.next = &struct {
-			tok lex.Token
-			ok  bool
-		}{tok, ok}
+// Peek retrieves the next token. It returns a second parameter to indicate
+// whether the next token exists.
+//
+// Repeated calls to Peek return the same result.
+func (tr *tokenReader) Peek() (lex.Token, bool) {
+	if tr.next == nil {
+		tr.cacheNext()
 	}
-	return r.next.tok, r.next.ok
+	return tr.next.tok, tr.next.ok
 }
 
-// Read returns the next token and a flag to indicate whether a token exists.
-func (r *peekerReader) Read() (lex.Token, bool) {
-	if r.next != nil {
-		cache := r.next
-		r.next = nil
-		return cache.tok, cache.ok
+func (tr *tokenReader) cacheNext() {
+	tok, ok := tr.reader.Read()
+	tr.next = &struct {
+		tok lex.Token
+		ok  bool
+	}{tok, ok}
+}
+
+// Read returns the next token. It uses cached value if the last call was to
+// [Peek] and resets the cache so that next calls to Read retrieve the next
+// token from the reader.
+//
+// Read returns a second parameter to indicate whether the next token exists.
+func (tr *tokenReader) Read() (lex.Token, bool) {
+	if tr.next != nil {
+		defer func() { tr.next = nil }()
+		return tr.next.tok, tr.next.ok
 	}
-	return r.reader.Read()
+	return tr.reader.Read()
 }

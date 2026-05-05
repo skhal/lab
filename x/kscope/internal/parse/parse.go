@@ -37,7 +37,7 @@ func parse(s string, pf func(*parser) (ast.Node, error)) (ast.Node, error) {
 	toks, _ := lx.Lex(s)
 	next, stop := iter.Pull(toks)
 	defer stop()
-	r := &peekerReader{reader: readerFunc(next)}
+	r := &tokenReader{reader: readerFunc(next)}
 	n, err := pf(&parser{r: r})
 	if err != nil {
 		return nil, err
@@ -51,7 +51,7 @@ func parse(s string, pf func(*parser) (ast.Node, error)) (ast.Node, error) {
 // parser is a Recursive Descent Parser (RDP) to parse a sequence of tokens
 // into an AST.
 type parser struct {
-	r *peekerReader
+	r *tokenReader
 }
 
 // ParseCode parses tokens into an AST.
