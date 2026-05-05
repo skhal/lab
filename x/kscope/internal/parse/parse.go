@@ -10,7 +10,6 @@ import (
 	"fmt"
 	"io"
 	"iter"
-	"os"
 	"strconv"
 
 	"github.com/skhal/lab/x/kscope/internal/ast"
@@ -20,44 +19,33 @@ import (
 // ErrParse means there is an error in parsing.
 var ErrParse = errors.New("parse error")
 
-// Parse returns an Abstract Syntax Tree (AST) representing parsed string s.
-func Parse(s string) (*ast.File, error) {
+var errRootToken = errors.New("invalid root token") // NOEXPORT
+
+// Parse parses the code s as a file content with all declarations.
+func Parse(s string) (ast.Node, error) {
+	return parse(s, (*parser).ParseFile)
+}
+
+// ParseExpr parses a single expression, e.g. a declaration, binary expression,
+// etc.
+func ParseExpr(s string) (ast.Node, error) {
+	return parse(s, (*parser).ParseExpr)
+}
+
+func parse(s string, pf func(*parser) (ast.Node, error)) (ast.Node, error) {
 	var lx lex.Lexer
 	toks, _ := lx.Lex(s)
 	next, stop := iter.Pull(toks)
 	defer stop()
 	r := &peekerReader{reader: readerFunc(next)}
-	par := &parser{r: r}
-	f, err := par.Parse()
+	n, err := pf(&parser{r: r})
 	if err != nil {
 		return nil, err
 	}
 	if lx.Err() != nil {
 		return nil, lx.Err()
 	}
-	return f, nil
-}
-
-// ParseFile reads and parses a file with a given name.
-func ParseFile(name string) (*ast.File, error) {
-	b, err := os.ReadFile(name)
-	if err != nil {
-		return nil, err
-	}
-	var lx lex.Lexer
-	toks, _ := lx.Lex(string(b))
-	next, stop := iter.Pull(toks)
-	defer stop()
-	r := &peekerReader{reader: readerFunc(next)}
-	par := &parser{r: r}
-	f, err := par.Parse()
-	if err != nil {
-		return nil, fmt.Errorf("%s: %w", name, err)
-	}
-	if lx.Err() != nil {
-		return nil, fmt.Errorf("%s: %w", name, lx.Err())
-	}
-	return f, nil
+	return n, nil
 }
 
 // parser is a Recursive Descent Parser (RDP) to parse a sequence of tokens
@@ -66,8 +54,8 @@ type parser struct {
 	r *peekerReader
 }
 
-// Parse parses tokens into an AST.
-func (p *parser) Parse() (*ast.File, error) {
+// ParseFile parses tokens into an AST.
+func (p *parser) ParseFile() (ast.Node, error) {
 	f, err := p.parseFile()
 	if err != nil {
 		return nil, fmt.Errorf("%w: %s", ErrParse, err)
@@ -108,7 +96,22 @@ func (p *parser) parseDecl() (ast.Node, error) {
 		return p.parseVar()
 	}
 	// keep-sorted end
-	return nil, fmt.Errorf("unsupported top-level token %s", tok)
+	return nil, fmt.Errorf("%s: %w", tok, errRootToken)
+}
+
+// ParseExpr parses an expression, e.g. a declaration, binary expression, etc.
+func (p *parser) ParseExpr() (ast.Node, error) {
+	n, err := p.parseDecl()
+	switch {
+	case err == io.EOF:
+		return nil, nil
+	case errors.Is(err, errRootToken):
+		n, err = p.parseExpression()
+	}
+	if err != nil {
+		return nil, fmt.Errorf("%w: %s", ErrParse, err)
+	}
+	return n, err
 }
 
 // parseFunc parses a function definition.

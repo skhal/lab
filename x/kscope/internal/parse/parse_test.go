@@ -21,7 +21,7 @@ import (
 const diffFloatFractionPcent = 0.001
 
 type testCase struct {
-	want    *ast.File
+	want    ast.Node
 	wantErr error
 	name    string
 	text    string
@@ -41,14 +41,14 @@ func TestParser_expr(t *testing.T) {
 		{
 			name: "plus",
 			text: "var x = 1 + 2",
-			want: newASTFile(t, ast.Var{
+			want: ast.Var{
 				Name: "x",
 				Val: ast.BinExpr{
 					Op:    ast.BinOpPlus,
 					Left:  ast.Number{Val: 1},
 					Right: ast.Number{Val: 2},
 				},
-			}),
+			},
 		},
 		{
 			name:    "plus misses left operand",
@@ -63,44 +63,44 @@ func TestParser_expr(t *testing.T) {
 		{
 			name: "minus",
 			text: "var x = 1 - 2",
-			want: newASTFile(t, ast.Var{
+			want: ast.Var{
 				Name: "x",
 				Val: ast.BinExpr{
 					Op:    ast.BinOpMinus,
 					Left:  ast.Number{Val: 1},
 					Right: ast.Number{Val: 2},
 				},
-			}),
+			},
 		},
 		{
 			name: "multiply",
 			text: "var x = 1 * 2",
-			want: newASTFile(t, ast.Var{
+			want: ast.Var{
 				Name: "x",
 				Val: ast.BinExpr{
 					Op:    ast.BinOpMul,
 					Left:  ast.Number{Val: 1},
 					Right: ast.Number{Val: 2},
 				},
-			}),
+			},
 		},
 		{
 			name: "divide",
 			text: "var x = 1 / 2",
-			want: newASTFile(t, ast.Var{
+			want: ast.Var{
 				Name: "x",
 				Val: ast.BinExpr{
 					Op:    ast.BinOpDiv,
 					Left:  ast.Number{Val: 1},
 					Right: ast.Number{Val: 2},
 				},
-			}),
+			},
 		},
 		// same order
 		{
 			name: "plus and plus",
 			text: "var x = 1 + 2 + 3",
-			want: newASTFile(t, ast.Var{
+			want: ast.Var{
 				Name: "x",
 				Val: ast.BinExpr{
 					Op:   ast.BinOpPlus,
@@ -111,12 +111,12 @@ func TestParser_expr(t *testing.T) {
 						Right: ast.Number{Val: 3},
 					},
 				},
-			}),
+			},
 		},
 		{
 			name: "plus and minus",
 			text: "var x = 1 + 2 - 3",
-			want: newASTFile(t, ast.Var{
+			want: ast.Var{
 				Name: "x",
 				Val: ast.BinExpr{
 					Op:   ast.BinOpPlus,
@@ -127,12 +127,12 @@ func TestParser_expr(t *testing.T) {
 						Right: ast.Number{Val: 3},
 					},
 				},
-			}),
+			},
 		},
 		{
 			name: "plus and multiply",
 			text: "var x = 1 + 2 * 3",
-			want: newASTFile(t, ast.Var{
+			want: ast.Var{
 				Name: "x",
 				Val: ast.BinExpr{
 					Op:   ast.BinOpPlus,
@@ -143,12 +143,12 @@ func TestParser_expr(t *testing.T) {
 						Right: ast.Number{Val: 3},
 					},
 				},
-			}),
+			},
 		},
 		{
 			name: "plus and divide",
 			text: "var x = 1 + 2 / 3",
-			want: newASTFile(t, ast.Var{
+			want: ast.Var{
 				Name: "x",
 				Val: ast.BinExpr{
 					Op:   ast.BinOpPlus,
@@ -159,12 +159,12 @@ func TestParser_expr(t *testing.T) {
 						Right: ast.Number{Val: 3},
 					},
 				},
-			}),
+			},
 		},
 		{
 			name: "minus and plus",
 			text: "var x = 1 - 2 + 3",
-			want: newASTFile(t, ast.Var{
+			want: ast.Var{
 				Name: "x",
 				Val: ast.BinExpr{
 					Op:   ast.BinOpMinus,
@@ -175,12 +175,12 @@ func TestParser_expr(t *testing.T) {
 						Right: ast.Number{Val: 3},
 					},
 				},
-			}),
+			},
 		},
 		{
 			name: "minus and minus",
 			text: "var x = 1 - 2 - 3",
-			want: newASTFile(t, ast.Var{
+			want: ast.Var{
 				Name: "x",
 				Val: ast.BinExpr{
 					Op:   ast.BinOpMinus,
@@ -191,12 +191,12 @@ func TestParser_expr(t *testing.T) {
 						Right: ast.Number{Val: 3},
 					},
 				},
-			}),
+			},
 		},
 		{
 			name: "minus and multiply",
 			text: "var x = 1 - 2 * 3",
-			want: newASTFile(t, ast.Var{
+			want: ast.Var{
 				Name: "x",
 				Val: ast.BinExpr{
 					Op:   ast.BinOpMinus,
@@ -207,12 +207,12 @@ func TestParser_expr(t *testing.T) {
 						Right: ast.Number{Val: 3},
 					},
 				},
-			}),
+			},
 		},
 		{
 			name: "minus and divide",
 			text: "var x = 1 - 2 / 3",
-			want: newASTFile(t, ast.Var{
+			want: ast.Var{
 				Name: "x",
 				Val: ast.BinExpr{
 					Op:   ast.BinOpMinus,
@@ -223,12 +223,12 @@ func TestParser_expr(t *testing.T) {
 						Right: ast.Number{Val: 3},
 					},
 				},
-			}),
+			},
 		},
 		{
 			name: "multiply and plus",
 			text: "var x = 1 * 2 + 3",
-			want: newASTFile(t, ast.Var{
+			want: ast.Var{
 				Name: "x",
 				Val: ast.BinExpr{
 					Op: ast.BinOpPlus,
@@ -239,12 +239,12 @@ func TestParser_expr(t *testing.T) {
 					},
 					Right: ast.Number{Val: 3},
 				},
-			}),
+			},
 		},
 		{
 			name: "multiply and minus",
 			text: "var x = 1 * 2 - 3",
-			want: newASTFile(t, ast.Var{
+			want: ast.Var{
 				Name: "x",
 				Val: ast.BinExpr{
 					Op: ast.BinOpMinus,
@@ -255,12 +255,12 @@ func TestParser_expr(t *testing.T) {
 					},
 					Right: ast.Number{Val: 3},
 				},
-			}),
+			},
 		},
 		{
 			name: "multiply and multiply",
 			text: "var x = 1 * 2 * 3",
-			want: newASTFile(t, ast.Var{
+			want: ast.Var{
 				Name: "x",
 				Val: ast.BinExpr{
 					Op: ast.BinOpMul,
@@ -271,12 +271,12 @@ func TestParser_expr(t *testing.T) {
 					},
 					Right: ast.Number{Val: 3},
 				},
-			}),
+			},
 		},
 		{
 			name: "multiply and divide",
 			text: "var x = 1 * 2 / 3",
-			want: newASTFile(t, ast.Var{
+			want: ast.Var{
 				Name: "x",
 				Val: ast.BinExpr{
 					Op: ast.BinOpDiv,
@@ -287,12 +287,12 @@ func TestParser_expr(t *testing.T) {
 					},
 					Right: ast.Number{Val: 3},
 				},
-			}),
+			},
 		},
 		{
 			name: "divide and plus",
 			text: "var x = 1 / 2 + 3",
-			want: newASTFile(t, ast.Var{
+			want: ast.Var{
 				Name: "x",
 				Val: ast.BinExpr{
 					Op: ast.BinOpPlus,
@@ -303,12 +303,12 @@ func TestParser_expr(t *testing.T) {
 					},
 					Right: ast.Number{Val: 3},
 				},
-			}),
+			},
 		},
 		{
 			name: "divide and minus",
 			text: "var x = 1 / 2 - 3",
-			want: newASTFile(t, ast.Var{
+			want: ast.Var{
 				Name: "x",
 				Val: ast.BinExpr{
 					Op: ast.BinOpMinus,
@@ -319,12 +319,12 @@ func TestParser_expr(t *testing.T) {
 					},
 					Right: ast.Number{Val: 3},
 				},
-			}),
+			},
 		},
 		{
 			name: "divide and multiply",
 			text: "var x = 1 / 2 * 3",
-			want: newASTFile(t, ast.Var{
+			want: ast.Var{
 				Name: "x",
 				Val: ast.BinExpr{
 					Op: ast.BinOpMul,
@@ -335,12 +335,12 @@ func TestParser_expr(t *testing.T) {
 					},
 					Right: ast.Number{Val: 3},
 				},
-			}),
+			},
 		},
 		{
 			name: "divide and divide",
 			text: "var x = 1 / 2 / 3",
-			want: newASTFile(t, ast.Var{
+			want: ast.Var{
 				Name: "x",
 				Val: ast.BinExpr{
 					Op: ast.BinOpDiv,
@@ -351,24 +351,24 @@ func TestParser_expr(t *testing.T) {
 					},
 					Right: ast.Number{Val: 3},
 				},
-			}),
+			},
 		},
 		{
 			name: "group plus",
 			text: "var x = (1 + 2)",
-			want: newASTFile(t, ast.Var{
+			want: ast.Var{
 				Name: "x",
 				Val: ast.BinExpr{
 					Op:    ast.BinOpPlus,
 					Left:  ast.Number{Val: 1},
 					Right: ast.Number{Val: 2},
 				},
-			}),
+			},
 		},
 		{
 			name: "group prioritizes",
 			text: "var x = 1 * (2 + 3)",
-			want: newASTFile(t, ast.Var{
+			want: ast.Var{
 				Name: "x",
 				Val: ast.BinExpr{
 					Op:   ast.BinOpMul,
@@ -379,31 +379,31 @@ func TestParser_expr(t *testing.T) {
 						Right: ast.Number{Val: 3},
 					},
 				},
-			}),
+			},
 		},
 		{
 			name: "lhs is identifier",
 			text: "var x = x + 1",
-			want: newASTFile(t, ast.Var{
+			want: ast.Var{
 				Name: "x",
 				Val: ast.BinExpr{
 					Op:    ast.BinOpPlus,
 					Left:  ast.Ident{Name: "x"},
 					Right: ast.Number{Val: 1},
 				},
-			}),
+			},
 		},
 		{
 			name: "rhs is identifier",
 			text: "var x = 1 + x",
-			want: newASTFile(t, ast.Var{
+			want: ast.Var{
 				Name: "x",
 				Val: ast.BinExpr{
 					Op:    ast.BinOpPlus,
 					Left:  ast.Number{Val: 1},
 					Right: ast.Ident{Name: "x"},
 				},
-			}),
+			},
 		},
 	}
 	testParser_Parse(t, tests)
@@ -414,10 +414,10 @@ func TestParser_call(t *testing.T) {
 		{
 			name: "no args",
 			text: "var x = test()",
-			want: newASTFile(t, ast.Var{
+			want: ast.Var{
 				Name: "x",
 				Val:  ast.Call{Name: "test"},
-			}),
+			},
 		},
 		{
 			name:    "no right parenthesis",
@@ -427,13 +427,13 @@ func TestParser_call(t *testing.T) {
 		{
 			name: "one arg",
 			text: "var x = test(1)",
-			want: newASTFile(t, ast.Var{
+			want: ast.Var{
 				Name: "x",
 				Val: ast.Call{
 					Name: "test",
 					Args: []ast.Node{ast.Number{Val: 1}},
 				},
-			}),
+			},
 		},
 		{
 			name:    "one arg no right parenthesis",
@@ -442,7 +442,7 @@ func TestParser_call(t *testing.T) {
 		}, {
 			name: "one arg expression",
 			text: "var x = test(1 + 2)",
-			want: newASTFile(t, ast.Var{
+			want: ast.Var{
 				Name: "x",
 				Val: ast.Call{
 					Name: "test",
@@ -454,12 +454,12 @@ func TestParser_call(t *testing.T) {
 						},
 					},
 				},
-			}),
+			},
 		},
 		{
 			name: "two args",
 			text: "var x = test(1, 2)",
-			want: newASTFile(t, ast.Var{
+			want: ast.Var{
 				Name: "x",
 				Val: ast.Call{
 					Name: "test",
@@ -468,7 +468,7 @@ func TestParser_call(t *testing.T) {
 						ast.Number{Val: 2},
 					},
 				},
-			}),
+			},
 		},
 		{
 			name:    "two args no right parenthesis",
@@ -484,12 +484,12 @@ func TestParser_func(t *testing.T) {
 		{
 			name: "body is a number",
 			text: "def test() 1",
-			want: newASTFile(t, ast.Func{
+			want: ast.Func{
 				Name: "test",
 				Body: []ast.Node{
 					ast.Number{Val: 1},
 				},
-			}),
+			},
 		},
 		{
 			name:    "no identifier",
@@ -514,29 +514,29 @@ func TestParser_func(t *testing.T) {
 		{
 			name: "one param",
 			text: "def test(a) 1",
-			want: newASTFile(t, ast.Func{
+			want: ast.Func{
 				Name:   "test",
 				Params: []string{"a"},
 				Body: []ast.Node{
 					ast.Number{Val: 1},
 				},
-			}),
+			},
 		},
 		{
 			name: "two params",
 			text: "def test(a, b) 1",
-			want: newASTFile(t, ast.Func{
+			want: ast.Func{
 				Name:   "test",
 				Params: []string{"a", "b"},
 				Body: []ast.Node{
 					ast.Number{Val: 1},
 				},
-			}),
+			},
 		},
 		{
 			name: "body is a binary expression",
 			text: "def test() 1 + 2",
-			want: newASTFile(t, ast.Func{
+			want: ast.Func{
 				Name: "test",
 				Body: []ast.Node{
 					ast.BinExpr{
@@ -545,7 +545,7 @@ func TestParser_func(t *testing.T) {
 						Right: ast.Number{Val: 2},
 					},
 				},
-			}),
+			},
 		},
 	}
 	testParser_Parse(t, tests)
@@ -556,10 +556,10 @@ func TestParser_var(t *testing.T) {
 		{
 			name: "number",
 			text: "var x = 1",
-			want: newASTFile(t, ast.Var{
+			want: ast.Var{
 				Name: "x",
 				Val:  ast.Number{Val: 1},
-			}),
+			},
 		},
 		{
 			name:    "no identifier",
@@ -583,7 +583,7 @@ func TestParser_var(t *testing.T) {
 func testParser_Parse(t *testing.T, tests []testCase) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			got, err := parse.Parse(tc.text)
+			got, err := parse.ParseExpr(tc.text)
 
 			if !errors.Is(err, tc.wantErr) {
 				t.Errorf("unexpected error %v; want %v", err, tc.wantErr)
@@ -600,7 +600,7 @@ func testParser_Parse(t *testing.T, tests []testCase) {
 	}
 }
 
-func ExampleParse() {
+func ExampleParseExpr() {
 	const s = `
 var a = 1
 var b = a + 22
@@ -622,13 +622,4 @@ def d(x, y)
 	//   a + b * 2.0
 	// def d(x, y)
 	//   x * c() + a
-}
-
-func newASTFile(t *testing.T, nn ...ast.Node) *ast.File {
-	t.Helper()
-	decls := make([]*ast.Decl, 0, len(nn))
-	for _, n := range nn {
-		decls = append(decls, &ast.Decl{Node: n})
-	}
-	return &ast.File{Decls: decls}
 }

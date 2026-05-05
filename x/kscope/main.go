@@ -15,6 +15,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/skhal/lab/x/kscope/internal/ast"
 	"github.com/skhal/lab/x/kscope/internal/parse"
 )
 
@@ -31,10 +32,22 @@ func main() {
 }
 
 func run(fname string) error {
-	f, err := parse.ParseFile(fname)
+	n, err := parseFile(fname)
 	if err != nil {
 		return err
 	}
-	fmt.Println(f)
+	fmt.Println(n)
 	return nil
+}
+
+func parseFile(name string) (ast.Node, error) {
+	b, err := os.ReadFile(name)
+	if err != nil {
+		return nil, err
+	}
+	n, err := parse.Parse(string(b))
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", name, err)
+	}
+	return n, nil
 }
