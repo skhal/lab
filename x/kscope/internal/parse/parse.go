@@ -177,15 +177,18 @@ func (p *parser) parseExpression() (ast.Node, error) {
 	if err != nil {
 		return nil, err
 	}
-	tok, ok := p.tr.Peek()
-	if !ok {
-		return lhs, nil
-	}
-	switch tok.Kind {
-	case lex.TokPlus, lex.TokMinus, lex.TokMul, lex.TokDiv:
+	if tok, ok := p.tr.Peek(); ok && isBinExprOperator(tok) {
 		return p.parseBinExpr(lhs)
 	}
 	return lhs, nil
+}
+
+func isBinExprOperator(tok lex.Token) bool {
+	switch tok.Kind {
+	case lex.TokPlus, lex.TokMinus, lex.TokMul, lex.TokDiv:
+		return true
+	}
+	return false
 }
 
 func (p *parser) parseOperand() (ast.Node, error) {
