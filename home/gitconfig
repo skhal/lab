@@ -9,9 +9,22 @@
   command = log --all --decorate --oneline --graph
 
 [alias]
+  # x prints online decored list of commits with all branches
   x = !git '_x' --max-count=10
+
+  # today prints onenline decored list of commits with all branches since
+  # midnight.
   today = !git '_x' --since=midnight
-  week = "!week() { dow=`date +%u`; since=`date -j -v-${dow}d +%Y-%m-%d` ; git '_x' --since=$since; }; week"
+
+  # week prints oneline decorated list of commits with all branches for
+  # current week, starting from Sunday midnight. It groups commits by day using
+  # Lab script ./git/log-bydate.
+  #
+  # One can pass additional arguments to git-log(1). For example, to list
+  # commits in last week filtered by path:
+  #
+  #   git week path
+  week = "!bydate() { [ -x ./git/log-bydate ] && ./git/log-bydate || cut -d ' ' -f 1-2,4-; }; week() { dow=`date +%u`; since=`date -j -v-${dow}d +%Y-%m-%dT00:00:00` ; git '_x' --since=${since} --color --date=short --format='%C(auto)%h %ad %s' "$@" | bydate; }; week"
 
 [commit]
 	gpgsign = true
