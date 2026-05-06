@@ -20,6 +20,19 @@ nogroup() {
   exec cut -d ' ' -f 1,3-
 }
 
+last_date=
+last_date_count=
+buf=
+
+flush() {
+  if [ -z "${last_date}" ]; then
+    return
+  fi
+  day_of_week="$(date -j -f%Y-%m-%d "${last_date}" +%a)"
+  echo "${day_of_week} ${last_date} (${last_date_count})"
+  echo -e "${buf}"
+}
+
 # group groups lines in the standard input by date.
 #
 # The log messages must have the following format:
@@ -30,15 +43,17 @@ nogroup() {
 #
 #   * 2026-01-01 abc123 commit message
 group() {
-  last_date=
   while read prefix date suffix; do
     if [ "${last_date}" != "${date}" ]; then
+      flush
       last_date="${date}"
-      day_of_week="$(date -j -f%Y-%m-%d "${date}" +%a)"
-      echo "${day_of_week} ${date}"
+      last_date_count=0
+      buf=
     fi
-    echo "${prefix} ${suffix}"
+    last_date_count=$((last_date_count + 1))
+    buf="${buf}${buf:+\n}${prefix} ${suffix}"
   done
+  flush
 }
 
 # GITGROUP environment variable has preference to control grouping.
