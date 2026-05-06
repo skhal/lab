@@ -5,10 +5,13 @@
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 
+[alias "_x"]
+  command = log --all --decorate --oneline --graph
+
 [alias]
-  x = log --all --decorate --oneline --graph
-  today = !git x --since=midnight
-  week = "!week() { dow=`date +%u`; since=`date -j -v-${dow}d +%Y-%m-%d` ; git x --since=$since; }; week"
+  x = !git '_x' --max-count=10
+  today = !git '_x' --since=midnight
+  week = "!week() { dow=`date +%u`; since=`date -j -v-${dow}d +%Y-%m-%d` ; git '_x' --since=$since; }; week"
 
 [commit]
 	gpgsign = true
