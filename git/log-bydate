@@ -56,21 +56,28 @@ group() {
   flush
 }
 
-# GITGROUP environment variable has preference to control grouping.
-#
-# keep-sorted start skip_lines=1,-1
-case "$GITGROUP" in
-  [Nn][Oo] | [Ff][Aa][Ll][Ss][Ee])
-    nogroup
-    ;;
-  [Yy][Ee][Ss] | [Tt][Rr][Uu][Ee])
-    group
-    ;;
-esac
-# keep-sorted end
+main() {
+  # GITGROUP environment variable has preference to control grouping.
+  #
+  case "$GITGROUP" in
+    [Nn][Oo] | [Ff][Aa][Ll][Ss][Ee])
+      nogroup
+      ;;
+    [Yy][Ee][Ss] | [Tt][Rr][Uu][Ee])
+      group
+      ;;
+    *)
+      echo >&2 "invalid GITGROUP value '$GITGROUP' - must be yes/no or true/false"
+      exit 1
+      ;;
+  esac
+}
 
-# do not group if STDOUT is not connected to a terminal
+# Disable grouping if standard output is piped unless forced to group by
+# GITGROUP environment variable.
 if ! [ -t 1 ]; then
-  nogroup
+  : ${GITGROUP:=no}
 fi
-group
+: ${GITGROUP:=yes}
+
+main | less -FR
