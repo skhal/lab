@@ -5,14 +5,9 @@
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 
-# log-bydate groups log messages by date. The log messages must have the
-# following format:
-#
-#   * DATE <suffix>
-#
-# for example:
-#
-#   * 2026-01-01 abc123 commit message
+# log-bydate groups log messages by date. It skips grouping if the output is
+# the output is piped. Use GITGROUP environment variable to override grouping
+# decision.
 #
 # ENVIRONMENT
 #
@@ -20,17 +15,46 @@
 #
 set -e
 
+# nogroup removes dates from standard input and passes it ungrouped.
+nogroup() {
+  exec cut -d ' ' -f 1,3-
+}
+
+# group groups lines in the standard input by date.
+#
+# The log messages must have the following format:
+#
+#   * DATE <suffix>
+#
+# for example:
+#
+#   * 2026-01-01 abc123 commit message
+group() {
+  last_date=
+  while read prefix date suffix; do
+    if [ "${last_date}" != "${date}" ]; then
+      last_date="${date}"
+      echo "${date}"
+    fi
+    echo "${prefix} ${suffix}"
+  done
+}
+
+# GITGROUP environment variable has preference to control grouping.
+#
+# keep-sorted start skip_lines=1,-1
 case "$GITGROUP" in
   [Nn][Oo] | [Ff][Aa][Ll][Ss][Ee])
-    exec cut -d ' ' -f 1,3-
+    nogroup
+    ;;
+  [Yy][Ee][Ss] | [Tt][Rr][Uu][Ee])
+    group
     ;;
 esac
+# keep-sorted end
 
-last_date=
-while read prefix date suffix; do
-  if [ "${last_date}" != "${date}" ]; then
-    last_date="${date}"
-    echo "${date}"
-  fi
-  echo "${prefix} ${suffix}"
-done
+# do not group if STDOUT is not connected to a terminal
+if ! [ -t 1 ]; then
+  nogroup
+fi
+group
