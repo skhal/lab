@@ -47,13 +47,19 @@ func parse(s string, pf parseFunc) (node ast.Node, err error) {
 	next, stop := iter.Pull(toks)
 	defer stop()
 	r := newTokenReader(readerFunc(next))
-	return pf(&parser{tr: r})
+	p := newParser(r)
+	return pf(p)
 }
 
 // parser is a Recursive Descent Parser (RDP). It converts a sequence of tokens
 // into an Abstract Syntax Tree (AST).
 type parser struct {
 	tr *tokenReader
+}
+
+// newParser creates a parser with supplied token reader.
+func newParser(r *tokenReader) *parser {
+	return &parser{tr: r}
 }
 
 // ParseCode parses a code segment. A code segment only holds declarations.
