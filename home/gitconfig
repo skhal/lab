@@ -6,8 +6,8 @@
 # license that can be found in the LICENSE file.
 
 [alias]
-  x = log --all --decorate --oneline --graph --max-count=10
-  today = log --all --decorate --oneline --graph --since=midnight
+  x = log --all --decorate --oneline --graph
+  today = !git x --since=midnight
 
 [commit]
 	gpgsign = true
