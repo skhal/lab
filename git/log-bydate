@@ -8,7 +8,11 @@
 # log-bydate groups log messages by date. The log messages must have the
 # following format:
 #
-#   * SHA DATE ...
+#   * DATE <suffix>
+#
+# for example:
+#
+#   * 2026-01-01 abc123 commit message
 #
 # ENVIRONMENT
 #
@@ -18,15 +22,15 @@ set -e
 
 case "$GITGROUP" in
   [Nn][Oo] | [Ff][Aa][Ll][Ss][Ee])
-    exec cut -d ' ' -f 1-2,4-
+    exec cut -d ' ' -f 1,3-
     ;;
 esac
 
 last_date=
-while read star sha cur_date suffix; do
-  if [ "${last_date}" != "${cur_date}" ]; then
-    last_date="${cur_date}"
-    echo "${cur_date}"
+while read prefix date suffix; do
+  if [ "${last_date}" != "${date}" ]; then
+    last_date="${date}"
+    echo "${date}"
   fi
-  echo "${star} ${sha} ${suffix}"
+  echo "${prefix} ${suffix}"
 done
