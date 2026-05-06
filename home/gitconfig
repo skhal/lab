@@ -24,7 +24,7 @@
   # commits in last week filtered by path:
   #
   #   git week path
-  week = "!bydate() { [ -x ./git/log-bydate ] && ./git/log-bydate || cut -d ' ' -f 1-2,4-; }; week() { dow=`date +%u`; since=`date -j -v-${dow}d +%Y-%m-%dT00:00:00` ; git '_x' --since=${since} --color --date=short --format='%C(auto)%h %ad %s' "$@" | bydate; }; week"
+  week = "!bydate() { [ -x ./git/log-bydate ] && ./git/log-bydate || cut -d ' ' -f 1-2,4-; }; week() { dow=`date +%u`; since=`date -j -v-${dow}d +%Y-%m-%dT00:00:00` ; git '_x' --since=${since} --color --date=short --format='%C(auto)%h %ad%d %s' "$@" | bydate; }; week"
 
 [commit]
 	gpgsign = true
