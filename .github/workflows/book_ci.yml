@@ -10,8 +10,8 @@ on:
     branches: ["main"]
     paths: ['book/**']
   schedule:
-  # Everyday at 6:00 UTC
-  - cron: '0 6 * * *'
+  # Everyday Monday at 6:00 UTC
+  - cron: '0 6 * * MON'
 
 jobs:
   bootstrap:
