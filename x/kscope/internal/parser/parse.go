@@ -16,12 +16,6 @@ import (
 	"github.com/skhal/lab/x/kscope/internal/lex"
 )
 
-// ErrParse means there is an error in parsing.
-var ErrParse = errors.New("parse error")
-
-// errNotDeclaration means the root element is not a declaration.
-var errNotDeclaration = errors.New("invalid root token") // NOEXPORT
-
 // Parse parses the code segment s.
 func Parse(s string) (ast.Node, error) {
 	return parse(s, (*parser).ParseCode)
@@ -43,30 +37,34 @@ func parse(s string, pf parseFunc) (node ast.Node, err error) {
 		}
 		err = lx.Err()
 	}()
-	toks, _ := lx.Lex(s)
+	toks, posr := lx.Lex(s)
 	next, stop := iter.Pull(toks)
 	defer stop()
 	r := newTokenReader(readerFunc(next))
-	p := newParser(r)
+	p := newParser(r, posr)
 	return pf(p)
 }
 
 // parser is a Recursive Descent Parser (RDP). It converts a sequence of tokens
 // into an Abstract Syntax Tree (AST).
 type parser struct {
-	tr *tokenReader
+	tr   *tokenReader
+	posr *lex.Positioner
 }
 
 // newParser creates a parser with supplied token reader.
-func newParser(r *tokenReader) *parser {
-	return &parser{tr: r}
+func newParser(r *tokenReader, p *lex.Positioner) *parser {
+	return &parser{tr: r, posr: p}
 }
 
 // ParseCode parses a code segment. A code segment only holds declarations.
 // It is an exported API to wrap all internal errors into ErrParse.
 func (p *parser) ParseCode() (ast.Node, error) {
 	f, err := p.parseCode()
-	if err != nil {
+	switch {
+	case errors.Is(err, ErrParse):
+		return nil, err
+	case err != nil:
 		return nil, fmt.Errorf("%w: %s", ErrParse, err)
 	}
 	return f, nil
@@ -100,8 +98,9 @@ func (p *parser) ParseExpr() (ast.Node, error) {
 		return nil, nil
 	case errors.Is(err, errNotDeclaration):
 		n, err = p.parseExpression()
-	}
-	if err != nil {
+	case errors.Is(err, ErrParse):
+		return nil, err
+	case err != nil:
 		return nil, fmt.Errorf("%w: %s", ErrParse, err)
 	}
 	return n, err
@@ -122,29 +121,41 @@ func (p *parser) parseDecl() (ast.Node, error) {
 		return p.parseVar()
 	}
 	// keep-sorted end
-	return nil, fmt.Errorf("%s: %w", tok, errNotDeclaration)
+	return nil, p.error(errNotDeclaration)
 }
 
 // parseFunc parses a function definition.
 func (p *parser) parseFunc() (ast.Node, error) {
 	p.tr.Read() // skip TokDef
 	ident, ok := p.tr.Read()
-	if !ok || ident.Kind != lex.TokIdent {
-		return nil, fmt.Errorf("missing function identifier")
+	switch {
+	case !ok:
+		return nil, p.errorf("missing function identifier")
+	case ident.Kind != lex.TokIdent:
+		return nil, p.errorf("not a function identifier")
 	}
-	if tok, ok := p.tr.Read(); !ok || tok.Kind != lex.TokLpar {
-		return nil, fmt.Errorf("func %s: missing args left parenthesis", ident.Val)
+	switch tok, ok := p.tr.Read(); {
+	case !ok:
+		return nil, p.errorf("missing left parenthesis")
+	case tok.Kind != lex.TokLpar:
+		return nil, p.errorf("not left parenthesis")
 	}
 	params, err := p.parseFuncParams()
 	if err != nil {
-		return nil, fmt.Errorf("func %s: %s", ident.Val, err)
+		return nil, err
 	}
-	if tok, ok := p.tr.Read(); !ok || tok.Kind != lex.TokRpar {
-		return nil, fmt.Errorf("func %s: missing args right parenthesis", ident.Val)
+	switch tok, ok := p.tr.Read(); {
+	case !ok:
+		return nil, p.errorf("missing right parenthesis")
+	case tok.Kind != lex.TokRpar:
+		return nil, p.errorf("not right parenthesis")
+	}
+	if _, ok := p.tr.Peek(); !ok {
+		return nil, p.errorf("missing function body")
 	}
 	body, err := p.parseExpression()
 	if err != nil {
-		return nil, fmt.Errorf("func %s: parse body: %s", ident.Val, err)
+		return nil, err
 	}
 	node := &ast.Func{
 		Name: ident.Val,
@@ -163,9 +174,9 @@ func (p *parser) parseFuncParams() ([]string, error) {
 		if tok, ok := p.tr.Peek(); !ok || tok.Kind == lex.TokRpar {
 			break
 		}
-		par, ok := p.tr.Read()
-		if !ok || par.Kind != lex.TokIdent {
-			return nil, fmt.Errorf("param %d: missing name", pnum)
+		par, _ := p.tr.Read()
+		if par.Kind != lex.TokIdent {
+			return nil, p.errorf("not a parameter name")
 		}
 		params = append(params, par.Val)
 		if tok, ok := p.tr.Peek(); ok && tok.Kind == lex.TokComma {
@@ -201,7 +212,7 @@ func isBinExprOperator(tok lex.Token) bool {
 func (p *parser) parseOperand() (ast.Node, error) {
 	tok, ok := p.tr.Read()
 	if !ok {
-		return nil, fmt.Errorf("missing operand")
+		return nil, p.errorf("missing operand")
 	}
 	// keep-sorted start skip_lines=1,-1
 	switch tok.Kind {
@@ -213,24 +224,24 @@ func (p *parser) parseOperand() (ast.Node, error) {
 	case lex.TokLpar:
 		return p.parseGroup(tok)
 	case lex.TokNum:
-		return parseNumber(tok)
+		return p.parseNumber(tok)
 	}
 	// keep-sorted end
-	return nil, fmt.Errorf("unsupported operand token %s", tok)
+	return nil, p.errorf("not operand %s", tok.Val)
 }
 
 // parseCall parses a function call.
 func (p *parser) parseCall(ident lex.Token) (ast.Node, error) {
 	// left parenthesis
 	if _, ok := p.tr.Read(); !ok {
-		return nil, fmt.Errorf("call %s: missing left parenthesis", ident.Val)
+		return nil, p.errorf("missing left parenthesis")
 	}
 	args, err := p.parseCallArgs()
 	if err != nil {
-		return nil, fmt.Errorf("call %s: %s", ident.Val, err)
+		return nil, err
 	}
 	if tok, ok := p.tr.Read(); !ok || tok.Kind != lex.TokRpar {
-		return nil, fmt.Errorf("call %s: missing right parenthesis", ident.Val)
+		return nil, p.errorf("missing right parenthesis")
 	}
 	node := &ast.Call{
 		Name: ident.Val,
@@ -270,19 +281,19 @@ var binOps = map[lex.TokenKind]ast.BinOp{
 func (p *parser) parseBinExpr(lhs ast.Node) (ast.Node, error) {
 	tok, ok := p.tr.Read()
 	if !ok {
-		return nil, fmt.Errorf("missing binary operator")
+		return nil, p.errorf("missing binary operator")
 	}
 	op, ok := binOps[tok.Kind]
 	if !ok {
-		return nil, fmt.Errorf("unsupported binary operator %s", tok)
+		return nil, p.errorf("invalid operator %s", tok)
 	}
 	next, ok := p.tr.Peek()
 	if !ok {
-		return nil, fmt.Errorf("missing right operand")
+		return nil, p.errorf("missing right operand")
 	}
 	rhs, err := p.parseExpression()
 	if err != nil {
-		return nil, fmt.Errorf("operator %s: right operand: %s", tok, err)
+		return nil, err
 	}
 	n := &ast.BinExpr{Op: op, Left: lhs, Right: rhs}
 	if shouldRotateLeft(tok, next) {
@@ -312,10 +323,10 @@ func rotateLeft(n *ast.BinExpr) *ast.BinExpr {
 }
 
 // parseNumber parses token as a numbee
-func parseNumber(tok lex.Token) (ast.Node, error) {
+func (p *parser) parseNumber(tok lex.Token) (ast.Node, error) {
 	v, err := strconv.ParseFloat(tok.Val, 64)
 	if err != nil {
-		return nil, fmt.Errorf("failed to parse number - %s", tok)
+		return nil, p.errorf("not a number - %s", tok.Val)
 	}
 	return &ast.Number{Val: v}, nil
 }
@@ -326,7 +337,7 @@ func (p *parser) parseGroup(_ lex.Token) (ast.Node, error) {
 		return nil, err
 	}
 	if tok, ok := p.tr.Read(); !ok || tok.Kind != lex.TokRpar {
-		return nil, fmt.Errorf("missing right paraenthesis")
+		return nil, p.errorf("missing right paraenthesis")
 	}
 	return expr, nil
 }
@@ -334,16 +345,31 @@ func (p *parser) parseGroup(_ lex.Token) (ast.Node, error) {
 func (p *parser) parseVar() (ast.Node, error) {
 	p.tr.Read() // skip TokVar
 	ident, ok := p.tr.Read()
-	if !ok || ident.Kind != lex.TokIdent {
-		return nil, fmt.Errorf("missing variable identifier")
+	switch {
+	case !ok:
+		return nil, p.errorf("missing variable identifier")
+	case ident.Kind != lex.TokIdent:
+		return nil, p.errorf("want variable identifier")
 	}
-	if tok, ok := p.tr.Read(); !ok || tok.Kind != lex.TokAssign {
-		return nil, fmt.Errorf("var %s: missing assignment", ident.Val)
+	switch tok, ok := p.tr.Read(); {
+	case !ok:
+		return nil, p.errorf("missing assignment")
+	case tok.Kind != lex.TokAssign:
+		return nil, p.errorf("want assignment")
 	}
 	val, err := p.parseExpression()
 	if err != nil {
-		return nil, fmt.Errorf("var %s: parse value: %s", ident.Val, err)
+		return nil, err
 	}
 	n := &ast.Var{Name: ident.Val, Val: val}
 	return n, nil
+}
+
+func (p *parser) error(err error) error {
+	return newParseError(p.posr.Pos(), err)
+}
+
+func (p *parser) errorf(format string, arg ...any) error {
+	err := fmt.Errorf(format, arg...)
+	return p.error(err)
 }

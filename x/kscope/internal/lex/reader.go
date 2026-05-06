@@ -85,6 +85,7 @@ func (br *blockReader) Read() (rune, bool) {
 	if r == runeEOL {
 		br.pos.push(br.block.end)
 	}
+	br.pos.position(br.block.end)
 	br.block.end += sz
 	return r, true
 }
@@ -93,6 +94,7 @@ func (br *blockReader) Read() (rune, bool) {
 // ready to read the next block.
 func (br *blockReader) Text() (s string, pos int) {
 	defer br.Ignore()
+	br.pos.position(br.block.start)
 	return br.str[br.block.start:br.block.end], br.block.start
 }
 
@@ -113,4 +115,5 @@ func (br *blockReader) Unread() {
 		br.pos.pop()
 	}
 	br.block.end -= sz
+	br.pos.position(br.block.end)
 }

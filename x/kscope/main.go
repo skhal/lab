@@ -17,6 +17,7 @@ import (
 	"path/filepath"
 
 	"github.com/skhal/lab/x/kscope/internal/ast"
+	"github.com/skhal/lab/x/kscope/internal/lex"
 	"github.com/skhal/lab/x/kscope/internal/parser"
 )
 
@@ -55,6 +56,10 @@ func parseFile(name string) (ast.Node, error) {
 	}
 	n, err := parser.Parse(string(b))
 	if err != nil {
+		type pos interface{ Pos() lex.Position }
+		if p, ok := err.(pos); ok {
+			return nil, fmt.Errorf("%s:%s: %w", name, p.Pos(), err)
+		}
 		return nil, fmt.Errorf("%s: %w", name, err)
 	}
 	return n, nil

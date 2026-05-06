@@ -25,19 +25,19 @@ func (l Position) String() string {
 // source code.
 type Positioner struct {
 	eols []int // sorted indises of new lines in the code.
+	pos  int   // position of the last read character
 }
 
-// Pos converts token index in the code to the line and column number. It
+// Pos returns current read position.
+func (p *Positioner) Pos() Position {
+	return p.PosIndex(p.pos)
+}
+
+// PosToken converts token index in the code to the line and column number. It
 // assumes that the code is ASCII in calculating the column number, i.e. every
 // character is a single byte rune.
-func (p *Positioner) Pos(tok Token) Position {
+func (p *Positioner) PosToken(tok Token) Position {
 	return p.PosIndex(tok.pos)
-}
-
-func (p *Positioner) pos(n int) Position {
-	ln := p.findLine(n)
-	col := p.findCol(n, ln)
-	return Position{Line: ln + 1, Col: col}
 }
 
 // PosIndex converts code index to the line and column number. See [Pos] for
@@ -46,9 +46,14 @@ func (p *Positioner) PosIndex(n int) Position {
 	if n < 0 {
 		return Position{}
 	}
-	return p.pos(n)
+	return p.posIndex(n)
 }
 
+func (p *Positioner) posIndex(n int) Position {
+	ln := p.findLine(n)
+	col := p.findCol(n, ln)
+	return Position{Line: ln + 1, Col: col}
+}
 func (p *Positioner) findLine(pos int) int {
 	// oftentimes the code wants the position of the last token, e.g. errors.
 	if len(p.eols) == 0 || pos > p.eols[len(p.eols)-1] {
@@ -65,10 +70,17 @@ func (p *Positioner) findCol(pos int, ln int) int {
 	return pos - p.eols[ln-1] // -1 for previous line
 }
 
+// push adds an end-of-line index.
 func (p *Positioner) push(eol int) {
 	p.eols = append(p.eols, eol)
 }
 
+// pop removes last end-of-line index.
 func (p *Positioner) pop() {
 	p.eols = p.eols[:len(p.eols)-1]
+}
+
+// position stores current position.
+func (p *Positioner) position(n int) {
+	p.pos = n
 }

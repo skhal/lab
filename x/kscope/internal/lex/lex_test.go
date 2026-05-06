@@ -280,7 +280,7 @@ func ExampleLexer_Lex() {
 name 3`
 	seq, positioner := (&lex.Lexer{}).Lex(s)
 	for tk := range seq {
-		fmt.Printf("%s %s\n", positioner.Pos(tk), tk)
+		fmt.Printf("%s %s\n", positioner.PosToken(tk), tk)
 	}
 	// Output:
 	// 1:1 number "1"
