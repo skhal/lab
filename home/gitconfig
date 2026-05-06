@@ -8,6 +8,7 @@
 [alias]
   x = log --all --decorate --oneline --graph
   today = !git x --since=midnight
+  week = "!week() { dow=`date +%u`; since=`date -j -v-${dow}d +%Y-%m-%d` ; git x --since=$since; }; week"
 
 [commit]
 	gpgsign = true
