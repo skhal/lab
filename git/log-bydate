@@ -34,7 +34,8 @@ group() {
   while read prefix date suffix; do
     if [ "${last_date}" != "${date}" ]; then
       last_date="${date}"
-      echo "${date}"
+      day_of_week="$(date -j -f%Y-%m-%d "${date}" +%a)"
+      echo "${day_of_week} ${date}"
     fi
     echo "${prefix} ${suffix}"
   done
