@@ -7,6 +7,7 @@
 
 [alias]
   x = log --all --decorate --oneline --graph --max-count=10
+  today = log --all --decorate --oneline --graph --since=yesterday
 
 [commit]
 	gpgsign = true
