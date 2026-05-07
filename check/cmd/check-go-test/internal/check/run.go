@@ -15,9 +15,6 @@ import (
 	goslices "github.com/skhal/lab/go/slices"
 )
 
-// ErrTest indicates an error in running go tests.
-var ErrTest = errors.New("test error")
-
 // Run runs `go test` on packages for listed files.
 func Run(files []string) error {
 	packages := slices.Collect(Unique(Paths(FilterFunc(slices.Values(files), IsGoFile))))
