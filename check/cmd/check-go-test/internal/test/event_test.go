@@ -22,11 +22,6 @@ func TestAction_MarshalJSON(t *testing.T) {
 		want   string
 	}{
 		{
-			name:   "unspecified",
-			action: test.ActionUnspecified,
-			want:   `"unspecified"`,
-		},
-		{
 			name:   "start",
 			action: test.ActionStart,
 			want:   `"start"`,
@@ -92,11 +87,6 @@ func TestAction_UnmarshalJSON(t *testing.T) {
 		b    string
 		want test.Action
 	}{
-		{
-			name: "unspecified",
-			b:    `"unspecified"`,
-			want: test.ActionUnspecified,
-		},
 		{
 			name: "start",
 			b:    `"start"`,

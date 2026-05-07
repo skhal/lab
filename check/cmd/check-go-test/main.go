@@ -11,7 +11,6 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"os"
 
@@ -20,9 +19,7 @@ import (
 
 func main() {
 	if err := check.Run(os.Args[1:]); err != nil {
-		if !errors.Is(err, check.ErrTest) {
-			fmt.Fprintln(os.Stderr, err)
-		}
+		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 }

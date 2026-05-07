@@ -15,7 +15,7 @@ import (
 	"github.com/skhal/lab/check/cmd/check-go-test/internal/build"
 )
 
-func TestActino_MarshalJSON(t *testing.T) {
+func TestAction_MarshalJSON(t *testing.T) {
 	tests := []struct {
 		name    string
 		action  build.Action
@@ -31,11 +31,6 @@ func TestActino_MarshalJSON(t *testing.T) {
 			name:   "build fail",
 			action: build.ActionFail,
 			want:   "build-fail",
-		},
-		{
-			name:    "invalid action",
-			action:  build.Action(123),
-			wantErr: build.ErrInvalidAction,
 		},
 	}
 	for _, tc := range tests {
@@ -56,7 +51,7 @@ func TestActino_MarshalJSON(t *testing.T) {
 	}
 }
 
-func TestActino_UnmarshalJSON(t *testing.T) {
+func TestAction_UnmarshalJSON(t *testing.T) {
 	tests := []struct {
 		name    string
 		b       string

@@ -2,37 +2,37 @@
 //
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
-//
-//go:generate stringer -type=Action
 
 package test
 
 import (
 	"encoding/json"
+	"fmt"
 	"strings"
 	"time"
 )
 
-// Event is a TestEvent from test2json (see: go doc test2json).
+// TestEvent is a go-test output from test2json (see: go doc test2json).
 type TestEvent struct {
-	// Time is the time of the event, omitted for cached test results.
-	Time        time.Time     `json:",omitzero"`  // RFC3339
-	Action      Action        `json:",omitzero"`  // a JSON stream begins with ActionStart
-	Package     string        `json:",omitempty"` // identifies the package under test
-	Test        string        `json:",omitempty"`
-	Elapsed     time.Duration `json:",omitzero"`
-	Output      string        `json:",omitempty"`
-	FailedBuild string        `json:",omitempty"`
+	// Time is the event's time in RFC3339. It is missing for cached results.
+	Time        time.Time     `json:",omitzero"`
+	Package     string        `json:",omitempty"` // package under test
+	Test        string        `json:",omitempty"` // test name
+	Output      string        `json:",omitempty"` // output line
+	FailedBuild string        `json:",omitempty"` // build output on error
+	Action      Action        `json:",omitzero"`  // event kind
+	Elapsed     time.Duration `json:",omitzero"`  // time since the test started
 }
 
+// MarshalJSON implements [json.Marshaler].
 func (e *TestEvent) MarshalJSON() ([]byte, error) {
 	// Use an alias to the Event to avoid MarshalJSON() infinite loop - json
 	// package recursively traverses the structure and uses MarshalJSON for the
 	// fields of types with such a method.
 	type EventAlias TestEvent
 	evt := struct {
-		Elapsed float64 `json:",omitempty"`
 		*EventAlias
+		Elapsed float64 `json:",omitempty"`
 	}{
 		Elapsed:    e.Elapsed.Seconds(),
 		EventAlias: (*EventAlias)(e),
@@ -40,14 +40,15 @@ func (e *TestEvent) MarshalJSON() ([]byte, error) {
 	return json.Marshal(evt)
 }
 
+// UnmarshalJSON implements [json.Unmarshaler].
 func (e *TestEvent) UnmarshalJSON(b []byte) error {
 	// Use an alias to the Event to avoid MarshalJSON() infinite loop - json
 	// package recursively traverses the structure and uses MarshalJSON for the
 	// fields of types with such a method.
 	type EventAlias TestEvent
 	evt := &struct {
-		Elapsed float64
 		*EventAlias
+		Elapsed float64
 	}{
 		EventAlias: (*EventAlias)(e),
 	}
@@ -58,77 +59,49 @@ func (e *TestEvent) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-// Actin is the event state (see go doc test2json)
+// Action is the event state (see go doc test2json)
+//
+//go:generate stringer -type=Action -linecomment
 type Action int
 
 const (
-	ActionUnspecified Action = iota
-	ActionStart              // the test binary is about to be executed
-	ActionRun                // the test run started
-	ActionPause              // the test paused
-	ActionContinue           // the test run continued
-	ActionPass               // the test passed
-	ActionBenchmark          // the benchmarks logs and did not fail
-	ActionFail               // the test or benchmark failed
-	ActionOutput             // test output prints
-	ActionSkip               // the test skipped or no tests in the package
+	_ Action = iota
+	// keep-sorted start
+	ActionBenchmark // bench
+	ActionContinue  // cont
+	ActionFail      // fail
+	ActionOutput    // output
+	ActionPass      // pass
+	ActionPause     // pause
+	ActionRun       // run
+	ActionSkip      // skip
+	ActionStart     // start
+	// keep-sorted end
 )
 
-// MarshalJSON implements json.Marshaler interface.
+// MarshalJSON implements [json.Marshaler].
 func (a Action) MarshalJSON() ([]byte, error) {
-	var s string
-	switch a {
-	default:
-		s = "unspecified"
-	case ActionStart:
-		s = "start"
-	case ActionRun:
-		s = "run"
-	case ActionPause:
-		s = "pause"
-	case ActionContinue:
-		s = "cont"
-	case ActionPass:
-		s = "pass"
-	case ActionBenchmark:
-		s = "bench"
-	case ActionFail:
-		s = "fail"
-	case ActionOutput:
-		s = "output"
-	case ActionSkip:
-		s = "skip"
-	}
-	return json.Marshal(s)
+	return json.Marshal(a.String())
 }
 
-// UnmsarshalJSON implements json.Unmarshaler interface.
+var actionByName = make(map[string]Action)
+
+func init() {
+	for a := ActionBenchmark; a <= ActionStart; a++ {
+		actionByName[a.String()] = a
+	}
+}
+
+// UnmarshalJSON implements [json.Unmarshaler] interface.
 func (a *Action) UnmarshalJSON(b []byte) error {
 	var s string
 	if err := json.Unmarshal(b, &s); err != nil {
 		return err
 	}
-	switch strings.ToLower(s) {
-	default:
-		*a = ActionUnspecified
-	case "start":
-		*a = ActionStart
-	case "run":
-		*a = ActionRun
-	case "pause":
-		*a = ActionPause
-	case "cont":
-		*a = ActionContinue
-	case "pass":
-		*a = ActionPass
-	case "bench":
-		*a = ActionBenchmark
-	case "fail":
-		*a = ActionFail
-	case "output":
-		*a = ActionOutput
-	case "skip":
-		*a = ActionSkip
+	action, ok := actionByName[strings.ToLower(s)]
+	if !ok {
+		return fmt.Errorf("invalid action %s", s)
 	}
+	*a = action
 	return nil
 }

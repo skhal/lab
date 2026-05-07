@@ -19,13 +19,13 @@ import (
 var ErrTest = errors.New("test error")
 
 // Run runs `go test` on packages for listed files.
-func Run(files []string) (err error) {
+func Run(files []string) error {
 	packages := slices.Collect(Unique(Paths(FilterFunc(slices.Values(files), IsGoFile))))
 	packages = slices.DeleteFunc(packages, func(p string) bool {
 		return strings.Contains(p, "/testdata/")
 	})
 	if len(packages) == 0 {
-		return
+		return nil
 	}
 	packages = goslices.MapFunc(packages, func(p string) string {
 		// Gotest is a pre-commit check. Git reports changed files with respect
@@ -34,14 +34,14 @@ func Run(files []string) (err error) {
 		return filepath.FromSlash("./" + filepath.Clean(p))
 	})
 	tester := NewTester()
-	if err = tester.TestAll(packages); err != nil {
-		return
+	if err := tester.TestAll(packages); err != nil {
+		return err
 	}
+	var errs []error
 	tester.VisitFails(func(f *FailedTest) {
-		err = ErrTest
-		fmt.Print(string(f.Output))
+		errs = append(errs, fmt.Errorf("%s", f.Output))
 	})
-	return
+	return errors.Join(errs...)
 }
 
 // IsGoFile reports whether a file is a Go source, i.e. has `.go` extension.
