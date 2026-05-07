@@ -34,5 +34,5 @@ for pkg in $packages; do
   if [ -z "$pkg" ]; then
     continue
   fi
-  fieldalignment -fix ./"$pkg"/...
+  fieldalignment -test=false -fix ./"$pkg"/...
 done
