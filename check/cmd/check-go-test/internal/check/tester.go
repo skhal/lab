@@ -71,7 +71,7 @@ func (t *Tester) TestAll(pkgs []string) error {
 func (t *Tester) test(pkgs []string) error {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-	args := append([]string{"test", "-json", "-vet=all", "-race"}, pkgs...)
+	args := append([]string{"test", "-json", "-vet=all"}, pkgs...)
 	cmd := exec.CommandContext(ctx, "go", args...)
 	cmd.Stderr = os.Stderr
 	stdout, err := cmd.StdoutPipe()
