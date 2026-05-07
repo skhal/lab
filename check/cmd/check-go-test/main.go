@@ -11,14 +11,24 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/skhal/lab/check/cmd/check-go-test/internal/check"
 )
 
+func init() {
+	flag.Usage = func() {
+		w := flag.CommandLine.Output()
+		fmt.Fprintf(w, "usage: %s file ...\n", filepath.Base(os.Args[0]))
+	}
+}
+
 func main() {
-	if err := check.Run(os.Args[1:]); err != nil {
+	flag.Parse()
+	if err := check.Run(flag.Args()); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
