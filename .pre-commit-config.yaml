@@ -141,6 +141,7 @@ repos:
     exclude: |
       (?x)^(
          .*\.pb\.go
+        |.*_test\.go
         |nvim/plugin/lab-skeleton/share/new.*
       )$
   - id: go-test
