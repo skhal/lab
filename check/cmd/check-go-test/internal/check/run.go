@@ -22,7 +22,7 @@ func Run(files []string) error {
 		return nil
 	}
 	tester := NewTester()
-	if err := tester.TestAll(packages); err != nil {
+	if err := tester.Test(packages); err != nil {
 		return err
 	}
 	var errs []error

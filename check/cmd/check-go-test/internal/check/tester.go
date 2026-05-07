@@ -35,14 +35,8 @@ func NewTester() *Tester {
 	}
 }
 
-// Test runs `go test` on a single package and collects test output, grouped
-// by test id. It keeps track of failed tests.
-func (t *Tester) Test(pkg string) error {
-	return t.test([]string{pkg})
-}
-
-// TestAll runs a single `go test` for the packages.
-func (t *Tester) TestAll(pkgs []string) error {
+// Test runs a single `go test` for the packages.
+func (t *Tester) Test(pkgs []string) error {
 	return t.test(pkgs)
 }
 
