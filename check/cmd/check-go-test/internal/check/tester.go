@@ -16,44 +16,22 @@ import (
 	"iter"
 	"os"
 	"os/exec"
-	"path/filepath"
 
 	"github.com/skhal/lab/check/cmd/check-go-test/internal/build"
 	"github.com/skhal/lab/check/cmd/check-go-test/internal/test"
 )
 
-// EventID identifies an Event. It includes the Event's package and test names.
-type EventID string
-
-// Event is a single item output by Go test command. It is either a build or
-// test event.
-type Event struct {
-	BuildEvent *build.Event    // building output (go help buildjson)
-	TestEvent  *test.TestEvent // testing output (go doc test2json)
-}
-
-// Fail returns true if the event represents ActionFail.
-func (e *Event) Fail() bool {
-	if e.BuildEvent != nil && e.BuildEvent.Action == build.ActionFail {
-		return true
-	}
-	if e.TestEvent != nil && e.TestEvent.Action == test.ActionFail {
-		return true
-	}
-	return false
-}
-
 // Tester runs `go test` on packages and groups events by event ids. It also
 // keeps track of failed tests for further analysis.
 type Tester struct {
-	events map[EventID][]*Event
+	events map[EventID][]Event
 	fails  []EventID
 }
 
 // NewTester creates a tester, ready for testing packages.
 func NewTester() *Tester {
 	return &Tester{
-		events: make(map[EventID][]*Event),
+		events: make(map[EventID][]Event),
 	}
 }
 
@@ -92,8 +70,8 @@ func (t *Tester) test(pkgs []string) error {
 	return nil
 }
 
-func decodeEvents(r io.Reader) iter.Seq2[EventID, *Event] {
-	return func(yield func(EventID, *Event) bool) {
+func decodeEvents(r io.Reader) iter.Seq2[EventID, Event] {
+	return func(yield func(EventID, Event) bool) {
 		scanner := bufio.NewScanner(r)
 		for scanner.Scan() {
 			b := scanner.Bytes()
@@ -101,7 +79,7 @@ func decodeEvents(r io.Reader) iter.Seq2[EventID, *Event] {
 			if err != nil {
 				break
 			}
-			if !yield(NewEventID(e), e) {
+			if !yield(e.ID(), e) {
 				break
 			}
 		}
@@ -117,7 +95,7 @@ var (
 var ErrNotJSON = errors.New("not JSON")
 
 // JSONUnmarshal decodes b into a build or test event.
-func JSONUnmarshal(b []byte) (*Event, error) {
+func JSONUnmarshal(b []byte) (Event, error) {
 	// Build output may include non-JSON lines `go help buildjson`
 	if !bytes.HasPrefix(b, jsonPrefix) {
 		return nil, fmt.Errorf("parse %q: %w", b, ErrNotJSON)
@@ -128,25 +106,20 @@ func JSONUnmarshal(b []byte) (*Event, error) {
 	return jsonUnmarshalTestEvent(b)
 }
 
-func jsonUnmarshalBuildEvent(b []byte) (*Event, error) {
+func jsonUnmarshalBuildEvent(b []byte) (Event, error) {
 	e := new(build.Event)
 	if err := json.Unmarshal(b, &e); err != nil {
 		return nil, err
 	}
-	return &Event{
-		BuildEvent: e,
-	}, nil
-
+	return (*BuildEvent)(e), nil
 }
 
-func jsonUnmarshalTestEvent(b []byte) (*Event, error) {
+func jsonUnmarshalTestEvent(b []byte) (Event, error) {
 	e := new(test.TestEvent)
 	if err := json.Unmarshal(b, &e); err != nil {
 		return nil, err
 	}
-	return &Event{
-		TestEvent: e,
-	}, nil
+	return (*TestEvent)(e), nil
 }
 
 // VisitFails calls f on failed tests.
@@ -155,33 +128,6 @@ func (t *Tester) VisitFails(f func(*FailedTest)) {
 		ft := newFailedTest(t.events[id])
 		f(ft)
 	}
-}
-
-// NewEventID constructs an EventID for a given event.
-func NewEventID(e *Event) EventID {
-	var eid EventID
-	switch {
-	default:
-		// invalid event
-	case e.BuildEvent != nil:
-		eid = newEventIDFromBuildEvent(e.BuildEvent)
-	case e.TestEvent != nil:
-		eid = newEventIDFromTestEvent(e.TestEvent)
-	}
-	return eid
-}
-
-func newEventIDFromBuildEvent(e *build.Event) EventID {
-	id := e.ImportPath
-	return EventID(id)
-}
-
-func newEventIDFromTestEvent(e *test.TestEvent) EventID {
-	id := e.Test
-	if e.Package != "" {
-		id = filepath.Join(e.Package, e.Test)
-	}
-	return EventID(id)
 }
 
 // FailedTest holds failed test package, name and output of `go test` for a
@@ -193,12 +139,12 @@ type FailedTest struct {
 	Output []byte // test output
 }
 
-func newFailedTest(ee []*Event) *FailedTest {
+func newFailedTest(ee []Event) *FailedTest {
 	var (
 		pkg, t string
 		buf    = new(bytes.Buffer)
 	)
-	collectBuildEvent := func(e *build.Event) {
+	collectBuildEvent := func(e *BuildEvent) {
 		switch e.Action {
 		case build.ActionFail:
 			pkg = e.ImportPath
@@ -206,7 +152,7 @@ func newFailedTest(ee []*Event) *FailedTest {
 			buf.WriteString(e.Output)
 		}
 	}
-	collectTestEvent := func(e *test.TestEvent) {
+	collectTestEvent := func(e *TestEvent) {
 		switch e.Action {
 		case test.ActionFail:
 			pkg = e.Package
@@ -216,11 +162,11 @@ func newFailedTest(ee []*Event) *FailedTest {
 		}
 	}
 	for _, e := range ee {
-		switch {
-		case e.BuildEvent != nil:
-			collectBuildEvent(e.BuildEvent)
-		case e.TestEvent != nil:
-			collectTestEvent(e.TestEvent)
+		switch v := e.(type) {
+		case *BuildEvent:
+			collectBuildEvent(v)
+		case *TestEvent:
+			collectTestEvent(v)
 		}
 	}
 	return &FailedTest{
