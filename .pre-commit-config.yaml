@@ -147,7 +147,7 @@ repos:
   - id: go-test
     name: "Go test"
     description: "run Go tests for changes packages"
-    entry: env CHECKGOTESTPARALLEL=yes check-go-test
+    entry: check-go-test
     language: system
     types_or: [go]
     pass_filenames: true
