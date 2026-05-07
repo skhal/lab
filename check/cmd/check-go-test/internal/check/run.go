@@ -17,19 +17,10 @@ import (
 
 // Run runs `go test` on packages for listed files.
 func Run(files []string) error {
-	packages := slices.Collect(Unique(Paths(FilterFunc(slices.Values(files), IsGoFile))))
-	packages = slices.DeleteFunc(packages, func(p string) bool {
-		return strings.Contains(p, "/testdata/")
-	})
+	packages := collectPackages(files)
 	if len(packages) == 0 {
 		return nil
 	}
-	packages = goslices.MapFunc(packages, func(p string) string {
-		// Gotest is a pre-commit check. Git reports changed files with respect
-		// to the work tree, without leading "./". `go test` expects local packages
-		// to start with "./".
-		return filepath.FromSlash("./" + filepath.Clean(p))
-	})
 	tester := NewTester()
 	if err := tester.TestAll(packages); err != nil {
 		return err
@@ -39,6 +30,20 @@ func Run(files []string) error {
 		errs = append(errs, fmt.Errorf("%s", f.Output))
 	})
 	return errors.Join(errs...)
+}
+
+func collectPackages(files []string) []string {
+	packages := slices.Collect(Unique(Paths(FilterFunc(slices.Values(files), IsGoFile))))
+	packages = slices.DeleteFunc(packages, func(p string) bool {
+		return strings.Contains(p, "/testdata/")
+	})
+	packages = goslices.MapFunc(packages, func(p string) string {
+		// Gotest is a pre-commit check. Git reports changed files with respect
+		// to the work tree, without leading "./". `go test` expects local packages
+		// to start with "./".
+		return filepath.FromSlash("./" + filepath.Clean(p))
+	})
+	return packages
 }
 
 // IsGoFile reports whether a file is a Go source, i.e. has `.go` extension.
