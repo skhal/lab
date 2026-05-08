@@ -16,6 +16,8 @@ import (
 	"iter"
 	"os"
 	"os/exec"
+	"strings"
+	"unicode"
 
 	"github.com/skhal/lab/check/cmd/check-go-test/internal/build"
 	"github.com/skhal/lab/check/cmd/check-go-test/internal/test"
@@ -38,7 +40,14 @@ func NewTester() *Tester {
 
 // Test runs a single `go test` for the packages.
 func (t *Tester) Test(pkgs []string) error {
-	return t.test(pkgs)
+	if err := t.test(pkgs); err != nil {
+		return err
+	}
+	var errs []error
+	for _, id := range t.fails {
+		errs = append(errs, newError(t.events[id]))
+	}
+	return errors.Join(errs...)
 }
 
 func (t *Tester) test(pkgs []string) error {
@@ -117,45 +126,21 @@ func jsonUnmarshalTestEvent(b []byte) (Event, error) {
 	return &TestEvent{TestEvent: e}, nil
 }
 
-// VisitFails calls f on failed tests.
-func (t *Tester) VisitFails(f func(*FailedTest)) {
-	for _, id := range t.fails {
-		ft := newFailedTest(t.events[id])
-		f(ft)
-	}
-}
-
-// FailedTest holds failed test package, name and output of `go test` for a
-// given test.
-type FailedTest struct {
-	Err     error  // test error
-	Package string // package name
-	Test    string // test name
-}
-
-func newFailedTest(ee []Event) *FailedTest {
-	var (
-		pkg, t string
-		buf    = new(bytes.Buffer)
-	)
+func newError(events []Event) error {
+	buf := new(bytes.Buffer)
 	collectBuildEvent := func(e *BuildEvent) {
-		switch e.Action {
-		case build.ActionFail:
-			pkg = e.ImportPath
-		case build.ActionOutput:
-			buf.WriteString(e.Output)
+		if e.Action != build.ActionOutput {
+			return
 		}
+		buf.WriteString(e.Output)
 	}
 	collectTestEvent := func(e *TestEvent) {
-		switch e.Action {
-		case test.ActionFail:
-			pkg = e.Package
-			t = e.Test
-		case test.ActionOutput:
-			buf.WriteString(e.Output)
+		if e.Action != test.ActionOutput {
+			return
 		}
+		buf.WriteString(e.Output)
 	}
-	for _, e := range ee {
+	for _, e := range events {
 		switch v := e.(type) {
 		case *BuildEvent:
 			collectBuildEvent(v)
@@ -163,9 +148,6 @@ func newFailedTest(ee []Event) *FailedTest {
 			collectTestEvent(v)
 		}
 	}
-	return &FailedTest{
-		Package: pkg,
-		Test:    t,
-		Err:     errors.New(buf.String()),
-	}
+	output := strings.TrimRightFunc(buf.String(), unicode.IsSpace)
+	return errors.New(output)
 }

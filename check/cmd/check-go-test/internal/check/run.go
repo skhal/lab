@@ -6,7 +6,6 @@
 package check
 
 import (
-	"errors"
 	"path/filepath"
 	"slices"
 	"strings"
@@ -31,14 +30,7 @@ func Run(files []string, opts ...Opt) error {
 		return nil
 	}
 	tester := NewTester()
-	if err := tester.Test(packages); err != nil {
-		return err
-	}
-	var errs []error
-	tester.VisitFails(func(ft *FailedTest) {
-		errs = append(errs, ft.Err)
-	})
-	return errors.Join(errs...)
+	return tester.Test(packages)
 }
 
 func collectPackages(files []string) []string {
