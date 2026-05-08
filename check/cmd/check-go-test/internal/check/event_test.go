@@ -90,20 +90,20 @@ func TestNewTestEvent(t *testing.T) {
 		},
 		{
 			name:  "zero coverage",
-			event: &test.Event{Output: "test\ncoverage: 0.0% of statements\n"},
+			event: &test.Event{Output: "coverage: 0.0% of statements\n"},
 			want: &check.TestEvent{
 				Event: &test.Event{
-					Output: "test\ncoverage: 0.0% of statements\n",
+					Output: "coverage: 0.0% of statements\n",
 				},
 				Coverage: new(check.Coverage(0)),
 			},
 		},
 		{
 			name:  "non zero coverage",
-			event: &test.Event{Output: "test\ncoverage: 12.3% of statements\n"},
+			event: &test.Event{Output: "coverage: 12.3% of statements\n"},
 			want: &check.TestEvent{
 				Event: &test.Event{
-					Output: "test\ncoverage: 12.3% of statements\n",
+					Output: "coverage: 12.3% of statements\n",
 				},
 				Coverage: new(check.Coverage(12.3)),
 			},

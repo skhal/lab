@@ -7,6 +7,7 @@ package check
 
 import (
 	"bytes"
+	"fmt"
 	"strings"
 	"unicode"
 
@@ -42,4 +43,20 @@ func (err buildError) Error() string {
 		buf.WriteString(be.Output)
 	}
 	return strings.TrimRightFunc(buf.String(), unicode.IsSpace)
+}
+
+type coverageError struct {
+	pkg  string
+	got  Coverage
+	want Coverage
+}
+
+// Error implements [builtin.error].
+func (err *coverageError) Error() string {
+	var b strings.Builder
+	fmt.Fprintf(&b, "=== COVERAGE: %s\n", err.pkg)
+	fmt.Fprintf(&b, "    coverage: %s of statements\n", err.got)
+	fmt.Fprintf(&b, "    threshold: %s\n", err.want)
+	fmt.Fprintf(&b, "--- FAIL")
+	return b.String()
 }

@@ -66,7 +66,7 @@ func NewTestEvent(te *test.Event) (*TestEvent, error) {
 	return &TestEvent{Event: te, Coverage: c}, nil
 }
 
-var rxCoverage = regexp.MustCompile(`coverage: (\d+\.\d)% of statements`)
+var rxCoverage = regexp.MustCompile(`^coverage: (\d+\.\d)% of statements`)
 
 func extractCoverage(s string) (*Coverage, error) {
 	matches := rxCoverage.FindStringSubmatch(s)

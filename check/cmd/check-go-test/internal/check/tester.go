@@ -21,6 +21,8 @@ import (
 	"github.com/skhal/lab/check/cmd/check-go-test/internal/test"
 )
 
+var defaultArgs = []string{"test", "-json", "-vet=all"}
+
 // Tester runs go-test on a list of packages and processes JSON output. It
 // groups events by event ids, which is a package and optional test case.
 type Tester struct {
@@ -31,7 +33,7 @@ type Tester struct {
 func (t *Tester) Test(pkgs []string) error {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-	args := append([]string{"test", "-json", "-vet=all"}, pkgs...)
+	args := t.args(pkgs)
 	cmd := exec.CommandContext(ctx, "go", args...)
 	cmd.Stderr = os.Stderr
 	stdout, err := cmd.StdoutPipe()
@@ -43,6 +45,14 @@ func (t *Tester) Test(pkgs []string) error {
 	}
 	defer cmd.Wait()
 	return t.processOutput(stdout)
+}
+
+func (t *Tester) args(pos []string) []string {
+	args := defaultArgs
+	if t.coverage > 0 {
+		args = append(args, "-cover")
+	}
+	return append(args, pos...)
 }
 
 func (t *Tester) processOutput(r io.Reader) error {
@@ -61,8 +71,26 @@ func (t *Tester) processOutput(r io.Reader) error {
 				errs = append(errs, buildError(ee))
 			}
 		}
+		if err := t.checkCoverage(e); err != nil {
+			errs = append(errs, err)
+		}
 	}
 	return errors.Join(errs...)
+}
+
+func (t *Tester) checkCoverage(e Event) error {
+	te, ok := e.(*TestEvent)
+	if !ok {
+		return nil
+	}
+	if te.Coverage == nil || *te.Coverage >= t.coverage {
+		return nil
+	}
+	return &coverageError{
+		pkg:  te.Package,
+		got:  *te.Coverage,
+		want: t.coverage,
+	}
 }
 
 func decodeEvents(r io.Reader) iter.Seq2[EventID, Event] {
@@ -114,5 +142,5 @@ func jsonUnmarshalTestEvent(b []byte) (Event, error) {
 	if err := json.Unmarshal(b, &e); err != nil {
 		return nil, err
 	}
-	return &TestEvent{Event: e}, nil
+	return NewTestEvent(e)
 }
