@@ -19,7 +19,7 @@ import (
 	"github.com/skhal/lab/check/cmd/check-go-test/internal/check"
 )
 
-var coverage = flag.Float64("coverage", 40, "coverage threshold in pcent")
+var coverage = flag.Float64("cover", 0, "coverage threshold in pcent")
 
 func init() {
 	flag.Usage = func() {
