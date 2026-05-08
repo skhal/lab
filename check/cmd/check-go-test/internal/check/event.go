@@ -6,7 +6,10 @@
 package check
 
 import (
+	"fmt"
 	"path/filepath"
+	"regexp"
+	"strconv"
 
 	"github.com/skhal/lab/check/cmd/check-go-test/internal/build"
 	"github.com/skhal/lab/check/cmd/check-go-test/internal/test"
@@ -39,8 +42,43 @@ func (e *BuildEvent) ID() EventID {
 	return EventID(id)
 }
 
+// Coverage is the percent of coverage as reported by `go test -cover`.
+type Coverage float64
+
+// String prints coverage as percent.
+func (c Coverage) String() string {
+	return fmt.Sprintf("%.1f%%", c)
+}
+
 // TestEvent is an even from the test stage.
-type TestEvent test.TestEvent
+type TestEvent struct {
+	*test.TestEvent
+	Coverage *Coverage // test coverage
+}
+
+// NewTestEvent creates a TestEvent with coverage extracted from the event
+// output if "coverage: ##.#% of statements" substring is present.
+func NewTestEvent(te *test.TestEvent) (*TestEvent, error) {
+	c, err := extractCoverage(te.Output)
+	if err != nil {
+		return nil, err
+	}
+	return &TestEvent{TestEvent: te, Coverage: c}, nil
+}
+
+var rxCoverage = regexp.MustCompile(`coverage: (\d+\.\d)% of statements`)
+
+func extractCoverage(s string) (*Coverage, error) {
+	matches := rxCoverage.FindStringSubmatch(s)
+	if matches == nil {
+		return nil, nil
+	}
+	n, err := strconv.ParseFloat(matches[1], 64)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse coverage %s", matches[1])
+	}
+	return (*Coverage)(&n), nil
+}
 
 // Fail returns true if the event corresponds t the fail action.
 func (e *TestEvent) Fail() bool {

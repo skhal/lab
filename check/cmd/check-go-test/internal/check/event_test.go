@@ -6,65 +6,40 @@
 package check_test
 
 import (
+	"errors"
 	"fmt"
 	"testing"
 
+	"github.com/google/go-cmp/cmp"
 	"github.com/skhal/lab/check/cmd/check-go-test/internal/build"
 	"github.com/skhal/lab/check/cmd/check-go-test/internal/check"
 	"github.com/skhal/lab/check/cmd/check-go-test/internal/test"
 )
 
-func TestEvent_Fail(t *testing.T) {
+func ExampleCoverage_String() {
+	fmt.Println(check.Coverage(0))
+	fmt.Println(check.Coverage(12))
+	fmt.Println(check.Coverage(100))
+	// Output:
+	// 0.0%
+	// 12.0%
+	// 100.0%
+}
+
+func TestBuildEvent_Fail(t *testing.T) {
 	tests := []struct {
 		name  string
-		event check.Event
+		event *check.BuildEvent
 		want  bool
 	}{
 		{
-			name:  "build event action output",
+			name:  "action output",
 			event: withBuildEventAction(t, build.ActionOutput),
 		},
 		{
-			name:  "build event action fail",
+			name:  "action fail",
 			event: withBuildEventAction(t, build.ActionFail),
 			want:  true,
-		},
-		{
-			name:  "test event action start",
-			event: withTestEventAction(t, test.ActionStart),
-		},
-		{
-			name:  "test event action run",
-			event: withTestEventAction(t, test.ActionRun),
-		},
-		{
-			name:  "test event action pause",
-			event: withTestEventAction(t, test.ActionPause),
-		},
-		{
-			name:  "test event action continue",
-			event: withTestEventAction(t, test.ActionContinue),
-		},
-		{
-			name:  "test event action pass",
-			event: withTestEventAction(t, test.ActionPass),
-		},
-		{
-			name:  "test event action benchmark",
-			event: withTestEventAction(t, test.ActionBenchmark),
-		},
-		{
-			name:  "test event action fail",
-			event: withTestEventAction(t, test.ActionFail),
-			want:  true,
-		},
-		{
-			name:  "test event action output",
-			event: withTestEventAction(t, test.ActionOutput),
-		},
-		{
-			name:  "test event action skip",
-			event: withTestEventAction(t, test.ActionSkip),
 		},
 	}
 	for _, tc := range tests {
@@ -77,26 +52,16 @@ func TestEvent_Fail(t *testing.T) {
 	}
 }
 
-func TestEvent_ID(t *testing.T) {
+func TestBuildEvent_ID(t *testing.T) {
 	tests := []struct {
 		name  string
-		event check.Event
+		event *check.BuildEvent
 		want  check.EventID
 	}{
 		{
-			name:  "build event",
+			name:  "import path",
 			event: (*check.BuildEvent)(&build.Event{ImportPath: "test"}),
 			want:  check.EventID("test"),
-		},
-		{
-			name:  "test event no package",
-			event: (*check.TestEvent)(&test.TestEvent{Test: "test"}),
-			want:  check.EventID("test"),
-		},
-		{
-			name:  "test event with package",
-			event: (*check.TestEvent)(&test.TestEvent{Package: "package", Test: "test"}),
-			want:  check.EventID("package/test"),
 		},
 	}
 	for _, tc := range tests {
@@ -111,14 +76,148 @@ func TestEvent_ID(t *testing.T) {
 	}
 }
 
-func withBuildEventAction(t *testing.T, a build.Action) check.Event {
+func TestNewTestEvent(t *testing.T) {
+	tests := []struct {
+		name    string
+		event   *test.TestEvent
+		want    *check.TestEvent
+		wantErr error
+	}{
+		{
+			name:  "no coverage",
+			event: &test.TestEvent{Output: "test"},
+			want:  mustTestEvent(t, &test.TestEvent{Output: "test"}),
+		},
+		{
+			name:  "zero coverage",
+			event: &test.TestEvent{Output: "test\ncoverage: 0.0% of statements\n"},
+			want: &check.TestEvent{
+				TestEvent: &test.TestEvent{
+					Output: "test\ncoverage: 0.0% of statements\n",
+				},
+				Coverage: new(check.Coverage(0)),
+			},
+		},
+		{
+			name:  "non zero coverage",
+			event: &test.TestEvent{Output: "test\ncoverage: 12.3% of statements\n"},
+			want: &check.TestEvent{
+				TestEvent: &test.TestEvent{
+					Output: "test\ncoverage: 12.3% of statements\n",
+				},
+				Coverage: new(check.Coverage(12.3)),
+			},
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			got, err := check.NewTestEvent(tc.event)
+
+			if !errors.Is(err, tc.wantErr) {
+				t.Errorf("unexpected error %v; want %v", err, tc.wantErr)
+			}
+			if d := cmp.Diff(tc.want, got); d != "" {
+				t.Errorf("mismatch (-want +got):\n%s", d)
+			}
+		})
+	}
+}
+
+func TestTestEvent_Fail(t *testing.T) {
+	tests := []struct {
+		name  string
+		event *check.TestEvent
+		want  bool
+	}{
+		{
+			name:  "action start",
+			event: mustTestEvent(t, &test.TestEvent{Action: test.ActionStart}),
+		},
+		{
+			name:  "action run",
+			event: mustTestEvent(t, &test.TestEvent{Action: test.ActionRun}),
+		},
+		{
+			name:  "action pause",
+			event: mustTestEvent(t, &test.TestEvent{Action: test.ActionPause}),
+		},
+		{
+			name:  "action continue",
+			event: mustTestEvent(t, &test.TestEvent{Action: test.ActionContinue}),
+		},
+		{
+			name:  "action pass",
+			event: mustTestEvent(t, &test.TestEvent{Action: test.ActionPass}),
+		},
+		{
+			name:  "action benchmark",
+			event: mustTestEvent(t, &test.TestEvent{Action: test.ActionBenchmark}),
+		},
+		{
+			name:  "action fail",
+			event: mustTestEvent(t, &test.TestEvent{Action: test.ActionFail}),
+			want:  true,
+		},
+		{
+			name:  "action output",
+			event: mustTestEvent(t, &test.TestEvent{Action: test.ActionOutput}),
+		},
+		{
+			name:  "action skip",
+			event: mustTestEvent(t, &test.TestEvent{Action: test.ActionSkip}),
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			got := tc.event.Fail()
+			if got != tc.want {
+				t.Errorf("check.Event.Fail() got %v; want %v", got, tc.want)
+			}
+		})
+	}
+}
+
+func TestTestEvent_ID(t *testing.T) {
+	tests := []struct {
+		name  string
+		event *check.TestEvent
+		want  check.EventID
+	}{
+		{
+			name:  "no package",
+			event: mustTestEvent(t, &test.TestEvent{Test: "test"}),
+			want:  check.EventID("test"),
+		},
+		{
+			name:  "with package",
+			event: &check.TestEvent{TestEvent: &test.TestEvent{Package: "package", Test: "test"}},
+			want:  check.EventID("package/test"),
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			got := tc.event.ID()
+
+			if tc.want != got {
+				t.Errorf("(*TestEvent).ID() = %s; want %s", got, tc.want)
+				t.Logf("event:\n%s", formatEvent(tc.event))
+			}
+		})
+	}
+}
+
+func withBuildEventAction(t *testing.T, a build.Action) *check.BuildEvent {
 	t.Helper()
 	return (*check.BuildEvent)(&build.Event{Action: a})
 }
 
-func withTestEventAction(t *testing.T, a test.Action) check.Event {
+func mustTestEvent(t *testing.T, te *test.TestEvent) *check.TestEvent {
 	t.Helper()
-	return (*check.TestEvent)(&test.TestEvent{Action: a})
+	event, err := check.NewTestEvent(te)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return event
 }
 
 func formatEvent(e check.Event) string {

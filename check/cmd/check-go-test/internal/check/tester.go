@@ -113,7 +113,7 @@ func jsonUnmarshalTestEvent(b []byte) (Event, error) {
 	if err := json.Unmarshal(b, &e); err != nil {
 		return nil, err
 	}
-	return (*TestEvent)(e), nil
+	return &TestEvent{TestEvent: e}, nil
 }
 
 // VisitFails calls f on failed tests.
