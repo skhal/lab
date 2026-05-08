@@ -148,6 +148,7 @@ repos:
     name: "Go test"
     description: "run Go tests for changes packages"
     entry: check-go-test
+    args: ["-cover", "80"]
     language: system
     types_or: [go]
     pass_filenames: true
