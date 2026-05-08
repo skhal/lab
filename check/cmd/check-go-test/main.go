@@ -19,16 +19,21 @@ import (
 	"github.com/skhal/lab/check/cmd/check-go-test/internal/check"
 )
 
+var coverage = flag.Float64("coverage", 40, "coverage threshold in pcent")
+
 func init() {
 	flag.Usage = func() {
 		w := flag.CommandLine.Output()
 		fmt.Fprintf(w, "usage: %s file ...\n", filepath.Base(os.Args[0]))
+		fmt.Fprintln(w)
+		fmt.Fprintln(w, "flags:")
+		flag.CommandLine.PrintDefaults()
 	}
 }
 
 func main() {
 	flag.Parse()
-	if err := check.Run(flag.Args()); err != nil {
+	if err := check.Run(flag.Args(), check.WithCoverage(*coverage)); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}

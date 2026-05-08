@@ -24,8 +24,9 @@ import (
 // Tester runs `go test` on packages and groups events by event ids. It also
 // keeps track of failed tests for further analysis.
 type Tester struct {
-	events map[EventID][]Event
-	fails  []EventID
+	events   map[EventID][]Event
+	fails    []EventID
+	coverage Coverage
 }
 
 // NewTester creates a tester, ready for testing packages.
