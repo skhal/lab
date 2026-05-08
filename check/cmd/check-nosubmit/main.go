@@ -7,14 +7,24 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/skhal/lab/check/cmd/check-nosubmit/internal/nosubmit"
 )
 
+func init() {
+	flag.Usage = func() {
+		w := flag.CommandLine.Output()
+		fmt.Fprintf(w, "usage: %s file ...\n", filepath.Base(os.Args[0]))
+	}
+}
+
 func main() {
-	if err := nosubmit.Run(os.Args[1:]...); err != nil {
+	flag.Parse()
+	if err := nosubmit.Run(flag.Args()...); err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
