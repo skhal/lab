@@ -128,10 +128,9 @@ func (t *Tester) VisitFails(f func(*FailedTest)) {
 // FailedTest holds failed test package, name and output of `go test` for a
 // given test.
 type FailedTest struct {
-	Package string // package name of the test source.
+	Err     error  // test error
+	Package string // package name
 	Test    string // test name
-
-	Output []byte // test output
 }
 
 func newFailedTest(ee []Event) *FailedTest {
@@ -167,6 +166,6 @@ func newFailedTest(ee []Event) *FailedTest {
 	return &FailedTest{
 		Package: pkg,
 		Test:    t,
-		Output:  buf.Bytes(),
+		Err:     errors.New(buf.String()),
 	}
 }

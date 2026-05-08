@@ -7,7 +7,6 @@ package check
 
 import (
 	"errors"
-	"fmt"
 	"path/filepath"
 	"slices"
 	"strings"
@@ -36,8 +35,8 @@ func Run(files []string, opts ...Opt) error {
 		return err
 	}
 	var errs []error
-	tester.VisitFails(func(f *FailedTest) {
-		errs = append(errs, fmt.Errorf("%s", f.Output))
+	tester.VisitFails(func(ft *FailedTest) {
+		errs = append(errs, ft.Err)
 	})
 	return errors.Join(errs...)
 }
