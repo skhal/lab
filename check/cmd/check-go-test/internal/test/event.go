@@ -12,8 +12,8 @@ import (
 	"time"
 )
 
-// TestEvent is a go-test output from test2json (see: go doc test2json).
-type TestEvent struct {
+// Event is a go-test output from test2json (see: go doc test2json).
+type Event struct {
 	// Time is the event's time in RFC3339. It is missing for cached results.
 	Time        time.Time     `json:",omitzero"`
 	Package     string        `json:",omitempty"` // package under test
@@ -25,11 +25,11 @@ type TestEvent struct {
 }
 
 // MarshalJSON implements [json.Marshaler].
-func (e *TestEvent) MarshalJSON() ([]byte, error) {
+func (e *Event) MarshalJSON() ([]byte, error) {
 	// Use an alias to the Event to avoid MarshalJSON() infinite loop - json
 	// package recursively traverses the structure and uses MarshalJSON for the
 	// fields of types with such a method.
-	type EventAlias TestEvent
+	type EventAlias Event
 	evt := struct {
 		*EventAlias
 		Elapsed float64 `json:",omitempty"`
@@ -41,11 +41,11 @@ func (e *TestEvent) MarshalJSON() ([]byte, error) {
 }
 
 // UnmarshalJSON implements [json.Unmarshaler].
-func (e *TestEvent) UnmarshalJSON(b []byte) error {
+func (e *Event) UnmarshalJSON(b []byte) error {
 	// Use an alias to the Event to avoid MarshalJSON() infinite loop - json
 	// package recursively traverses the structure and uses MarshalJSON for the
 	// fields of types with such a method.
-	type EventAlias TestEvent
+	type EventAlias Event
 	evt := &struct {
 		*EventAlias
 		Elapsed float64

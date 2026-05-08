@@ -52,18 +52,18 @@ func (c Coverage) String() string {
 
 // TestEvent is an even from the test stage.
 type TestEvent struct {
-	*test.TestEvent
+	*test.Event
 	Coverage *Coverage // test coverage
 }
 
 // NewTestEvent creates a TestEvent with coverage extracted from the event
 // output if "coverage: ##.#% of statements" substring is present.
-func NewTestEvent(te *test.TestEvent) (*TestEvent, error) {
+func NewTestEvent(te *test.Event) (*TestEvent, error) {
 	c, err := extractCoverage(te.Output)
 	if err != nil {
 		return nil, err
 	}
-	return &TestEvent{TestEvent: te, Coverage: c}, nil
+	return &TestEvent{Event: te, Coverage: c}, nil
 }
 
 var rxCoverage = regexp.MustCompile(`coverage: (\d+\.\d)% of statements`)

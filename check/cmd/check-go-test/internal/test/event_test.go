@@ -151,60 +151,60 @@ func TestAction_UnmarshalJSON(t *testing.T) {
 func TestEvent_MarshalJSON(t *testing.T) {
 	tests := []struct {
 		name     string
-		event    *test.TestEvent
+		event    *test.Event
 		wantJSON string
 		wantErr  error
 	}{
 		{
 			name:     "zero value",
-			event:    &test.TestEvent{},
+			event:    &test.Event{},
 			wantJSON: `{}`,
 		},
 		{
 			name: "time",
-			event: &test.TestEvent{
+			event: &test.Event{
 				Time: time.Date(2006, 01, 02, 03, 04, 05, 0, time.UTC),
 			},
 			wantJSON: `{"Time":"2006-01-02T03:04:05Z"}`,
 		},
 		{
 			name: "action",
-			event: &test.TestEvent{
+			event: &test.Event{
 				Action: test.ActionStart,
 			},
 			wantJSON: `{"Action":"start"}`,
 		},
 		{
 			name: "package",
-			event: &test.TestEvent{
+			event: &test.Event{
 				Package: "test-package",
 			},
 			wantJSON: `{"Package":"test-package"}`,
 		},
 		{
 			name: "test",
-			event: &test.TestEvent{
+			event: &test.Event{
 				Test: "test-name",
 			},
 			wantJSON: `{"Test":"test-name"}`,
 		},
 		{
 			name: "elapsed",
-			event: &test.TestEvent{
+			event: &test.Event{
 				Elapsed: time.Duration(1.23 * float64(time.Second)),
 			},
 			wantJSON: `{"Elapsed":1.23}`,
 		},
 		{
 			name: "output",
-			event: &test.TestEvent{
+			event: &test.Event{
 				Output: "test-output",
 			},
 			wantJSON: `{"Output":"test-output"}`,
 		},
 		{
 			name: "failed build",
-			event: &test.TestEvent{
+			event: &test.Event{
 				FailedBuild: "test-build",
 			},
 			wantJSON: `{"FailedBuild":"test-build"}`,
@@ -226,71 +226,71 @@ func TestEvent_MarshalJSON(t *testing.T) {
 	}
 }
 
-func TestTestEvent_UnmarshalJSON(t *testing.T) {
+func TestEvent_UnmarshalJSON(t *testing.T) {
 	tests := []struct {
 		name      string
 		json      string
-		wantEvent *test.TestEvent
+		wantEvent *test.Event
 		wantErr   error
 	}{
 		{
 			name:      "zero value",
 			json:      `{}`,
-			wantEvent: &test.TestEvent{},
+			wantEvent: &test.Event{},
 		},
 		{
 			name: "time",
 			json: `{"Time":"2006-01-02T03:04:05Z"}`,
-			wantEvent: &test.TestEvent{
+			wantEvent: &test.Event{
 				Time: time.Date(2006, 01, 02, 03, 04, 05, 0, time.UTC),
 			},
 		},
 		{
 			name: "action",
 			json: `{"Action":"start"}`,
-			wantEvent: &test.TestEvent{
+			wantEvent: &test.Event{
 				Action: test.ActionStart,
 			},
 		},
 		{
 			name: "package",
 			json: `{"Package":"test-package"}`,
-			wantEvent: &test.TestEvent{
+			wantEvent: &test.Event{
 				Package: "test-package",
 			},
 		},
 		{
 			name: "test",
 			json: `{"Test":"test-name"}`,
-			wantEvent: &test.TestEvent{
+			wantEvent: &test.Event{
 				Test: "test-name",
 			},
 		},
 		{
 			name: "elapsed",
 			json: `{"Elapsed":1.23}`,
-			wantEvent: &test.TestEvent{
+			wantEvent: &test.Event{
 				Elapsed: time.Duration(1.23 * float64(time.Second)),
 			},
 		},
 		{
 			name: "output",
 			json: `{"Output":"test-output"}`,
-			wantEvent: &test.TestEvent{
+			wantEvent: &test.Event{
 				Output: "test-output",
 			},
 		},
 		{
 			name: "failed build",
 			json: `{"FailedBuild":"test-build"}`,
-			wantEvent: &test.TestEvent{
+			wantEvent: &test.Event{
 				FailedBuild: "test-build",
 			},
 		},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			var testEvent *test.TestEvent
+			var testEvent *test.Event
 
 			err := json.Unmarshal([]byte(tc.json), &testEvent)
 

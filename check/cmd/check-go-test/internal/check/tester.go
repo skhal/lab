@@ -119,11 +119,11 @@ func jsonUnmarshalBuildEvent(b []byte) (Event, error) {
 }
 
 func jsonUnmarshalTestEvent(b []byte) (Event, error) {
-	e := new(test.TestEvent)
+	e := new(test.Event)
 	if err := json.Unmarshal(b, &e); err != nil {
 		return nil, err
 	}
-	return &TestEvent{TestEvent: e}, nil
+	return &TestEvent{Event: e}, nil
 }
 
 func newError(events []Event) error {

@@ -37,7 +37,7 @@ func TestJSONUnmarshal(t *testing.T) {
 		{
 			name: "test event",
 			b:    `{"Package":"test","Action":"output"}`,
-			want: &check.TestEvent{TestEvent: &test.TestEvent{Package: "test", Action: test.ActionOutput}},
+			want: &check.TestEvent{Event: &test.Event{Package: "test", Action: test.ActionOutput}},
 		},
 	}
 	for _, tc := range tests {
