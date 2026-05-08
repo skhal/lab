@@ -30,6 +30,9 @@ func Run(files []string, opts ...Opt) error {
 		return nil
 	}
 	tester := NewTester()
+	for _, opt := range opts {
+		opt(tester)
+	}
 	return tester.Test(packages)
 }
 
