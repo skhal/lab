@@ -57,38 +57,37 @@ func (t *Tester) args(pos []string) []string {
 
 func (t *Tester) processOutput(r io.Reader) error {
 	var (
-		events = make(map[EventID][]Event)
-		errs   []error
+		buildEvents = make(map[EventID][]*BuildEvent)
+		testEvents  = make(map[EventID][]*TestEvent)
+		errs        []error
 	)
-	for id, e := range decodeEvents(r) {
-		ee := events[id]
-		events[id] = append(ee, e)
-		if e.Fail() {
-			switch e.(type) {
-			case *TestEvent:
-				errs = append(errs, testError(ee))
-			case *BuildEvent:
-				errs = append(errs, buildError(ee))
+	for id, event := range decodeEvents(r) {
+		switch e := event.(type) {
+		case *TestEvent:
+			testEvents[id] = append(testEvents[id], e)
+			if e.Fail() {
+				errs = append(errs, testError(testEvents[id]))
 			}
-		}
-		if err := t.checkCoverage(e); err != nil {
-			errs = append(errs, err)
+			if err := t.checkCoverage(e); err != nil {
+				errs = append(errs, err)
+			}
+		case *BuildEvent:
+			buildEvents[id] = append(buildEvents[id], e)
+			if e.Fail() {
+				errs = append(errs, buildError(buildEvents[id]))
+			}
 		}
 	}
 	return errors.Join(errs...)
 }
 
-func (t *Tester) checkCoverage(e Event) error {
-	te, ok := e.(*TestEvent)
-	if !ok {
-		return nil
-	}
-	if te.Coverage == nil || *te.Coverage >= t.coverage {
+func (t *Tester) checkCoverage(e *TestEvent) error {
+	if e.Coverage == nil || *e.Coverage >= t.coverage {
 		return nil
 	}
 	return &coverageError{
-		pkg:  te.Package,
-		got:  *te.Coverage,
+		pkg:  e.Package,
+		got:  *e.Coverage,
 		want: t.coverage,
 	}
 }

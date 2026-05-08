@@ -15,32 +15,30 @@ import (
 	"github.com/skhal/lab/check/cmd/check-go-test/internal/test"
 )
 
-type testError []Event
+type testError []*TestEvent
 
 // Error implements [builtin.error].
 func (err testError) Error() string {
 	buf := new(bytes.Buffer)
 	for _, item := range err {
-		te := item.(*TestEvent)
-		if te.Action != test.ActionOutput {
+		if item.Action != test.ActionOutput {
 			continue
 		}
-		buf.WriteString(te.Output)
+		buf.WriteString(item.Output)
 	}
 	return strings.TrimRightFunc(buf.String(), unicode.IsSpace)
 }
 
-type buildError []Event
+type buildError []*BuildEvent
 
 // Error implements [builtin.error].
 func (err buildError) Error() string {
 	buf := new(bytes.Buffer)
 	for _, item := range err {
-		be := item.(*BuildEvent)
-		if be.Action != build.ActionOutput {
+		if item.Action != build.ActionOutput {
 			continue
 		}
-		buf.WriteString(be.Output)
+		buf.WriteString(item.Output)
 	}
 	return strings.TrimRightFunc(buf.String(), unicode.IsSpace)
 }
