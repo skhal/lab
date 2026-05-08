@@ -16,8 +16,6 @@ import (
 	"iter"
 	"os"
 	"os/exec"
-	"strings"
-	"unicode"
 
 	"github.com/skhal/lab/check/cmd/check-go-test/internal/build"
 	"github.com/skhal/lab/check/cmd/check-go-test/internal/test"
@@ -27,7 +25,6 @@ import (
 // keeps track of failed tests for further analysis.
 type Tester struct {
 	events   map[EventID][]Event
-	fails    []EventID
 	coverage Coverage
 }
 
@@ -40,17 +37,6 @@ func NewTester() *Tester {
 
 // Test runs a single `go test` for the packages.
 func (t *Tester) Test(pkgs []string) error {
-	if err := t.test(pkgs); err != nil {
-		return err
-	}
-	var errs []error
-	for _, id := range t.fails {
-		errs = append(errs, newError(t.events[id]))
-	}
-	return errors.Join(errs...)
-}
-
-func (t *Tester) test(pkgs []string) error {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	args := append([]string{"test", "-json", "-vet=all"}, pkgs...)
@@ -64,14 +50,20 @@ func (t *Tester) test(pkgs []string) error {
 		return err
 	}
 	defer cmd.Wait()
+	var errs []error
 	for id, e := range decodeEvents(stdout) {
-		if e.Fail() {
-			t.fails = append(t.fails, id)
-		}
 		ee := t.events[id]
 		t.events[id] = append(ee, e)
+		if e.Fail() {
+			switch e.(type) {
+			case *TestEvent:
+				errs = append(errs, testError(ee))
+			case *BuildEvent:
+				errs = append(errs, buildError(ee))
+			}
+		}
 	}
-	return nil
+	return errors.Join(errs...)
 }
 
 func decodeEvents(r io.Reader) iter.Seq2[EventID, Event] {
@@ -124,30 +116,4 @@ func jsonUnmarshalTestEvent(b []byte) (Event, error) {
 		return nil, err
 	}
 	return &TestEvent{Event: e}, nil
-}
-
-func newError(events []Event) error {
-	buf := new(bytes.Buffer)
-	collectBuildEvent := func(e *BuildEvent) {
-		if e.Action != build.ActionOutput {
-			return
-		}
-		buf.WriteString(e.Output)
-	}
-	collectTestEvent := func(e *TestEvent) {
-		if e.Action != test.ActionOutput {
-			return
-		}
-		buf.WriteString(e.Output)
-	}
-	for _, e := range events {
-		switch v := e.(type) {
-		case *BuildEvent:
-			collectBuildEvent(v)
-		case *TestEvent:
-			collectTestEvent(v)
-		}
-	}
-	output := strings.TrimRightFunc(buf.String(), unicode.IsSpace)
-	return errors.New(output)
 }
