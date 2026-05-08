@@ -1,0 +1,21 @@
+// Copyright 2026 Samvel Khalatyan. All rights reserved.
+//
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
+edition = "2023";
+
+package check.cmd.checknextid.internal.nextid.testdata;
+
+import "google/protobuf/go_features.proto";
+
+option features.(.pb.go).api_level = API_OPAQUE;
+option go_package = "github.com/skhal/lab/check/cmd/check-nextid/internal/nextid/testdata";
+
+// Test is a demo message.
+//
+// Next ID: 2
+message Test {
+  // foo is a test field.
+  int32 foo = 1;
+}

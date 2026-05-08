@@ -24,6 +24,9 @@ var ErrNextID = errors.New("invalid next id")
 // ErrRange means that it failed to process a reserved range.
 var ErrRange = errors.New("invalid range")
 
+// ErrParse means there is an error parsing source file.
+var ErrParse = errors.New("parse error")
+
 // CheckFile validates that a .proto file parses and has next-id comments set
 // to the (last-id + 1).
 func CheckFile(name string) error {
@@ -34,13 +37,9 @@ func CheckFile(name string) error {
 	defer f.Close()
 	fn, err := parser.Parse(name, f, reporter.NewHandler(nil))
 	if err != nil {
-		return err
+		return fmt.Errorf("%w: %s", ErrParse, err)
 	}
-	err = CheckFileNode(fn)
-	if err != nil {
-		return err
-	}
-	return nil
+	return CheckFileNode(fn)
 }
 
 // CheckFileNode validates a .proto AST's top-level declarations.

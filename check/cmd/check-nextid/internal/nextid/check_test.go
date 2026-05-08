@@ -7,6 +7,7 @@ package nextid_test
 
 import (
 	"errors"
+	"os"
 	"strings"
 	"testing"
 
@@ -15,6 +16,38 @@ import (
 	"github.com/bufbuild/protocompile/reporter"
 	"github.com/skhal/lab/check/cmd/check-nextid/internal/nextid"
 )
+
+func TestCheckFile(t *testing.T) {
+	tests := []struct {
+		name    string
+		file    string
+		wantErr error
+	}{
+		{
+			name:    "missing file",
+			file:    "testdata/does_not_exist.txt",
+			wantErr: os.ErrNotExist,
+		},
+		{
+			name:    "not proto file",
+			file:    "testdata/not_proto.txt",
+			wantErr: nextid.ErrParse,
+		},
+		{
+			name: "valid next id",
+			file: "testdata/valid.proto",
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			err := nextid.CheckFile(tc.file)
+
+			if !errors.Is(err, tc.wantErr) {
+				t.Errorf("unexpected error %v; want %v", err, tc.wantErr)
+			}
+		})
+	}
+}
 
 func TestCheckFileNode_message(t *testing.T) {
 	tests := []struct {
@@ -27,6 +60,7 @@ func TestCheckFileNode_message(t *testing.T) {
 			code: `
 edition = "2024";
 package test;
+// a comment without next id
 message Test {}
 `,
 		},
@@ -45,6 +79,16 @@ message Test {}
 edition = "2024";
 package test;
 // Next ID: 2
+message Test {}
+`,
+			want: nextid.ErrNextID,
+		},
+		{
+			name: "empty message unparsable next-id",
+			code: `
+edition = "2024";
+package test;
+// Next ID: abc
 message Test {}
 `,
 			want: nextid.ErrNextID,
