@@ -29,11 +29,11 @@ func Run(files []string, opts ...Opt) error {
 	if len(packages) == 0 {
 		return nil
 	}
-	tester := NewTester()
+	t := new(Tester)
 	for _, opt := range opts {
-		opt(tester)
+		opt(t)
 	}
-	return tester.Test(packages)
+	return t.Test(packages)
 }
 
 func collectPackages(files []string) []string {

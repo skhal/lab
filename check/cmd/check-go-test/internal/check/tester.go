@@ -21,21 +21,13 @@ import (
 	"github.com/skhal/lab/check/cmd/check-go-test/internal/test"
 )
 
-// Tester runs `go test` on packages and groups events by event ids. It also
-// keeps track of failed tests for further analysis.
+// Tester runs go-test on a list of packages and processes JSON output. It
+// groups events by event ids, which is a package and optional test case.
 type Tester struct {
-	events   map[EventID][]Event
 	coverage Coverage
 }
 
-// NewTester creates a tester, ready for testing packages.
-func NewTester() *Tester {
-	return &Tester{
-		events: make(map[EventID][]Event),
-	}
-}
-
-// Test runs a single `go test` for the packages.
+// Test runs go-test for multiple packages.
 func (t *Tester) Test(pkgs []string) error {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
@@ -50,10 +42,17 @@ func (t *Tester) Test(pkgs []string) error {
 		return err
 	}
 	defer cmd.Wait()
-	var errs []error
-	for id, e := range decodeEvents(stdout) {
-		ee := t.events[id]
-		t.events[id] = append(ee, e)
+	return t.processOutput(stdout)
+}
+
+func (t *Tester) processOutput(r io.Reader) error {
+	var (
+		events = make(map[EventID][]Event)
+		errs   []error
+	)
+	for id, e := range decodeEvents(r) {
+		ee := events[id]
+		events[id] = append(ee, e)
 		if e.Fail() {
 			switch e.(type) {
 			case *TestEvent:
