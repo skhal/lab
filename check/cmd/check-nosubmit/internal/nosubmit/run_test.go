@@ -6,6 +6,8 @@
 package nosubmit_test
 
 import (
+	"errors"
+	"os"
 	"testing"
 
 	"github.com/skhal/lab/check/cmd/check-nosubmit/internal/nosubmit"
@@ -64,6 +66,38 @@ DO NOT SUBMIT: description
 			if tc.want != got {
 				t.Errorf("Check() = %v; want %v", got, tc.want)
 				t.Logf("data:\n%s", tc.data)
+			}
+		})
+	}
+}
+
+func TestRun(t *testing.T) {
+	tests := []struct {
+		name    string
+		file    string
+		wantErr error
+	}{
+		{
+			name:    "missing file",
+			file:    "testdata/does_not_exist",
+			wantErr: os.ErrNotExist,
+		},
+		{
+			name:    "missing file",
+			file:    "testdata/has_nosubmit.txt",
+			wantErr: nosubmit.ErrCheck,
+		},
+		{
+			name: "missing file",
+			file: "testdata/has_no_nosubmit.txt",
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			err := nosubmit.Run(tc.file)
+
+			if !errors.Is(err, tc.wantErr) {
+				t.Errorf("unexpected error %v; want %v", err, tc.wantErr)
 			}
 		})
 	}
