@@ -7,12 +7,34 @@ package issue_test
 
 import (
 	"errors"
+	"os"
 	"testing"
 
 	"github.com/skhal/lab/check/cmd/check-issue/internal/issue"
 )
 
-var TestErr = errors.New("test error")
+func TestRun(t *testing.T) {
+	tests := []struct {
+		name    string
+		file    string
+		wantErr error
+	}{
+		{
+			name:    "file does not exist",
+			file:    "testdata/not_exist.txt",
+			wantErr: os.ErrNotExist,
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			err := issue.Run([]string{tc.file})
+
+			if !errors.Is(err, tc.wantErr) {
+				t.Errorf("unexpected error %v; want %v", err, tc.wantErr)
+			}
+		})
+	}
+}
 
 func TestCheck(t *testing.T) {
 	tests := []struct {
