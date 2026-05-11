@@ -66,7 +66,7 @@ func (t *Tester) processOutput(r io.Reader) error {
 		case *TestEvent:
 			testEvents[id] = append(testEvents[id], e)
 			if e.Fail() {
-				errs = append(errs, testError(testEvents[id]))
+				errs = append(errs, TestError(testEvents[id]))
 			}
 			if err := t.checkCoverage(e); err != nil {
 				errs = append(errs, err)
@@ -74,7 +74,7 @@ func (t *Tester) processOutput(r io.Reader) error {
 		case *BuildEvent:
 			buildEvents[id] = append(buildEvents[id], e)
 			if e.Fail() {
-				errs = append(errs, buildError(buildEvents[id]))
+				errs = append(errs, BuildError(buildEvents[id]))
 			}
 		}
 	}
@@ -85,10 +85,10 @@ func (t *Tester) checkCoverage(e *TestEvent) error {
 	if e.Coverage == nil || *e.Coverage >= t.coverage {
 		return nil
 	}
-	return &coverageError{
-		pkg:  e.Package,
-		got:  *e.Coverage,
-		want: t.coverage,
+	return &CoverageError{
+		Package: e.Package,
+		Got:     *e.Coverage,
+		Want:    t.coverage,
 	}
 }
 

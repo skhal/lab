@@ -15,10 +15,12 @@ import (
 	"github.com/skhal/lab/check/cmd/check-go-test/internal/test"
 )
 
-type testError []*TestEvent
+// TestError is a test error with the message extracted from the ActionOutput
+// events.
+type TestError []*TestEvent
 
 // Error implements [builtin.error].
-func (err testError) Error() string {
+func (err TestError) Error() string {
 	buf := new(bytes.Buffer)
 	for _, item := range err {
 		if item.Action != test.ActionOutput {
@@ -29,10 +31,12 @@ func (err testError) Error() string {
 	return strings.TrimRightFunc(buf.String(), unicode.IsSpace)
 }
 
-type buildError []*BuildEvent
+// BuildError is a build error with the message extracted from the ActionOutput
+// events.
+type BuildError []*BuildEvent
 
 // Error implements [builtin.error].
-func (err buildError) Error() string {
+func (err BuildError) Error() string {
 	buf := new(bytes.Buffer)
 	for _, item := range err {
 		if item.Action != build.ActionOutput {
@@ -43,18 +47,20 @@ func (err buildError) Error() string {
 	return strings.TrimRightFunc(buf.String(), unicode.IsSpace)
 }
 
-type coverageError struct {
-	pkg  string
-	got  Coverage
-	want Coverage
+// CoverageError means the package has test coverage less than acceptable
+// threshold.
+type CoverageError struct {
+	Package string   // failed package name
+	Got     Coverage // actual coverage
+	Want    Coverage // threshold
 }
 
 // Error implements [builtin.error].
-func (err *coverageError) Error() string {
+func (err *CoverageError) Error() string {
 	var b strings.Builder
-	fmt.Fprintf(&b, "=== COVERAGE: %s\n", err.pkg)
-	fmt.Fprintf(&b, "    coverage: %s of statements\n", err.got)
-	fmt.Fprintf(&b, "    threshold: %s\n", err.want)
+	fmt.Fprintf(&b, "=== COVERAGE: %s\n", err.Package)
+	fmt.Fprintf(&b, "    coverage: %s of statements\n", err.Got)
+	fmt.Fprintf(&b, "    threshold: %s\n", err.Want)
 	fmt.Fprintf(&b, "--- FAIL")
 	return b.String()
 }
