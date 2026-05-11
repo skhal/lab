@@ -8,7 +8,6 @@ package check
 import (
 	"bufio"
 	"bytes"
-	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -23,18 +22,46 @@ import (
 
 var defaultArgs = []string{"test", "-json", "-vet=all"}
 
+// Opt is an option to configure tester.
+type Opt func(*Tester)
+
+// WithCoverage enables coverage profile in the tests.
+func WithCoverage(cov float64) Opt {
+	return func(t *Tester) {
+		t.coverage = Coverage(cov)
+	}
+}
+
+// WithCommand sets a factory function to create [exec.Cmd].
+//
+// WARNING: the option is for tests only.
+func WithCommand(f func(cmd string, args ...string) *exec.Cmd) Opt {
+	return func(t *Tester) {
+		t.newExecCmd = f
+	}
+}
+
 // Tester runs go-test on a list of packages and processes JSON output. It
 // groups events by event ids, which is a package and optional test case.
 type Tester struct {
-	coverage Coverage
+	newExecCmd func(cmd string, args ...string) *exec.Cmd
+	coverage   Coverage
+}
+
+// NewTester creates a tester with options. The options configure the tester,
+// e.g. set the coverage threshold.
+func NewTester(opts ...Opt) *Tester {
+	t := &Tester{newExecCmd: exec.Command}
+	for _, o := range opts {
+		o(t)
+	}
+	return t
 }
 
 // Test runs go-test for multiple packages.
 func (t *Tester) Test(pkgs []string) error {
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
 	args := t.args(pkgs)
-	cmd := exec.CommandContext(ctx, "go", args...)
+	cmd := t.newExecCmd("go", args...)
 	cmd.Stderr = os.Stderr
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {

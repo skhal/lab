@@ -6,6 +6,7 @@
 package check_test
 
 import (
+	"errors"
 	"fmt"
 	"testing"
 
@@ -51,6 +52,14 @@ func TestTestError_Error(t *testing.T) {
 	}
 }
 
+func TestTestError_Is(t *testing.T) {
+	err := check.TestError([]*check.TestEvent{nil})
+
+	if !errors.Is(err, check.ErrTest) {
+		t.Error("TestError is not ErrTest")
+	}
+}
+
 func TestBuildError_Error(t *testing.T) {
 	tests := []struct {
 		name   string
@@ -87,6 +96,14 @@ func TestBuildError_Error(t *testing.T) {
 	}
 }
 
+func TestBuildError_Is(t *testing.T) {
+	err := check.BuildError([]*check.BuildEvent{nil})
+
+	if !errors.Is(err, check.ErrBuild) {
+		t.Error("BuildError is not ErrBuild")
+	}
+}
+
 func ExampleCoverageError() {
 	err := check.CoverageError{
 		Package: "test/package",
@@ -99,6 +116,14 @@ func ExampleCoverageError() {
 	//     coverage: 10.0% of statements
 	//     threshold: 20.0%
 	// --- FAIL
+}
+
+func TestCoverageError_Is(t *testing.T) {
+	err := new(check.CoverageError)
+
+	if !errors.Is(err, check.ErrCoverage) {
+		t.Error("CoverageError is not ErrBuild")
+	}
 }
 
 func newTestEvent(t *testing.T, a test.Action, out string) *check.TestEvent {

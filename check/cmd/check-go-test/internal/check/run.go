@@ -13,27 +13,13 @@ import (
 	goslices "github.com/skhal/lab/go/slices"
 )
 
-// Opt is an option to configure tester.
-type Opt func(*Tester)
-
-// WithCoverage enables coverage profile in the tests.
-func WithCoverage(cov float64) Opt {
-	return func(t *Tester) {
-		t.coverage = Coverage(cov)
-	}
-}
-
 // Run runs `go test` on packages for listed files.
 func Run(files []string, opts ...Opt) error {
 	packages := CollectPackages(files)
 	if len(packages) == 0 {
 		return nil
 	}
-	t := new(Tester)
-	for _, opt := range opts {
-		opt(t)
-	}
-	return t.Test(packages)
+	return NewTester(opts...).Test(packages)
 }
 
 // CollectPackages collects a unique set of packages from a list of files with
