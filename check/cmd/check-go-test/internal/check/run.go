@@ -25,7 +25,7 @@ func WithCoverage(cov float64) Opt {
 
 // Run runs `go test` on packages for listed files.
 func Run(files []string, opts ...Opt) error {
-	packages := collectPackages(files)
+	packages := CollectPackages(files)
 	if len(packages) == 0 {
 		return nil
 	}
@@ -36,7 +36,9 @@ func Run(files []string, opts ...Opt) error {
 	return t.Test(packages)
 }
 
-func collectPackages(files []string) []string {
+// CollectPackages collects a unique set of packages from a list of files with
+// .go extension.
+func CollectPackages(files []string) []string {
 	packages := slices.Collect(Unique(Paths(FilterFunc(slices.Values(files), IsGoFile))))
 	packages = slices.DeleteFunc(packages, func(p string) bool {
 		return strings.Contains(p, "/testdata/")
