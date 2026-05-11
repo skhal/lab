@@ -3,17 +3,25 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Bazel provides integration points with Bazel build system such as running
-// actions query.
+// Package bazel provides integration points with Bazel build system such as
+// running actions query.
 package bazel
 
 import (
-	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"os/exec"
 	"strings"
+)
+
+var (
+	// ErrCommand means there is an error running Bazel.
+	ErrCommand = errors.New("command error")
+
+	// ErrJSON means there is an error unmarshaling JSON.
+	ErrJSON = errors.New("json error")
 )
 
 const bazelCommand = "bazel"
@@ -30,23 +38,35 @@ type Action struct {
 	Arguments []string // A command associated with the action.
 }
 
+// NewCmdFunc is a constructor for [exec.Cmd].
+type NewCmdFunc func(name string, args ...string) *exec.Cmd
+
 // Aquery runs an actions query (aquery) for targets.
 func Aquery(targets []string) (*ActionSet, error) {
-	cmd := exec.Command(bazelCommand, newArgs(targets)...)
-	cmd.Stderr = os.Stderr
-	b := new(bytes.Buffer)
-	cmd.Stdout = b
-	if err := cmd.Run(); err != nil {
-		return nil, err
-	}
-	aset := new(ActionSet)
-	if err := json.Unmarshal(b.Bytes(), aset); err != nil {
-		return nil, err
-	}
-	return aset, nil
+	return AqueryWithCommand(targets, exec.Command)
 }
 
-var standardArgs = []string{
+// AqueryWithCommand runs Bazel actions-query (aquery) for targets. It uses
+// the newCmd function to create exec.Cmd to run Bazel.
+func AqueryWithCommand(targets []string, newCmd NewCmdFunc) (*ActionSet, error) {
+	if len(targets) == 0 {
+		return nil, nil
+	}
+	cmd := newCmd(bazelCommand, newArgs(targets)...)
+	cmd.Stderr = os.Stderr
+	b, err := cmd.Output()
+	if err != nil {
+		return nil, fmt.Errorf("%w: %s", ErrCommand, err)
+	}
+	aset := new(ActionSet)
+	if err := json.Unmarshal(b, aset); err != nil {
+		return nil, fmt.Errorf("%w: %s", ErrJSON, err)
+	}
+	return aset, nil
+
+}
+
+var defaultArgs = []string{
 	"--output=jsonproto",
 	// Disable logging
 	"--noshow_progress",
@@ -73,7 +93,7 @@ func newArgs(targets []string) []string {
 	return append([]string{
 		"aquery",
 		fmt.Sprintf(`mnemonic('CppCompile',%s)`, unionDeps(targets)),
-	}, standardArgs...)
+	}, defaultArgs...)
 }
 
 func unionDeps(targets []string) string {

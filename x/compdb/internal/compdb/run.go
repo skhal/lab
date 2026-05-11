@@ -3,12 +3,13 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Compdb generates LLVM compilation database for Bazel targets.
+// Package compdb generates LLVM compilation database for Bazel targets.
 package compdb
 
 import (
 	"encoding/json"
 	"errors"
+	"io"
 	"os"
 
 	"github.com/skhal/lab/x/compdb/internal/bazel"
@@ -27,24 +28,23 @@ type Command struct {
 	Arguments []string `json:"arguments"` // the compile command
 }
 
-// Run generates a compilation database for a list of targets.
-func Run(targets []string) error {
-	commands, err := genCommands(targets)
-	if err != nil {
-		return err
-	}
-	return Print(commands)
-}
-
-func genCommands(targets []string) ([]*Command, error) {
+// GenCommands generates compile commands for a list of targets.
+func GenCommands(targets []string) ([]*Command, error) {
 	aset, err := bazel.Aquery(targets)
 	if err != nil {
 		return nil, err
 	}
-	return makeCommands(aset)
+	return MakeCommands(aset)
 }
 
-func makeCommands(aset *bazel.ActionSet) ([]*Command, error) {
+// MakeCommands generates a list of compile commands from a set of Bazel
+// actions. It returns an error if the actions do not include source file that
+// is set by a pair of arguments ("-c", "file") or can't extract current
+// working directory.
+func MakeCommands(aset *bazel.ActionSet) ([]*Command, error) {
+	if aset == nil || len(aset.Actions) == 0 {
+		return nil, nil
+	}
 	wd, err := os.Getwd()
 	if err != nil {
 		return nil, err
@@ -68,9 +68,7 @@ const compileFlag = "-c"
 
 // GetSource extracts the main translation unit source file from the action.
 // It expects the source to be present in the [bazel.Action.Arguments] list,
-// right after the compile flag "-c".
-//
-// For eexample, the following action has source "foo.c":
+// right after the compile flag "-c", e.g. "foo.c" source in:
 //
 //	bazel.Action{Arguments: [1, 2, 3, "-c", "foo.c", 4, 5]}
 func GetSource(a *bazel.Action) (string, error) {
@@ -87,7 +85,8 @@ func GetSource(a *bazel.Action) (string, error) {
 }
 
 // Print dumps commands in JSON format.
-func Print(cc []*Command) error {
-	e := json.NewEncoder(os.Stdout)
-	return e.Encode(cc)
+func Print(w io.Writer, cc []*Command) error {
+	enc := json.NewEncoder(w)
+	enc.SetIndent("", "  ")
+	return enc.Encode(cc)
 }

@@ -22,8 +22,16 @@ import (
 )
 
 func main() {
-	if err := compdb.Run(os.Args[1:]); err != nil {
+	if err := run(os.Args[1:]); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
+}
+
+func run(targets []string) error {
+	commands, err := compdb.GenCommands(targets)
+	if err != nil {
+		return err
+	}
+	return compdb.Print(os.Stdout, commands)
 }
