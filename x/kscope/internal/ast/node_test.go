@@ -48,12 +48,14 @@ func ExampleFunc_String() {
 		Params: []string{"a", "b"},
 		Body: []ast.Node{
 			ast.Number{Val: 1},
+			ast.Number{Val: 2},
 		},
 	}
 	fmt.Println(n)
 	// Output:
 	// def demo(a, b)
 	//   1.0
+	//   2.0
 }
 
 func ExampleVar_String() {
@@ -64,4 +66,36 @@ func ExampleVar_String() {
 	fmt.Println(n)
 	// Output:
 	// var demo = 1.0
+}
+
+func ExampleDecl_String() {
+	var n ast.Node = ast.Decl{
+		ast.Var{
+			Name: "demo",
+			Val:  ast.Number{Val: 1}},
+	}
+	fmt.Println(n)
+	// Output:
+	// var demo = 1.0
+}
+
+func ExampleCode_String() {
+	var n ast.Node = ast.Code{
+		Decls: []*ast.Decl{
+			{
+				ast.Var{
+					Name: "a",
+					Val:  ast.Number{Val: 1}},
+			},
+			{
+				ast.Var{
+					Name: "b",
+					Val:  ast.Number{Val: 2}},
+			},
+		},
+	}
+	fmt.Println(n)
+	// Output:
+	// var a = 1.0
+	// var b = 2.0
 }
