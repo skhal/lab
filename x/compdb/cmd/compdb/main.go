@@ -15,14 +15,28 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/skhal/lab/x/compdb/internal/compdb"
 )
 
+func init() {
+	flag.Usage = func() {
+		w := flag.CommandLine.Output()
+		fmt.Fprintf(w, "usage: %s package ...\n", filepath.Base(os.Args[0]))
+	}
+}
+
 func main() {
-	if err := run(os.Args[1:]); err != nil {
+	flag.Parse()
+	if flag.NArg() < 1 {
+		flag.Usage()
+		os.Exit(1)
+	}
+	if err := run(flag.Args()); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
