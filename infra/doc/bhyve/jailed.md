@@ -217,3 +217,10 @@ Update the configuration (alternatively run `vm configure ubuntu`):
 # fetch -o /tmp https://raw.githubusercontent.com/skhal/lab/refs/heads/main/infra/doc/bhyve/data/usr/bhyve/ubuntu/ubuntu.conf.diff
 # patch -lb -i /tmp/ubuntu.conf.diff /usr/bhyve/ubuntu/ubuntu.conf
 ```
+
+## Autostart VMs
+
+```console
+# sysrc -f /usr/local/etc/rc.conf.d/vm vm_list+=ubuntu
+vm_list:  -> ubuntu
+```
