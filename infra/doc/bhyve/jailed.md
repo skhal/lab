@@ -91,12 +91,14 @@ Use packer filter (PF) to forward packets from the local network to the epair:
 ```console
 # sysrc -f /etc/rc.conf.d/routing gateway_enable=yes
 
-# fetch -o /tmp https://raw.githubusercontent.com/skhal/lab/refs/heads/main/infra/doc/bhyve/data/etc/pf.conf
-
+# pkg install -y FreeBSD-pf
 # sysrc -f /etc/rc.conf.d/pf pf_enable=yes
+
+# fetch -o /tmp https://raw.githubusercontent.com/skhal/lab/refs/heads/main/infra/doc/bhyve/data/etc/pf.conf
+# cp -n /tmp/pf.conf /etc/pf.conf
 ```
 
-Use newly create bridge in bhyve:
+Use newly created bridge in bhyve:
 
 ```console
 # vm switch create -t manual -b bridge0 public
