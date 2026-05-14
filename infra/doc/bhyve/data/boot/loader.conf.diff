@@ -1,0 +1,9 @@
+--- /boot/loader.conf.orig	2026-05-13 09:01:12.733587000 -0500
++++ /boot/loader.conf	2026-05-13 09:05:28.183166000 -0500
+@@ -1,4 +1,6 @@
+ autoboot_delay="-1"
+ kern.geom.label.disk_ident.enable="0"
+ kern.geom.label.gptid.enable="0"
++nmdm_load="YES"
++vmm_load="YES"
+ zfs_load="YES"
