@@ -1,0 +1,13 @@
+--- /usr/bhyve/freebsd/freebsd.conf.orig	2026-05-14 09:02:45.841535000 -0500
++++ /usr/bhyve/freebsd/freebsd.conf	2026-05-14 09:03:56.826918000 -0500
+@@ -1,4 +1,4 @@
+-loader="bhyveload"
++loader="uefi"
+ cpu="2"
+ memory="1G"
+ network0_type="virtio-net"
+@@ -7,3 +7,4 @@
+ disk0_name="disk0.img"
+ uuid="8ee3ca43-4f9d-11f1-ae7c-88aedd73f215"
+ network0_mac="58:9c:fc:0d:25:3e"
++debug="yes"
