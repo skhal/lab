@@ -1,0 +1,15 @@
+--- /usr/bhyve/ubuntu/ubuntu.conf.orig	2026-05-14 09:26:40.303875000 -0500
++++ /usr/bhyve/ubuntu/ubuntu.conf	2026-05-14 09:46:51.161004000 -0500
+@@ -1,4 +1,6 @@
+-loader="bhyveload"
++loader="grub"
++grub_run_partition="gpt2"
++grub_run_dir="/grub"
+ cpu="4"
+ memory="8G"
+ network0_type="virtio-net"
+@@ -7,3 +9,4 @@
+ disk0_name="disk0.img"
+ uuid="d8bcc012-4fa0-11f1-ae7c-88aedd73f215"
+ network0_mac="58:9c:fc:08:23:60"
++debug="yes"

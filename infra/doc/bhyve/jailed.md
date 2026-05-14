@@ -116,7 +116,7 @@ restart networking and routing services.
 # cp /usr/bhyve/freebsd/freebsd.conf{,.orig}
 ```
 
-Change loader to UEFI and enable bhyve debugging:
+Change the loader to UEFI and enable bhyve debugging:
 
 ```console
 # fetch -o /tmp https://raw.githubusercontent.com/skhal/lab/refs/heads/main/infra/doc/bhyve/data/usr/bhyve/freebsd/freebsd.conf.diff
@@ -151,4 +151,69 @@ IP: 10.0.1.10
 Netmask: 255.255.255.0
 Gateway: 10.0.1.1
 DNS Server #1: 10.0.0.2
+```
+
+## Ubuntu VM
+
+```console
+# vm create -s 10G -m 8G -c 4 ubuntu
+# cp /usr/bhyve/ubuntu/ubuntu.conf{,.orig}
+```
+
+Change the loader to GRUB and enable bhyve debugging:
+
+```console
+# vm configure ubuntu
+# diff -u /usr/bhyve/ubuntu/ubuntu.conf{.orig,}
+--- /usr/bhyve/ubuntu/ubuntu.conf.orig	2026-05-14 09:26:40.303875000 -0500
++++ /usr/bhyve/ubuntu/ubuntu.conf	2026-05-14 09:28:33.227796000 -0500
+@@ -1,4 +1,4 @@
+-loader="bhyveload"
++loader="grub"
+ cpu="4"
+ memory="8G"
+ network0_type="virtio-net"
+@@ -7,3 +7,4 @@
+ disk0_name="disk0.img"
+ uuid="d8bcc012-4fa0-11f1-ae7c-88aedd73f215"
+ network0_mac="58:9c:fc:08:23:60"
++debug="yes"
+```
+
+Install Ubuntu:
+
+```console
+# vm iso
+DATASTORE           FILENAME
+default             FreeBSD-15.0-RELEASE-amd64-bootonly.iso
+default             ubuntu-26.04-live-server-amd64.iso
+
+# vm install ubuntu ubuntu-26.04-live-server-amd64.iso
+```
+
+Setup network manually with IPv4:
+
+```
+Network mask: 10.0.1.0/24
+IP: 10.0.1.11
+Gateway: 10.0.1.1
+DNS Server: 10.0.0.2
+```
+
+The network must be st in CIDR format `a.b.c.d/x` with the host bits set to
+zero.
+
+Find location of GRUB on the new installation `(hd0,gpt2)/grub`:
+
+```console
+grub> ls (hd0,gpt2)/grub
+i386-pc/ locale/ gfxblacklist.txt unicode.pf2 grub.cfg fonts/ grubenv
+grub> reboot -h
+```
+
+Update the configuration (alternatively run `vm configure ubuntu`):
+
+```console
+# fetch -o /tmp https://raw.githubusercontent.com/skhal/lab/refs/heads/main/infra/doc/bhyve/data/usr/bhyve/ubuntu/ubuntu.conf.diff
+# patch -lb -i /tmp/ubuntu.conf.diff /usr/bhyve/ubuntu/ubuntu.conf
 ```
