@@ -1,0 +1,16 @@
+--- /etc/ldap/ldap.conf.orig	2026-05-15 18:20:46.174146365 +0000
++++ /etc/ldap/ldap.conf	2026-05-15 18:23:07.305339058 +0000
+@@ -5,9 +5,8 @@
+ # See ldap.conf(5) for details
+ # This file should be world readable but not world writable.
+
+-#BASE	dc=example,dc=com
+-#URI	ldap://ldap.example.com ldap://ldap-provider.example.com:666
++BASE	dc=lab,dc=net
++URI	ldap://ldap.lab.net
+
+-#SIZELIMIT	12
+-#TIMELIMIT	15
+-#DEREF		never
++SSL START_TLS
++TLS_REQCERT ALLOW

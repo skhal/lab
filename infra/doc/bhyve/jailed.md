@@ -245,6 +245,72 @@ Update the configuration (alternatively run `vm configure ubuntu`):
 # patch -lb -i /tmp/ubuntu.conf.diff /usr/bhyve/ubuntu/ubuntu.conf
 ```
 
+### LDAP
+
+Use System Security Services Daemon (SSSD) to integrate the system with LDAP,
+[sssd.io](https://sssd.io).
+
+Install CA certificate on the system for LDAP TLS:
+
+```console
+$ sudo cp /tmp/ca.crt /usr/local/share/ca-certificates/
+$ sudo update-ca-certificates
+```
+
+Setup SSSD:
+
+```console
+$ sudo apt install sssd-ldap ldap-utils
+
+# fetch -o /tmp https://raw.githubusercontent.com/skhal/lab/refs/heads/main/infra/doc/bhyve/data/etc/ldap/ldap.conf.diff
+# patch -lb -i /tmp/ldap.conf.diff /etc/ldap/ldap.conf
+```
+
+Verify SSSD can connect to LDAP server:
+
+```console
+$ ldapwhoami -x
+ldap_parse_result: Confidentiality required (13)
+	additional info: confidentiality required
+Result: Confidentiality required (13)
+Additional info: confidentiality required
+
+$ ldapwhoami -x -ZZ
+anonymous
+```
+
+Add configuration:
+
+```console
+$ fetch -o /tmp https://raw.githubusercontent.com/skhal/lab/refs/heads/main/infra/doc/bhyve/data/etc/sssd/sssd.conf
+$ sudo cp -n /tmp/sssd.conf /etc/sssd/
+
+$ fetch -o /tmp https://raw.githubusercontent.com/skhal/lab/refs/heads/main/infra/doc/bhyve/data/etc/sssd/conf.d/lab.net.conf
+$ sudo cp -n /tmp/lab.net.conf /etc/sssd/conf.d/
+
+-- fix permissions else SSSD won't start
+$ sudo chmod -R o-r /etc/sssd/conf.d/lab.net.conf
+```
+
+Start SSSD and enable PAM module to create home folders upon first login:
+
+```console
+$ sudo systemctl start sssd.service
+$ sudo pam-auth-update --enable mkhomedir
+```
+
+Verify:
+
+```console
+$ getent passwd op
+op:*:1000:1000:Operator:/home/op:/bin/tcsh
+$ su - op
+> whoami
+op
+> pwd
+/home/op
+```
+
 ## Autostart VMs
 
 ```console
