@@ -84,6 +84,7 @@ connect to the outside of the jail:
 ```console
 # ifconfig -g epair
 epair7b
+
 # sysrc -f /etc/rc.conf.d/network cloned_interfaces="bridge0"
 # sysrc -f /etc/rc.conf.d/network ifconfig_bridge0="inet 10.0.1.1/24 addm epair7b up descr vm:ext"
 ```
@@ -92,12 +93,38 @@ Use packer filter (PF) to forward packets from the local network to the epair:
 
 ```console
 # sysrc -f /etc/rc.conf.d/routing gateway_enable=yes
+# sysrc -f /etc/rc.conf.d/routing default_gateway="10.0.0.1"
+# service routing restart
 
 # pkg install -y FreeBSD-pf
-# sysrc -f /etc/rc.conf.d/pf pf_enable=yes
 
+# sysrc -f /etc/rc.conf.d/pflog pflog_enable=yes
+# sysrc -f /etc/rc.conf.d/pflog pflog_logfile=/var/log/pflog
+# service start pflog
+
+# sysrc -f /etc/rc.conf.d/pf pf_enable=yes
+# service start pf
+```
+
+Update the configuration:
+
+```console
 # fetch -o /tmp https://raw.githubusercontent.com/skhal/lab/refs/heads/main/infra/doc/bhyve/data/etc/pf.conf
 # cp -n /tmp/pf.conf /etc/pf.conf
+
+-- Check the config for errors and load it
+# pfctl -nf /etc/pf.conf
+# pfctl -f /etc/pf.conf
+
+-- see PF info (stats)
+# pfctl -s all
+```
+
+Dump and follow PF logs as needed (use `-r /var/log/pflog.log` to see logged
+events):
+
+```console
+# tcpdump -n -e -ttt -i pflog0
 ```
 
 Use newly created bridge in bhyve:
