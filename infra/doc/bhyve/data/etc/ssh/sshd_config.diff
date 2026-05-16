@@ -1,0 +1,10 @@
+--- /etc/ssh/sshd_config.orig	2026-05-16 19:01:19.372913939 +0000
++++ /etc/ssh/sshd_config	2026-05-16 19:01:46.801049043 +0000
+@@ -36,6 +36,7 @@
+ #AddressFamily any
+ #ListenAddress 0.0.0.0
+ #ListenAddress ::
++ListenAddress 10.0.1.11
+
+ #HostKey /etc/ssh/ssh_host_rsa_key
+ #HostKey /etc/ssh/ssh_host_ecdsa_key

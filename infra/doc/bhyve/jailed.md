@@ -245,6 +245,19 @@ Update the configuration (alternatively run `vm configure ubuntu`):
 # patch -lb -i /tmp/ubuntu.conf.diff /usr/bhyve/ubuntu/ubuntu.conf
 ```
 
+### SSH
+
+Restrict SSH to bind to local IP.
+
+```console
+$ sudo apt install openssh-server
+
+$ fetch -o /tmp https://raw.githubusercontent.com/skhal/lab/refs/heads/main/infra/doc/bhyve/data/etc/ssh/sshd_conf.diff
+$ sudo patch -lb -i /tmp/sshd_conf.diff /etc/ssh/sshd_conf
+
+$ sudo systmctl restart ssh.service
+```
+
 ### LDAP
 
 Use System Security Services Daemon (SSSD) to integrate the system with LDAP,
