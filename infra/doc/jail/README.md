@@ -25,9 +25,7 @@ Instructions:
 
 - [bootstrap](./bootstrap.md): setup a FreeBSD host to run jails.
 
-- [template](./freebsd_template.md): create a jail template, ready for cloning
-  to create new jails from in the future. It has network setup, all packages up
-  to date, snapshotted.
+- [FreeBSD](./freebsd.md): a thick jail to run FreeBSD environment.
 
 - Ubuntu [template](./ubuntu_template.md), [jail](./ubuntu_jail.md): create a
   jail running Ubuntu using debootstrap(8). It installs Ubuntu environment under
