@@ -1,0 +1,25 @@
+-- Copyright 2026 Samvel Khalatyan. All rights reserved.
+--
+-- Use of this source code is governed by a BSD-style
+-- license that can be found in the LICENSE file.
+
+-- keep-sorted start
+vim.o.number = true
+-- keep-sorted end
+
+-- fix +q4D73 shown at Neovim startup.
+-- Ref: https://github.com/neovim/neovim/issues/28776
+local termfeatures = vim.g.termfeatures or {}
+termfeatures.osc52 = false
+vim.g.termfeatures = termfeatures
+
+vim.o.listchars = "eol:¬,extends:›,precedes:‹,space:░,tab:«–»,trail:•"
+vim.keymap.set({ "n" }, "<leader>l", "<esc>:set list!<cr>")
+
+-- keep-sorted start
+vim.o.expandtab = true
+vim.o.shiftwidth = 2
+vim.o.smartindent = true
+vim.o.softtabstop = 2
+vim.o.tabstop = 2
+-- keep-sorted end
