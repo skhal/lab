@@ -93,7 +93,7 @@ Use packer filter (PF) to forward packets from the local network to the epair:
 
 ```console
 # sysrc -f /etc/rc.conf.d/routing gateway_enable=yes
-# sysrc -f /etc/rc.conf.d/routing default_gateway="10.0.0.1"
+# sysrc -f /etc/rc.conf.d/routing defaultrouter="10.0.0.1"
 # service routing restart
 
 # pkg install -y FreeBSD-pf
