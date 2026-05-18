@@ -7,15 +7,23 @@
 
 # NAME
 
-**jail** - jails provide virtual environment
+**jail** - isolated virtual environment
 
 # DESCRIPTION
 
-Setup *thick* jails with full FreeBSD environment excluding Kernel. Manage jails
-with builtin tools: jail(8), jls(8), and jexec(8).
+FreeBSD jails combine chroot(8) with resource confinment (CPU, memory, network).
 
-- [bootstrap](./bootstrap.md): prepare the host to serve jails - create a ZFS
-  dataset for jails, configure networking, setup jail(8) service.
+A jail may run a single process (*thin*) or entire world (*thick*). This section
+focuses on thick jails.
+
+A thick jail, provides virtual envirotnment to run applications. It still
+shares Kernel with the host but has own world and resource isolation - CPU,
+Memory, optional network stack (Virtual Network - VNET). It uses resource
+configuration (RC) scripts to create runtime environment.
+
+Instructions:
+
+- [bootstrap](./bootstrap.md): setup a FreeBSD host to run jails.
 
 - [template](./freebsd_template.md): create a jail template, ready for cloning
   to create new jails from in the future. It has network setup, all packages up
@@ -27,3 +35,7 @@ with builtin tools: jail(8), jls(8), and jexec(8).
   that folder.
 
 - [Alpine Linux](./alpine_linux.md): enjail Alpine Linux
+
+# SEE ALSO
+
+jail(8) • jls(8) • jexec(8)
