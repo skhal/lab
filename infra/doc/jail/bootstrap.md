@@ -28,7 +28,12 @@ Store jail configurations in `/etc/jail.conf.d`:
 
 ```console
 # mkdir /etc/jail.conf.d
-# echo '.include "/etc/jail.conf.d/*.conf"' >/etc/jail.conf
+
+# fetch -o /tmp https://raw.githubusercontent.com/skhal/lab/refs/heads/main/infra/doc/jail/data/host/etc/jail.conf
+# mv -nv /tmp/jail.conf /etc/
+
+# fetch -o /tmp https://raw.githubusercontent.com/skhal/lab/refs/heads/main/infra/doc/jail/data/host/etc/jail.conf.d/template.conf
+# mv -nv /tmp/template.conf /etc/jail.conf.d/
 ```
 
 ## Network
