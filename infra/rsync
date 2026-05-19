@@ -28,8 +28,9 @@ NOOP=/usr/bin/false
 # keep-sorted end
 
 usage() {
+  local cmd=${0##*/}
   cat <<EOF
-usage: $0 [options] [path]
+usage: ${cmd} [options] [path]
 
 options:
   -h    print help and exit
