@@ -1,0 +1,207 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+# rc.jail implements some of the jail.exec hooks to help with VNET management.
+# It automates epair(4) management.
+#
+# SYNOPSIS
+#
+#   # file: /etc/jail.conf.d/foo.conf:
+#   foo {
+#     $id = "12";
+#     $bridge0 = "bridge0";
+#     $bridge0ip = "${bridge0}:10.0.1.${id}/24";
+#     vnet;
+#     exec.prestart = "/bin/sh /usr/local/etc/rc.jail prestart ${name} ${bridge0}"
+#     exec.created  = "/bin/sh /usr/local/etc/rc.jail created ${name} ${bridge0ip}"
+#     exec.poststop = "/bin/sh /usr/local/etc/rc.jail poststop ${name} ${bridge0}"
+#   }
+#
+# DESCRIPTION
+#
+# rc.jail creates a new random epair(4) for every jail, connects it to the
+# specified bridge(4) on the host, and enjails the b-side of the epair(4)
+# using jail(8) exec-hooks.
+#
+# Startup sequence:
+#   - exec.prestart: create next logical epair(4) and attach it to the
+#     bridge(4).
+#   - exec.created: enjail the b-side of newly created epair(4) and
+#     assign it the IP address.
+#
+# Shutdown sequence:
+#   - exec.poststop: disconnect jail's epair(4) from the bridge(4) and remove
+#     it from the host environment.
+#
+# FILES
+#
+#   /var/run/jail/${jname}_${bridge}  stores jail epair(4) name
+
+# keep-sorted start
+readonly IFCONFIG_CMD=/sbin/ifconfig
+readonly MKDIR_CMD=/bin/mkdir
+readonly RM_CMD=/bin/rm
+# keep-sorted end
+
+readonly JAIL_RUN_PATH=/var/run/jail
+
+# exec_prestart creates an epair(4) for every bridge and connects it to
+# that bridge, resultin in N epairs for N bridges.
+#
+# Arguments:
+#   $1 : jail name
+#   $* : bridge name
+#
+# It stores the epair(4) identifier in the jail runtime file for every bridge.
+exec_prestart() {
+  local jid=${1:?'exec_prestart: missing jail name'}
+  shift 1
+  local bridge epair_a epair descr
+  for bridge; do
+    epair_a=$(${IFCONFIG_CMD} epair create)
+    epair=${epair_a%a}
+    write_epair ${jid} ${bridge} ${epair}
+    descr=jail:${jid}:${bridge}
+    ${IFCONFIG_CMD} ${epair_a} up descr ${descr}
+    ${IFCONFIG_CMD} ${bridge} addm ${epair_a} up
+  done
+}
+
+# exec_created moves the epair(4) for every bridge to the jail(8) and
+# assigns the IP address in the jailed environment. It loads jail's epair(4)
+# from the jail runtime file for a given bridge.
+#
+# Arguments:
+#   $1 : jail name
+#   $* : colon-separated bridge name and ip
+exec_created() {
+  local jid=${1:?'exec_created: missing jail name'}
+  shift 1
+  local bridge_and_ip bridge ip epair epair_b descr
+  for bridge_and_ip; do
+    bridge=${bridge_and_ip%%:*}
+    ip=${bridge_and_ip#*:}
+    epair="$(read_epair ${jid} ${bridge})"
+    epair_b=${epair}b
+    # Enjail the b-side of epair(4). Once enjailed, the jail is responsible
+    # for the b-side configuration, i.e., run ifconfig(8) from inside the jail.
+    ${IFCONFIG_CMD} ${epair_b} vnet ${jid}
+    descr=jail:${jid}:${bridge}
+    ${IFCONFIG_CMD} -j ${jid} ${epair_b} ${ip} up descr ${descr}
+  done
+}
+
+# exec_poststop disconnects the epair(4) from corresponding bridge and
+# removes the disconnected epair(4) from the host environment.
+#
+# Arguments:
+#   $1 : jail name
+#   $* : bridge name
+#
+# It cleans the jail runtime file for every bridge.
+exec_poststop() {
+  local jid=${1:?'exec_poststop: missing jail name'}
+  shift 1
+  local bridge epair epair_a
+  for bridge; do
+    epair=$(read_epair ${jid} ${bridge})
+    epair_a=${epair}a
+    ${IFCONFIG_CMD} ${bridge} deletem ${epair_a}
+    ${IFCONFIG_CMD} ${epair_a} destroy
+    clean_epair ${jid} ${bridge}
+  done
+}
+
+# write_epair writes the epair(4) identifier to the jail runtime file.
+#
+# Arguments:
+#   $1 : jail name
+#   $2 : bridge name
+#   $3 : epair
+#
+# It creates the jail runtime path if one does not exist.
+write_epair() {
+  local jid=${1:?'write_epair: missing jail name'}
+  local bridge=${2:?'write_epair: missing jail bridge'}
+  local epair=${3:?'write_epair: missing jail epair'}
+  local fname
+  fname=$(get_epair_file ${jid} ${bridge})
+  local fpath=${fname%/*}
+  if ! [ -d ${fpath} ]; then
+    ${MKDIR_CMD} ${fpath}
+  fi
+  echo ${epair} >${fname}
+}
+
+# read_epair reads the epair(4) identifier from the jail runtime file.
+
+# Arguments:
+#   $1 : jail name
+#   $2 : bridge name
+#
+# It returns 1 if the jail runtime file does not exist.
+read_epair() {
+  local jid=${1:?'read_epair: missing jail name'}
+  local bridge=${2:?'read_epair: missing jail bridge'}
+  local fname
+  fname=$(get_epair_file ${jid} ${bridge})
+  if ! [ -f ${fname} ]; then
+    echo "read_epair: runtime file ${fname} does not exist" >&2
+    return 1
+  fi
+  local epair
+  read epair <${fname}
+  echo "${epair}"
+}
+
+# clean_epair cleans up the jail runtime file.
+#
+# Arguments:
+#   $1 : jail name
+#   $2 : bridge name
+clean_epair() {
+  local jid=${1:?'clean_epair: missing jail name'}
+  local bridge=${2:?'clean_epair: missing jail bridge'}
+  local fname=$(get_epair_file ${jid} ${bridge})
+  if [ -f ${fname} ]; then
+    ${RM_CMD} ${fname}
+  fi
+}
+
+# get_epair_file builds the jail runtime file name.
+#
+# Arguments:
+#   $1 : jail name
+#   $2 : bridge name
+#
+# The jail runtime file is in JAIL_RUN_PATH.
+get_epair_file() {
+  local jid=${1:?'get_epair_file: missing jail name'}
+  local bridge=${2:?'get_epair_file: missing jail bridge'}
+  echo ${JAIL_RUN_PATH}/${jid}_${bridge}
+}
+
+# main runs jail(4) exec hooks.
+#
+# Arguments:
+#   $1 : hook name: prestart, created, poststop
+#   $* : hook arguments
+#
+# It prints an error message on unsupported hooks and return 1.
+main() {
+  local hook=${1:?'main: missing hook'}
+  shift 1
+  case ${hook} in
+    prestart | created | poststop) ;;
+    *)
+      echo "invalid hook - ${hook}" >&2
+      return 1
+      ;;
+  esac
+  local hook_func=exec_${hook}
+  ${hook_func} "$@"
+}
+
+main "$@"
