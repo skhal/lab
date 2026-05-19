@@ -5,6 +5,23 @@
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 
+# Rsync pulls cluster configurations.
+#
+# SYNOPSIS
+#
+#   ./rsync [-h|-n] path
+#
+# DESCRIPTION
+#
+# Rsync pulls configuration files for each node that has `rsync.files-from`
+# file, with a list of files to pull. The last component of the path's dirname
+# identifies the host starting with top-level domain, e.g. nat.lab.bsd.
+#
+# OPTIONS
+#
+#   -h  print help and exit
+#   -n  dry-run, print commands but do not run them
+
 # keep-sorted start
 FIND_PATH=./
 NOOP=/usr/bin/false
@@ -15,7 +32,8 @@ usage() {
 usage: $0 [options] [path]
 
 options:
-  -n    dry-run
+  -h    print help and exit
+  -n    dry-run, print commands but do not run them
 
 arguments:
   path  path to search for rsync.files-from
