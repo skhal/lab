@@ -22,11 +22,9 @@
 #   -h  print help and exit
 #   -n  dry-run, print commands but do not run them
 
-# keep-sorted start
-FIND_PATH=./
-NOOP=/usr/bin/false
-# keep-sorted end
+NOOP=false
 
+# usage prints help message.
 usage() {
   local cmd=${0##*/}
   cat <<EOF
@@ -38,67 +36,96 @@ options:
 
 arguments:
   path  path to search for rsync.files-from
-        default: ${FIND_PATH}
 EOF
 }
 
-run() {
-  echo ".. $@"
-  if ${NOOP}; then
+# execve executes the command using exec. If NOOP environment variable is set
+# to true, then it prints the command to be executed but does not run it.
+execve() {
+  if command -p "${NOOP}"; then
+    echo ".. $@"
     return
   fi
-  eval "$@"
+  exec "$@"
 }
 
-run_rsync() {
-  (
-    path=${f%/*}
-    cd ${path}
-
-    remote=${PWD##*/}
-    echo -- rsync ${remote}
-    case "${remote}" in
-      # keep-sorted start
-      "laptop") # macOS
-        src=/
-        ;;
-      "net.lab.nuc") # server
-        src=op@nuc.lab.net:/
-        ;;
-      # keep-sorted end
-      *) # jail
-        jid=${remote##*.}
-        src=op@nuc.lab.net:/usr/jail/${jid}/
-        ;;
-    esac
-
-    run rsync -arvz --files-from=./${rsync_files_from} ${src} ./
-  )
-}
-
-while getopts "hn" opt; do
-  case "$opt" in
-    h)
-      usage
-      exit
+# handle_rsync_files_from handles a file rsync.files-from. It expects the file
+# to be located in a folder, named after the cluster node, e.g.
+#   .../net.lab.dns/rsync.files-from
+handle_rsync_files_from() {
+  local file=${1:?'handle_rsync_files_from: missing file'}
+  local path=${file%/*}
+  local remote=${path##*/}
+  local jid src
+  case "${remote}" in
+    # keep-sorted start
+    "laptop") # macOS
+      src=/
       ;;
-    n)
-      NOOP=/usr/bin/true
+    "net.lab.nuc") # server
+      src=op@nuc.lab.net:/
       ;;
-    *)
-      usage
-      exit 1
+    # keep-sorted end
+    *) # jail
+      jid=${remote##*.}
+      src=op@nuc.lab.net:/usr/jail/${jid}/
       ;;
   esac
-done
-shift $((OPTIND - 1))
 
-find_path=${1:-${FIND_PATH}}
-rsync_files_from="rsync.files-from"
-find ${find_path} -type f -name ${rsync_files_from} -maxdepth 2 \
-  | sort \
-  | {
-    while read f; do
-      run_rsync "$f"
-    done
-  }
+  echo "-- rsync ${remote}"
+  execve rsync -arvz --files-from="${file}" "${src}" ${path}/
+}
+
+# handle_path searches for rsync.files-from at path and runs rsync if the
+# file is found.
+handle_path() {
+  local path=${1:?'handle_path: missing path'}
+  find "${path}" -type f -name rsync.files-from -maxdepth 2 \
+    | sort \
+    | {
+      while read f; do
+        handle_rsync_files_from "$f"
+      done
+    }
+}
+
+# main handles command options and runs path handler for every provided path
+# or ./ if no path is set.
+main() {
+  local opt
+  while getopts "hn" opt; do
+    case "$opt" in
+      h)
+        usage
+        exit 1
+        ;;
+      n)
+        NOOP=true
+        export NOOP
+        ;;
+      *)
+        usage
+        exit 1
+        ;;
+    esac
+  done
+  shift $((OPTIND - 1))
+
+  if [ $# -eq 0 ]; then
+    set -- "$PWD"
+  fi
+
+  local p seen=""
+  for p; do
+    case "$seen" in
+      *":$p:"*)
+        echo >&2 "skip duplicate path $p"
+        continue
+        ;;
+    esac
+    seen=":$p:$seen"
+    handle_path "$p"
+  done
+}
+
+main "$@"
