@@ -16,15 +16,15 @@ repos:
     exclude: |
       (?x)^(
          .*/testdata/.*
-        |.*\\.diff
-        |.*\\.patch
+        |.*\.diff
+        |.*\.patch
       )$
   - id: trailing-whitespace
     exclude: |
       (?x)^(
          .*/testdata/.*
-        |.*\\.diff
-        |.*\\.patch
+        |.*\.diff
+        |.*\.patch
       )$
 
 - repo: local
@@ -256,7 +256,7 @@ repos:
     types: [shell, executable]
     files: |
       (?x)^(
-        .*\\.\\w*sh
+        .*\.\\w*sh
       )$
 
   # YAML
@@ -283,14 +283,15 @@ repos:
     exclude_types: [json]
     exclude: |
       (?x)^(
-         MODULE\\.bazel\\.lock
-        |go\.(mod|sum)
+         MODULE\.bazel\.lock
         |.*/(test)?data/.*
+        |.*\.diff
+        |.*\.patch
+        |.*\.pb\.go
         |.*_string\.go
-        |.*\\.pb\\.go
-        |.*\\.diff
-        |.*\\.patch
+        |go\.(mod|sum)
         |home/vim/templates/skel.*
+        |infra/net\.lab.*
         |nvim/plugin/lab-skeleton/share/new.*
       )$
   - id: nosubmit
@@ -305,8 +306,8 @@ repos:
     language: system
     exclude: |
       (?x)^(
-         .*\\.diff
-        |.*\\.patch
+         .*\.diff
+        |.*\.patch
       )$
   - id: keep-sorted
     name: "Keep sorted"
@@ -327,6 +328,6 @@ repos:
     types: [text]
     exclude: |
       (?x)^(
-         .*\\.diff
-        |infra/net\\.lab.*\\.conf
+         .*\.diff
+        |infra/net\.lab.*\.conf
       )$
