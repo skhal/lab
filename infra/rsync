@@ -94,7 +94,7 @@ shift $((OPTIND - 1))
 
 find_path=${1:-${FIND_PATH}}
 rsync_files_from="rsync.files-from"
-find ${find_path} -type f -name ${rsync_files_from} -depth 2 \
+find ${find_path} -type f -name ${rsync_files_from} -maxdepth 2 \
   | sort \
   | {
     while read f; do
