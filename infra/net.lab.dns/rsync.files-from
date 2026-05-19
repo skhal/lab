@@ -1,6 +1,5 @@
 etc/rc.conf.d
 etc/resolv.conf
-etc/ssh/sshd_config
 usr/local/etc/namedb/named.conf
 usr/local/etc/namedb/primary/0.0.10.in-addr.arpa
 usr/local/etc/namedb/primary/1.0.10.in-addr.arpa
