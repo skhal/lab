@@ -1,22 +1,25 @@
 ; file: /usr/local/etc/namedb/primary/lab.net-forward.db
 $TTL  1h
 @       IN      SOA     dns.lab.net. root.dns.lab.net. (
-                        ;; [YYYYMMDDnn] (update date + number)
-                        2025100501; Serial
-                        1h;   Refresh
-                        15m;    Retry
-                        1w;   Expiry
-                        1d;   Minimum
+                        2025100501 ; serial (yyyymmddnn)
+                        1h         ; refresh
+                        15m        ; update retry
+                        1w         ; expiry
+                        1d         ; minimum
 )
 
 ; Name server
-      IN  NS  dns.lab.net.
-      IN  A   10.0.1.2
+       IN  NS  dns.lab.net.
+       IN  A   10.0.0.2
 
 ; Servers
-dns   IN  A 10.0.1.2
-ldap  IN  A 10.0.1.3
-www   IN  A 10.0.1.4
-dev   IN  A 10.0.1.11
-jammy IN  A 10.0.1.12
-nuc   IN  A 10.0.1.101
+nuc     IN A 10.0.0.1
+dns     IN A 10.0.0.2
+ldap    IN A 10.0.0.3
+www     IN A 10.0.0.4
+bastion IN A 10.0.0.5
+bsd     IN A 10.0.0.11
+linux   IN A 10.0.0.12
+alpine  IN A 10.0.0.13
+bhyve   IN A 10.0.0.15
+ubuntu  IN A 10.0.1.11

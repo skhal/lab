@@ -4,13 +4,8 @@ zone "lab.net" IN {
   file "/usr/local/etc/namedb/primary/lab.net-forward.db";
   allow-update { none; };
 };
-zone "0.0.10.in-addr.arpa" IN {
-  type master;
-  file "/usr/local/etc/namedb/primary/0.0.10.in-addr.arpa";
-  allow-update { none; };
-};
 zone "1.0.10.in-addr.arpa" IN {
   type master;
-  file "/usr/local/etc/namedb/primary/1.0.10.in-addr.arpa";
+  file "/usr/local/etc/namedb/primary/lab.net-reverse.db";
   allow-update { none; };
 };

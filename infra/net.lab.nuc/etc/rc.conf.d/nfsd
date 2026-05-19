@@ -1,0 +1,5 @@
+nfs_server_enable="yes"
+nfs_server_flags="-u -t -h 10.0.0.1"
+nfsv4_server_enable="yes"
+nfsv4_server_only="yes"
+nfs_server_managegids="yes"

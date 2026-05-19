@@ -17,6 +17,8 @@
 #AddressFamily any
 #ListenAddress 0.0.0.0
 #ListenAddress ::
+ListenAddress=192.168.10.5
+ListenAddress=10.0.0.5
 
 #HostKey /etc/ssh/ssh_host_rsa_key
 #HostKey /etc/ssh/ssh_host_ecdsa_key
@@ -87,6 +89,7 @@ AuthorizedKeysFile	.ssh/authorized_keys
 # PAM authentication, then enable this but set PasswordAuthentication
 # and KbdInteractiveAuthentication to 'no'.
 #UsePAM yes
+AllowGroups=ssh
 
 #AllowAgentForwarding yes
 #AllowTcpForwarding yes
