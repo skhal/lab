@@ -1,0 +1,24 @@
+; file: /usr/local/etc/namedb/primary/lab.net-reverse.db
+$TTL  1h
+@       IN      SOA     lab.net. root.lab.net. (
+                        2025100501 ; serial (yyyymmddnn)
+                        1h         ; refresh
+                        15m        ; update retry
+                        1w         ; expiry
+                        1d         ; minimum
+)
+
+; Name server
+      IN  NS  dns.lab.net.
+      IN  A   10.0.0.2
+
+; Servers
+1     IN  PTR nuc.lab.net.
+2     IN  PTR dns.lab.net.
+3     IN  PTR ldap.lab.net.
+4     IN  PTR www.lab.net.
+5     IN  PTR bastion.lab.net.
+11    IN  PTR bsd.lab.net.
+12    IN  PTR linux.lab.net.
+13    IN  PTR alpine.lab.net.
+15    IN  PTR bhyve.lab.net.
