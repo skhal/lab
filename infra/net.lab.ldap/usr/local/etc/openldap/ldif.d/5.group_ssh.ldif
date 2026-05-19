@@ -1,0 +1,7 @@
+dn: cn=ssh,ou=groups,dc=lab,dc=net
+cn: ssh
+objectClass: top
+objectClass: posixGroup
+gidNumber: 1001
+memberUid: op
+memberUid: skhalatyan

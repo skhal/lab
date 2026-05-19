@@ -1,0 +1,16 @@
+dn: dc=lab,dc=net
+dc: lab
+objectClass: dcObject
+objectClass: organization
+description: Research & Development lab
+o: Research Lab
+
+dn: ou=people,dc=lab,dc=net
+ou: people
+objectClass: organizationalUnit
+description: people in the lab
+
+dn: ou=groups,dc=lab,dc=net
+ou: groups
+objectClass: organizationalUnit
+description: groups in the lab

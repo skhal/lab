@@ -1,0 +1,19 @@
+dn: uid=jump,ou=people,dc=lab,dc=net
+cn: jump
+objectClass: top
+objectClass: account
+objectClass: posixAccount
+uid: jump
+uidNumber: 1001
+gidNumber: 1001
+homeDirectory: /home/jump
+loginShell: /bin/tcsh
+gecos: Operator
+description: Operator
+
+dn: cn=jump,ou=groups,dc=lab,dc=net
+cn: jump
+objectClass: top
+objectClass: posixGroup
+gidNumber: 1001
+memberUid: jump

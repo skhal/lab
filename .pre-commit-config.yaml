@@ -25,6 +25,7 @@ repos:
          .*/testdata/.*
         |.*\.diff
         |.*\.patch
+        |infra/net\.lab.*
       )$
 
 - repo: local

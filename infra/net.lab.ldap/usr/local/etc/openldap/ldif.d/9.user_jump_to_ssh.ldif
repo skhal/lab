@@ -1,0 +1,5 @@
+# ldapmodify
+dn: cn=ssh,ou=groups,dc=lab,dc=net
+changeType: modify
+add: memberUid
+memberUid: jump

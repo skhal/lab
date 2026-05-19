@@ -1,0 +1,19 @@
+dn: uid=op,ou=people,dc=lab,dc=net
+cn: op
+objectClass: top
+objectClass: account
+objectClass: posixAccount
+uid: op
+uidNumber: 1000
+gidNumber: 1000
+homeDirectory: /home/op
+loginShell: /bin/tcsh
+gecos: Operator
+description: Operator
+
+dn: cn=op,ou=groups,dc=lab,dc=net
+cn: op
+objectClass: top
+objectClass: posixGroup
+gidNumber: 1000
+memberUid: op
