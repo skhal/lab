@@ -7,8 +7,15 @@
 
 # NAME
 
-**infra** - infrastructure configurations, documentation
+**infra** - cluster configuration and documentation
 
 # DESCRIPTION
 
-- [doc/](./doc/) documents cluster setup.
+Infrastructure section describes Lab cluster setup ([doc/](./doc/)) and holds
+configuration files for each node.
+
+Command to pull cluster configuration:
+
+```console
+# ./rsync
+```
