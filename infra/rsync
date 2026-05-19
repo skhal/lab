@@ -39,14 +39,14 @@ arguments:
 EOF
 }
 
-# execve executes the command using exec. If NOOP environment variable is set
+# run executes the command using exec. If NOOP environment variable is set
 # to true, then it prints the command to be executed but does not run it.
-execve() {
+run() {
   if command -p "${NOOP}"; then
     echo ".. $@"
     return
   fi
-  exec "$@"
+  eval "$@"
 }
 
 # handle_rsync_files_from handles a file rsync.files-from. It expects the file
@@ -73,7 +73,7 @@ handle_rsync_files_from() {
   esac
 
   echo "-- rsync ${remote}"
-  execve rsync -arvz --files-from="${file}" "${src}" ${path}/
+  run rsync -arvz --files-from="${file}" "${src}" ${path}/
 }
 
 # handle_path searches for rsync.files-from at path and runs rsync if the
