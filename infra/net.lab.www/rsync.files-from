@@ -1,10 +1,5 @@
-etc/nsswitch.conf
-etc/pam.d/sshd
-etc/rc.conf
 etc/rc.conf.d
 etc/resolv.conf
-etc/ssh/sshd_config
-usr/local/etc/ldap.conf
+usr/local/etc/newsyslog.conf.d/
 usr/local/etc/nginx/nginx.conf
-usr/local/etc/nss_ldap.conf
-usr/local/etc/openldap/ldap.conf
+usr/local/etc/rc.conf.d
