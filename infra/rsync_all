@@ -31,6 +31,32 @@ run() {
   eval "$@"
 }
 
+run_rsync() {
+  (
+    path=${f%/*}
+    cd ${path}
+
+    remote=${PWD##*/}
+    echo -- rsync ${remote}
+    case "${remote}" in
+      # keep-sorted start
+      "laptop") # macOS
+        src=/
+        ;;
+      "net.lab.nuc") # server
+        src=op@nuc.lab.net:/
+        ;;
+      # keep-sorted end
+      *) # jail
+        jid=${remote##*.}
+        src=op@nuc.lab.net:/usr/jail/${jid}/
+        ;;
+    esac
+
+    run rsync -arvz --files-from=./${rsync_files_from} ${src} ./
+  )
+}
+
 while getopts "hn" opt; do
   case "$opt" in
     h)
@@ -49,12 +75,11 @@ done
 shift $((OPTIND - 1))
 
 find_path=${1:-${FIND_PATH}}
-find ${find_path} -type f -name rsync.files-from -depth 2 | {
-  while read f; do
-    (
-      cd ${f%/*}
-      echo -- $PWD
-      run rsync -arvz --files-from=./${f##*/} op@${PWD##*.}:/ ./
-    )
-  done
-}
+rsync_files_from="rsync.files-from"
+find ${find_path} -type f -name ${rsync_files_from} -depth 2 \
+  | sort \
+  | {
+    while read f; do
+      run_rsync "$f"
+    done
+  }
