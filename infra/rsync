@@ -60,6 +60,12 @@ handle_rsync_files_from() {
   case "${remote}" in
     # keep-sorted start
     "laptop") # macOS
+      case $(hostname) in
+        *.lab.net)
+          echo >&2 "skip ${remote} -- running in Lab cluster"
+          return
+          ;;
+      esac
       src=/
       ;;
     "net.lab.nuc") # server
