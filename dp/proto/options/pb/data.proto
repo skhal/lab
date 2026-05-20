@@ -1,0 +1,27 @@
+// Copyright 2026 Samvel Khalatyan. All rights reserved.
+//
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
+edition = "2023";
+
+package dp.proto.options;
+
+import "google/protobuf/go_features.proto";
+import "dp/proto/options/pb/annotations.proto";
+
+option features.(.pb.go).api_level = API_OPAQUE;
+option go_package = "github.com/skhal/lab/dp/proto/options/pb";
+
+// Store is a data store.
+//
+// Next ID: 3
+message Store {
+  // public holds data publicly available data. It is safe to share this data
+  // with other applications.
+  string public = 1;
+
+  // private holds sensitive data that should be cleaned before the message is
+  // stored or send over the wire.
+  string private = 2 [(privacy) = { sensitive: true }];
+}

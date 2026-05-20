@@ -1,0 +1,27 @@
+// Copyright 2026 Samvel Khalatyan. All rights reserved.
+//
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
+edition = "2023";
+
+package dp.proto.options;
+
+import "google/protobuf/go_features.proto";
+import "google/protobuf/descriptor.proto";
+
+option features.(.pb.go).api_level = API_OPAQUE;
+option go_package = "github.com/skhal/lab/dp/proto/options/pb";
+
+extend google.protobuf.FieldOptions {
+  Privacy privacy = 50000;
+}
+
+// Privacy defines field privacy settings.
+//
+// Next ID: 2
+message Privacy {
+  // sensitive indicates whether the field holds sensitive data and should be
+  // cleaned before it is stored or passed on the wire.
+  bool sensitive = 1;
+}
