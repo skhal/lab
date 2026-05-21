@@ -1,0 +1,20 @@
+--- /usr/local/etc/poudriere.conf.sample	2026-05-18 21:37:47.000000000 -0500
++++ /usr/local/etc/poudriere.conf	2026-05-21 13:06:18.833670000 -0500
+@@ -160,7 +160,7 @@
+ # It will be mounted into the jail and be shared among all jails.
+ # It is recommended that extra ccache configuration be done with
+ # ccache -o rather than from the environment.
+-#CCACHE_DIR=/var/cache/ccache
++CCACHE_DIR=/var/cache/ccache
+ 
+ # Static ccache support from host.  This uses the existing
+ # ccache from the host in the build jail.  This is useful for
+@@ -227,7 +227,7 @@
+ 
+ # By default MAKE_JOBS is disabled to allow only one process per cpu
+ # Use the following to allow it anyway
+-# ALLOW_MAKE_JOBS=yes
++ALLOW_MAKE_JOBS=yes
+ 
+ # List of package name patterns that will always be allowed to use MAKE_JOBS
+ # regardless of ALLOW_MAKE_JOBS. This is useful for allowing ports

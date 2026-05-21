@@ -15,4 +15,5 @@
   FreeBSD.
 - [jail/](./jail/) - Setup jails to contain services or provide virtual
   environments.
+- [port/](./port/) - Build ports with poudriere(8).
 - [vpn/](./vpn/) - Virtual Private Network setup.
