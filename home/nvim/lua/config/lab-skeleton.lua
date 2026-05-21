@@ -147,7 +147,7 @@ local registrations = {
 				local relpath = git.relpath(opts.file)
 				local dirname = vim.fs.dirname(relpath)
 				local pkg = vim.fs.joinpath(gomod, dirname)
-				return vim.fn.escape(pkg, "/")
+				return pkg
 			end,
 			package = function(opts)
 				local relpath = git.relpath(opts.file)
