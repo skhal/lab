@@ -13,6 +13,7 @@ FreeBSD-runtime-dev
 FreeBSD-toolchain
 FreeBSD-utilities-dev
 bash
+buf
 catch2
 ccache
 cmake
