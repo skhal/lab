@@ -7,6 +7,7 @@ local opt = vim.o
 
 -- General
 -- keep-sorted start
+opt.mouse = "" -- disable to copy-on-select
 opt.number = true
 opt.termguicolors = true
 -- keep-sorted end
