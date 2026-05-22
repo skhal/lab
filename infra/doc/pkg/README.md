@@ -117,6 +117,18 @@ If the package builds successfully, re-generate package list (plist):
 ```
 
 Review the generated file and remove the first todo line that says: `/you/...`.
+Verify the package is valid:
+
+```console
+# poudriere testport -j 15amd64 -J 16 devel/protobuf
+```
+
+Bump `PACKAGEVERSION` in packages that depend on this one:
+
+```console
+# make all-depends-list
+```
+
 The package is ready to be build by poudriere(8):
 
 ```console
@@ -163,3 +175,7 @@ Fetch the repository:
 # pkg search -r lab protobuf
 # pkg install -r lab protobuf
 ```
+
+# SEE ALSO
+
+- https://www.freebsdsoftware.org/blog/poudriere-freebsd-setup.html
