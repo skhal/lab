@@ -1,0 +1,5 @@
+etc/rc.conf.d
+etc/resolv.conf
+usr/local/etc/nginx/nginx.conf
+usr/local/etc/poudriere.conf
+usr/local/etc/rc.conf.d

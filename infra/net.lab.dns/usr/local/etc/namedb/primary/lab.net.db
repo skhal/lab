@@ -18,6 +18,7 @@ dns     IN A 10.0.0.2
 ldap    IN A 10.0.0.3
 www     IN A 10.0.0.4
 bastion IN A 10.0.0.5
+pkg     IN A 10.0.0.6
 bsd     IN A 10.0.0.11
 linux   IN A 10.0.0.12
 alpine  IN A 10.0.0.13

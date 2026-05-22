@@ -18,6 +18,7 @@ $TTL  1h
 3     IN  PTR ldap.lab.net.
 4     IN  PTR www.lab.net.
 5     IN  PTR bastion.lab.net.
+6     IN  PTR pkg.lab.net.
 11    IN  PTR bsd.lab.net.
 12    IN  PTR linux.lab.net.
 13    IN  PTR alpine.lab.net.
