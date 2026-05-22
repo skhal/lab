@@ -4,3 +4,12 @@
 -- license that can be found in the LICENSE file.
 
 vim.bo.equalprg = "clang-format21 -assume-filename=%"
+
+local selector = require("file.selector")
+
+local function selectProto()
+	local file = vim.fn.expand("%")
+	selector.Select(file, { pattern = "*.proto" }, vim.cmd.edit)
+end
+
+vim.keymap.set("n", "<localleader>rs", selectProto, { buffer = true })
