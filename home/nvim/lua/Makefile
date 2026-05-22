@@ -5,7 +5,7 @@
 
 # Flavor: FreeBSD
 
-INSTALL_PATHS = config
+INSTALL_PATHS = config go
 
 install: ${INSTALL_PATHS} .PHONY
 
