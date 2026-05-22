@@ -29,7 +29,14 @@ including poudriere run in a jail). Keep in mind, that we add other
 dependencies because the jail template is minimal:
 
 ```console
-# pkg install poudriere-devel git FreeBSD-jail FreeBSD-clibs-dev FreeBSD-mtree FreeBSD-bmake FreeBSD-clang ccache
+# pkg install poudriere-devel \
+    FreeBSD-bmake \
+    FreeBSD-clang \
+    FreeBSD-clibs-dev \
+    FreeBSD-jail \
+    FreeBSD-mtree \
+    ccache \
+    git
 
 # grep DISTFILES_CACHE /usr/local/etc/poudriere.conf
 DISTFILES_CACHE=/usr/ports/distfiles
@@ -47,6 +54,19 @@ Initialize poudriere(8) and create a build jail:
 # poudriere jail -c -j 15amd64 -v 15.0-RELEASE
 ```
 
+Generate a key to sign packages -- it will be used to connect to the server:
+
+```console
+# mkdir /usr/local/etc/poudriere.d/keys
+
+# openssl genrsa -out /usr/local/etc/poudriere.d/keys/pkg.key 4096
+# chmod 400 /usr/local/etc/poudriere.d/keys/pkg.key
+# openssl rsa -in /usr/local/etc/poudriere.d/keys/pkg.key -pubout -out /usr/local/etc/poudriere.d/keys/pkg.pub
+```
+
+Point `PKG_REPO_SIGNING_KEY` at pkg.key in `poudriere.conf`. Now on,
+poudriere(8) signs repo during builds.
+
 ## Build packages
 
 Use a list of packages to build:
@@ -55,5 +75,50 @@ Use a list of packages to build:
 # cat /usr/local/etc/poudriere.d/pkglist
 devel/protobuf
 
+# poudriere bulk -j 15amd64 -J 16 -f /usr/local/etc/poudriere.d/pkglist
+```
+
+## Upgrade a package
+
+Example: want to update devel/protobuf package from 29.6 to 34.2.
+
+The package uses cmake to build and requires additional tools or libraries.
+
+```console
+# pkg install \
+    FreeBSD-clang-dev \
+    FreeBSD-toolchain \
+    cmake
+```
+
+Work in the default ports tree:
+
+```console
+# cd /usr/local/poudriere/ports/default/
+# git checkout --track -b protobuf-v34.2
+
+# cd devel/protobuf
+```
+
+Update:
+
+- Makefile: bump the version
+- distinfo: change the release archive, sha256, size, and set timestamp to
+  `date -u +%s`
+
+```console
+# make
+```
+
+If the package builds successfully, re-generate package list (plist):
+
+```console
+# makeplist
+```
+
+Review the generated file and remove the first todo line that says: `/you/...`.
+The package is ready to be build by poudriere(8):
+
+```console
 # poudriere bulk -j 15amd64 -J 16 -f /usr/local/etc/poudriere.d/pkglist
 ```
