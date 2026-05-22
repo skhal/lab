@@ -7,7 +7,7 @@
 
 # NAME
 
-**port** -- custom ports
+**pkg** -- pkg(8) repository of custom ports
 
 # DESCRIPTION
 

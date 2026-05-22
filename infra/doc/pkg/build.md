@@ -16,7 +16,7 @@
 Run a jail:
 
 ```console
-# fetch -o /tmp https://raw.githubusercontent.com/skhal/lab/refs/heads/main/infra/doc/port/data/host/etc/jail.conf.d/pkg.conf
+# fetch -o /tmp https://raw.githubusercontent.com/skhal/lab/refs/heads/main/infra/doc/pkg/data/host/etc/jail.conf.d/pkg.conf
 # mv -nv /tmp/pkg.conf /etc/jail.conf.d/
 
 # service jail run pkg
@@ -35,7 +35,7 @@ dependencies because the jail template is minimal:
 DISTFILES_CACHE=/usr/ports/distfiles
 # mkdir -p /usr/ports/distfiles
 
-# fetch -o /tmp https://raw.githubusercontent.com/skhal/lab/refs/heads/main/infra/doc/port/data/jail/usr/local/etc/poudriere.conf.diff
+# fetch -o /tmp https://raw.githubusercontent.com/skhal/lab/refs/heads/main/infra/doc/pkg/data/jail/usr/local/etc/poudriere.conf.diff
 # patch -lb -i /tmp/poudriere.conf.diff /usr/local/etc/poudriere.conf
 ```
 
