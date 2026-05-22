@@ -1,0 +1,55 @@
+// Copyright 2026 Samvel Khalatyan. All rights reserved.
+//
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
+edition = "2024";
+
+package book.irex;
+
+import "google/protobuf/go_features.proto";
+
+option features.(.pb.go).api_level = API_OPAQUE;
+option go_package = "github.com/skhal/lab/book/irex/pb";
+
+// Market contains market data such as indices, dividends, etc.
+//
+// Next ID: 2
+message Market {
+  // Quotes is a list of market quotes, sorted by dates in ascending order.
+  // There is one quote per date.
+  repeated Quote quotes = 1;
+}
+
+// Quote represents a market state as of a given date.
+//
+// Next ID: 3
+message Quote {
+  // Date is the day of the year when the quote applies.
+  Date date = 1;
+
+  // SPX is Standard & Poor Composite Index.
+  Cent spx = 2;
+}
+
+// Date represents a calendar date with year, month, and day.
+//
+// Next ID: 4
+message Date {
+  // Year is the date's year.
+  int32 year = 1;
+
+  // Month is the date's month of the year.
+  int32 month = 2;
+
+  // Day is is the date's day of the month.
+  int32 day = 3;
+}
+
+// Cent is the amount in cents.
+//
+// Next ID: 2
+message Cent {
+  // Value is the number in cents.
+  int32 value = 1;
+}
