@@ -1,0 +1,25 @@
+--- /usr/local/etc/nginx/nginx.conf-dist	2026-05-18 20:27:32.000000000 -0500
++++ /usr/local/etc/nginx/nginx.conf	2026-05-21 19:17:49.230607000 -0500
+@@ -38,14 +38,18 @@
+     #gzip  on;
+ 
+     server {
+-        listen       80;
++        listen       10.0.0.6:80;
+         server_name  localhost;
+ 
+         #access_log  logs/host.access.log  main;
+ 
+-        location / {
+-            root   /usr/local/www/nginx;
+-            index  index.html index.htm;
++        location ~ ^/FreeBSD:([[:digit:]]+):amd64/latest/(.+)$ {
++            allow 10.0.0.0/24;
++	    deny  all;
++
++	    autoindex on;
++
++            alias /usr/local/poudriere/data/packages/$1amd64-default/$2;
+         }
+ 
+         #error_page  404              /404.html;
