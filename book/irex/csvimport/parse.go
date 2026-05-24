@@ -24,8 +24,11 @@ var (
 	// to the date format, it is represented by ####.1.
 	ErrDate = errors.New("invalid date")
 
-	errYear  = errors.New("invalid year")
-	errMonth = errors.New("invalid month")
+	// ErrYear means the date has invalid year
+	ErrYear = errors.New("invalid year")
+
+	// ErrMonth means the date has invalid month.
+	ErrMonth = errors.New("invalid month")
 )
 
 var (
@@ -95,17 +98,30 @@ func (rec record) Date() (*pb.Date, error) {
 	if len(rec) <= idxDate {
 		return nil, ErrNoDate
 	}
-	tokens := strings.SplitN(rec[idxDate], ".", 2)
+	d, err := ParseDate(rec[idxDate])
+	if err != nil {
+		return nil, fmt.Errorf("%w: %s", ErrDate, err)
+	}
+	return d, nil
+}
+
+// ParseDate parses date string ####.## into year, month, and the last day of
+// the month. The year has minimum threshold of [MinYear]. The month is in the
+// range (1, 12) inclusive, represented by two digits except October, which is
+// given by .1, e.g. 1990.1 is Oct 1990.
+// It returns an error if parsing fails.
+func ParseDate(s string) (*pb.Date, error) {
+	tokens := strings.SplitN(s, ".", 2)
 	if len(tokens) != 2 {
-		return nil, fmt.Errorf("%w: %s must be YYYY.MM", ErrDate, rec[idxDate])
+		return nil, fmt.Errorf("%w: %s must be YYYY.MM", ErrFormat, s)
 	}
 	year, err := date(tokens).Year()
 	if err != nil {
-		return nil, fmt.Errorf("%w: %s", ErrDate, err)
+		return nil, err
 	}
 	month, err := date(tokens).Month()
 	if err != nil {
-		return nil, fmt.Errorf("%w: %s", ErrDate, err)
+		return nil, err
 	}
 	day := lastDayOf(year, month)
 	dt := pb.Date_builder{
@@ -142,10 +158,10 @@ const (
 func (d date) Year() (int, error) {
 	n, err := strconv.Atoi(d[idxDateYear])
 	if err != nil {
-		return 0, fmt.Errorf("%w: %s", errYear, err)
+		return 0, fmt.Errorf("%w: %s", ErrYear, err)
 	}
 	if n < MinYear {
-		return 0, fmt.Errorf("%w: %d below minimum %d", errYear, n, MinYear)
+		return 0, fmt.Errorf("%w: %d below minimum %d", ErrYear, n, MinYear)
 	}
 	return n, nil
 }
@@ -161,16 +177,16 @@ func (d date) Month() (int, error) {
 	if len(s) == 1 {
 		// "1" means month 10 or October
 		if s != "1" {
-			return 0, fmt.Errorf("%w: %s", errMonth, s)
+			return 0, fmt.Errorf("%w: %s", ErrMonth, s)
 		}
 		return 10, nil
 	}
 	n, err := strconv.Atoi(s)
 	if err != nil {
-		return 0, fmt.Errorf("%w: %s", errMonth, err)
+		return 0, fmt.Errorf("%w: %s", ErrMonth, err)
 	}
 	if n < 1 || n > 12 {
-		return 0, fmt.Errorf("%w: %s", errMonth, s)
+		return 0, fmt.Errorf("%w: %s", ErrMonth, s)
 	}
 	return n, nil
 }
