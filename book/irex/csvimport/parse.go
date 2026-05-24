@@ -38,6 +38,15 @@ var (
 )
 
 var (
+	// ErrNoDividend means Dividend value is missing in the record.
+	ErrNoDividend = errors.New("missing dividend")
+
+	// ErrDividend means Dividend value has invalid format. See [ErrSPX] for
+	// format description.
+	ErrDividend = errors.New("invalid dividend")
+)
+
+var (
 	errDollars = errors.New("invalid dollars")
 	errCents   = errors.New("invalid cents")
 )
@@ -57,7 +66,11 @@ func Parse(rec []string) (*pb.Quote, error) {
 	if err != nil {
 		return nil, err
 	}
-	q := pb.Quote_builder{Date: date, Spx: spx}.Build()
+	div, err := record(rec).Dividend()
+	if err != nil {
+		return nil, err
+	}
+	q := pb.Quote_builder{Date: date, Spx: spx, Div: div}.Build()
 	return q, nil
 }
 
@@ -67,6 +80,7 @@ type record []string
 const (
 	idxDate = iota
 	idxSPX
+	idxDividend
 )
 
 // Date returns the date value of the record.
@@ -162,17 +176,38 @@ func (rec record) SPX() (*pb.Cent, error) {
 	if len(rec) <= idxSPX {
 		return nil, ErrNoSPX
 	}
-	tokens := strings.SplitN(rec[idxSPX], ".", 2)
-	if len(tokens) != 2 {
-		return nil, fmt.Errorf("%w: %s must be #.##", ErrSPX, rec[idxSPX])
-	}
-	dollars, err := balance(tokens).Dollars()
+	c, err := parseCents(rec[idxSPX])
 	if err != nil {
 		return nil, fmt.Errorf("%w: %s", ErrSPX, err)
 	}
+	return c, nil
+}
+
+// Dividend parses the Dividend value of the record.
+// It returns an error if the value is missing or invalid.
+func (rec record) Dividend() (*pb.Cent, error) {
+	if len(rec) <= idxDividend {
+		return nil, ErrNoDividend
+	}
+	c, err := parseCents(rec[idxDividend])
+	if err != nil {
+		return nil, fmt.Errorf("%w: %s", ErrDividend, err)
+	}
+	return c, nil
+}
+
+func parseCents(s string) (*pb.Cent, error) {
+	tokens := strings.SplitN(s, ".", 2)
+	if len(tokens) != 2 {
+		return nil, fmt.Errorf("%s must be #.##", s)
+	}
+	dollars, err := balance(tokens).Dollars()
+	if err != nil {
+		return nil, fmt.Errorf("%s", err)
+	}
 	cents, err := balance(tokens).Cents()
 	if err != nil {
-		return nil, fmt.Errorf("%w; %s", ErrSPX, err)
+		return nil, fmt.Errorf("%s", err)
 	}
 	n := dollars*100 + cents
 	c := pb.Cent_builder{Value: &n}.Build()

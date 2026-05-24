@@ -28,7 +28,7 @@ const (
 
 // Market contains market data such as indices, dividends, etc.
 //
-// Next ID: 1
+// Next ID: 2
 type Market struct {
 	state             protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Quotes *[]*Quote              `protobuf:"bytes,1,rep,name=quotes"`
@@ -92,11 +92,12 @@ func (b0 Market_builder) Build() *Market {
 
 // Quote represents a market state as of a given date.
 //
-// Next ID: 3
+// Next ID: 4
 type Quote struct {
 	state           protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Date *Date                  `protobuf:"bytes,1,opt,name=date"`
 	xxx_hidden_Spx  *Cent                  `protobuf:"bytes,2,opt,name=spx"`
+	xxx_hidden_Div  *Cent                  `protobuf:"bytes,3,opt,name=div"`
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
 }
@@ -140,12 +141,23 @@ func (x *Quote) GetSpx() *Cent {
 	return nil
 }
 
+func (x *Quote) GetDiv() *Cent {
+	if x != nil {
+		return x.xxx_hidden_Div
+	}
+	return nil
+}
+
 func (x *Quote) SetDate(v *Date) {
 	x.xxx_hidden_Date = v
 }
 
 func (x *Quote) SetSpx(v *Cent) {
 	x.xxx_hidden_Spx = v
+}
+
+func (x *Quote) SetDiv(v *Cent) {
+	x.xxx_hidden_Div = v
 }
 
 func (x *Quote) HasDate() bool {
@@ -162,6 +174,13 @@ func (x *Quote) HasSpx() bool {
 	return x.xxx_hidden_Spx != nil
 }
 
+func (x *Quote) HasDiv() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Div != nil
+}
+
 func (x *Quote) ClearDate() {
 	x.xxx_hidden_Date = nil
 }
@@ -170,13 +189,19 @@ func (x *Quote) ClearSpx() {
 	x.xxx_hidden_Spx = nil
 }
 
+func (x *Quote) ClearDiv() {
+	x.xxx_hidden_Div = nil
+}
+
 type Quote_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
-	// Date is the day of the year when the quote applies.
+	// date is the day of the year when the quote applies.
 	Date *Date
-	// SPX is Standard & Poor Composite Index.
+	// spx is Standard & Poor Composite Index.
 	Spx *Cent
+	// div is dividends.
+	Div *Cent
 }
 
 func (b0 Quote_builder) Build() *Quote {
@@ -185,6 +210,7 @@ func (b0 Quote_builder) Build() *Quote {
 	_, _ = b, x
 	x.xxx_hidden_Date = b.Date
 	x.xxx_hidden_Spx = b.Spx
+	x.xxx_hidden_Div = b.Div
 	return m0
 }
 
@@ -414,10 +440,11 @@ const file_book_irex_pb_market_proto_rawDesc = "" +
 	"\n" +
 	"\x19book/irex/pb/market.proto\x12\tbook.irex\x1a!google/protobuf/go_features.proto\"2\n" +
 	"\x06Market\x12(\n" +
-	"\x06quotes\x18\x01 \x03(\v2\x10.book.irex.QuoteR\x06quotes\"O\n" +
+	"\x06quotes\x18\x01 \x03(\v2\x10.book.irex.QuoteR\x06quotes\"r\n" +
 	"\x05Quote\x12#\n" +
 	"\x04date\x18\x01 \x01(\v2\x0f.book.irex.DateR\x04date\x12!\n" +
-	"\x03spx\x18\x02 \x01(\v2\x0f.book.irex.CentR\x03spx\"B\n" +
+	"\x03spx\x18\x02 \x01(\v2\x0f.book.irex.CentR\x03spx\x12!\n" +
+	"\x03div\x18\x03 \x01(\v2\x0f.book.irex.CentR\x03div\"B\n" +
 	"\x04Date\x12\x12\n" +
 	"\x04year\x18\x01 \x01(\x05R\x04year\x12\x14\n" +
 	"\x05month\x18\x02 \x01(\x05R\x05month\x12\x10\n" +
@@ -436,11 +463,12 @@ var file_book_irex_pb_market_proto_depIdxs = []int32{
 	1, // 0: book.irex.Market.quotes:type_name -> book.irex.Quote
 	2, // 1: book.irex.Quote.date:type_name -> book.irex.Date
 	3, // 2: book.irex.Quote.spx:type_name -> book.irex.Cent
-	3, // [3:3] is the sub-list for method output_type
-	3, // [3:3] is the sub-list for method input_type
-	3, // [3:3] is the sub-list for extension type_name
-	3, // [3:3] is the sub-list for extension extendee
-	0, // [0:3] is the sub-list for field type_name
+	3, // 3: book.irex.Quote.div:type_name -> book.irex.Cent
+	4, // [4:4] is the sub-list for method output_type
+	4, // [4:4] is the sub-list for method input_type
+	4, // [4:4] is the sub-list for extension type_name
+	4, // [4:4] is the sub-list for extension extendee
+	0, // [0:4] is the sub-list for field type_name
 }
 
 func init() { file_book_irex_pb_market_proto_init() }

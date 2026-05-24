@@ -23,13 +23,16 @@ message Market {
 
 // Quote represents a market state as of a given date.
 //
-// Next ID: 3
+// Next ID: 4
 message Quote {
-  // Date is the day of the year when the quote applies.
+  // date is the day of the year when the quote applies.
   Date date = 1;
 
-  // SPX is Standard & Poor Composite Index.
+  // spx is Standard & Poor Composite Index.
   Cent spx = 2;
+
+  // div is dividends.
+  Cent div = 3;
 }
 
 // Date represents a calendar date with year, month, and day.

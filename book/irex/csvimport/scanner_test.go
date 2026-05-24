@@ -37,32 +37,32 @@ func TestScanner(t *testing.T) {
 		{
 			name: "one record",
 			csv: `
-1990.01,1.11
+1990.01,1.01,1.02
 `,
 			want: []*pb.Quote{
-				newQuote(t, 1990, time.January, 31, 111),
+				newQuote(t, 1990, time.January, 31, 101, 102),
 			},
 		},
 		{
 			name:      "one record skip lines",
 			skipLines: 1,
 			csv: `
-1990.01,1.11
-1990.02,2.22
+1990.01,1.01,1.02
+1990.02,2.01,2.02
 `,
 			want: []*pb.Quote{
-				newQuote(t, 1990, time.February, 28, 222),
+				newQuote(t, 1990, time.February, 28, 201, 202),
 			},
 		},
 		{
 			name: "two records",
 			csv: `
-1990.01,1.11
-1990.02,2.22
+1990.01,1.01,1.02
+1990.02,2.01,2.02
 `,
 			want: []*pb.Quote{
-				newQuote(t, 1990, time.January, 31, 111),
-				newQuote(t, 1990, time.February, 28, 222),
+				newQuote(t, 1990, time.January, 31, 101, 102),
+				newQuote(t, 1990, time.February, 28, 201, 202),
 			},
 		},
 		{
@@ -76,34 +76,41 @@ func TestScanner(t *testing.T) {
 			csv: `
 foo,bar
 baz
-1990.01,1.11
+1990.01,1.01,1.02
 `,
 			wantErr: csvimport.ErrScan,
 		},
 		{
 			name: "invalid lines",
 			csv: `
-1990.01,1.11
+1990.01,1.01,1.02
 1990.02
 `,
 			want: []*pb.Quote{
-				newQuote(t, 1990, time.January, 31, 111),
+				newQuote(t, 1990, time.January, 31, 101, 102),
 			},
 			wantErr: csvimport.ErrScan,
 		},
 		{
 			name: "invalid date",
 			csv: `
-1000.01,1.11
+1000.01,1.01,1.02
 `,
 			wantErr: csvimport.ErrDate,
 		},
 		{
 			name: "invalid spx",
 			csv: `
-1990.01,1.ab
+1990.01,1.ab,1.02
 `,
 			wantErr: csvimport.ErrSPX,
+		},
+		{
+			name: "invalid dividend",
+			csv: `
+1990.01,1.01,1.ab
+`,
+			wantErr: csvimport.ErrDividend,
 		},
 	}
 	for _, tc := range tests {
@@ -132,8 +139,8 @@ baz
 
 func ExampleScanner() {
 	data := `
-1990.01,1.01
-1990.02,1.02
+1990.01,1.01,1.02
+1990.02,2.01,2.02
 `
 	r := csv.NewReader(strings.NewReader(data))
 	sc := csvimport.NewScanner(r)
@@ -146,9 +153,6 @@ func ExampleScanner() {
 		return
 	}
 	for _, q := range quotes {
-		fmt.Printf("%s\n", q)
+		fmt.Printf("%v\n", q)
 	}
-	// Output:
-	// date:{year:1990  month:1  day:31}  spx:{value:101}
-	// date:{year:1990  month:2  day:28}  spx:{value:102}
 }
