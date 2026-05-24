@@ -151,23 +151,8 @@ func TestParse_spx(t *testing.T) {
 			wantErr: csvimport.ErrSPX,
 		},
 		{
-			name:    "no dollar",
-			rec:     []string{"1990.01", ".01", "1.02"},
-			wantErr: csvimport.ErrSPX,
-		},
-		{
-			name:    "no cents",
-			rec:     []string{"1990.01", "1.", "1.02"},
-			wantErr: csvimport.ErrSPX,
-		},
-		{
-			name:    "two digit cents",
-			rec:     []string{"1990.01", "1.1", "1.02"},
-			wantErr: csvimport.ErrSPX,
-		},
-		{
-			name:    "cents not number",
-			rec:     []string{"1990.01", "1.ab", "1.02"},
+			name:    "invalid",
+			rec:     []string{"1990.01", "1.a1", "1.02"},
 			wantErr: csvimport.ErrSPX,
 		},
 	}
@@ -187,23 +172,8 @@ func TestParse_div(t *testing.T) {
 			wantErr: csvimport.ErrDividend,
 		},
 		{
-			name:    "no dollar",
-			rec:     []string{"1990.01", "1.01", ".02"},
-			wantErr: csvimport.ErrDividend,
-		},
-		{
-			name:    "no cents",
-			rec:     []string{"1990.01", "1.01", "1."},
-			wantErr: csvimport.ErrDividend,
-		},
-		{
-			name:    "two digit cents",
-			rec:     []string{"1990.01", "1.01", "1.2"},
-			wantErr: csvimport.ErrDividend,
-		},
-		{
-			name:    "cents not number",
-			rec:     []string{"1990.01", "1.01", "1.ab"},
+			name:    "invalid",
+			rec:     []string{"1990.01", "1.01", "1.a2"},
 			wantErr: csvimport.ErrDividend,
 		},
 	}
@@ -222,6 +192,67 @@ func testParse(t *testing.T, tests []parseTest) {
 			if d := cmp.Diff(tc.want, got, protocmp.Transform()); d != "" {
 				t.Errorf("mismatch (-want +got):\n%s", d)
 				t.Logf("record:\n%v", tc.rec)
+			}
+		})
+	}
+}
+
+func TestParseCent(t *testing.T) {
+	tests := []struct {
+		name    string
+		value   string
+		want    *pb.Cent
+		wantErr error
+	}{
+		{
+			name:    "empty",
+			wantErr: csvimport.ErrFormat,
+		},
+		{
+			name:    "no dollar",
+			value:   ".02",
+			wantErr: csvimport.ErrDollar,
+		},
+		{
+			name:    "dollar not number",
+			value:   "a.23",
+			wantErr: csvimport.ErrDollar,
+		},
+		{
+			name:    "no cent",
+			value:   "1.",
+			wantErr: csvimport.ErrCent,
+		},
+		{
+			name:    "one digit cent",
+			value:   "1.2",
+			wantErr: csvimport.ErrCent,
+		},
+		{
+			name:  "two digit cent",
+			value: "1.23",
+			want:  pb.Cent_builder{Value: new(int32(123))}.Build(),
+		},
+		{
+			name:    "three digit cent",
+			value:   "1.234",
+			wantErr: csvimport.ErrCent,
+		},
+		{
+			name:    "cent not number",
+			value:   "1.ab",
+			wantErr: csvimport.ErrCent,
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			got, err := csvimport.ParseCent(tc.value)
+
+			if !errors.Is(err, tc.wantErr) {
+				t.Errorf("unexpected error '%v', want '%v'", err, tc.wantErr)
+			}
+			if d := cmp.Diff(tc.want, got, protocmp.Transform()); d != "" {
+				t.Errorf("ParseCent(%q) mismatch (-want +got):\n%s", tc.value, d)
 			}
 		})
 	}

@@ -47,8 +47,14 @@ var (
 )
 
 var (
-	errDollars = errors.New("invalid dollars")
-	errCents   = errors.New("invalid cents")
+	// ErrFormat means the field has invalid format.
+	ErrFormat = errors.New("invalid format")
+
+	// ErrDollar means dollar part of the value in ####.## fails to parse.
+	ErrDollar = errors.New("invalid dollar")
+
+	// ErrCent means cent part of the value in ####.## fails to parse.
+	ErrCent = errors.New("invalid cent")
 )
 
 // MinYear is the minimal supported year. Any date before the first day of this
@@ -176,7 +182,7 @@ func (rec record) SPX() (*pb.Cent, error) {
 	if len(rec) <= idxSPX {
 		return nil, ErrNoSPX
 	}
-	c, err := parseCents(rec[idxSPX])
+	c, err := ParseCent(rec[idxSPX])
 	if err != nil {
 		return nil, fmt.Errorf("%w: %s", ErrSPX, err)
 	}
@@ -189,25 +195,28 @@ func (rec record) Dividend() (*pb.Cent, error) {
 	if len(rec) <= idxDividend {
 		return nil, ErrNoDividend
 	}
-	c, err := parseCents(rec[idxDividend])
+	c, err := ParseCent(rec[idxDividend])
 	if err != nil {
 		return nil, fmt.Errorf("%w: %s", ErrDividend, err)
 	}
 	return c, nil
 }
 
-func parseCents(s string) (*pb.Cent, error) {
+// ParseCent parses string ####.## as cents. It returns an error if the value
+// has invalid format such as cents or dollars are missing, the cents must have
+// two digits, or the value is not a number.
+func ParseCent(s string) (*pb.Cent, error) {
 	tokens := strings.SplitN(s, ".", 2)
 	if len(tokens) != 2 {
-		return nil, fmt.Errorf("%s must be #.##", s)
+		return nil, fmt.Errorf("%w: %s must be #.##", ErrFormat, s)
 	}
 	dollars, err := balance(tokens).Dollars()
 	if err != nil {
-		return nil, fmt.Errorf("%s", err)
+		return nil, err
 	}
 	cents, err := balance(tokens).Cents()
 	if err != nil {
-		return nil, fmt.Errorf("%s", err)
+		return nil, err
 	}
 	n := dollars*100 + cents
 	c := pb.Cent_builder{Value: &n}.Build()
@@ -228,7 +237,7 @@ const (
 func (b balance) Dollars() (int32, error) {
 	n, err := strconv.Atoi(b[idxBalanceDollars])
 	if err != nil {
-		return 0, fmt.Errorf("%w: %s", errDollars, err)
+		return 0, fmt.Errorf("%w: %s", ErrDollar, err)
 	}
 	return int32(n), nil
 }
@@ -239,11 +248,11 @@ func (b balance) Dollars() (int32, error) {
 func (b balance) Cents() (int32, error) {
 	s := b[idxBalanceCents]
 	if len(s) != 2 {
-		return 0, fmt.Errorf("%w: %s must be #.##", errCents, s)
+		return 0, fmt.Errorf("%w: %s must be #.##", ErrCent, s)
 	}
 	n, err := strconv.Atoi(s)
 	if err != nil {
-		return 0, fmt.Errorf("%w: %s", errCents, err)
+		return 0, fmt.Errorf("%w: %s", ErrCent, err)
 	}
 	return int32(n), nil
 }
