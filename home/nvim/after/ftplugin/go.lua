@@ -16,7 +16,7 @@ vim.keymap.set("n", "<localleader>rt", relatedFile.Test, { buffer = true })
 
 local generate = require("go.generate")
 
-vim.keymap.set("n", "<localleader>gen", generate.Run, { buffer = true })
+vim.keymap.set("n", "<localleader>gen", generate.RunFile, { buffer = true })
 
 local locationList = require("go.location_list")
 

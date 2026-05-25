@@ -13,3 +13,7 @@ local function selectProto()
 end
 
 vim.keymap.set("n", "<localleader>rs", selectProto, { buffer = true })
+
+local generate = require("go.generate")
+
+vim.keymap.set("n", "<localleader>gen", generate.RunPackage, { buffer = true })
