@@ -24,6 +24,7 @@ func TestScanner(t *testing.T) {
 		name      string
 		csv       string
 		skipLines int
+		scanLines int
 		want      []*pb.Quote
 		wantErr   error
 	}{
@@ -112,6 +113,17 @@ baz
 `,
 			wantErr: scanner.ErrScan,
 		},
+		{
+			name: "scan lines one",
+			csv: `
+1990.01,1.01,1.02
+1990.02,2.01,2.02
+`,
+			scanLines: 1,
+			want: []*pb.Quote{
+				newQuote(t, 1990, time.January, 31, 101, 102),
+			},
+		},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
@@ -119,6 +131,7 @@ baz
 			rcsv := csv.NewReader(rstr)
 			sc := scanner.New(rcsv)
 			sc.SkipLines = tc.skipLines
+			sc.ScanLines = tc.scanLines
 
 			var got []*pb.Quote
 			for sc.Next() {
