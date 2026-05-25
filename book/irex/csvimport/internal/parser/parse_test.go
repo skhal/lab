@@ -3,7 +3,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package csvimport_test
+package parser_test
 
 import (
 	"errors"
@@ -12,7 +12,7 @@ import (
 	"time"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/skhal/lab/book/irex/csvimport"
+	"github.com/skhal/lab/book/irex/csvimport/internal/parser"
 	"github.com/skhal/lab/book/irex/pb"
 	"google.golang.org/protobuf/testing/protocmp"
 )
@@ -28,7 +28,7 @@ func TestParse(t *testing.T) {
 	tests := []parseTest{
 		{
 			name:    "empty",
-			wantErr: csvimport.ErrNoDate,
+			wantErr: parser.ErrNoDate,
 		},
 		{
 			name: "valid record",
@@ -44,12 +44,12 @@ func TestParse_date(t *testing.T) {
 		{
 			name:    "empty",
 			rec:     []string{"", "1.01", "1.02"},
-			wantErr: csvimport.ErrDate,
+			wantErr: parser.ErrDate,
 		},
 		{
 			name:    "invalid",
 			rec:     []string{"1990.a1", "1.01", "1.02"},
-			wantErr: csvimport.ErrDate,
+			wantErr: parser.ErrDate,
 		},
 	}
 	testParse(t, tests)
@@ -60,17 +60,17 @@ func TestParse_spx(t *testing.T) {
 		{
 			name:    "no field",
 			rec:     []string{"1990.01"},
-			wantErr: csvimport.ErrNoSPX,
+			wantErr: parser.ErrNoSPX,
 		},
 		{
 			name:    "empty field",
 			rec:     []string{"1990.01", "", "1.02"},
-			wantErr: csvimport.ErrSPX,
+			wantErr: parser.ErrSPX,
 		},
 		{
 			name:    "invalid",
 			rec:     []string{"1990.01", "1.a1", "1.02"},
-			wantErr: csvimport.ErrSPX,
+			wantErr: parser.ErrSPX,
 		},
 	}
 	testParse(t, tests)
@@ -81,17 +81,17 @@ func TestParse_div(t *testing.T) {
 		{
 			name:    "no field",
 			rec:     []string{"1990.01", "1.01"},
-			wantErr: csvimport.ErrNoDividend,
+			wantErr: parser.ErrNoDividend,
 		},
 		{
 			name:    "empty field",
 			rec:     []string{"1990.01", "1.01", ""},
-			wantErr: csvimport.ErrDividend,
+			wantErr: parser.ErrDividend,
 		},
 		{
 			name:    "invalid",
 			rec:     []string{"1990.01", "1.01", "1.a2"},
-			wantErr: csvimport.ErrDividend,
+			wantErr: parser.ErrDividend,
 		},
 	}
 	testParse(t, tests)
@@ -101,7 +101,7 @@ func testParse(t *testing.T, tests []parseTest) {
 	t.Helper()
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			got, err := csvimport.Parse(tc.rec)
+			got, err := parser.ParseQuote(tc.rec)
 
 			if !errors.Is(err, tc.wantErr) {
 				t.Errorf("unexpected error '%v', want '%v'", err, tc.wantErr)
@@ -123,33 +123,33 @@ func TestParseDate(t *testing.T) {
 	}{
 		{
 			name:    "empty",
-			wantErr: csvimport.ErrFormat,
+			wantErr: parser.ErrFormat,
 		},
 		{
 			name:    "no year",
 			value:   ".01",
-			wantErr: csvimport.ErrYear,
+			wantErr: parser.ErrYear,
 		},
 		{
 			name:    "invalid year",
-			value:   fmt.Sprintf("%d.01", csvimport.MinYear-1),
-			wantErr: csvimport.ErrYear,
+			value:   fmt.Sprintf("%d.01", parser.MinYear-1),
+			wantErr: parser.ErrYear,
 		},
 		{
 			name:    "no month",
 			value:   "1990.",
-			wantErr: csvimport.ErrMonth,
+			wantErr: parser.ErrMonth,
 		},
 		{
 			name:    "invalid month",
 			value:   "1990.13",
-			wantErr: csvimport.ErrMonth,
+			wantErr: parser.ErrMonth,
 		},
 		{
 			// single digit is only for October (10) that is .10 become .1
 			name:    "single digit month only october",
 			value:   "1990.2",
-			wantErr: csvimport.ErrMonth,
+			wantErr: parser.ErrMonth,
 		},
 		{
 			name:  "january",
@@ -214,7 +214,7 @@ func TestParseDate(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			got, err := csvimport.ParseDate(tc.value)
+			got, err := parser.ParseDate(tc.value)
 
 			if !errors.Is(err, tc.wantErr) {
 				t.Errorf("unexpected error '%v', want '%v'", err, tc.wantErr)
@@ -235,27 +235,27 @@ func TestParseCent(t *testing.T) {
 	}{
 		{
 			name:    "empty",
-			wantErr: csvimport.ErrFormat,
+			wantErr: parser.ErrFormat,
 		},
 		{
 			name:    "no dollar",
 			value:   ".02",
-			wantErr: csvimport.ErrDollar,
+			wantErr: parser.ErrDollar,
 		},
 		{
 			name:    "dollar not number",
 			value:   "a.23",
-			wantErr: csvimport.ErrDollar,
+			wantErr: parser.ErrDollar,
 		},
 		{
 			name:    "no cent",
 			value:   "1.",
-			wantErr: csvimport.ErrCent,
+			wantErr: parser.ErrCent,
 		},
 		{
 			name:    "one digit cent",
 			value:   "1.2",
-			wantErr: csvimport.ErrCent,
+			wantErr: parser.ErrCent,
 		},
 		{
 			name:  "two digit cent",
@@ -265,17 +265,17 @@ func TestParseCent(t *testing.T) {
 		{
 			name:    "three digit cent",
 			value:   "1.234",
-			wantErr: csvimport.ErrCent,
+			wantErr: parser.ErrCent,
 		},
 		{
 			name:    "cent not number",
 			value:   "1.ab",
-			wantErr: csvimport.ErrCent,
+			wantErr: parser.ErrCent,
 		},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			got, err := csvimport.ParseCent(tc.value)
+			got, err := parser.ParseCent(tc.value)
 
 			if !errors.Is(err, tc.wantErr) {
 				t.Errorf("unexpected error '%v', want '%v'", err, tc.wantErr)

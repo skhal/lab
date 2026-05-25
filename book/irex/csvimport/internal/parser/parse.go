@@ -3,7 +3,9 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package csvimport
+// Package parser can parse CSV records into Protobuf quotes. It provides tools
+// to parse dates, cents, or entire record.
+package parser
 
 import (
 	"errors"
@@ -64,9 +66,9 @@ var (
 // year is considered invalid.
 const MinYear = 1900
 
-// Parse converts a CSV record (row) into a quote. It returns and error if
+// ParseQuote converts a CSV record (row) into a quote. It returns and error if
 // the row is invalid, i.e. it misses fields or the fields are invalid.
-func Parse(rec []string) (*pb.Quote, error) {
+func ParseQuote(rec []string) (*pb.Quote, error) {
 	date, err := record(rec).Date()
 	if err != nil {
 		return nil, err

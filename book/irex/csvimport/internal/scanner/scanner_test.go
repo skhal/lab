@@ -3,7 +3,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package csvimport_test
+package scanner_test
 
 import (
 	"encoding/csv"
@@ -14,7 +14,7 @@ import (
 	"time"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/skhal/lab/book/irex/csvimport"
+	"github.com/skhal/lab/book/irex/csvimport/internal/scanner"
 	"github.com/skhal/lab/book/irex/pb"
 	"google.golang.org/protobuf/testing/protocmp"
 )
@@ -68,7 +68,7 @@ func TestScanner(t *testing.T) {
 		{
 			name:      "negative skip lines",
 			skipLines: -1,
-			wantErr:   csvimport.ErrScan,
+			wantErr:   scanner.ErrScan,
 		},
 		{
 			name:      "skip invalid lines",
@@ -78,7 +78,7 @@ foo,bar
 baz
 1990.01,1.01,1.02
 `,
-			wantErr: csvimport.ErrScan,
+			wantErr: scanner.ErrScan,
 		},
 		{
 			name: "invalid lines",
@@ -89,35 +89,35 @@ baz
 			want: []*pb.Quote{
 				newQuote(t, 1990, time.January, 31, 101, 102),
 			},
-			wantErr: csvimport.ErrScan,
+			wantErr: scanner.ErrScan,
 		},
 		{
 			name: "invalid date",
 			csv: `
 1000.01,1.01,1.02
 `,
-			wantErr: csvimport.ErrDate,
+			wantErr: scanner.ErrScan,
 		},
 		{
 			name: "invalid spx",
 			csv: `
 1990.01,1.ab,1.02
 `,
-			wantErr: csvimport.ErrSPX,
+			wantErr: scanner.ErrScan,
 		},
 		{
 			name: "invalid dividend",
 			csv: `
 1990.01,1.01,1.ab
 `,
-			wantErr: csvimport.ErrDividend,
+			wantErr: scanner.ErrScan,
 		},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			rstr := strings.NewReader(tc.csv)
 			rcsv := csv.NewReader(rstr)
-			sc := csvimport.NewScanner(rcsv)
+			sc := scanner.New(rcsv)
 			sc.SkipLines = tc.skipLines
 
 			var got []*pb.Quote
@@ -143,7 +143,7 @@ func ExampleScanner() {
 1990.02,2.01,2.02
 `
 	r := csv.NewReader(strings.NewReader(data))
-	sc := csvimport.NewScanner(r)
+	sc := scanner.New(r)
 	var quotes []*pb.Quote
 	for sc.Next() {
 		quotes = append(quotes, sc.Quote())
@@ -155,4 +155,22 @@ func ExampleScanner() {
 	for _, q := range quotes {
 		fmt.Printf("%v\n", q)
 	}
+}
+
+func newQuote(t *testing.T, year int32, month time.Month, day int32, spx, div int32) *pb.Quote {
+	t.Helper()
+	return pb.Quote_builder{
+		Date: newDate(t, year, month, day),
+		Spx:  pb.Cent_builder{Value: &spx}.Build(),
+		Div:  pb.Cent_builder{Value: &div}.Build(),
+	}.Build()
+}
+
+func newDate(t *testing.T, year int32, month time.Month, day int32) *pb.Date {
+	t.Helper()
+	return pb.Date_builder{
+		Year:  &year,
+		Month: new(int32(month)),
+		Day:   &day,
+	}.Build()
 }

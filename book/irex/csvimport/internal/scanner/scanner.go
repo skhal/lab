@@ -3,7 +3,19 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package csvimport
+// Package scanner provides tools to access market quotes from CSV data in
+// Protobuf format.
+//
+//	r *csv.Reader = getReader()
+//	sc := scanner.NewScanner(r)
+//	for sc.Next() {
+//		quote := sc.Quote()
+//		// handle quote
+//	}
+//	if err := sc.Err(); err != nil {
+//		// handle error
+//	}
+package scanner
 
 import (
 	"encoding/csv"
@@ -11,6 +23,7 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/skhal/lab/book/irex/csvimport/internal/parser"
 	"github.com/skhal/lab/book/irex/pb"
 )
 
@@ -35,8 +48,8 @@ type Scanner struct {
 	lineNum   int // last line number processed by Next()
 }
 
-// NewScanner creates a scanner for a csv reader. Once created,
-func NewScanner(r *csv.Reader) *Scanner {
+// New creates a scanner for a csv reader. Once created,
+func New(r *csv.Reader) *Scanner {
 	return &Scanner{r: r}
 }
 
@@ -81,7 +94,7 @@ func (sc *Scanner) next() bool {
 		sc.err = fmt.Errorf("%w:%d: %s", ErrScan, sc.lineNum, err)
 		return false
 	}
-	quote, err := Parse(rec)
+	quote, err := parser.ParseQuote(rec)
 	if err != nil {
 		sc.err = fmt.Errorf("%w:%d: %w", ErrScan, sc.lineNum, err)
 		return false

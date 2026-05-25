@@ -3,6 +3,6 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Package csvimport provides utilities to import CSV data. It uses Protobuf
-// pb.Quote to represents records, a single quote per date.
+// Package csvimport provides tools to parse CSV data into Protobuf quotes.
+// Each quote is a marker state for a given date.
 package csvimport
