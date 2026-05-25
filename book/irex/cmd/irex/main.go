@@ -25,16 +25,17 @@ type command struct {
 
 var commands = []command{
 	{
-		name:        "help",
-		description: "print help and exit",
-		run:         func([]string) error { flag.Usage(); return nil },
+		name:        "import",
+		description: "import CSV data",
+		run:         new(cmdImport).Run,
 	},
 }
 
 func init() {
+	flag.CommandLine.Init(filepath.Base(os.Args[0]), flag.ExitOnError)
 	flag.Usage = func() {
 		w := flag.CommandLine.Output()
-		fmt.Fprintf(w, "usage: %s command\n", filepath.Base(os.Args[0]))
+		fmt.Fprintf(w, "usage: %s command\n", flag.CommandLine.Name())
 		fmt.Fprintln(w)
 		fmt.Fprintln(w, "commands:")
 		for _, cmd := range commands {
