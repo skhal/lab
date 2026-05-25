@@ -64,7 +64,7 @@ var (
 
 // MinYear is the minimal supported year. Any date before the first day of this
 // year is considered invalid.
-const MinYear = 1900
+const MinYear = 1870
 
 // ParseQuote converts a CSV record (row) into a quote. It returns and error if
 // the row is invalid, i.e. it misses fields or the fields are invalid.
