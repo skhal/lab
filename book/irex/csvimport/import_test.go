@@ -20,68 +20,103 @@ import (
 
 func TestImport(t *testing.T) {
 	tests := []struct {
-		name    string
-		csv     string
-		want    []*pb.Quote
-		wantErr error
+		name      string
+		csv       string
+		skipLines int
+		scanLines int
+		want      []*pb.Quote
+		wantErr   error
 	}{
 		{
 			name: "empty",
 		},
 		{
-			name: "no data",
+			name: "data",
 			csv: `
-1,header
-2,header
-3,header
-4,header
-5,header
-6,header
-7,header
-8,header
-`,
-		},
-		{
-			name: "non-empty data",
-			csv: `
-1-date,spx,dividend
-2-date,spx,dividend
-3-date,spx,dividend
-4-date,spx,dividend
-5-date,spx,dividend
-6-date,spx,dividend
-7-date,spx,dividend
-8-date,spx,dividend
 1990.01,1.01,1.02
-1990.02,2.01,2.02
 `,
 			want: []*pb.Quote{
 				newQuote(t, 1990, time.January, 31, 101, 102),
-				newQuote(t, 1990, time.February, 28, 201, 202),
 			},
 		},
 		{
 			name: "data error",
 			csv: `
-1-date,spx,dividend
-2-date,spx,dividend
-3-date,spx,dividend
-4-date,spx,dividend
-5-date,spx,dividend
-6-date,spx,dividend
-7-date,spx,dividend
-8-date,spx,dividend
-1990.01,1.01,1.02
-1990.02,abc,2.02
+1990.01,abc,1.02
 `,
 			wantErr: csvimport.ErrImport,
+		},
+		{
+			name: "skip lines no data",
+			csv: `
+1-date,spx,dividend
+`,
+			skipLines: 1,
+		},
+		{
+			name: "skip lines",
+			csv: `
+1-date,spx,dividend
+1990.01,1.01,1.02
+`,
+			skipLines: 1,
+			want: []*pb.Quote{
+				newQuote(t, 1990, time.January, 31, 101, 102),
+			},
+		},
+		{
+			name: "skip lines data error",
+			csv: `
+1-date,spx,dividend
+1990.01,abc,1.02
+`,
+			skipLines: 1,
+			wantErr:   csvimport.ErrImport,
+		},
+		{
+			name: "scan lines",
+			csv: `
+1990.01,1.01,1.02
+1990.02,2.01,2.02
+`,
+			scanLines: 1,
+			want: []*pb.Quote{
+				newQuote(t, 1990, time.January, 31, 101, 102),
+			},
+		},
+		{
+			name: "skip lines scan lines same",
+			csv: `
+1-date,spx,dividend
+1990.01,1.01,1.02
+1990.02,2.01,2.02
+`,
+			skipLines: 1,
+			scanLines: 1, // includes skip lines
+		},
+		{
+			name: "skip lines scan lines",
+			csv: `
+1-date,spx,dividend
+1990.01,1.01,1.02
+1990.02,2.01,2.02
+`,
+			skipLines: 1,
+			scanLines: 2,
+			want: []*pb.Quote{
+				newQuote(t, 1990, time.January, 31, 101, 102),
+			},
 		},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			r := csv.NewReader(strings.NewReader(tc.csv))
+			opts := []csvimport.Opt{
+				csvimport.WithSkipLines(tc.skipLines),
+				csvimport.WithScanLines(tc.scanLines),
+			}
 
-			got, err := csvimport.Import(r)
+			got, err := csvimport.Import(r, opts...)
 
 			if !errors.Is(err, tc.wantErr) {
 				t.Errorf("unexpected error '%v', want '%v'", err, tc.wantErr)

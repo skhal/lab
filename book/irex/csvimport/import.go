@@ -17,16 +17,47 @@ import (
 // ErrImport means there was an error in importing CSV data.
 var ErrImport = errors.New("import fail")
 
-// SkipLines is the number of header lines to skip in CSV data.
-const SkipLines = 8
+// Opt configures the importer in some way.
+type Opt func(*importer)
 
-// Import parses CSV data into a list of quotes. It skips first [SkipLines] for
-// header lines.
+// WithSkipLines makes importer skip first n lines.
+func WithSkipLines(n int) Opt {
+	return func(imp *importer) {
+		imp.skipLines = n
+	}
+}
+
+// WithScanLines makes importer scan at most n lines including skipped lines.
+func WithScanLines(n int) Opt {
+	return func(imp *importer) {
+		imp.scanLines = n
+	}
+}
+
+// Import parses CSV data into a list of quotes. It returns an error if data
+// parsing fails.
+func Import(r *csv.Reader, opts ...Opt) ([]*pb.Quote, error) {
+	imp := &importer{}
+	for _, o := range opts {
+		o(imp)
+	}
+	return imp.Import(r)
+}
+
+type importer struct {
+	skipLines int
+	scanLines int
+}
+
+// Import parses CSV data into a list of quotes. It skip first skipLines and
+// scans at most scanLines, including the skipLines. A zero value for skipLines
+// or scanLines disables skips or limits.
 // It returns an error if data parsing fails.
-func Import(r *csv.Reader) ([]*pb.Quote, error) {
+func (imp *importer) Import(r *csv.Reader) ([]*pb.Quote, error) {
 	var quotes []*pb.Quote
 	sc := scanner.New(r)
-	sc.SkipLines = SkipLines
+	sc.SkipLines = imp.skipLines
+	sc.ScanLines = imp.scanLines
 	for sc.Next() {
 		quotes = append(quotes, sc.Quote())
 	}
