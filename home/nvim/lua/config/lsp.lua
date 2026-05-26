@@ -8,6 +8,7 @@ vim.lsp.enable("buf_ls")
 vim.lsp.enable("clangd")
 vim.lsp.enable("gopls")
 vim.lsp.enable("lua_ls")
+vim.lsp.enable("superhtml")
 vim.lsp.enable("ty")
 vim.lsp.enable("typos_lsp")
 -- keep-sorted end

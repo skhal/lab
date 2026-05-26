@@ -42,6 +42,7 @@ python
 ripgrep
 rsync
 rust
+superhtml
 tmux
 tree
 universal-ctags
