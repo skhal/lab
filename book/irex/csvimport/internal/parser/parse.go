@@ -52,6 +52,15 @@ var (
 )
 
 var (
+	// ErrNoCPI means Consumer Price Index is missing in the record.
+	ErrNoCPI = errors.New("missing CPI")
+
+	// ErrCPI means Consumer Price Index has invalid format. See [ErrSPX] for
+	// format description.
+	ErrCPI = errors.New("invalid CPI")
+)
+
+var (
 	// ErrFormat means the field has invalid format.
 	ErrFormat = errors.New("invalid format")
 
@@ -81,7 +90,11 @@ func ParseQuote(rec []string) (*pb.Quote, error) {
 	if err != nil {
 		return nil, err
 	}
-	q := pb.Quote_builder{Date: date, Spx: spx, Div: div}.Build()
+	cpi, err := record(rec).CPI()
+	if err != nil {
+		return nil, err
+	}
+	q := pb.Quote_builder{Date: date, Spx: spx, Div: div, Cpi: cpi}.Build()
 	return q, nil
 }
 
@@ -92,6 +105,7 @@ const (
 	idxDate = iota
 	idxSPX
 	idxDividend
+	idxCPI
 )
 
 // Date returns the date value of the record.
@@ -216,6 +230,19 @@ func (rec record) Dividend() (*pb.Cent, error) {
 	c, err := ParseCent(rec[idxDividend])
 	if err != nil {
 		return nil, fmt.Errorf("%w: %s", ErrDividend, err)
+	}
+	return c, nil
+}
+
+// CPI parses Consumer Price Index value of the record.
+// It returns an error if the value is missing or invalid.
+func (rec record) CPI() (*pb.Cent, error) {
+	if len(rec) <= idxCPI {
+		return nil, ErrNoCPI
+	}
+	c, err := ParseCent(rec[idxCPI])
+	if err != nil {
+		return nil, fmt.Errorf("%w: %s", ErrCPI, err)
 	}
 	return c, nil
 }

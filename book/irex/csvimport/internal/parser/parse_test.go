@@ -32,8 +32,8 @@ func TestParse(t *testing.T) {
 		},
 		{
 			name: "valid record",
-			rec:  []string{"1990.01", "1.01", "1.02"},
-			want: newQuote(t, 1990, time.January, 31, 101, 102),
+			rec:  []string{"1990.01", "1.01", "1.02", "1.03"},
+			want: newQuote(t, 1990, time.January, 31, 101, 102, 103),
 		},
 	}
 	testParse(t, tests)
@@ -92,6 +92,27 @@ func TestParse_div(t *testing.T) {
 			name:    "invalid",
 			rec:     []string{"1990.01", "1.01", "1.a2"},
 			wantErr: parser.ErrDividend,
+		},
+	}
+	testParse(t, tests)
+}
+
+func TestParse_cpi(t *testing.T) {
+	tests := []parseTest{
+		{
+			name:    "no field",
+			rec:     []string{"1990.01", "1.01", "1.02"},
+			wantErr: parser.ErrNoCPI,
+		},
+		{
+			name:    "empty field",
+			rec:     []string{"1990.01", "1.01", "1.02", ""},
+			wantErr: parser.ErrCPI,
+		},
+		{
+			name:    "invalid",
+			rec:     []string{"1990.01", "1.01", "1.02", "1.a3"},
+			wantErr: parser.ErrCPI,
 		},
 	}
 	testParse(t, tests)
@@ -287,12 +308,13 @@ func TestParseCent(t *testing.T) {
 	}
 }
 
-func newQuote(t *testing.T, year int32, month time.Month, day int32, spx, div int32) *pb.Quote {
+func newQuote(t *testing.T, year int32, month time.Month, day int32, spx, div, cpi int32) *pb.Quote {
 	t.Helper()
 	return pb.Quote_builder{
 		Date: newDate(t, year, month, day),
 		Spx:  pb.Cent_builder{Value: &spx}.Build(),
 		Div:  pb.Cent_builder{Value: &div}.Build(),
+		Cpi:  pb.Cent_builder{Value: &cpi}.Build(),
 	}.Build()
 }
 
