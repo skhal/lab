@@ -33,88 +33,88 @@ func TestImport(t *testing.T) {
 		{
 			name: "data",
 			csv: `
-1990.01,1.01,1.02
+1990.01,1.01,1.02,1.03
 `,
 			want: []*pb.Quote{
-				newQuote(t, 1990, time.January, 31, 101, 102),
+				newQuote(t, 1990, time.January, 31, 101, 102, 103),
 			},
 		},
 		{
 			name: "sorts data",
 			csv: `
-1990.02,2.01,2.02
-1990.01,1.01,1.02
+1990.02,2.01,2.02,2.03
+1990.01,1.01,1.02,1.03
 `,
 			want: []*pb.Quote{
-				newQuote(t, 1990, time.January, 31, 101, 102),
-				newQuote(t, 1990, time.February, 28, 201, 202),
+				newQuote(t, 1990, time.January, 31, 101, 102, 103),
+				newQuote(t, 1990, time.February, 28, 201, 202, 203),
 			},
 		},
 		{
 			name: "same date",
 			csv: `
-1990.01,1.01,1.02
-1990.01,2.01,2.02
+1990.01,1.01,1.02,1.03
+1990.01,2.01,2.02,2.03
 `,
 			wantErr: csvimport.ErrImport,
 		},
 		{
 			name: "date gap same year",
 			csv: `
-1990.01,1.01,1.02
-1990.03,3.01,3.02
+1990.01,1.01,1.02,1.03
+1990.03,3.01,3.02,3.02
 `,
 			wantErr: csvimport.ErrImport,
 		},
 		{
 			name: "date gap next year",
 			csv: `
-1990.01,1.01,1.02
-1991.01,2.01,2.02
+1990.01,1.01,1.02,1.03
+1991.01,2.01,2.02,2.03
 `,
 			wantErr: csvimport.ErrImport,
 		},
 		{
 			name: "no gap dec jan",
 			csv: `
-1990.12,1.01,1.02
-1991.01,2.01,2.02
+1990.12,1.01,1.02,1.03
+1991.01,2.01,2.02,2.03
 `,
 			want: []*pb.Quote{
-				newQuote(t, 1990, time.December, 31, 101, 102),
-				newQuote(t, 1991, time.January, 31, 201, 202),
+				newQuote(t, 1990, time.December, 31, 101, 102, 103),
+				newQuote(t, 1991, time.January, 31, 201, 202, 203),
 			},
 		},
 		{
 			name: "data error",
 			csv: `
-1990.01,abc,1.02
+1990.01,abc,1.02,1.03
 `,
 			wantErr: csvimport.ErrImport,
 		},
 		{
 			name: "skip lines no data",
 			csv: `
-1-date,spx,dividend
+1-date,spx,dividend,cpi
 `,
 			skipLines: 1,
 		},
 		{
 			name: "skip lines",
 			csv: `
-1-date,spx,dividend
-1990.01,1.01,1.02
+1-date,spx,dividend,cpi
+1990.01,1.01,1.02,1.03
 `,
 			skipLines: 1,
 			want: []*pb.Quote{
-				newQuote(t, 1990, time.January, 31, 101, 102),
+				newQuote(t, 1990, time.January, 31, 101, 102, 103),
 			},
 		},
 		{
 			name: "skip lines data error",
 			csv: `
-1-date,spx,dividend
-1990.01,abc,1.02
+1-date,spx,dividend,cpi
+1990.01,abc,1.02,1.03
 `,
 			skipLines: 1,
 			wantErr:   csvimport.ErrImport,
@@ -122,20 +122,19 @@ func TestImport(t *testing.T) {
 		{
 			name: "scan lines",
 			csv: `
-1990.01,1.01,1.02
-1990.02,2.01,2.02
+1990.01,1.01,1.02,1.03
+1990.02,2.01,2.02,2.03
 `,
 			scanLines: 1,
 			want: []*pb.Quote{
-				newQuote(t, 1990, time.January, 31, 101, 102),
+				newQuote(t, 1990, time.January, 31, 101, 102, 103),
 			},
 		},
 		{
 			name: "skip lines scan lines same",
 			csv: `
-1-date,spx,dividend
-1990.01,1.01,1.02
-1990.02,2.01,2.02
+1-date,spx,dividend,cpi
+1990.01,1.01,1.02,1.03
 `,
 			skipLines: 1,
 			scanLines: 1, // includes skip lines
@@ -143,14 +142,14 @@ func TestImport(t *testing.T) {
 		{
 			name: "skip lines scan lines",
 			csv: `
-1-date,spx,dividend
-1990.01,1.01,1.02
-1990.02,2.01,2.02
+1-date,spx,dividend,cpi
+1990.01,1.01,1.02,1.03
+1990.02,2.01,2.02,2.03
 `,
 			skipLines: 1,
 			scanLines: 2,
 			want: []*pb.Quote{
-				newQuote(t, 1990, time.January, 31, 101, 102),
+				newQuote(t, 1990, time.January, 31, 101, 102, 103),
 			},
 		},
 	}
@@ -175,12 +174,13 @@ func TestImport(t *testing.T) {
 	}
 }
 
-func newQuote(t *testing.T, year int32, month time.Month, day int32, spx, div int32) *pb.Quote {
+func newQuote(t *testing.T, year int32, month time.Month, day int32, spx, div, cpi int32) *pb.Quote {
 	t.Helper()
 	return pb.Quote_builder{
 		Date: newDate(t, year, month, day),
 		Spx:  pb.Cent_builder{Value: &spx}.Build(),
 		Div:  pb.Cent_builder{Value: &div}.Build(),
+		Cpi:  pb.Cent_builder{Value: &cpi}.Build(),
 	}.Build()
 }
 
