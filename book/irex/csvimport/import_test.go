@@ -40,6 +40,52 @@ func TestImport(t *testing.T) {
 			},
 		},
 		{
+			name: "sorts data",
+			csv: `
+1990.02,2.01,2.02
+1990.01,1.01,1.02
+`,
+			want: []*pb.Quote{
+				newQuote(t, 1990, time.January, 31, 101, 102),
+				newQuote(t, 1990, time.February, 28, 201, 202),
+			},
+		},
+		{
+			name: "same date",
+			csv: `
+1990.01,1.01,1.02
+1990.01,2.01,2.02
+`,
+			wantErr: csvimport.ErrImport,
+		},
+		{
+			name: "date gap same year",
+			csv: `
+1990.01,1.01,1.02
+1990.03,3.01,3.02
+`,
+			wantErr: csvimport.ErrImport,
+		},
+		{
+			name: "date gap next year",
+			csv: `
+1990.01,1.01,1.02
+1991.01,2.01,2.02
+`,
+			wantErr: csvimport.ErrImport,
+		},
+		{
+			name: "no gap dec jan",
+			csv: `
+1990.12,1.01,1.02
+1991.01,2.01,2.02
+`,
+			want: []*pb.Quote{
+				newQuote(t, 1990, time.December, 31, 101, 102),
+				newQuote(t, 1991, time.January, 31, 201, 202),
+			},
+		},
+		{
 			name: "data error",
 			csv: `
 1990.01,abc,1.02
