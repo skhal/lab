@@ -29,6 +29,11 @@ var commands = []command{
 		description: "import CSV data",
 		run:         new(cmdImport).Run,
 	},
+	{
+		name:        "serve",
+		description: "run HTTP server",
+		run:         new(cmdServe).Run,
+	},
 }
 
 func init() {
