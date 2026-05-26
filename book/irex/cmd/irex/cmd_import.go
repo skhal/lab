@@ -38,7 +38,7 @@ func (cmd *cmdImport) Run(args []string) error {
 }
 
 func (cmd *cmdImport) init() {
-	name := fmt.Sprintf("%s %s", flag.CommandLine.Name(), "import")
+	name := fmt.Sprintf("%s import", flag.CommandLine.Name())
 	fs := flag.NewFlagSet(name, flag.ExitOnError)
 	fs.Usage = func() {
 		w := fs.Output()
