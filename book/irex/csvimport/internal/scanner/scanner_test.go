@@ -150,6 +150,32 @@ baz
 	}
 }
 
+func TestScanner_Next_noop_on_err(t *testing.T) {
+	s := `
+1990.01,1.01,1.02
+1990.02,ab,2.02
+1990.03,3.01,3.02
+`
+	rcsv := csv.NewReader(strings.NewReader(s))
+	sc := scanner.New(rcsv)
+
+	var got []*pb.Quote
+	for sc.Next() {
+		got = append(got, sc.Quote())
+	}
+	sc.Next()
+
+	if err, want := sc.Err(), scanner.ErrScan; !errors.Is(err, want) {
+		t.Errorf("unexpected error '%v', want '%v'", err, want)
+	}
+	want := []*pb.Quote{
+		newQuote(t, 1990, time.January, 31, 101, 102),
+	}
+	if d := cmp.Diff(want, got, protocmp.Transform()); d != "" {
+		t.Errorf("mismatch (-want +got):\n%s", d)
+	}
+}
+
 func ExampleScanner() {
 	data := `
 1990.01,1.01,1.02
