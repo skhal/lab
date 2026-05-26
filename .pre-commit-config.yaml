@@ -159,14 +159,23 @@ repos:
       )$
     verbose: true
 
+  # JSON
+  - id: json-fmt
+    name: "JSON format"
+    description: "format JSON files"
+    language: system
+    types_or: [json]
+    entry: prettier
+    args: ["-w"]
+
   # HTML
   - id: html-fmt
     name: "HTML format"
     description: "format HTML files"
-    entry: prettier
     language: system
     types_or: [html, json]
-    args: ["-w"]
+    entry: superhtml
+    args: ["fmt"]
 
   # Lua
   - id: lua-fmt

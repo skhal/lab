@@ -33,7 +33,7 @@ conform.setup({
 		c = { "clang-format", "keep-sorted" },
 		cpp = { "clang-format", "keep-sorted" },
 		go = { "goimports", "keep-sorted" },
-		html = { "prettier", "keep-sorted" },
+		html = { "superhtml", "keep-sorted" },
 		json = { "prettier" },
 		lua = { "stylua", "keep-sorted" },
 		markdown = { "markdownfmt", "keep-sorted" },
