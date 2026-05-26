@@ -3,7 +3,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package serv
+package serve
 
 import (
 	"embed"
@@ -21,7 +21,8 @@ var (
 	efs embed.FS
 )
 
-func serveRoot(w http.ResponseWriter, req *http.Request) error {
+// Root serves main page.
+func Root(w http.ResponseWriter, req *http.Request) error {
 	f, err := efs.Open("static/root/index.html")
 	if err != nil {
 		return err

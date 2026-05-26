@@ -10,6 +10,8 @@ import (
 	"log"
 	"net/http"
 	"time"
+
+	"github.com/skhal/lab/book/irex/serv/internal/serve"
 )
 
 var (
@@ -37,8 +39,8 @@ func (s *Server) handler() http.Handler {
 		return withTimeout(defaultHandleTimeout, handleError(h))
 	}
 	mux := http.NewServeMux()
-	mux.HandleFunc("GET /{$}", wrap(serveRoot))
-	mux.HandleFunc("/", wrap(serveNotFound))
+	mux.HandleFunc("GET /{$}", wrap(serve.Root))
+	mux.HandleFunc("/", wrap(serve.NotFound))
 	return mux
 }
 

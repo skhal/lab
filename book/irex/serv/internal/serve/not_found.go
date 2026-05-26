@@ -3,7 +3,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package serv
+package serve
 
 import (
 	"html/template"
@@ -13,7 +13,8 @@ import (
 
 var notFoundTemplate = template.Must(template.New("index.html").ParseFS(efs, "static/404/index.html"))
 
-func serveNotFound(w http.ResponseWriter, req *http.Request) error {
+// NotFound serves 404 (not found) status page.
+func NotFound(w http.ResponseWriter, req *http.Request) error {
 	w.WriteHeader(http.StatusNotFound)
 	w.Header().Set(headerContentType, contentTypeTextHTML)
 	d := struct {
