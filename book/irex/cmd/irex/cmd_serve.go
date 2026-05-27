@@ -10,7 +10,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/skhal/lab/book/irex/serv"
+	"github.com/skhal/lab/book/irex/web"
 )
 
 const defaultAddress = ":8080"
@@ -50,6 +50,6 @@ func (cmd *cmdServe) parseFlags(args []string) error {
 
 func (cmd *cmdServe) run() error {
 	fmt.Printf("serve on %s\n", cmd.addr)
-	s := &serv.Server{Address: cmd.addr}
+	s := &web.Server{Address: cmd.addr}
 	return s.Run()
 }

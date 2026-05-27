@@ -10,25 +10,25 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/skhal/lab/book/irex/serv/internal/serve"
+	"github.com/skhal/lab/book/irex/web/internal/serve"
 )
 
-func TestRoot(t *testing.T) {
+func TestNotFound(t *testing.T) {
 	tests := []struct {
 		name     string
 		req      *http.Request
 		wantCode status
 	}{
 		{
-			name:     "get",
-			req:      httptest.NewRequest(http.MethodGet, "/", nil),
-			wantCode: http.StatusOK,
+			name:     "get /test",
+			req:      httptest.NewRequest(http.MethodGet, "/test", nil),
+			wantCode: http.StatusNotFound,
 		},
 	}
 	for _, tc := range tests {
 		w := httptest.NewRecorder()
 
-		err := serve.Root(w, tc.req)
+		err := serve.NotFound(w, tc.req)
 
 		if err != nil {
 			t.Errorf("unexpected error '%v'", err)
@@ -37,4 +37,10 @@ func TestRoot(t *testing.T) {
 			t.Errorf("unexpected code %s, want %s", got, tc.wantCode)
 		}
 	}
+}
+
+type status int
+
+func (s status) String() string {
+	return http.StatusText(int(s))
 }

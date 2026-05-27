@@ -3,7 +3,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package serv
+package web
 
 import (
 	"context"
@@ -11,7 +11,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/skhal/lab/book/irex/serv/internal/serve"
+	"github.com/skhal/lab/book/irex/web/internal/serve"
 )
 
 var (

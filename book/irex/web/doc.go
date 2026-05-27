@@ -3,5 +3,5 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Package serv implements finance HTTP server.
-package serv
+// Package web implements finance HTTP server.
+package web
