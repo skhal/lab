@@ -46,12 +46,10 @@ type splitFirstLineFunc func([]byte) splitBlock
 //	   [end]
 //	   text
 type inserter struct {
-	start  string // start of the comment, e.g. "<!--" for HTML
-	prefix string // comment prefix, e.g. "#" for shell
-	end    string // end of the comment, e.g. "-->" for HTML
-
-	// split first line if Shell shebang, HTML doctype, etc.
 	splitFirstLine splitFirstLineFunc
+	start          string // start of the comment, e.g. "<!--" for HTML
+	prefix         string // comment prefix, e.g. "#" for shell
+	end            string // end of the comment, e.g. "-->" for HTML
 }
 
 var (
@@ -88,7 +86,7 @@ func newInserter(file string) (*inserter, error) {
 		return &insShell, nil
 	case ".bazel", ".conf", ".ctags", ".toml", ".txt", ".txtpb", ".yaml":
 		return &insShellNoSplit, nil
-	case ".cc", ".go", ".h", ".proto":
+	case ".cc", ".go", ".h", ".js", ".proto", ".ts":
 		return &insC, nil
 	case ".html", ".md":
 		return &insHTML, nil
