@@ -11,6 +11,7 @@ vim.lsp.enable("lua_ls")
 vim.lsp.enable("superhtml")
 vim.lsp.enable("ty")
 vim.lsp.enable("typos_lsp")
+vim.lsp.enable("vtsls")
 -- keep-sorted end
 
 vim.diagnostic.config({

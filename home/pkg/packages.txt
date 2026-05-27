@@ -45,6 +45,7 @@ rust
 superhtml
 tmux
 tree
+typescript-go
 universal-ctags
 unzip
 webfonts
