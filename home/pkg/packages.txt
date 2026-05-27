@@ -17,6 +17,7 @@ buf
 catch2
 ccache
 cmake
+deno
 doas
 fzf
 git
