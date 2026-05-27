@@ -19,6 +19,7 @@ ccache
 cmake
 deno
 doas
+fswatch-mon
 fzf
 git
 go126
