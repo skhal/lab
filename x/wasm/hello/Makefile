@@ -14,7 +14,7 @@ M_zipsrc = C,.gz$$,,
 
 COMPRESS_TARGET: .NOTMAIN .USE
 	@echo ".. compress ${.TARGET:${M_zipsrc}}"; \
-		gzip --keep ${.TARGET:${M_zipsrc}}
+		gzip --force --keep ${.TARGET:${M_zipsrc}}
 
 install: index.html.gz hello.wasm.gz wasm_exec.js.gz .PHONY
 
