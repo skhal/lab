@@ -157,6 +157,11 @@ local registrations = {
 			end,
 		},
 	},
+	typescript = {
+		find = function(_, _)
+			return "new.ts"
+		end,
+	},
 	-- keep-sorted end
 }
 
