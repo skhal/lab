@@ -57,6 +57,12 @@ var (
 	insC = inserter{
 		prefix: "//",
 	}
+	insCSS = inserter{
+		start:          "/*",
+		prefix:         " ",
+		end:            "*/",
+		splitFirstLine: splitDoctype,
+	}
 	insHTML = inserter{
 		start:          "<!--",
 		prefix:         " ",
@@ -88,6 +94,8 @@ func newInserter(file string) (*inserter, error) {
 		return &insShellNoSplit, nil
 	case ".cc", ".go", ".h", ".js", ".proto", ".ts":
 		return &insC, nil
+	case ".css":
+		return &insCSS, nil
 	case ".html", ".md":
 		return &insHTML, nil
 	case ".lua":
