@@ -1,0 +1,24 @@
+<!--
+  Copyright 2026 Samvel Khalatyan. All rights reserved.
+
+  Use of this source code is governed by a BSD-style
+  license that can be found in the LICENSE file.
+-->
+
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Canvas Solar System</title>
+		<link rel="stylesheet" href="solsys.css">
+		<script type="module" src="solsys.js"></script>
+	</head>
+	<body>
+		<canvas id="solsys-canvas" width="500" height="500">
+			Animated solar system of a Sun, Earth, and Moon, orbiting each other.
+		</canvas>
+		<script type="module">
+			import * as solsys from "/solsys.js";
+			solsys.Main("solsys-canvas")
+		</script>
+	</body>
+</html>
