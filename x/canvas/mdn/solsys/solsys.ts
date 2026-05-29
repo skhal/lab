@@ -36,6 +36,8 @@ class drawer {
     this.sun = new Sun(ctx);
     this.earth = new Earth(ctx, dim.width / 4);
     this.moon = new Moon(ctx, this.dim.width / 18);
+    this.sun.AddSatellite(this.earth);
+    this.earth.AddSatellite(this.moon);
   }
 
   public Run() {
@@ -64,18 +66,15 @@ class drawer {
   private renderSun() {
     this.ctx.translate(this.dim.width / 2, this.dim.height / 2);
     this.sun.Draw();
-    this.earth.Draw();
-    this.moon.Draw();
   }
 }
 
 // image wraps HTMLImageElement to start loading the image in the constructor
 // and let clients use [Ready] to wait for the image to be ready.
 class image {
-  elem: HTMLImageElement = new Image();
-  dim: dimensions;
-
+  private img: HTMLImageElement = new Image();
   private load: Promise<HTMLImageElement>;
+  private dim: dimensions;
 
   constructor(url: string, dim: dimensions) {
     this.load = new Promise((resolve) => {
@@ -87,15 +86,20 @@ class image {
   }
 
   public async Ready() {
-    this.elem = await this.load;
+    this.img = await this.load;
   }
-}
 
-const animationFPS = 60;
+  public Image() {
+    return this.img;
+  }
 
-function angleDelta(spinFPS: number): number {
-  const fps = spinFPS * animationFPS;
-  return 2 * Math.PI / fps;
+  public Height() {
+    return this.dim.height;
+  }
+
+  public Width() {
+    return this.dim.width;
+  }
 }
 
 type astronomicalObjectConfig = {
@@ -105,23 +109,58 @@ type astronomicalObjectConfig = {
 };
 
 class astronomicalObject {
+  private static animationFPS = 60;
+  protected ctx: CanvasRenderingContext2D;
   private frame: number = 0;
   private cfg: {
-    orbit: { r: number; dphi: number };
-    spin: { dphi: number };
+    // orbit describes how far and fast an object rotates in the orbit.
+    orbit: {
+      r: number; // radius
+      dphi: number; // angle change per frame
+    };
+    // spin describes how fast an object sping around its axis.
+    spin: {
+      dphi: number; // angle change per frame
+    };
+    img: {
+      clipRatio: number;
+    };
   };
-
-  protected ctx: CanvasRenderingContext2D;
+  private img: image;
+  private satellites: astronomicalObject[] = [];
 
   constructor(
     ctx: CanvasRenderingContext2D,
     cfg: astronomicalObjectConfig,
+    img: { el: image; clipRatio: number },
   ) {
     this.ctx = ctx;
     this.cfg = {
-      orbit: { r: cfg.orbitRadius, dphi: angleDelta(cfg.orbitSeconds) },
-      spin: { dphi: angleDelta(cfg.spinSeconds) },
+      orbit: {
+        r: cfg.orbitRadius,
+        dphi: this.dphi(cfg.orbitSeconds),
+      },
+      spin: {
+        dphi: this.dphi(cfg.spinSeconds),
+      },
+      img: {
+        clipRatio: img.clipRatio,
+      },
     };
+    this.img = img.el;
+  }
+
+  public async Ready() {
+    return this.img.Ready();
+  }
+
+  private dphi(seconds: number): number {
+    const fps = seconds * astronomicalObject.animationFPS;
+    return 2 * Math.PI / fps;
+  }
+
+  public AddSatellite(ao: astronomicalObject) {
+    this.satellites.push(ao);
   }
 
   public Draw() {
@@ -131,6 +170,30 @@ class astronomicalObject {
     }
     this.position();
     this.spin();
+    stateLock(this.ctx, () => this.draw());
+    this.satellites.forEach((el) => el.Draw());
+  }
+
+  protected draw() {
+    this.ctx.beginPath();
+    this.ctx.arc(
+      0,
+      0,
+      this.img.Width() * this.cfg.img.clipRatio,
+      0,
+      2 * Math.PI,
+      true,
+    );
+    this.ctx.clip();
+
+    this.ctx.translate(-this.img.Width() / 2, -this.img.Height() / 2);
+    this.ctx.drawImage(
+      this.img.Image(),
+      0,
+      0,
+      this.img.Width(),
+      this.img.Height(),
+    );
   }
 
   private drawOrbit() {
@@ -163,39 +226,16 @@ class Sun extends astronomicalObject {
     spinSeconds: 120,
   };
 
-  private img: image;
-
   constructor(ctx: CanvasRenderingContext2D) {
-    super(ctx, Sun.config);
     const dim = {
       width: 2 * Sun.config.radius,
       height: 2 * Sun.config.radius,
     };
-    this.img = new image("img/sun.jpg", dim);
-  }
-
-  public async Ready() {
-    return this.img.Ready();
-  }
-
-  public Draw() {
-    super.Draw();
-    stateLock(this.ctx, () => this.draw());
-  }
-
-  private draw() {
-    this.ctx.beginPath();
-    this.ctx.arc(0, 0, this.img.dim.width / 2, 0, 2 * Math.PI, true);
-    this.ctx.clip();
-
-    this.ctx.translate(-this.img.dim.width / 2, -this.img.dim.height / 2);
-    this.ctx.drawImage(
-      this.img.elem,
-      0,
-      0,
-      this.img.dim.width,
-      this.img.dim.height,
-    );
+    const img = {
+      el: new image("img/sun.jpg", dim),
+      clipRatio: 0.5,
+    };
+    super(ctx, Sun.config, img);
   }
 }
 
@@ -206,40 +246,17 @@ class Earth extends astronomicalObject {
     spinSeconds: 5,
   };
 
-  private img: image;
-
   constructor(ctx: CanvasRenderingContext2D, orbit: number) {
     const cfg = { ...Earth.config, ...{ orbitRadius: orbit } };
-    super(ctx, cfg);
     const dim = {
       width: 2 * Earth.config.radius,
       height: 2 * Earth.config.radius,
     };
-    this.img = new image("img/earth.jpg", dim);
-  }
-
-  public async Ready() {
-    return this.img.Ready();
-  }
-
-  public Draw() {
-    super.Draw();
-    stateLock(this.ctx, () => this.draw());
-  }
-
-  private draw() {
-    this.ctx.beginPath();
-    this.ctx.arc(0, 0, this.img.dim.width * .35, 0, 2 * Math.PI, true);
-    this.ctx.clip();
-
-    this.ctx.translate(-this.img.dim.width / 2, -this.img.dim.height / 2);
-    this.ctx.drawImage(
-      this.img.elem,
-      0,
-      0,
-      this.img.dim.width,
-      this.img.dim.height,
-    );
+    const img = {
+      el: new image("img/earth.jpg", dim),
+      clipRatio: 0.35,
+    };
+    super(ctx, cfg, img);
   }
 }
 
@@ -250,40 +267,17 @@ class Moon extends astronomicalObject {
     spinSeconds: 1,
   };
 
-  private img: image;
-
   constructor(ctx: CanvasRenderingContext2D, orbit: number) {
     const cfg = { ...Moon.config, ...{ orbitRadius: orbit } };
-    super(ctx, cfg);
     const dim = {
       width: 2 * Moon.config.radius,
       height: 2 * Moon.config.radius,
     };
-    this.img = new image("img/moon.jpg", dim);
-  }
-
-  public async Ready() {
-    return this.img.Ready();
-  }
-
-  public Draw() {
-    super.Draw();
-    stateLock(this.ctx, () => this.draw());
-  }
-
-  private draw() {
-    this.ctx.beginPath();
-    this.ctx.arc(0, 0, this.img.dim.width / 2, 0, 2 * Math.PI, true);
-    this.ctx.clip();
-
-    this.ctx.translate(-this.img.dim.width / 2, -this.img.dim.height / 2);
-    this.ctx.drawImage(
-      this.img.elem,
-      0,
-      0,
-      this.img.dim.width,
-      this.img.dim.height,
-    );
+    const img = {
+      el: new image("img/moon.jpg", dim),
+      clipRatio: 0.5,
+    };
+    super(ctx, cfg, img);
   }
 }
 
