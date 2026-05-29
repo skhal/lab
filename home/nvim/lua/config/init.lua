@@ -10,5 +10,6 @@ require("config.format")
 require("config.lab-git")
 require("config.lab-skeleton")
 require("config.lsp")
+require("config.netrw")
 require("config.options")
 -- keep-sorted end

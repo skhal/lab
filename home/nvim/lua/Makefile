@@ -5,7 +5,7 @@
 
 # Flavor: FreeBSD
 
-INSTALL_PATHS = config file go
+INSTALL_PATHS = config file go netrw
 
 install: ${INSTALL_PATHS} .PHONY
 
