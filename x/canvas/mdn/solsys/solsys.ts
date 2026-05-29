@@ -26,26 +26,94 @@ type dimensions = {
 class drawer {
   private ctx: CanvasRenderingContext2D;
   private dim: dimensions;
-  private sun: Sun;
-  private earth: Earth;
-  private moon: Moon;
+  private sun: astronomicalObject;
+  private images: Promise<void>[];
 
   constructor(ctx: CanvasRenderingContext2D, dim: dimensions) {
     this.ctx = ctx;
     this.dim = dim;
-    this.sun = new Sun(ctx);
-    this.earth = new Earth(ctx, dim.width / 4);
-    this.moon = new Moon(ctx, this.dim.width / 18);
-    this.sun.AddSatellite(this.earth);
-    this.earth.AddSatellite(this.moon);
+
+    this.sun = astronomicalObject.New(ctx, {
+      radius: 80,
+      orbitRadius: 0,
+      orbitSeconds: 0,
+      spinSeconds: 120,
+      img: {
+        url: "img/sun.jpg",
+        clipRatio: 0.5,
+      },
+    });
+    const earth = astronomicalObject.New(ctx, {
+      radius: 15,
+      orbitRadius: dim.width / 6,
+      orbitSeconds: 30,
+      spinSeconds: 5,
+      img: {
+        url: "img/earth.jpg",
+        clipRatio: 0.35,
+      },
+    });
+    const moon = astronomicalObject.New(ctx, {
+      radius: 2,
+      orbitRadius: this.dim.width / 40,
+      orbitSeconds: 10,
+      spinSeconds: 1,
+      img: {
+        url: "img/moon.jpg",
+        clipRatio: 0.5,
+      },
+    });
+    const jupiter = astronomicalObject.New(ctx, {
+      radius: 40,
+      orbitRadius: this.dim.width / 3,
+      orbitSeconds: 60,
+      spinSeconds: 20,
+      img: {
+        url: "img/jupiter.jpg",
+        clipRatio: 0.47,
+      },
+    });
+    const io = astronomicalObject.New(ctx, {
+      radius: 3,
+      orbitRadius: this.dim.width / 12,
+      orbitSeconds: 15,
+      spinSeconds: 10,
+      img: {
+        url: "img/io.gif",
+        clipRatio: 0.5,
+      },
+    });
+    const europa = astronomicalObject.New(ctx, {
+      radius: 5,
+      orbitRadius: this.dim.width / 10,
+      orbitSeconds: 40,
+      spinSeconds: 20,
+      img: {
+        url: "img/europa.jpg",
+        clipRatio: 0.5,
+      },
+    });
+
+    this.sun.AddSatellite(earth);
+    this.sun.AddSatellite(jupiter);
+
+    earth.AddSatellite(moon);
+
+    jupiter.AddSatellite(io);
+    jupiter.AddSatellite(europa);
+
+    this.images = [
+      this.sun.Ready(),
+      earth.Ready(),
+      moon.Ready(),
+      jupiter.Ready(),
+      io.Ready(),
+      europa.Ready(),
+    ];
   }
 
   public Run() {
-    Promise.all([
-      this.sun.Ready(),
-      this.earth.Ready(),
-      this.moon.Ready(),
-    ]).then(() => this.draw());
+    Promise.all(this.images).then(() => this.draw());
   }
 
   private draw() {
@@ -129,6 +197,27 @@ class astronomicalObject {
   private img: image;
   private satellites: astronomicalObject[] = [];
 
+  public static New(ctx: CanvasRenderingContext2D, cfg: {
+    radius: number;
+    orbitRadius: number;
+    orbitSeconds: number;
+    spinSeconds: number;
+    img: {
+      url: string;
+      clipRatio: number;
+    };
+  }): astronomicalObject {
+    const dim = {
+      width: 2 * cfg.radius,
+      height: 2 * cfg.radius,
+    };
+    const img = {
+      el: new image(cfg.img.url, dim),
+      clipRatio: cfg.img.clipRatio,
+    };
+    return new astronomicalObject(ctx, cfg, img);
+  }
+
   constructor(
     ctx: CanvasRenderingContext2D,
     cfg: astronomicalObjectConfig,
@@ -171,7 +260,10 @@ class astronomicalObject {
     this.position();
     this.spin();
     stateLock(this.ctx, () => this.draw());
-    this.satellites.forEach((el) => el.Draw());
+    const that = this;
+    this.satellites.forEach((el) => {
+      stateLock(that.ctx, () => el.Draw());
+    });
   }
 
   protected draw() {
@@ -215,69 +307,6 @@ class astronomicalObject {
   private spin() {
     const angle = this.frame * this.cfg.spin.dphi;
     this.ctx.rotate(angle);
-  }
-}
-
-class Sun extends astronomicalObject {
-  private static config = {
-    radius: 50,
-    orbitRadius: 0,
-    orbitSeconds: 0,
-    spinSeconds: 120,
-  };
-
-  constructor(ctx: CanvasRenderingContext2D) {
-    const dim = {
-      width: 2 * Sun.config.radius,
-      height: 2 * Sun.config.radius,
-    };
-    const img = {
-      el: new image("img/sun.jpg", dim),
-      clipRatio: 0.5,
-    };
-    super(ctx, Sun.config, img);
-  }
-}
-
-class Earth extends astronomicalObject {
-  private static config = {
-    radius: 25,
-    orbitSeconds: 30,
-    spinSeconds: 5,
-  };
-
-  constructor(ctx: CanvasRenderingContext2D, orbit: number) {
-    const cfg = { ...Earth.config, ...{ orbitRadius: orbit } };
-    const dim = {
-      width: 2 * Earth.config.radius,
-      height: 2 * Earth.config.radius,
-    };
-    const img = {
-      el: new image("img/earth.jpg", dim),
-      clipRatio: 0.35,
-    };
-    super(ctx, cfg, img);
-  }
-}
-
-class Moon extends astronomicalObject {
-  private static config = {
-    radius: 5,
-    orbitSeconds: 10,
-    spinSeconds: 1,
-  };
-
-  constructor(ctx: CanvasRenderingContext2D, orbit: number) {
-    const cfg = { ...Moon.config, ...{ orbitRadius: orbit } };
-    const dim = {
-      width: 2 * Moon.config.radius,
-      height: 2 * Moon.config.radius,
-    };
-    const img = {
-      el: new image("img/moon.jpg", dim),
-      clipRatio: 0.5,
-    };
-    super(ctx, cfg, img);
   }
 }
 
