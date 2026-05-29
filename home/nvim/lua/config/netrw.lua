@@ -5,4 +5,4 @@
 
 local netrw = require("netrw")
 
-vim.keymap.set("n", "<localleader>fe", netrw.Open, { buffer = true })
+vim.keymap.set("n", "<localleader>fe", netrw.Open)
