@@ -1,0 +1,53 @@
+<!--
+  Copyright 2026 Samvel Khalatyan. All rights reserved.
+
+  Use of this source code is governed by a BSD-style
+  license that can be found in the LICENSE file.
+-->
+
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Canvas WebAssembly</title>
+		<script src="wasm_exec.js"></script>
+		<script type="module" src="solsys.js"></script>
+		<style>
+			canvas {
+				border: 1px solid blue;
+				image-rendering: pixelated;
+			}
+		</style>
+	</head>
+	<body>
+		Demo: HTML5 Canvas draw with WebAssembly:
+		<button id="solsys-start" onclick="StartAnimation()" disabled>Start</button>
+		<button id="solsys-stop" onclick="StopAnimation()" disabled>Stop</button>
+		<canvas id="solsys-canvas" width="600" height="600">
+			Animated solar system of a Sun, Earth, and Moon, orbiting each other.
+		</canvas>
+		<script type="module">
+			import * as solsys from "/solsys.js";
+			const go = new Go();
+			let app;
+			WebAssembly
+			.instantiateStreaming(fetch("solsys.wasm"), go.importObject)
+			.then((result) => {
+				go.run(result.instance)
+				console.log("Go runtime started")
+				Run("solsys-canvas")
+				app = new solsys.App({
+					canvas: "solsys-canvas",
+					buttons: {
+						start: {
+							id: "solsys-start",
+							},
+							stop: {
+								id: "solsys-stop",
+								},
+								},
+								})
+								app.Run()
+								});
+		</script>
+	</body>
+</html>
