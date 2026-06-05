@@ -37,3 +37,6 @@
 
 [gpg]
 	format = ssh
+
+[diff]
+	wsErrorHighlight = all
