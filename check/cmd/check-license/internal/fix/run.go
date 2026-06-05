@@ -96,7 +96,7 @@ func newInserter(file string) (*inserter, error) {
 		return &insC, nil
 	case ".css":
 		return &insCSS, nil
-	case ".html", ".md":
+	case ".html", ".md", ".svg":
 		return &insHTML, nil
 	case ".lua":
 		return &insLua, nil
