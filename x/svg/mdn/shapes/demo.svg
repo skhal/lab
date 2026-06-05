@@ -15,7 +15,16 @@
 			}
 			#stroke-blue:hover {
 			stroke: green;
-      fill: black;
+			fill: black;
+			}
+			#stroke-yellow {
+        stroke: yellow;
+        stroke-width: 0.5;
+        fill: none;
+			}
+			#stroke-yellow:hover {
+        stroke: blue;
+        fill: gray;
 			}
 			]]></style>
 	</defs>
@@ -59,4 +68,10 @@
   -->
 	<path d="M 85 75 H 95 V 80" style="stroke: blue; stroke-width: 1; fill: none"/>
 	<path d="M 85 85 H 95 V 90 Z" id="stroke-blue"/>
+
+	<!-- Translation -->
+	<rect x="0" y="0" width="10" height="10" transform="translate(25, 5)" id="stroke-yellow"/>
+  <g transform="translate(25, 25) rotate(45)">
+    <rect x="0" y="0" width="10" height="10" id="stroke-yellow"/>
+  </g>
 </svg>
