@@ -40,6 +40,7 @@ conform.setup({
 		pbtxt = { "txtpbfmt" },
 		proto = { "clang-format", "keep-sorted" },
 		sh = { "shfmt", "keep-sorted" },
+		svg = { "superhtml", "keep-sorted" },
 		text = { "keep-sorted" },
 		typescript = { "deno_fmt", "keep-sorted" },
 		yaml = { "yamlfmt", "keep-sorted" },
