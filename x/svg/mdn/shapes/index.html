@@ -1,0 +1,33 @@
+<!--
+  Copyright 2026 Samvel Khalatyan. All rights reserved.
+
+  Use of this source code is governed by a BSD-style
+  license that can be found in the LICENSE file.
+-->
+
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>SVG Demo</title>
+	</head>
+	<body>
+		<h1>SVG Demo.</h1>
+		<p>Ref: <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorials/SVG_from_scratch">mdn: Introducing SVG from scratch</a></p>
+
+		<p>SVG embedded in HTML</p>
+		<div>
+			<svg version="1.1" width="300" height="200" xmlns="http://www.w3.org/2000/svg">
+				<rect width="100%" height="100%" fill="red"/>
+				<circle cx="150" cy="100" r="80" fill="green"/>
+				<text x="150" y="125" font-size="60" text-anchor="middle" fill="white">SVG</text>
+			</svg>
+		</div>
+
+		<hr>
+
+		<p>SVG included via object-tag</p>
+		<div>
+			<object data="demo.svg" type="image/svg+xml"></object>
+		</div>
+	</body>
+</html>
