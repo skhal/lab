@@ -6,9 +6,13 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
+	"os"
+	"os/signal"
 	"strings"
+	"sync"
 
 	"github.com/skhal/lab/book/irex/web"
 )
@@ -49,7 +53,46 @@ func (cmd *cmdServe) parseFlags(args []string) error {
 }
 
 func (cmd *cmdServe) run() error {
-	fmt.Printf("serve on %s\n", cmd.addr)
+	wait, err := cmd.runWebServer()
+	if err != nil {
+		return err
+	}
+	return wait()
+}
+
+func (cmd *cmdServe) runWebServer() (func() error, error) {
 	s := &web.Server{Address: cmd.addr}
-	return s.Run()
+
+	fmt.Printf("web server: start on %s\n", cmd.addr)
+	if err := s.Run(); err != nil {
+		return nil, err
+	}
+
+	var (
+		wg  sync.WaitGroup
+		err error
+	)
+	wg.Go(func() {
+		sigint := make(chan os.Signal, 1)
+		defer close(sigint)
+
+		signal.Notify(sigint, os.Interrupt)
+
+		<-sigint
+		signal.Stop(sigint)
+
+		fmt.Println()
+		fmt.Println("web server: shutdown")
+		err = s.Shutdown(context.Background())
+	})
+
+	wait := func() error {
+		wg.Wait()
+		if err := s.Err(); err != nil {
+			return err
+		}
+		return err
+	}
+
+	return wait, nil
 }

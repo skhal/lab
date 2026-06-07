@@ -7,12 +7,16 @@ package web
 
 import (
 	"context"
+	"errors"
 	"log"
 	"net/http"
 	"time"
 
 	"github.com/skhal/lab/book/irex/web/internal/serve"
 )
+
+// ErrServerRuns means the web server already runs (see [Server.Run]).
+var ErrServerRuns = errors.New("web server runs")
 
 var (
 	// keep-sorted start
@@ -24,14 +28,27 @@ var (
 
 // Server is the finance server to serve the results page, plots, etc.
 type Server struct {
+	err        error
+	httpServer *http.Server
+
 	// Address is the host:port to serve HTTP on.
 	Address string
 }
 
-// Run starts HTTP server listening on [Server.Address].
+// Err returns the error from [http.Server.ListenAndServe] if any.
+func (s *Server) Err() error {
+	return s.err
+}
+
+// Run starts HTTP server listening on [Server.Address] in a goroutine. Use
+// [Server.Err] to check for errors.
 func (s *Server) Run() error {
+	if s.httpServer != nil {
+		return ErrServerRuns
+	}
 	h := s.handler()
-	return s.serve(h)
+	s.serve(h)
+	return nil
 }
 
 func (s *Server) handler() http.Handler {
@@ -44,14 +61,25 @@ func (s *Server) handler() http.Handler {
 	return mux
 }
 
-func (s *Server) serve(h http.Handler) error {
-	hs := &http.Server{
+func (s *Server) serve(h http.Handler) {
+	s.httpServer = &http.Server{
 		Addr:         s.Address,
 		Handler:      h,
 		ReadTimeout:  defaultServerReadTimeout,
 		WriteTimeout: defaultServerWriteTimeout,
 	}
-	return hs.ListenAndServe()
+	go func() {
+		err := s.httpServer.ListenAndServe()
+		if !errors.Is(err, http.ErrServerClosed) {
+			s.err = err
+		}
+	}()
+}
+
+// Shutdown gracefully shuts down the server. It returns the error from
+// [http.Server.Shutdown].
+func (s *Server) Shutdown(ctx context.Context) error {
+	return s.httpServer.Shutdown(ctx)
 }
 
 func withTimeout(timeout time.Duration, h http.HandlerFunc) http.HandlerFunc {
