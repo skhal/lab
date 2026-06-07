@@ -17,12 +17,12 @@
 			stroke: green;
 			fill: black;
 			}
-			#stroke-yellow {
+			.stroke-yellow {
         stroke: yellow;
         stroke-width: 0.5;
         fill: none;
 			}
-			#stroke-yellow:hover {
+			.stroke-yellow:hover {
         stroke: blue;
         fill: gray;
 			}
@@ -70,8 +70,8 @@
 	<path d="M 85 85 H 95 V 90 Z" id="stroke-blue"/>
 
 	<!-- Translation -->
-	<rect x="0" y="0" width="10" height="10" transform="translate(25, 5)" id="stroke-yellow"/>
+	<rect x="0" y="0" width="10" height="10" transform="translate(25, 5)" class="stroke-yellow"/>
   <g transform="translate(25, 25) rotate(45)">
-    <rect x="0" y="0" width="10" height="10" id="stroke-yellow"/>
+    <rect x="0" y="0" width="10" height="10" class="stroke-yellow"/>
   </g>
 </svg>
