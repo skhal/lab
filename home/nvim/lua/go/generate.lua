@@ -24,8 +24,9 @@ local generate = {
 	-- RunPackage runs go-generate on the package holding the current buffer.
 	-- It reports an error if tool fails.
 	RunPackage = function()
-		local f = vim.fn.expand("%")
-		run(vim.fs.dirname(f))
+		local f = vim.fn.expand("%:p")
+		local d = vim.fs.dirname(f)
+		run(d)
 	end,
 }
 
