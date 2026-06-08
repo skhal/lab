@@ -7,6 +7,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"flag"
 	"fmt"
 	"os"
@@ -14,13 +15,17 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/skhal/lab/book/irex/market"
+	"github.com/skhal/lab/book/irex/pb"
 	"github.com/skhal/lab/book/irex/web"
+	"google.golang.org/protobuf/proto"
 )
 
 const defaultAddress = ":8080"
 
 type cmdServe struct {
-	addr string
+	addr           string
+	marketDataFile string // market data
 }
 
 // Run parses flags and runs the web server.
@@ -42,6 +47,7 @@ func (cmd *cmdServe) parseFlags(args []string) error {
 		fs.PrintDefaults()
 	}
 	fs.StringVar(&cmd.addr, "http", defaultAddress, "address to bind")
+	fs.StringVar(&cmd.marketDataFile, "f", "", "market data file")
 	if err := fs.Parse(args); err != nil {
 		return err
 	}
@@ -53,18 +59,91 @@ func (cmd *cmdServe) parseFlags(args []string) error {
 }
 
 func (cmd *cmdServe) run() error {
-	wait, err := cmd.runWebServer()
+	waitMarketServer, err := cmd.runMarketServer()
 	if err != nil {
 		return err
 	}
-	return wait()
+	waitWebServer, err := cmd.runWebServer()
+	if err != nil {
+		return err
+	}
+
+	var (
+		wg sync.WaitGroup
+		ee = make([]error, 2)
+	)
+	const (
+		idxErrMarketServer = iota
+		idxErrWebServer
+	)
+	wg.Go(func() {
+		if err := waitMarketServer(); err != nil {
+			ee[idxErrMarketServer] = err
+		}
+	})
+	wg.Go(func() {
+		if err := waitWebServer(); err != nil {
+			ee[idxErrWebServer] = err
+		}
+	})
+	wg.Wait()
+
+	return errors.Join(ee...)
 }
 
-func (cmd *cmdServe) runWebServer() (func() error, error) {
+type waitFunc func() error
+
+func (cmd *cmdServe) runMarketServer() (waitFunc, error) {
+	data, err := cmd.loadMarketData()
+	if err != nil {
+		return nil, err
+	}
+	s := market.NewServer(data)
+
+	fmt.Println("market server: start")
+	if err := s.Serve(); err != nil {
+		return nil, err
+	}
+
+	var wg sync.WaitGroup
+	wg.Go(func() {
+		sigint := make(chan os.Signal, 1)
+		defer close(sigint)
+
+		signal.Notify(sigint, os.Interrupt)
+
+		<-sigint
+		signal.Stop(sigint)
+
+		fmt.Println("market server: shutdown")
+		s.Shutdown()
+	})
+
+	wait := func() error {
+		wg.Wait()
+		return s.Err()
+	}
+
+	return wait, nil
+}
+
+func (cmd *cmdServe) loadMarketData() (*pb.Market, error) {
+	b, err := os.ReadFile(cmd.marketDataFile)
+	if err != nil {
+		return nil, err
+	}
+	data := new(pb.Market)
+	if err := proto.Unmarshal(b, data); err != nil {
+		return nil, fmt.Errorf("%s: %s", cmd.marketDataFile, err)
+	}
+	return data, nil
+}
+
+func (cmd *cmdServe) runWebServer() (waitFunc, error) {
 	s := &web.Server{Address: cmd.addr}
 
 	fmt.Printf("web server: start on %s\n", cmd.addr)
-	if err := s.Run(); err != nil {
+	if err := s.Serve(); err != nil {
 		return nil, err
 	}
 
@@ -81,7 +160,6 @@ func (cmd *cmdServe) runWebServer() (func() error, error) {
 		<-sigint
 		signal.Stop(sigint)
 
-		fmt.Println()
 		fmt.Println("web server: shutdown")
 		err = s.Shutdown(context.Background())
 	})

@@ -1,0 +1,58 @@
+// Copyright 2026 Samvel Khalatyan. All rights reserved.
+//
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
+edition = "2024";
+
+package book.irex;
+
+import "google/protobuf/go_features.proto";
+import "book/irex/pb/market.proto";
+
+option features.(.pb.go).api_level = API_OPAQUE;
+option go_package = "github.com/skhal/lab/book/irex/pb";
+
+service MarketService {
+  rpc Quote(QuoteRequest) returns (QuoteResponse) {}
+}
+
+// QuoteRequest is the request to [MarketService.Quote] endpoint. It defines
+// the symbol to get the market quotes for.
+//
+// Next ID: 2
+message QuoteRequest {
+  // Symbol identifies the market symbol, e.g. SPX for S&P500.
+  //
+  // Next ID: 2
+  enum Symbol {
+    // SYMBOL_UNSPECIFIED means the symbol is not set
+    SYMBOL_UNSPECIFIED = 0;
+
+    // SYMBOL_SPX S&P500 composite index
+    SYMBOL_SPX = 1;
+  }
+
+  // symbol defines the market symbol to get the quotes for.
+  Symbol symbol = 1;
+}
+
+// QuoteResponse is the response from [MarketService.Quote] endpoint. It
+// holds market data for the requested symbol.
+//
+// Next ID: 2
+message QuoteResponse {
+  // Quote is a single data point, one per date.
+  //
+  // Next ID: 3
+  message Quote {
+    // date is the calendar date when the quote is applicable.
+    Date date = 1;
+
+    // cent is the market value of the requested symbol on a given date.
+    Cent cent = 2;
+  }
+
+  // quotes is a date-ordered list of market values of the requested symbol.
+  repeated Quote quotes = 1;
+}

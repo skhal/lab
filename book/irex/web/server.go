@@ -15,7 +15,7 @@ import (
 	"github.com/skhal/lab/book/irex/web/internal/serve"
 )
 
-// ErrServerRuns means the web server already runs (see [Server.Run]).
+// ErrServerRuns means the web server already runs (see [Server.Serve]).
 var ErrServerRuns = errors.New("web server runs")
 
 var (
@@ -40,9 +40,9 @@ func (s *Server) Err() error {
 	return s.err
 }
 
-// Run starts HTTP server listening on [Server.Address] in a goroutine. Use
+// Serve starts HTTP server listening on [Server.Address] in a goroutine. Use
 // [Server.Err] to check for errors.
-func (s *Server) Run() error {
+func (s *Server) Serve() error {
 	if s.httpServer != nil {
 		return ErrServerRuns
 	}
