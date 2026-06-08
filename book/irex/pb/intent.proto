@@ -1,0 +1,28 @@
+// Copyright 2026 Samvel Khalatyan. All rights reserved.
+//
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
+edition = "2024";
+
+package book.irex;
+
+import "google/protobuf/go_features.proto";
+
+option features.(.pb.go).api_level = API_OPAQUE;
+option go_package = "github.com/skhal/lab/book/irex/pb";
+
+// Intent describes a query intent. There might be many different intents, e.g.
+// calculate intent, plot intent, measure intent. The Intent is a container for
+// these. It holds one of the specific intents, which implement using Protobuf
+// extensions.
+//
+// Next ID: 1
+message Intent {
+  extensions 525000000 to max
+  [declaration = {
+    number: 525000001,
+    full_name: ".book.irex.PlotIntent.plot_intent",
+    type: ".book.irex.PlotIntent",
+  }];
+}

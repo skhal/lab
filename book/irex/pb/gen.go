@@ -15,7 +15,10 @@ package pb
 // https://github.com/golang/protobuf/issues/1232
 //
 // keep-sorted start
+//go:generate protoc book/irex/pb/symbol.proto
+//go:generate protoc book/irex/pb/intent.proto
 //go:generate protoc book/irex/pb/market.proto
+//go:generate protoc book/irex/pb/plot_intent.proto
 // keep-sorted end
 //
 // keep-sorted start

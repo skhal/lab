@@ -11,6 +11,7 @@ import (
 	"io"
 	"net/http"
 
+	"github.com/skhal/lab/book/irex/query"
 	"github.com/skhal/lab/book/irex/web/queryparam"
 )
 
@@ -26,11 +27,15 @@ var (
 
 // Root serves main page.
 func Root(w http.ResponseWriter, req *http.Request) error {
-	_, ok := queryparam.Query(req)
+	q, ok := queryparam.Query(req)
 	if !ok {
 		return serveWelcomePage(w)
 	}
-	return errors.New("page for query parameter is under constructions")
+	_, err := query.Understand(q)
+	if err != nil {
+		return err
+	}
+	return errors.New("page for query parameter is under construction")
 }
 
 func serveWelcomePage(w http.ResponseWriter) error {

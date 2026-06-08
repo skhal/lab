@@ -1,0 +1,33 @@
+// Copyright 2026 Samvel Khalatyan. All rights reserved.
+//
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
+edition = "2024";
+
+package book.irex;
+
+import "google/protobuf/go_features.proto";
+
+option features.(.pb.go).api_level = API_OPAQUE;
+option go_package = "github.com/skhal/lab/book/irex/pb";
+
+// Symbol represents one of the market symbols, e.g. index.
+//
+// Next ID: 2
+message Symbol {
+  // Index is a market index, e.g. SPX for S&P500 composite index.
+  //
+  // Next ID: 2
+  enum Index {
+    // IDX_UNSPECIFIED means the index is not set
+    IDX_UNSPECIFIED = 0;
+
+    // IDX_SPX is S&P500 composite index
+    IDX_SPX = 1;
+  }
+
+  oneof symbol_oneof {
+    Index index = 1;
+  }
+}

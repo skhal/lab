@@ -18,11 +18,18 @@ func TestRoot(t *testing.T) {
 		name     string
 		req      *http.Request
 		wantCode status
+		wantErr  bool
 	}{
 		{
 			name:     "get",
 			req:      httptest.NewRequest(http.MethodGet, "/", nil),
 			wantCode: http.StatusOK,
+		},
+		{
+			name:     "get with query param",
+			req:      httptest.NewRequest(http.MethodGet, "/?q=test", nil),
+			wantCode: http.StatusOK,
+			wantErr:  true,
 		},
 	}
 	for _, tc := range tests {
@@ -30,8 +37,15 @@ func TestRoot(t *testing.T) {
 
 		err := serve.Root(w, tc.req)
 
-		if err != nil {
-			t.Errorf("unexpected error '%v'", err)
+		switch tc.wantErr {
+		case true:
+			if err == nil {
+				t.Error("missing error")
+			}
+		case false:
+			if err != nil {
+				t.Errorf("unexpected error '%v'", err)
+			}
 		}
 		if got := status(w.Code); got != tc.wantCode {
 			t.Errorf("unexpected code %s, want %s", got, tc.wantCode)
