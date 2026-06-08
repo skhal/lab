@@ -7,8 +7,11 @@ package serve
 
 import (
 	"embed"
+	"errors"
 	"io"
 	"net/http"
+
+	"github.com/skhal/lab/book/irex/web/queryparam"
 )
 
 const (
@@ -23,6 +26,14 @@ var (
 
 // Root serves main page.
 func Root(w http.ResponseWriter, req *http.Request) error {
+	_, ok := queryparam.Query(req)
+	if !ok {
+		return serveWelcomePage(w)
+	}
+	return errors.New("page for query parameter is under constructions")
+}
+
+func serveWelcomePage(w http.ResponseWriter) error {
 	f, err := efs.Open("static/root/index.html")
 	if err != nil {
 		return err
