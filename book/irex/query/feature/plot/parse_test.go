@@ -3,7 +3,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package query_test
+package plot_test
 
 import (
 	"errors"
@@ -11,47 +11,35 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/skhal/lab/book/irex/pb"
-	"github.com/skhal/lab/book/irex/query"
 	"github.com/skhal/lab/book/irex/query/feature/plot"
-	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/testing/protocmp"
 )
 
-func TestUnderstand(t *testing.T) {
+func TestParse(t *testing.T) {
 	tests := []struct {
 		name    string
 		q       string
-		want    *pb.Intent
+		want    *pb.PlotIntent
 		wantErr error
 	}{
 		{
-			name:    "empty query",
-			wantErr: query.ErrNoCommand,
-		},
-		{
-			name:    "unsupported command",
-			q:       "unsupportedcommand abc123",
-			wantErr: query.ErrInvalidCommand,
-		},
-		{
-			name:    "plot command no params",
-			q:       "plot",
+			name:    "empty params",
 			wantErr: plot.ErrPlotNoSymbol,
 		},
 		{
-			name:    "plot invalid symbol",
-			q:       "plot test-symbol",
+			name:    "invalid symbol",
+			q:       "test-symbol",
 			wantErr: plot.ErrPlotSymbol,
 		},
 		{
-			name: "plot spx",
-			q:    "plot spx",
+			name: "spx",
+			q:    "spx",
 			want: newPlotIntent(t, newIndexSymbol(t, pb.Symbol_IDX_SPX)),
 		},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			got, err := query.Understand(tc.q)
+			got, err := plot.Parse(tc.q)
 
 			if !errors.Is(err, tc.wantErr) {
 				t.Errorf("%q unexpected error '%v'; want '%v'", tc.q, err, tc.wantErr)
@@ -63,12 +51,9 @@ func TestUnderstand(t *testing.T) {
 	}
 }
 
-func newPlotIntent(t *testing.T, s *pb.Symbol) *pb.Intent {
+func newPlotIntent(t *testing.T, s *pb.Symbol) *pb.PlotIntent {
 	t.Helper()
-	msg := pb.PlotIntent_builder{Symbol: s}.Build()
-	intent := pb.Intent_builder{}.Build()
-	proto.SetExtension(intent, pb.E_PlotIntent_PlotIntent, msg)
-	return intent
+	return pb.PlotIntent_builder{Symbol: s}.Build()
 }
 
 func newIndexSymbol(t *testing.T, idx pb.Symbol_Index) *pb.Symbol {

@@ -11,6 +11,7 @@ import (
 	"strings"
 
 	"github.com/skhal/lab/book/irex/pb"
+	"github.com/skhal/lab/book/irex/query/feature/plot"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protoreflect"
 )
@@ -27,7 +28,7 @@ type parseFunc func(q string) (*pb.Intent, error)
 
 // commandParsers maps commands to a parser to handle parameters.
 var commandParsers = map[string]parseFunc{
-	"plot": dispatch(pb.E_PlotIntent_PlotIntent, parsePlot),
+	"plot": dispatch(pb.E_PlotIntent_PlotIntent, plot.Parse),
 }
 
 // Understand parses query q and generates an intent that best describes the

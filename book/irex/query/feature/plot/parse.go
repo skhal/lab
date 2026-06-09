@@ -3,7 +3,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package query
+package plot
 
 import (
 	"errors"
@@ -25,7 +25,9 @@ var indexByName = map[string]pb.Symbol_Index{
 	"spx": pb.Symbol_IDX_SPX,
 }
 
-func parsePlot(symbol string) (*pb.PlotIntent, error) {
+// Parse parses plot-command parameters. It returns the intent upon successful
+// parse or error if the parse fails.
+func Parse(symbol string) (*pb.PlotIntent, error) {
 	if symbol == "" {
 		return nil, ErrPlotNoSymbol
 	}
