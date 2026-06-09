@@ -7,12 +7,12 @@ package serve
 
 import (
 	"embed"
-	"errors"
 	"io"
 	"net/http"
 
 	"github.com/skhal/lab/book/irex/intent"
 	"github.com/skhal/lab/book/irex/query"
+	"github.com/skhal/lab/book/irex/render"
 	"github.com/skhal/lab/book/irex/web/queryparam"
 )
 
@@ -36,11 +36,11 @@ func Root(w http.ResponseWriter, req *http.Request) error {
 	if err != nil {
 		return err
 	}
-	_, err = intent.Fulfill(queryIntent)
+	page, err := intent.Fulfill(queryIntent)
 	if err != nil {
 		return err
 	}
-	return errors.New("page for query parameter is under construction")
+	return render.Render(page, w, req)
 }
 
 func serveWelcomePage(w http.ResponseWriter) error {

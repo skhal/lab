@@ -1,0 +1,16 @@
+<!--
+  Copyright 2026 Samvel Khalatyan. All rights reserved.
+
+  Use of this source code is governed by a BSD-style
+  license that can be found in the LICENSE file.
+-->
+
+{{define "header"}}
+<div class="header">
+	<form action="/" method="GET">
+		<label for="search">Command:</label>
+		<input type="search" id="search" name="q" value="{{.Search}}">
+		<button>Search</button>
+	</form>
+</div>
+{{end}}

@@ -1,0 +1,26 @@
+<!--
+  Copyright 2026 Samvel Khalatyan. All rights reserved.
+
+  Use of this source code is governed by a BSD-style
+  license that can be found in the LICENSE file.
+-->
+
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>IrEx</title>
+		<style>
+			.header {
+				padding-bottom: 10;
+			}
+		</style>
+	</head>
+	<body>
+		{{template "header" .Header}}
+		{{range $r := .Renderers}}
+		<div>
+			{{$r.Render}}
+		</div>
+		{{end}}
+	</body>
+</html>

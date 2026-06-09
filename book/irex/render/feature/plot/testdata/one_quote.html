@@ -1,0 +1,25 @@
+<svg version="1.1" width="600" height="300" viewbox="0 0 200 100" xmlns="http://www.w3.org/2000/svg">
+	<defs>
+		<style><![CDATA[
+			.background {
+			fill: white;
+			}
+			.axis {
+			stroke: black;
+			stroke-width: 0.25;
+			}
+			.line {
+			stroke: green;
+			stroke-width: 0.5;
+			fill: none;
+			}
+			]]></style>
+	</defs>
+	<rect x="0" y="0" width="100%" height="100%" class="background"/>
+	<text x="50%" y="5" font-size="5" text-anchor="middle">index:IDX_SPX</text>
+	<path d="M 7 93 L 193 93" class="axis"/>
+	<path d="M 7 7 L 7 93" class="axis"/>
+	<g transform="translate(7 93) scale(1 -1)">
+		<path d="M 0 0 L 95 45" class="line"/>
+	</g>
+</svg>
