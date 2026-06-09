@@ -19,24 +19,28 @@ var ErrPlotSymbol = errors.New("unsupported symbol")
 func fulfillPlotIntent(msg *pb.PlotIntent) (*pb.PlotFeature, error) {
 	switch sym := msg.GetSymbol(); sym.WhichSymbolOneof() {
 	case pb.Symbol_Index_case:
-		return fulfillIndexPlotIntent(sym)
+		return fulfillIndexPlotIntent(sym, msg)
 	default:
 		return nil, fmt.Errorf("fulfill plot intent: %w: %s", ErrPlotSymbol, sym)
 	}
 }
 
-func fulfillIndexPlotIntent(sym *pb.Symbol) (*pb.PlotFeature, error) {
+func fulfillIndexPlotIntent(sym *pb.Symbol, msg *pb.PlotIntent) (*pb.PlotFeature, error) {
 	switch idx := sym.GetIndex(); idx {
 	case pb.Symbol_IDX_SPX:
-		return fulfillSPXPlot(sym)
+		return fulfillSPXPlot(sym, msg)
 	default:
 		err := fmt.Errorf("fulfill plot intent: %w: index %s", ErrPlotSymbol, idx)
 		return nil, err
 	}
 }
 
-func fulfillSPXPlot(sym *pb.Symbol) (*pb.PlotFeature, error) {
-	req := pb.QuoteRequest_builder{Symbol: sym}.Build()
+func fulfillSPXPlot(sym *pb.Symbol, msg *pb.PlotIntent) (*pb.PlotFeature, error) {
+	req := pb.QuoteRequest_builder{
+		Symbol: sym,
+		Since:  msg.GetSince(),
+		Until:  msg.GetUntil(),
+	}.Build()
 	res, err := market.Quote(req)
 	if err != nil {
 		return nil, fmt.Errorf("%s", err)
