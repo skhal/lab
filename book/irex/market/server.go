@@ -10,6 +10,7 @@ import (
 	"os"
 	"sync"
 
+	"github.com/skhal/lab/book/irex/market/service"
 	"github.com/skhal/lab/book/irex/pb"
 	"google.golang.org/grpc"
 )
@@ -20,7 +21,7 @@ const defaultSocket = "/tmp/irex_market.sock"
 // Socket.
 type Server struct {
 	err        error
-	service    *Service
+	service    *service.Service
 	grpcServer *grpc.Server
 	socket     string
 	once       sync.Once
@@ -30,7 +31,7 @@ type Server struct {
 func NewServer(data *pb.Market) *Server {
 	return &Server{
 		socket:  defaultSocket,
-		service: &Service{Quotes: data.GetQuotes()},
+		service: &service.Service{Quotes: data.GetQuotes()},
 	}
 }
 

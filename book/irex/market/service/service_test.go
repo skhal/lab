@@ -3,7 +3,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package market_test
+package service_test
 
 import (
 	"errors"
@@ -11,7 +11,7 @@ import (
 	"time"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/skhal/lab/book/irex/market"
+	"github.com/skhal/lab/book/irex/market/service"
 	"github.com/skhal/lab/book/irex/pb"
 	"google.golang.org/protobuf/testing/protocmp"
 )
@@ -31,7 +31,7 @@ func TestService_Quote(t *testing.T) {
 				newQuote(t, 1990, time.February, 28, 201, 202, 203),
 			},
 			req:     pb.QuoteRequest_builder{}.Build(),
-			wantErr: market.ErrInvalidSymbol,
+			wantErr: service.ErrInvalidSymbol,
 		},
 		{
 			name: "spx",
@@ -104,7 +104,7 @@ func TestService_Quote(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			s := market.Service{Quotes: tc.quotes}
+			s := service.Service{Quotes: tc.quotes}
 
 			res, err := s.Quote(t.Context(), tc.req)
 

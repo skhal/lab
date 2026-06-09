@@ -3,7 +3,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package market_test
+package service_test
 
 import (
 	"slices"
@@ -11,7 +11,7 @@ import (
 	"time"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/skhal/lab/book/irex/market"
+	"github.com/skhal/lab/book/irex/market/service"
 	"github.com/skhal/lab/book/irex/pb"
 	"google.golang.org/protobuf/testing/protocmp"
 )
@@ -88,7 +88,7 @@ func TestDateRange_Range(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			dr := market.DateRange{Since: tc.since, Until: tc.until}
+			dr := service.DateRange{Since: tc.since, Until: tc.until}
 
 			got := slices.Collect(dr.Quotes(tc.quotes))
 
