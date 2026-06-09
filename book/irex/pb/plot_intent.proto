@@ -8,15 +8,18 @@ edition = "2024";
 package book.irex;
 
 import "google/protobuf/go_features.proto";
+// keep-sorted start
 import "book/irex/pb/intent.proto";
+import "book/irex/pb/market.proto";
 import "book/irex/pb/symbol.proto";
+// keep-sorted end
 
 option features.(.pb.go).api_level = API_OPAQUE;
 option go_package = "github.com/skhal/lab/book/irex/pb";
 
 // PlotIntent describes a user intent to plot a symbol.
 //
-// Next ID: 2
+// Next ID: 4
 message PlotIntent {
   extend Intent {
     PlotIntent plot_intent = 525000001;
@@ -24,4 +27,10 @@ message PlotIntent {
 
   // symbol is the financial symbol to plot.
   Symbol symbol = 1;
+
+  // since restricts data to date after the date.
+  Date since = 2;
+
+  // until restricts data to date before the date.
+  Date until = 3;
 }

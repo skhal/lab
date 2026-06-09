@@ -36,12 +36,12 @@ func TestUnderstand(t *testing.T) {
 		{
 			name:    "plot command no params",
 			q:       "plot",
-			wantErr: plot.ErrPlotNoSymbol,
+			wantErr: plot.ErrNoSymbol,
 		},
 		{
 			name:    "plot invalid symbol",
 			q:       "plot test-symbol",
-			wantErr: plot.ErrPlotSymbol,
+			wantErr: plot.ErrNoSymbol,
 		},
 		{
 			name: "plot spx",

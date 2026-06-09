@@ -28,10 +28,12 @@ const (
 
 // PlotIntent describes a user intent to plot a symbol.
 //
-// Next ID: 2
+// Next ID: 4
 type PlotIntent struct {
 	state             protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Symbol *Symbol                `protobuf:"bytes,1,opt,name=symbol"`
+	xxx_hidden_Since  *Date                  `protobuf:"bytes,2,opt,name=since"`
+	xxx_hidden_Until  *Date                  `protobuf:"bytes,3,opt,name=until"`
 	unknownFields     protoimpl.UnknownFields
 	sizeCache         protoimpl.SizeCache
 }
@@ -68,8 +70,30 @@ func (x *PlotIntent) GetSymbol() *Symbol {
 	return nil
 }
 
+func (x *PlotIntent) GetSince() *Date {
+	if x != nil {
+		return x.xxx_hidden_Since
+	}
+	return nil
+}
+
+func (x *PlotIntent) GetUntil() *Date {
+	if x != nil {
+		return x.xxx_hidden_Until
+	}
+	return nil
+}
+
 func (x *PlotIntent) SetSymbol(v *Symbol) {
 	x.xxx_hidden_Symbol = v
+}
+
+func (x *PlotIntent) SetSince(v *Date) {
+	x.xxx_hidden_Since = v
+}
+
+func (x *PlotIntent) SetUntil(v *Date) {
+	x.xxx_hidden_Until = v
 }
 
 func (x *PlotIntent) HasSymbol() bool {
@@ -79,8 +103,30 @@ func (x *PlotIntent) HasSymbol() bool {
 	return x.xxx_hidden_Symbol != nil
 }
 
+func (x *PlotIntent) HasSince() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Since != nil
+}
+
+func (x *PlotIntent) HasUntil() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Until != nil
+}
+
 func (x *PlotIntent) ClearSymbol() {
 	x.xxx_hidden_Symbol = nil
+}
+
+func (x *PlotIntent) ClearSince() {
+	x.xxx_hidden_Since = nil
+}
+
+func (x *PlotIntent) ClearUntil() {
+	x.xxx_hidden_Until = nil
 }
 
 type PlotIntent_builder struct {
@@ -88,6 +134,10 @@ type PlotIntent_builder struct {
 
 	// symbol is the financial symbol to plot.
 	Symbol *Symbol
+	// since restricts data to date after the date.
+	Since *Date
+	// until restricts data to date before the date.
+	Until *Date
 }
 
 func (b0 PlotIntent_builder) Build() *PlotIntent {
@@ -95,6 +145,8 @@ func (b0 PlotIntent_builder) Build() *PlotIntent {
 	b, x := &b0, m0
 	_, _ = b, x
 	x.xxx_hidden_Symbol = b.Symbol
+	x.xxx_hidden_Since = b.Since
+	x.xxx_hidden_Until = b.Until
 	return m0
 }
 
@@ -119,10 +171,12 @@ var File_book_irex_pb_plot_intent_proto protoreflect.FileDescriptor
 
 const file_book_irex_pb_plot_intent_proto_rawDesc = "" +
 	"\n" +
-	"\x1ebook/irex/pb/plot_intent.proto\x12\tbook.irex\x1a!google/protobuf/go_features.proto\x1a\x19book/irex/pb/intent.proto\x1a\x19book/irex/pb/symbol.proto\"\x86\x01\n" +
+	"\x1ebook/irex/pb/plot_intent.proto\x12\tbook.irex\x1a!google/protobuf/go_features.proto\x1a\x19book/irex/pb/intent.proto\x1a\x19book/irex/pb/market.proto\x1a\x19book/irex/pb/symbol.proto\"\xd4\x01\n" +
 	"\n" +
 	"PlotIntent\x12)\n" +
-	"\x06symbol\x18\x01 \x01(\v2\x11.book.irex.SymbolR\x06symbol2M\n" +
+	"\x06symbol\x18\x01 \x01(\v2\x11.book.irex.SymbolR\x06symbol\x12%\n" +
+	"\x05since\x18\x02 \x01(\v2\x0f.book.irex.DateR\x05since\x12%\n" +
+	"\x05until\x18\x03 \x01(\v2\x0f.book.irex.DateR\x05until2M\n" +
 	"\vplot_intent\x12\x11.book.irex.Intent\x18\xc1\xba\xab\xfa\x01 \x01(\v2\x15.book.irex.PlotIntentR\n" +
 	"plotIntentB+Z!github.com/skhal/lab/book/irex/pb\x92\x03\x05\xd2>\x02\x10\x03b\beditionsp\xe9\a"
 
@@ -130,17 +184,20 @@ var file_book_irex_pb_plot_intent_proto_msgTypes = make([]protoimpl.MessageInfo,
 var file_book_irex_pb_plot_intent_proto_goTypes = []any{
 	(*PlotIntent)(nil), // 0: book.irex.PlotIntent
 	(*Symbol)(nil),     // 1: book.irex.Symbol
-	(*Intent)(nil),     // 2: book.irex.Intent
+	(*Date)(nil),       // 2: book.irex.Date
+	(*Intent)(nil),     // 3: book.irex.Intent
 }
 var file_book_irex_pb_plot_intent_proto_depIdxs = []int32{
 	1, // 0: book.irex.PlotIntent.symbol:type_name -> book.irex.Symbol
-	2, // 1: book.irex.PlotIntent.plot_intent:extendee -> book.irex.Intent
-	0, // 2: book.irex.PlotIntent.plot_intent:type_name -> book.irex.PlotIntent
-	3, // [3:3] is the sub-list for method output_type
-	3, // [3:3] is the sub-list for method input_type
-	2, // [2:3] is the sub-list for extension type_name
-	1, // [1:2] is the sub-list for extension extendee
-	0, // [0:1] is the sub-list for field type_name
+	2, // 1: book.irex.PlotIntent.since:type_name -> book.irex.Date
+	2, // 2: book.irex.PlotIntent.until:type_name -> book.irex.Date
+	3, // 3: book.irex.PlotIntent.plot_intent:extendee -> book.irex.Intent
+	0, // 4: book.irex.PlotIntent.plot_intent:type_name -> book.irex.PlotIntent
+	5, // [5:5] is the sub-list for method output_type
+	5, // [5:5] is the sub-list for method input_type
+	4, // [4:5] is the sub-list for extension type_name
+	3, // [3:4] is the sub-list for extension extendee
+	0, // [0:3] is the sub-list for field type_name
 }
 
 func init() { file_book_irex_pb_plot_intent_proto_init() }
@@ -149,6 +206,7 @@ func file_book_irex_pb_plot_intent_proto_init() {
 		return
 	}
 	file_book_irex_pb_intent_proto_init()
+	file_book_irex_pb_market_proto_init()
 	file_book_irex_pb_symbol_proto_init()
 	type x struct{}
 	out := protoimpl.TypeBuilder{
