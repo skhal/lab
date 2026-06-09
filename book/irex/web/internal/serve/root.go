@@ -11,6 +11,7 @@ import (
 	"io"
 	"net/http"
 
+	"github.com/skhal/lab/book/irex/intent"
 	"github.com/skhal/lab/book/irex/query"
 	"github.com/skhal/lab/book/irex/web/queryparam"
 )
@@ -31,7 +32,11 @@ func Root(w http.ResponseWriter, req *http.Request) error {
 	if !ok {
 		return serveWelcomePage(w)
 	}
-	_, err := query.Understand(q)
+	queryIntent, err := query.Understand(q)
+	if err != nil {
+		return err
+	}
+	_, err = intent.Fulfill(queryIntent)
 	if err != nil {
 		return err
 	}

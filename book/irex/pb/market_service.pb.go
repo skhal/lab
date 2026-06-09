@@ -26,63 +26,15 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// Symbol identifies the market symbol, e.g. SPX for S&P500.
-//
-// Next ID: 2
-type QuoteRequest_Symbol int32
-
-const (
-	// SYMBOL_UNSPECIFIED means the symbol is not set
-	QuoteRequest_SYMBOL_UNSPECIFIED QuoteRequest_Symbol = 0
-	// SYMBOL_SPX S&P500 composite index
-	QuoteRequest_SYMBOL_SPX QuoteRequest_Symbol = 1
-)
-
-// Enum value maps for QuoteRequest_Symbol.
-var (
-	QuoteRequest_Symbol_name = map[int32]string{
-		0: "SYMBOL_UNSPECIFIED",
-		1: "SYMBOL_SPX",
-	}
-	QuoteRequest_Symbol_value = map[string]int32{
-		"SYMBOL_UNSPECIFIED": 0,
-		"SYMBOL_SPX":         1,
-	}
-)
-
-func (x QuoteRequest_Symbol) Enum() *QuoteRequest_Symbol {
-	p := new(QuoteRequest_Symbol)
-	*p = x
-	return p
-}
-
-func (x QuoteRequest_Symbol) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
-
-func (QuoteRequest_Symbol) Descriptor() protoreflect.EnumDescriptor {
-	return file_book_irex_pb_market_service_proto_enumTypes[0].Descriptor()
-}
-
-func (QuoteRequest_Symbol) Type() protoreflect.EnumType {
-	return &file_book_irex_pb_market_service_proto_enumTypes[0]
-}
-
-func (x QuoteRequest_Symbol) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
-}
-
 // QuoteRequest is the request to [MarketService.Quote] endpoint. It defines
 // the symbol to get the market quotes for.
 //
 // Next ID: 2
 type QuoteRequest struct {
-	state                  protoimpl.MessageState `protogen:"opaque.v1"`
-	xxx_hidden_Symbol      QuoteRequest_Symbol    `protobuf:"varint,1,opt,name=symbol,enum=book.irex.QuoteRequest_Symbol"`
-	XXX_raceDetectHookData protoimpl.RaceDetectHookData
-	XXX_presence           [1]uint32
-	unknownFields          protoimpl.UnknownFields
-	sizeCache              protoimpl.SizeCache
+	state             protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Symbol *Symbol                `protobuf:"bytes,1,opt,name=symbol"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
 }
 
 func (x *QuoteRequest) Reset() {
@@ -110,47 +62,40 @@ func (x *QuoteRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-func (x *QuoteRequest) GetSymbol() QuoteRequest_Symbol {
+func (x *QuoteRequest) GetSymbol() *Symbol {
 	if x != nil {
-		if protoimpl.X.Present(&(x.XXX_presence[0]), 0) {
-			return x.xxx_hidden_Symbol
-		}
+		return x.xxx_hidden_Symbol
 	}
-	return QuoteRequest_SYMBOL_UNSPECIFIED
+	return nil
 }
 
-func (x *QuoteRequest) SetSymbol(v QuoteRequest_Symbol) {
+func (x *QuoteRequest) SetSymbol(v *Symbol) {
 	x.xxx_hidden_Symbol = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 1)
 }
 
 func (x *QuoteRequest) HasSymbol() bool {
 	if x == nil {
 		return false
 	}
-	return protoimpl.X.Present(&(x.XXX_presence[0]), 0)
+	return x.xxx_hidden_Symbol != nil
 }
 
 func (x *QuoteRequest) ClearSymbol() {
-	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 0)
-	x.xxx_hidden_Symbol = QuoteRequest_SYMBOL_UNSPECIFIED
+	x.xxx_hidden_Symbol = nil
 }
 
 type QuoteRequest_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
-	// symbol defines the market symbol to get the quotes for.
-	Symbol *QuoteRequest_Symbol
+	// symbol identifies the market symbol to get the quotes for.
+	Symbol *Symbol
 }
 
 func (b0 QuoteRequest_builder) Build() *QuoteRequest {
 	m0 := &QuoteRequest{}
 	b, x := &b0, m0
 	_, _ = b, x
-	if b.Symbol != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 1)
-		x.xxx_hidden_Symbol = *b.Symbol
-	}
+	x.xxx_hidden_Symbol = b.Symbol
 	return m0
 }
 
@@ -320,13 +265,9 @@ var File_book_irex_pb_market_service_proto protoreflect.FileDescriptor
 
 const file_book_irex_pb_market_service_proto_rawDesc = "" +
 	"\n" +
-	"!book/irex/pb/market_service.proto\x12\tbook.irex\x1a!google/protobuf/go_features.proto\x1a\x19book/irex/pb/market.proto\"x\n" +
-	"\fQuoteRequest\x126\n" +
-	"\x06symbol\x18\x01 \x01(\x0e2\x1e.book.irex.QuoteRequest.SymbolR\x06symbol\"0\n" +
-	"\x06Symbol\x12\x16\n" +
-	"\x12SYMBOL_UNSPECIFIED\x10\x00\x12\x0e\n" +
-	"\n" +
-	"SYMBOL_SPX\x10\x01\"\x9a\x01\n" +
+	"!book/irex/pb/market_service.proto\x12\tbook.irex\x1a!google/protobuf/go_features.proto\x1a\x19book/irex/pb/market.proto\x1a\x19book/irex/pb/symbol.proto\"9\n" +
+	"\fQuoteRequest\x12)\n" +
+	"\x06symbol\x18\x01 \x01(\v2\x11.book.irex.SymbolR\x06symbol\"\x9a\x01\n" +
 	"\rQuoteResponse\x126\n" +
 	"\x06quotes\x18\x01 \x03(\v2\x1e.book.irex.QuoteResponse.QuoteR\x06quotes\x1aQ\n" +
 	"\x05Quote\x12#\n" +
@@ -335,23 +276,22 @@ const file_book_irex_pb_market_service_proto_rawDesc = "" +
 	"\rMarketService\x12<\n" +
 	"\x05Quote\x12\x17.book.irex.QuoteRequest\x1a\x18.book.irex.QuoteResponse\"\x00B+Z!github.com/skhal/lab/book/irex/pb\x92\x03\x05\xd2>\x02\x10\x03b\beditionsp\xe9\a"
 
-var file_book_irex_pb_market_service_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_book_irex_pb_market_service_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
 var file_book_irex_pb_market_service_proto_goTypes = []any{
-	(QuoteRequest_Symbol)(0),    // 0: book.irex.QuoteRequest.Symbol
-	(*QuoteRequest)(nil),        // 1: book.irex.QuoteRequest
-	(*QuoteResponse)(nil),       // 2: book.irex.QuoteResponse
-	(*QuoteResponse_Quote)(nil), // 3: book.irex.QuoteResponse.Quote
+	(*QuoteRequest)(nil),        // 0: book.irex.QuoteRequest
+	(*QuoteResponse)(nil),       // 1: book.irex.QuoteResponse
+	(*QuoteResponse_Quote)(nil), // 2: book.irex.QuoteResponse.Quote
+	(*Symbol)(nil),              // 3: book.irex.Symbol
 	(*Date)(nil),                // 4: book.irex.Date
 	(*Cent)(nil),                // 5: book.irex.Cent
 }
 var file_book_irex_pb_market_service_proto_depIdxs = []int32{
-	0, // 0: book.irex.QuoteRequest.symbol:type_name -> book.irex.QuoteRequest.Symbol
-	3, // 1: book.irex.QuoteResponse.quotes:type_name -> book.irex.QuoteResponse.Quote
+	3, // 0: book.irex.QuoteRequest.symbol:type_name -> book.irex.Symbol
+	2, // 1: book.irex.QuoteResponse.quotes:type_name -> book.irex.QuoteResponse.Quote
 	4, // 2: book.irex.QuoteResponse.Quote.date:type_name -> book.irex.Date
 	5, // 3: book.irex.QuoteResponse.Quote.cent:type_name -> book.irex.Cent
-	1, // 4: book.irex.MarketService.Quote:input_type -> book.irex.QuoteRequest
-	2, // 5: book.irex.MarketService.Quote:output_type -> book.irex.QuoteResponse
+	0, // 4: book.irex.MarketService.Quote:input_type -> book.irex.QuoteRequest
+	1, // 5: book.irex.MarketService.Quote:output_type -> book.irex.QuoteResponse
 	5, // [5:6] is the sub-list for method output_type
 	4, // [4:5] is the sub-list for method input_type
 	4, // [4:4] is the sub-list for extension type_name
@@ -365,19 +305,19 @@ func file_book_irex_pb_market_service_proto_init() {
 		return
 	}
 	file_book_irex_pb_market_proto_init()
+	file_book_irex_pb_symbol_proto_init()
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_book_irex_pb_market_service_proto_rawDesc), len(file_book_irex_pb_market_service_proto_rawDesc)),
-			NumEnums:      1,
+			NumEnums:      0,
 			NumMessages:   3,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
 		GoTypes:           file_book_irex_pb_market_service_proto_goTypes,
 		DependencyIndexes: file_book_irex_pb_market_service_proto_depIdxs,
-		EnumInfos:         file_book_irex_pb_market_service_proto_enumTypes,
 		MessageInfos:      file_book_irex_pb_market_service_proto_msgTypes,
 	}.Build()
 	File_book_irex_pb_market_service_proto = out.File

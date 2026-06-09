@@ -1,0 +1,39 @@
+// Copyright 2026 Samvel Khalatyan. All rights reserved.
+//
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
+edition = "2024";
+
+package book.irex;
+
+import "google/protobuf/go_features.proto";
+import "book/irex/pb/feature.proto";
+import "book/irex/pb/market.proto";
+import "book/irex/pb/symbol.proto";
+
+option features.(.pb.go).api_level = API_OPAQUE;
+option go_package = "github.com/skhal/lab/book/irex/pb";
+
+// PlotFeature is a FRP entity to plot a financial symbol.
+// Next ID: 3
+message PlotFeature {
+  extend Feature {
+    PlotFeature plot_feature = 525010001;
+  }
+
+  // symbol describes a financial entity represented by the plot.
+  Symbol symbol = 1;
+
+  // Quote is a value of the symbol on a specific date.
+  // Next ID: 3
+  message Quote {
+    // date is the calendar day of the quoted value.
+    Date date = 1;
+
+    // cent is the quote value in cents.
+    Cent cent = 2;
+  }
+  // quotes is a list of dated values of the symbol.
+  repeated Quote quotes = 2;
+}

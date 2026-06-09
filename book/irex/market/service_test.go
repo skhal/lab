@@ -39,7 +39,7 @@ func TestService_Quote(t *testing.T) {
 				newQuote(t, 1990, time.January, 31, 101, 102, 103),
 				newQuote(t, 1990, time.February, 28, 201, 202, 203),
 			},
-			req: pb.QuoteRequest_builder{Symbol: pb.QuoteRequest_SYMBOL_SPX.Enum()}.Build(),
+			req: pb.QuoteRequest_builder{Symbol: newIndexSymbol(t, pb.Symbol_IDX_SPX)}.Build(),
 			wantRes: pb.QuoteResponse_builder{
 				Quotes: []*pb.QuoteResponse_Quote{
 					newResponseQuote(t, 1990, time.January, 31, 101),
@@ -89,4 +89,9 @@ func newResponseQuote(t *testing.T, year int32, month time.Month, day int32, cen
 		Date: newDate(t, year, month, day),
 		Cent: pb.Cent_builder{Value: &cent}.Build(),
 	}.Build()
+}
+
+func newIndexSymbol(t *testing.T, idx pb.Symbol_Index) *pb.Symbol {
+	t.Helper()
+	return pb.Symbol_builder{Index: idx.Enum()}.Build()
 }

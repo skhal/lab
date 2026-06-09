@@ -1,0 +1,22 @@
+// Copyright 2026 Samvel Khalatyan. All rights reserved.
+//
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
+edition = "2024";
+
+package book.irex;
+
+import "google/protobuf/go_features.proto";
+import "book/irex/pb/feature.proto";
+
+option features.(.pb.go).api_level = API_OPAQUE;
+option go_package = "github.com/skhal/lab/book/irex/pb";
+
+// Page represents a finance results page with a list of served features.
+//
+// Next ID: 2
+message Page {
+  // features is a list of fulfilled features, to be included on the final page.
+  repeated Feature features = 1;
+}

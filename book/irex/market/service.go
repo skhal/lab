@@ -27,15 +27,24 @@ type Service struct {
 // Quote implements MarketService.Quote RPC endpoint. It retrieves quotes for
 // a requested symbol or returns an error if the symbol is invalid.
 func (svc *Service) Quote(ctx context.Context, req *pb.QuoteRequest) (*pb.QuoteResponse, error) {
-	switch sym := req.GetSymbol(); sym {
-	case pb.QuoteRequest_SYMBOL_SPX:
-		return svc.quoteSPX(ctx, req)
+	switch sym := req.GetSymbol(); sym.WhichSymbolOneof() {
+	case pb.Symbol_Index_case:
+		return svc.quoteIndex(sym)
 	default:
 		return nil, fmt.Errorf("%w: %s", ErrInvalidSymbol, sym)
 	}
 }
 
-func (svc *Service) quoteSPX(context.Context, *pb.QuoteRequest) (*pb.QuoteResponse, error) {
+func (svc *Service) quoteIndex(sym *pb.Symbol) (*pb.QuoteResponse, error) {
+	switch idx := sym.GetIndex(); idx {
+	case pb.Symbol_IDX_SPX:
+		return svc.quoteIndexSPX()
+	default:
+		return nil, fmt.Errorf("%w: %s", ErrInvalidSymbol, sym)
+	}
+}
+
+func (svc *Service) quoteIndexSPX() (*pb.QuoteResponse, error) {
 	quotes := make([]*pb.QuoteResponse_Quote, len(svc.Quotes))
 	for i, q := range svc.Quotes {
 		quotes[i] = pb.QuoteResponse_Quote_builder{

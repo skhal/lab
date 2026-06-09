@@ -31,6 +31,12 @@ func TestRoot(t *testing.T) {
 			wantCode: http.StatusOK,
 			wantErr:  true,
 		},
+		{
+			name:     "get with query param to plot",
+			req:      httptest.NewRequest(http.MethodGet, "/?q=plot+spx", nil),
+			wantCode: http.StatusOK,
+			wantErr:  true,
+		},
 	}
 	for _, tc := range tests {
 		w := httptest.NewRecorder()

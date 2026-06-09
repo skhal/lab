@@ -9,6 +9,7 @@ package book.irex;
 
 import "google/protobuf/go_features.proto";
 import "book/irex/pb/market.proto";
+import "book/irex/pb/symbol.proto";
 
 option features.(.pb.go).api_level = API_OPAQUE;
 option go_package = "github.com/skhal/lab/book/irex/pb";
@@ -22,18 +23,7 @@ service MarketService {
 //
 // Next ID: 2
 message QuoteRequest {
-  // Symbol identifies the market symbol, e.g. SPX for S&P500.
-  //
-  // Next ID: 2
-  enum Symbol {
-    // SYMBOL_UNSPECIFIED means the symbol is not set
-    SYMBOL_UNSPECIFIED = 0;
-
-    // SYMBOL_SPX S&P500 composite index
-    SYMBOL_SPX = 1;
-  }
-
-  // symbol defines the market symbol to get the quotes for.
+  // symbol identifies the market symbol to get the quotes for.
   Symbol symbol = 1;
 }
 
