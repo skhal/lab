@@ -29,10 +29,12 @@ const (
 // QuoteRequest is the request to [MarketService.Quote] endpoint. It defines
 // the symbol to get the market quotes for.
 //
-// Next ID: 2
+// Next ID: 4
 type QuoteRequest struct {
 	state             protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Symbol *Symbol                `protobuf:"bytes,1,opt,name=symbol"`
+	xxx_hidden_Since  *Date                  `protobuf:"bytes,2,opt,name=since"`
+	xxx_hidden_Until  *Date                  `protobuf:"bytes,3,opt,name=until"`
 	unknownFields     protoimpl.UnknownFields
 	sizeCache         protoimpl.SizeCache
 }
@@ -69,8 +71,30 @@ func (x *QuoteRequest) GetSymbol() *Symbol {
 	return nil
 }
 
+func (x *QuoteRequest) GetSince() *Date {
+	if x != nil {
+		return x.xxx_hidden_Since
+	}
+	return nil
+}
+
+func (x *QuoteRequest) GetUntil() *Date {
+	if x != nil {
+		return x.xxx_hidden_Until
+	}
+	return nil
+}
+
 func (x *QuoteRequest) SetSymbol(v *Symbol) {
 	x.xxx_hidden_Symbol = v
+}
+
+func (x *QuoteRequest) SetSince(v *Date) {
+	x.xxx_hidden_Since = v
+}
+
+func (x *QuoteRequest) SetUntil(v *Date) {
+	x.xxx_hidden_Until = v
 }
 
 func (x *QuoteRequest) HasSymbol() bool {
@@ -80,8 +104,30 @@ func (x *QuoteRequest) HasSymbol() bool {
 	return x.xxx_hidden_Symbol != nil
 }
 
+func (x *QuoteRequest) HasSince() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Since != nil
+}
+
+func (x *QuoteRequest) HasUntil() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Until != nil
+}
+
 func (x *QuoteRequest) ClearSymbol() {
 	x.xxx_hidden_Symbol = nil
+}
+
+func (x *QuoteRequest) ClearSince() {
+	x.xxx_hidden_Since = nil
+}
+
+func (x *QuoteRequest) ClearUntil() {
+	x.xxx_hidden_Until = nil
 }
 
 type QuoteRequest_builder struct {
@@ -89,6 +135,10 @@ type QuoteRequest_builder struct {
 
 	// symbol identifies the market symbol to get the quotes for.
 	Symbol *Symbol
+	// since requests the quotes starting form the date.
+	Since *Date
+	// until requests the quotes until the date.
+	Until *Date
 }
 
 func (b0 QuoteRequest_builder) Build() *QuoteRequest {
@@ -96,6 +146,8 @@ func (b0 QuoteRequest_builder) Build() *QuoteRequest {
 	b, x := &b0, m0
 	_, _ = b, x
 	x.xxx_hidden_Symbol = b.Symbol
+	x.xxx_hidden_Since = b.Since
+	x.xxx_hidden_Until = b.Until
 	return m0
 }
 
@@ -265,9 +317,11 @@ var File_book_irex_pb_market_service_proto protoreflect.FileDescriptor
 
 const file_book_irex_pb_market_service_proto_rawDesc = "" +
 	"\n" +
-	"!book/irex/pb/market_service.proto\x12\tbook.irex\x1a!google/protobuf/go_features.proto\x1a\x19book/irex/pb/market.proto\x1a\x19book/irex/pb/symbol.proto\"9\n" +
+	"!book/irex/pb/market_service.proto\x12\tbook.irex\x1a!google/protobuf/go_features.proto\x1a\x19book/irex/pb/market.proto\x1a\x19book/irex/pb/symbol.proto\"\x87\x01\n" +
 	"\fQuoteRequest\x12)\n" +
-	"\x06symbol\x18\x01 \x01(\v2\x11.book.irex.SymbolR\x06symbol\"\x9a\x01\n" +
+	"\x06symbol\x18\x01 \x01(\v2\x11.book.irex.SymbolR\x06symbol\x12%\n" +
+	"\x05since\x18\x02 \x01(\v2\x0f.book.irex.DateR\x05since\x12%\n" +
+	"\x05until\x18\x03 \x01(\v2\x0f.book.irex.DateR\x05until\"\x9a\x01\n" +
 	"\rQuoteResponse\x126\n" +
 	"\x06quotes\x18\x01 \x03(\v2\x1e.book.irex.QuoteResponse.QuoteR\x06quotes\x1aQ\n" +
 	"\x05Quote\x12#\n" +
@@ -287,16 +341,18 @@ var file_book_irex_pb_market_service_proto_goTypes = []any{
 }
 var file_book_irex_pb_market_service_proto_depIdxs = []int32{
 	3, // 0: book.irex.QuoteRequest.symbol:type_name -> book.irex.Symbol
-	2, // 1: book.irex.QuoteResponse.quotes:type_name -> book.irex.QuoteResponse.Quote
-	4, // 2: book.irex.QuoteResponse.Quote.date:type_name -> book.irex.Date
-	5, // 3: book.irex.QuoteResponse.Quote.cent:type_name -> book.irex.Cent
-	0, // 4: book.irex.MarketService.Quote:input_type -> book.irex.QuoteRequest
-	1, // 5: book.irex.MarketService.Quote:output_type -> book.irex.QuoteResponse
-	5, // [5:6] is the sub-list for method output_type
-	4, // [4:5] is the sub-list for method input_type
-	4, // [4:4] is the sub-list for extension type_name
-	4, // [4:4] is the sub-list for extension extendee
-	0, // [0:4] is the sub-list for field type_name
+	4, // 1: book.irex.QuoteRequest.since:type_name -> book.irex.Date
+	4, // 2: book.irex.QuoteRequest.until:type_name -> book.irex.Date
+	2, // 3: book.irex.QuoteResponse.quotes:type_name -> book.irex.QuoteResponse.Quote
+	4, // 4: book.irex.QuoteResponse.Quote.date:type_name -> book.irex.Date
+	5, // 5: book.irex.QuoteResponse.Quote.cent:type_name -> book.irex.Cent
+	0, // 6: book.irex.MarketService.Quote:input_type -> book.irex.QuoteRequest
+	1, // 7: book.irex.MarketService.Quote:output_type -> book.irex.QuoteResponse
+	7, // [7:8] is the sub-list for method output_type
+	6, // [6:7] is the sub-list for method input_type
+	6, // [6:6] is the sub-list for extension type_name
+	6, // [6:6] is the sub-list for extension extendee
+	0, // [0:6] is the sub-list for field type_name
 }
 
 func init() { file_book_irex_pb_market_service_proto_init() }

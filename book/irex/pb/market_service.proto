@@ -21,10 +21,16 @@ service MarketService {
 // QuoteRequest is the request to [MarketService.Quote] endpoint. It defines
 // the symbol to get the market quotes for.
 //
-// Next ID: 2
+// Next ID: 4
 message QuoteRequest {
   // symbol identifies the market symbol to get the quotes for.
   Symbol symbol = 1;
+
+  // since requests the quotes starting form the date.
+  Date since = 2;
+
+  // until requests the quotes until the date.
+  Date until = 3;
 }
 
 // QuoteResponse is the response from [MarketService.Quote] endpoint. It

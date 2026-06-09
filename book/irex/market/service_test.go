@@ -47,6 +47,60 @@ func TestService_Quote(t *testing.T) {
 				},
 			}.Build(),
 		},
+		{
+			name: "spx since date",
+			quotes: []*pb.Quote{
+				newQuote(t, 1990, time.January, 31, 101, 102, 103),
+				newQuote(t, 1990, time.February, 28, 201, 202, 203),
+				newQuote(t, 1990, time.March, 31, 301, 302, 303),
+			},
+			req: pb.QuoteRequest_builder{
+				Symbol: newIndexSymbol(t, pb.Symbol_IDX_SPX),
+				Since:  newDate(t, 1990, time.February, 28),
+			}.Build(),
+			wantRes: pb.QuoteResponse_builder{
+				Quotes: []*pb.QuoteResponse_Quote{
+					newResponseQuote(t, 1990, time.February, 28, 201),
+					newResponseQuote(t, 1990, time.March, 31, 301),
+				},
+			}.Build(),
+		},
+		{
+			name: "spx until date",
+			quotes: []*pb.Quote{
+				newQuote(t, 1990, time.January, 31, 101, 102, 103),
+				newQuote(t, 1990, time.February, 28, 201, 202, 203),
+				newQuote(t, 1990, time.March, 31, 301, 302, 303),
+			},
+			req: pb.QuoteRequest_builder{
+				Symbol: newIndexSymbol(t, pb.Symbol_IDX_SPX),
+				Until:  newDate(t, 1990, time.March, 31),
+			}.Build(),
+			wantRes: pb.QuoteResponse_builder{
+				Quotes: []*pb.QuoteResponse_Quote{
+					newResponseQuote(t, 1990, time.January, 31, 101),
+					newResponseQuote(t, 1990, time.February, 28, 201),
+				},
+			}.Build(),
+		},
+		{
+			name: "spx since and until date",
+			quotes: []*pb.Quote{
+				newQuote(t, 1990, time.January, 31, 101, 102, 103),
+				newQuote(t, 1990, time.February, 28, 201, 202, 203),
+				newQuote(t, 1990, time.March, 31, 301, 302, 303),
+			},
+			req: pb.QuoteRequest_builder{
+				Symbol: newIndexSymbol(t, pb.Symbol_IDX_SPX),
+				Since:  newDate(t, 1990, time.February, 28),
+				Until:  newDate(t, 1990, time.March, 31),
+			}.Build(),
+			wantRes: pb.QuoteResponse_builder{
+				Quotes: []*pb.QuoteResponse_Quote{
+					newResponseQuote(t, 1990, time.February, 28, 201),
+				},
+			}.Build(),
+		},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {

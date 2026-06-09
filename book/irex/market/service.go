@@ -29,28 +29,28 @@ type Service struct {
 func (svc *Service) Quote(ctx context.Context, req *pb.QuoteRequest) (*pb.QuoteResponse, error) {
 	switch sym := req.GetSymbol(); sym.WhichSymbolOneof() {
 	case pb.Symbol_Index_case:
-		return svc.quoteIndex(sym)
+		return svc.quoteIndex(sym, &DateRange{req.GetSince(), req.GetUntil()})
 	default:
 		return nil, fmt.Errorf("%w: %s", ErrInvalidSymbol, sym)
 	}
 }
 
-func (svc *Service) quoteIndex(sym *pb.Symbol) (*pb.QuoteResponse, error) {
+func (svc *Service) quoteIndex(sym *pb.Symbol, dr *DateRange) (*pb.QuoteResponse, error) {
 	switch idx := sym.GetIndex(); idx {
 	case pb.Symbol_IDX_SPX:
-		return svc.quoteIndexSPX()
+		return svc.quoteIndexSPX(dr)
 	default:
 		return nil, fmt.Errorf("%w: %s", ErrInvalidSymbol, sym)
 	}
 }
 
-func (svc *Service) quoteIndexSPX() (*pb.QuoteResponse, error) {
-	quotes := make([]*pb.QuoteResponse_Quote, len(svc.Quotes))
-	for i, q := range svc.Quotes {
-		quotes[i] = pb.QuoteResponse_Quote_builder{
+func (svc *Service) quoteIndexSPX(dr *DateRange) (*pb.QuoteResponse, error) {
+	var quotes []*pb.QuoteResponse_Quote
+	for q := range dr.Quotes(svc.Quotes) {
+		quotes = append(quotes, pb.QuoteResponse_Quote_builder{
 			Date: q.GetDate(),
 			Cent: q.GetSpx(),
-		}.Build()
+		}.Build())
 	}
 	res := pb.QuoteResponse_builder{
 		Quotes: quotes,
