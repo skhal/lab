@@ -14,6 +14,15 @@
 				padding-bottom: 10;
 			}
 		</style>
+		<script>
+			document.addEventListener('keydown', function(e) {
+				if (e.key == '/') {
+					var el = document.getElementById('search-input');
+					el.focus();
+					e.preventDefault();
+				}
+				});
+		</script>
 	</head>
 	<body>
 		{{template "header" .Header}}

@@ -7,10 +7,10 @@ package serve
 
 import (
 	"embed"
-	"io"
 	"net/http"
 
 	"github.com/skhal/lab/book/irex/intent"
+	"github.com/skhal/lab/book/irex/pb"
 	"github.com/skhal/lab/book/irex/query"
 	"github.com/skhal/lab/book/irex/render"
 	"github.com/skhal/lab/book/irex/web/queryparam"
@@ -30,7 +30,7 @@ var (
 func Root(w http.ResponseWriter, req *http.Request) error {
 	q, ok := queryparam.Query(req)
 	if !ok {
-		return serveWelcomePage(w)
+		return render.Render(pb.Page_builder{}.Build(), w, req)
 	}
 	queryIntent, err := query.Understand(q)
 	if err != nil {
@@ -41,15 +41,4 @@ func Root(w http.ResponseWriter, req *http.Request) error {
 		return err
 	}
 	return render.Render(page, w, req)
-}
-
-func serveWelcomePage(w http.ResponseWriter) error {
-	f, err := efs.Open("static/root/index.html")
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-	w.Header().Set(headerContentType, contentTypeTextHTML)
-	_, err = io.Copy(w, f)
-	return err
 }
