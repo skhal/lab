@@ -99,20 +99,31 @@ func (fr *renderer) generateTemplateData() *TemplateData {
 }
 
 func (fr *renderer) plotXaxis(cfg *AxisConfig) *Axis {
-	const guideCount = 4
+	const guideCount = 3
+	guidePositions := func() []int {
+		xx := make([]int, guideCount)
+		position := func(i int) int {
+			switch i {
+			case 0:
+				return cfg.Width
+			case guideCount - 1:
+				return fr.cfg.ViewBox.Width
+			default:
+				return cfg.Width + (fr.cfg.ViewBox.Width-cfg.Width)/(guideCount-1)*i
+			}
+		}
+		for i := range guideCount {
+			xx[i] = position(i)
+		}
+		return xx
+	}()
 	line := func() *Path {
 		y := fr.cfg.ViewBox.Height + cfg.Offset
-		return &Path{
+		p := &Path{
 			Commands: []PathCommand{
 				PathMoveCommand{
 					Point: Point{
 						X: cfg.Width,
-						Y: y - cfg.Width + cfg.TickWidth,
-					},
-				},
-				PathLineCommand{
-					Point: Point{
-						X: cfg.Width,
 						Y: y - cfg.Width,
 					},
 				},
@@ -120,38 +131,43 @@ func (fr *renderer) plotXaxis(cfg *AxisConfig) *Axis {
 					Point: Point{
 						X: fr.cfg.ViewBox.Width,
 						Y: y - cfg.Width,
-					},
-				},
-				PathLineCommand{
-					Point: Point{
-						X: fr.cfg.ViewBox.Width,
-						Y: y - cfg.Width + cfg.TickWidth,
 					},
 				},
 			},
 		}
+		for i, x := range guidePositions {
+			tickWidth := cfg.TickWidth
+			if i > 0 && i+1 < len(guidePositions) {
+				tickWidth /= 2
+			}
+			p.Commands = append(p.Commands,
+				PathMoveCommand{
+					Point: Point{
+						X: x,
+						Y: y - cfg.Width,
+					},
+				},
+				PathLineCommand{
+					Point: Point{
+						X: x,
+						Y: y - cfg.Width + tickWidth,
+					},
+				})
+		}
+		return p
 	}
 	guides := func() *Path {
 		p := &Path{
 			Commands: make([]PathCommand, 2*guideCount),
 		}
-		var x int
-		for i := range guideCount {
-			switch i {
-			case 0:
-				x = cfg.Width
-			case guideCount - 1:
-				x = fr.cfg.ViewBox.Width
-			default:
-				x = cfg.Width + (fr.cfg.ViewBox.Width-cfg.Width)/(guideCount-1)*i
-			}
-			p.Commands[i*2] = PathMoveCommand{
+		for i, x := range guidePositions {
+			p.Commands[2*i] = PathMoveCommand{
 				Point: Point{
 					X: x,
 					Y: 0,
 				},
 			}
-			p.Commands[i*2+1] = PathLineCommand{
+			p.Commands[2*i+1] = PathLineCommand{
 				Point: Point{
 					X: x,
 					Y: fr.cfg.ViewBox.Height - cfg.Width,
@@ -167,19 +183,30 @@ func (fr *renderer) plotXaxis(cfg *AxisConfig) *Axis {
 }
 
 func (fr *renderer) plotYaxis(cfg *AxisConfig) *Axis {
-	const guideCount = 5
+	const guideCount = 4
+	guidePositions := func() []int {
+		yy := make([]int, guideCount)
+		position := func(i int) int {
+			switch i {
+			case 0:
+				return 0
+			case guideCount - 1:
+				return fr.cfg.ViewBox.Height - cfg.Width
+			default:
+				return (fr.cfg.ViewBox.Height - cfg.Width) / (guideCount - 1) * i
+			}
+		}
+		for i := range guideCount {
+			yy[i] = position(i)
+		}
+		return yy
+	}()
 	line := func() *Path {
 		x := cfg.Width - cfg.Offset
-		return &Path{
+		p := &Path{
 			Commands: []PathCommand{
 				PathMoveCommand{
 					Point: Point{
-						X: x - cfg.TickWidth,
-						Y: 0,
-					},
-				},
-				PathLineCommand{
-					Point: Point{
 						X: x,
 						Y: 0,
 					},
@@ -187,32 +214,37 @@ func (fr *renderer) plotYaxis(cfg *AxisConfig) *Axis {
 				PathLineCommand{
 					Point: Point{
 						X: x,
-						Y: fr.cfg.ViewBox.Height - cfg.Width,
-					},
-				},
-				PathLineCommand{
-					Point: Point{
-						X: x - cfg.TickWidth,
 						Y: fr.cfg.ViewBox.Height - cfg.Width,
 					},
 				},
 			},
 		}
+		for i, y := range guidePositions {
+			tickWidth := cfg.TickWidth
+			if i > 0 && i+1 < len(guidePositions) {
+				tickWidth /= 2
+			}
+			p.Commands = append(p.Commands,
+				PathMoveCommand{
+					Point: Point{
+						X: x - tickWidth,
+						Y: y,
+					},
+				},
+				PathLineCommand{
+					Point: Point{
+						X: x,
+						Y: y,
+					},
+				})
+		}
+		return p
 	}
 	guides := func() *Path {
 		p := &Path{
 			Commands: make([]PathCommand, 2*guideCount),
 		}
-		var y int
-		for i := range guideCount {
-			switch i {
-			case 0:
-				y = 0
-			case guideCount - 1:
-				y = fr.cfg.ViewBox.Height - cfg.Width
-			default:
-				y = (fr.cfg.ViewBox.Height - cfg.Width) / (guideCount - 1) * i
-			}
+		for i, y := range guidePositions {
 			p.Commands[2*i] = PathMoveCommand{
 				Point: Point{
 					X: cfg.Width,
