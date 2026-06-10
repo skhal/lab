@@ -8,9 +8,9 @@
 {{define "header"}}
 <div class="header">
 	<form action="/" method="GET">
-		<label for="search">Command:</label>
+		<label for="search" id="search-label">IrEx</label>
 		<input type="search" id="search-input" name="q" value="{{.Search}}">
-		<button>Search</button>
+		<button id="search-button" hidden>Search</button>
 	</form>
 </div>
 {{end}}

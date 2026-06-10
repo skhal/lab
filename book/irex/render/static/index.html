@@ -10,8 +10,20 @@
 		<meta charset="utf-8">
 		<title>IrEx</title>
 		<style>
+			.main-col {
+				width: 900;
+				margin: 0 auto;
+			}
 			.header {
 				padding-bottom: 10;
+				width: 100%;
+			}
+			.header #search-label {
+				font-size: 2em;
+				padding: 1em;
+			}
+			.header #search-input {
+				font-size: 1.5em;
 			}
 		</style>
 		<script>
@@ -25,11 +37,15 @@
 		</script>
 	</head>
 	<body>
-		{{template "header" .Header}}
-		{{range $r := .Renderers}}
-		<div>
-			{{$r.Render}}
+		<div style="text-align:center;">
+			<div class="main-col">
+				{{template "header" .Header}}
+				{{range $r := .Renderers}}
+				<div>
+					{{$r.Render}}
+				</div>
+				{{end}}
+			</div>
 		</div>
-		{{end}}
 	</body>
 </html>
