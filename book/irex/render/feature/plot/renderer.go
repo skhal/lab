@@ -69,8 +69,8 @@ func (fr *renderer) generateTemplateData() *TemplateData {
 			X: fr.axisOffset,
 			Y: fr.height - fr.axisOffset,
 		},
-		Axis: &Axis{
-			X: &Path{
+		X: &Axis{
+			Line: &Path{
 				Move: Point{
 					X: fr.axisOffset,
 					Y: fr.height - fr.axisOffset,
@@ -82,7 +82,9 @@ func (fr *renderer) generateTemplateData() *TemplateData {
 					},
 				},
 			},
-			Y: &Path{
+		},
+		Y: &Axis{
+			Line: &Path{
 				Move: Point{
 					X: fr.axisOffset,
 					Y: fr.axisOffset,
@@ -106,13 +108,10 @@ func (fr *renderer) plot() []Point {
 	return pl.Plot(fr.msg.GetQuotes())
 }
 
-// Axis defines x and y axes.
+// Axis describes a single axis.
 type Axis struct {
-	// X is the x-axis.
-	X *Path
-
-	// Y is the y-axis.
-	Y *Path
+	// Line draws the axis line.
+	Line *Path
 }
 
 // TemplateData is the input data to HTML template.
@@ -123,8 +122,11 @@ type TemplateData struct {
 	// Origin defines the location of the graph origin on the SVG canvas.
 	Origin *Point
 
-	// Axis draws x & y axes in SVG canvas.
-	Axis *Axis
+	// X defines x-axis.
+	X *Axis
+
+	// Y defines y-axis.
+	Y *Axis
 
 	// Path is the plotted line of the quotes.
 	Path *Path
