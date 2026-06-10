@@ -73,11 +73,11 @@ func (fr *renderer) generateTemplateData() *TemplateData {
 			X: &Path{
 				Move: Point{
 					X: fr.axisOffset,
-					Y: fr.axisOffset,
+					Y: fr.height - fr.axisOffset,
 				},
 				Line: []Point{
 					{
-						X: fr.axisOffset,
+						X: fr.width - fr.axisOffset,
 						Y: fr.height - fr.axisOffset,
 					},
 				},
@@ -85,11 +85,11 @@ func (fr *renderer) generateTemplateData() *TemplateData {
 			Y: &Path{
 				Move: Point{
 					X: fr.axisOffset,
-					Y: fr.height - fr.axisOffset,
+					Y: fr.axisOffset,
 				},
 				Line: []Point{
 					{
-						X: fr.width - fr.axisOffset,
+						X: fr.axisOffset,
 						Y: fr.height - fr.axisOffset,
 					},
 				},
