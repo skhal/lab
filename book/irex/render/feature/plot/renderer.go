@@ -21,28 +21,24 @@ var (
 	tmplPlotFeature = template.Must(template.New("index.html").ParseFS(efs, "static/index.html"))
 )
 
-// renderer renders quores from the PlotFeature in SVG format. It adds padding
-// to the SVG box, x and y axes, and uses the plotter to plot the quotes inside
-// the svg view box.
+// renderer renders quores from the PlotFeature in SVG format. It adds x and y
+// axes and uses the plotter to plot the quotes inside the svg view box.
 type renderer struct {
 	msg           *pb.PlotFeature
-	padding       int
 	width, height int
 	axisOffset    int
 }
 
 const (
-	defaultPadding    = 2
-	defaultWidth      = 200
-	defaultHeight     = 100
-	defaultAxisOffset = 5
+	defaultWidth      = 400
+	defaultHeight     = 200
+	defaultAxisOffset = 10
 )
 
 // NewRenderer creates a renderer for PlotFeature.
 func NewRenderer(msg *pb.PlotFeature) *renderer {
 	return &renderer{
 		msg:        msg,
-		padding:    defaultPadding,
 		width:      defaultWidth,
 		height:     defaultHeight,
 		axisOffset: defaultAxisOffset,
@@ -70,31 +66,31 @@ func (fr *renderer) generateTemplateData() *TemplateData {
 			Height: fr.height,
 		},
 		Origin: &Point{
-			X: fr.padding + fr.axisOffset,
-			Y: fr.height - fr.padding - fr.axisOffset,
+			X: fr.axisOffset,
+			Y: fr.height - fr.axisOffset,
 		},
 		Axis: &Axis{
 			X: &Path{
 				Move: Point{
-					X: fr.padding + fr.axisOffset,
-					Y: fr.padding + fr.axisOffset,
+					X: fr.axisOffset,
+					Y: fr.axisOffset,
 				},
 				Line: []Point{
 					{
-						X: fr.padding + fr.axisOffset,
-						Y: fr.height - fr.padding - fr.axisOffset,
+						X: fr.axisOffset,
+						Y: fr.height - fr.axisOffset,
 					},
 				},
 			},
 			Y: &Path{
 				Move: Point{
-					X: fr.padding + fr.axisOffset,
-					Y: fr.height - fr.padding - fr.axisOffset,
+					X: fr.axisOffset,
+					Y: fr.height - fr.axisOffset,
 				},
 				Line: []Point{
 					{
-						X: fr.width - fr.padding - fr.axisOffset,
-						Y: fr.height - fr.padding - fr.axisOffset,
+						X: fr.width - fr.axisOffset,
+						Y: fr.height - fr.axisOffset,
 					},
 				},
 			},
@@ -104,8 +100,8 @@ func (fr *renderer) generateTemplateData() *TemplateData {
 }
 
 func (fr *renderer) plot() []Point {
-	xrange := fr.width - 2*fr.padding - fr.axisOffset
-	yrange := fr.height - 2*fr.padding - fr.axisOffset
+	xrange := fr.width - fr.axisOffset
+	yrange := fr.height - fr.axisOffset
 	pl := NewPlotter(xrange, yrange)
 	return pl.Plot(fr.msg.GetQuotes())
 }
