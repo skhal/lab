@@ -12,19 +12,55 @@ import (
 
 // Path is the SVG path.d attribute.
 type Path struct {
-	// Line is the list of LineTo commands.
-	Line []Point
+	// Commands are path.d commands.
+	Commands []PathCommand
+}
 
-	// Move is the MoveTo command.
-	Move Point
+// PathCommand restricts the types of path commands.
+type PathCommand interface {
+	command()
+}
+
+// pathCommandBase is implements the PathCommand unexported part of the
+// interface. It allows only local path commands to be added to the path.
+type pathCommandBase struct{}
+
+func (pathCommandBase) command() {}
+
+// PathMoveCommand is the MoveTo command of SVG path. It translates to "M X Y".
+type PathMoveCommand struct {
+	pathCommandBase
+
+	// Point is the destination to move to.
+	Point
+}
+
+// String prints the move command.
+func (cmd PathMoveCommand) String() string {
+	return fmt.Sprintf("M %s", cmd.Point)
+}
+
+// PathLineCommand is the LineTo command of SVG path. It translates to "L X Y".
+type PathLineCommand struct {
+	pathCommandBase
+
+	// Point is the destination to draw a line to.
+	Point
+}
+
+// String prints the line command.
+func (cmd PathLineCommand) String() string {
+	return fmt.Sprintf("L %s", cmd.Point)
 }
 
 // String dumps path as a series of commands, starting with MoveTo command.
 func (p Path) String() string {
-	var b strings.Builder
-	fmt.Fprintf(&b, "M %s", p.Move)
-	for _, point := range p.Line {
-		fmt.Fprintf(&b, " L %s", point)
+	if len(p.Commands) == 0 {
+		return ""
 	}
-	return b.String()
+	var b strings.Builder
+	for _, c := range p.Commands {
+		fmt.Fprintf(&b, " %s", c)
+	}
+	return b.String()[1:] // [1:] removes the leading space
 }

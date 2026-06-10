@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/google/go-cmp/cmp"
+	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/skhal/lab/book/irex/pb"
 	"github.com/skhal/lab/book/irex/render/feature/plot"
 )
@@ -20,13 +21,13 @@ func TestPlotter_Plot(t *testing.T) {
 		yrange = 100
 	)
 	type plotter interface {
-		Plot([]*pb.PlotFeature_Quote) []plot.Point
+		Plot([]*pb.PlotFeature_Quote) *plot.Path
 	}
 	tests := []struct {
 		name   string
 		pl     plotter
 		quotes []*pb.PlotFeature_Quote
-		want   []plot.Point
+		want   *plot.Path
 	}{
 		{
 			name: "no quotes",
@@ -39,9 +40,12 @@ func TestPlotter_Plot(t *testing.T) {
 				newQuote(t, 1990, time.January, 31, 101),
 			},
 			// place in the middle of the plot
-			want: []plot.Point{
-				{xrange / 2, yrange / 2},
-			},
+			want: func() *plot.Path {
+				cmds := []plot.PathCommand{
+					plot.PathMoveCommand{Point: plot.Point{X: xrange / 2, Y: yrange / 2}},
+				}
+				return &plot.Path{Commands: cmds}
+			}(),
 		},
 		{
 			name: "two quotes ascend",
@@ -51,10 +55,13 @@ func TestPlotter_Plot(t *testing.T) {
 				newQuote(t, 1990, time.February, 28, 102),
 			},
 			// place in the opposite corners of the plot
-			want: []plot.Point{
-				{0, 0},
-				{200, 100},
-			},
+			want: func() *plot.Path {
+				cmds := []plot.PathCommand{
+					plot.PathMoveCommand{Point: plot.Point{X: 0, Y: 0}},
+					plot.PathLineCommand{Point: plot.Point{X: 200, Y: 100}},
+				}
+				return &plot.Path{Commands: cmds}
+			}(),
 		},
 		{
 			name: "two quotes descend",
@@ -64,10 +71,13 @@ func TestPlotter_Plot(t *testing.T) {
 				newQuote(t, 1990, time.February, 28, 100),
 			},
 			// place in the opposite corners of the plot
-			want: []plot.Point{
-				{0, 100},
-				{200, 0},
-			},
+			want: func() *plot.Path {
+				cmds := []plot.PathCommand{
+					plot.PathMoveCommand{Point: plot.Point{X: 0, Y: 100}},
+					plot.PathLineCommand{Point: plot.Point{X: 200, Y: 0}},
+				}
+				return &plot.Path{Commands: cmds}
+			}(),
 		},
 		{
 			name: "three quotes",
@@ -77,18 +87,24 @@ func TestPlotter_Plot(t *testing.T) {
 				newQuote(t, 1990, time.February, 28, 102),
 				newQuote(t, 1990, time.March, 31, 103),
 			},
-			want: []plot.Point{
-				{0, 0},
-				{100, 50},
-				{200, 100},
-			},
+			want: func() *plot.Path {
+				cmds := []plot.PathCommand{
+					plot.PathMoveCommand{Point: plot.Point{X: 0, Y: 0}},
+					plot.PathLineCommand{Point: plot.Point{X: 100, Y: 50}},
+					plot.PathLineCommand{Point: plot.Point{X: 200, Y: 100}},
+				}
+				return &plot.Path{Commands: cmds}
+			}(),
 		},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			got := tc.pl.Plot(tc.quotes)
 
-			if d := cmp.Diff(tc.want, got); d != "" {
+			opts := []cmp.Option{
+				cmpopts.IgnoreUnexported(plot.PathMoveCommand{}, plot.PathLineCommand{}),
+			}
+			if d := cmp.Diff(tc.want, got, opts...); d != "" {
 				t.Errorf("mismatch (-want +got):\n%s", d)
 				t.Log(tc.quotes)
 			}

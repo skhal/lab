@@ -19,26 +19,28 @@ func TestPath(t *testing.T) {
 	}{
 		{
 			name: "empty",
-			want: "M 0 0",
 		},
 		{
 			name: "move only no points",
-			p:    plot.Path{Move: plot.Point{X: 11, Y: 12}},
+			p: func() plot.Path {
+				cmds := []plot.PathCommand{
+					plot.PathMoveCommand{Point: plot.Point{X: 11, Y: 12}},
+				}
+				return plot.Path{Commands: cmds}
+			}(),
 			want: "M 11 12",
 		},
 		{
 			name: "move and points",
-			p: plot.Path{Move: plot.Point{X: 11, Y: 12}, Line: []plot.Point{
-				{21, 22}, {31, 32},
-			}},
+			p: func() plot.Path {
+				cmds := []plot.PathCommand{
+					plot.PathMoveCommand{Point: plot.Point{X: 11, Y: 12}},
+					plot.PathLineCommand{Point: plot.Point{X: 21, Y: 22}},
+					plot.PathLineCommand{Point: plot.Point{X: 31, Y: 32}},
+				}
+				return plot.Path{Commands: cmds}
+			}(),
 			want: "M 11 12 L 21 22 L 31 32",
-		},
-		{
-			name: "points only no move",
-			p: plot.Path{Line: []plot.Point{
-				{21, 22}, {31, 32},
-			}},
-			want: "M 0 0 L 21 22 L 31 32",
 		},
 	}
 	for _, tc := range tests {

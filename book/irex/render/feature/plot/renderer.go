@@ -94,7 +94,7 @@ func (fr *renderer) generateTemplateData() *TemplateData {
 		},
 		X:    fr.plotXaxis(&fr.cfg.Axis),
 		Y:    fr.plotYaxis(&fr.cfg.Axis),
-		Path: &Path{Line: line},
+		Path: line,
 	}
 }
 
@@ -103,28 +103,38 @@ func (fr *renderer) plotXaxis(cfg *AxisConfig) *Axis {
 	line := func() *Path {
 		y := fr.cfg.ViewBox.Height + cfg.Offset
 		return &Path{
-			Move: Point{
-				X: cfg.Width,
-				Y: y - cfg.Width + cfg.TickWidth,
-			},
-			Line: []Point{
-				{
-					X: cfg.Width,
-					Y: y - cfg.Width,
+			Commands: []PathCommand{
+				PathMoveCommand{
+					Point: Point{
+						X: cfg.Width,
+						Y: y - cfg.Width + cfg.TickWidth,
+					},
 				},
-				{
-					X: fr.cfg.ViewBox.Width,
-					Y: y - cfg.Width,
+				PathLineCommand{
+					Point: Point{
+						X: cfg.Width,
+						Y: y - cfg.Width,
+					},
 				},
-				{
-					X: fr.cfg.ViewBox.Width,
-					Y: y - cfg.Width + cfg.TickWidth,
+				PathLineCommand{
+					Point: Point{
+						X: fr.cfg.ViewBox.Width,
+						Y: y - cfg.Width,
+					},
+				},
+				PathLineCommand{
+					Point: Point{
+						X: fr.cfg.ViewBox.Width,
+						Y: y - cfg.Width + cfg.TickWidth,
+					},
 				},
 			},
 		}
 	}
-	guides := func() []*Path {
-		gg := make([]*Path, guideCount)
+	guides := func() *Path {
+		p := &Path{
+			Commands: make([]PathCommand, 2*guideCount),
+		}
 		var x int
 		for i := range guideCount {
 			switch i {
@@ -135,21 +145,20 @@ func (fr *renderer) plotXaxis(cfg *AxisConfig) *Axis {
 			default:
 				x = cfg.Width + (fr.cfg.ViewBox.Width-cfg.Width)/(guideCount-1)*i
 			}
-			g := &Path{
-				Move: Point{
+			p.Commands[i*2] = PathMoveCommand{
+				Point: Point{
 					X: x,
-					Y: cfg.Width,
-				},
-				Line: []Point{
-					{
-						X: x,
-						Y: fr.cfg.ViewBox.Height - cfg.Width,
-					},
+					Y: 0,
 				},
 			}
-			gg[i] = g
+			p.Commands[i*2+1] = PathLineCommand{
+				Point: Point{
+					X: x,
+					Y: fr.cfg.ViewBox.Height - cfg.Width,
+				},
+			}
 		}
-		return gg
+		return p
 	}
 	return &Axis{
 		Line:   line(),
@@ -162,28 +171,38 @@ func (fr *renderer) plotYaxis(cfg *AxisConfig) *Axis {
 	line := func() *Path {
 		x := cfg.Width - cfg.Offset
 		return &Path{
-			Move: Point{
-				X: x - cfg.TickWidth,
-				Y: 0,
-			},
-			Line: []Point{
-				{
-					X: x,
-					Y: 0,
+			Commands: []PathCommand{
+				PathMoveCommand{
+					Point: Point{
+						X: x - cfg.TickWidth,
+						Y: 0,
+					},
 				},
-				{
-					X: x,
-					Y: fr.cfg.ViewBox.Height - cfg.Width,
+				PathLineCommand{
+					Point: Point{
+						X: x,
+						Y: 0,
+					},
 				},
-				{
-					X: x - cfg.TickWidth,
-					Y: fr.cfg.ViewBox.Height - cfg.Width,
+				PathLineCommand{
+					Point: Point{
+						X: x,
+						Y: fr.cfg.ViewBox.Height - cfg.Width,
+					},
+				},
+				PathLineCommand{
+					Point: Point{
+						X: x - cfg.TickWidth,
+						Y: fr.cfg.ViewBox.Height - cfg.Width,
+					},
 				},
 			},
 		}
 	}
-	guides := func() []*Path {
-		gg := make([]*Path, guideCount)
+	guides := func() *Path {
+		p := &Path{
+			Commands: make([]PathCommand, 2*guideCount),
+		}
 		var y int
 		for i := range guideCount {
 			switch i {
@@ -194,21 +213,20 @@ func (fr *renderer) plotYaxis(cfg *AxisConfig) *Axis {
 			default:
 				y = (fr.cfg.ViewBox.Height - cfg.Width) / (guideCount - 1) * i
 			}
-			g := &Path{
-				Move: Point{
+			p.Commands[2*i] = PathMoveCommand{
+				Point: Point{
 					X: cfg.Width,
 					Y: y,
 				},
-				Line: []Point{
-					{
-						X: fr.cfg.ViewBox.Width,
-						Y: y,
-					},
+			}
+			p.Commands[2*i+1] = PathLineCommand{
+				Point: Point{
+					X: fr.cfg.ViewBox.Width,
+					Y: y,
 				},
 			}
-			gg[i] = g
 		}
-		return gg
+		return p
 	}
 	return &Axis{
 		Line:   line(),
@@ -216,7 +234,7 @@ func (fr *renderer) plotYaxis(cfg *AxisConfig) *Axis {
 	}
 }
 
-func (fr *renderer) plot() []Point {
+func (fr *renderer) plot() *Path {
 	xrange := fr.cfg.ViewBox.Width - fr.cfg.Axis.Width
 	yrange := fr.cfg.ViewBox.Height - fr.cfg.Axis.Width
 	pl := NewPlotter(xrange, yrange)
@@ -229,7 +247,7 @@ type Axis struct {
 	Line *Path
 
 	// Guides is a set of the axis guide lines.
-	Guides []*Path
+	Guides *Path
 }
 
 // TemplateData is the input data to HTML template.

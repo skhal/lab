@@ -26,13 +26,22 @@ func NewPlotter(xrange, yrange int) *plotter {
 }
 
 // Plot plots the quotes and returns a list of points representing the graph.
-func (pl *plotter) Plot(quotes []*pb.PlotFeature_Quote) []Point {
+func (pl *plotter) Plot(quotes []*pb.PlotFeature_Quote) *Path {
 	switch len(quotes) {
 	case 0:
 		return nil
 	case 1:
 		// place a single quote in the middle of the plot
-		return []Point{{int(pl.xrange / 2), int(pl.yrange / 2)}}
+		return &Path{
+			Commands: []PathCommand{
+				PathMoveCommand{
+					Point: Point{
+						X: int(pl.xrange / 2),
+						Y: int(pl.yrange / 2),
+					},
+				},
+			},
+		}
 	}
 	pl.initAxis(quotes)
 	return pl.plot(quotes)
@@ -51,16 +60,26 @@ func (pl *plotter) initAxis(quotes []*pb.PlotFeature_Quote) {
 	}
 }
 
-func (pl *plotter) plot(quotes []*pb.PlotFeature_Quote) []Point {
+func (pl *plotter) plot(quotes []*pb.PlotFeature_Quote) *Path {
+	p := &Path{
+		Commands: make([]PathCommand, len(quotes)),
+	}
 	xtr := NewTransformer(0, pl.xrange/float64(len(quotes)-1))
 	ytr := NewTransformer(pl.ymin, pl.yrange/float64(pl.ymax-pl.ymin))
-	path := make([]Point, len(quotes))
 	for idx, q := range quotes {
 		x := xtr.Transform(float64(idx))
 		y := ytr.Transform(float64(q.GetCent().GetValue()))
-		path[idx] = Point{round(x), round(y)}
+		if idx == 0 {
+			p.Commands[idx] = PathMoveCommand{
+				Point: Point{X: round(x), Y: round(y)},
+			}
+		} else {
+			p.Commands[idx] = PathLineCommand{
+				Point: Point{X: round(x), Y: round(y)},
+			}
+		}
 	}
-	return path
+	return p
 }
 
 func round(x float64) int {

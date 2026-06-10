@@ -8,9 +8,7 @@
 {{define "axis" -}}
 <g>
 	<path d="{{.Line}}" class="axis"/>
-	{{- range .Guides}}
-	<path d="{{.}}" class="guide"/>
-	{{- end}}
+	<path d="{{.Guides}}" class="guide"/>
 </g>
 {{- end}}
 
