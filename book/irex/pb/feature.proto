@@ -21,5 +21,10 @@ message Feature {
     number: 525010001,
     full_name: ".book.irex.PlotFeature.plot_feature",
     type: ".book.irex.PlotFeature",
-  }];
+  },
+   declaration = {
+     number: 525010002,
+     full_name: ".book.irex.PingFeature.ping_feature",
+     type: ".book.irex.PingFeature",
+   }];
 }

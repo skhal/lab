@@ -22,6 +22,8 @@ package pb
 //go:generate protoc book/irex/pb/plot_feature.proto
 //go:generate protoc book/irex/pb/plot_intent.proto
 //go:generate protoc book/irex/pb/symbol.proto
+//go:generate protoc book/irex/pb/ping_intent.proto
+//go:generate protoc book/irex/pb/ping_feature.proto
 // keep-sorted end
 //
 // keep-sorted start

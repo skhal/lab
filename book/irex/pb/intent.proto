@@ -24,5 +24,10 @@ message Intent {
     number: 525000001,
     full_name: ".book.irex.PlotIntent.plot_intent",
     type: ".book.irex.PlotIntent",
-  }];
+  },
+   declaration = {
+     number: 525000002,
+     full_name: ".book.irex.PingIntent.ping_intent",
+     type: ".book.irex.PingIntent",
+   }];
 }

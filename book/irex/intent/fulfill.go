@@ -34,6 +34,10 @@ var fulfillInfos = map[protoreflect.ExtensionType]fulfillInfo{
 		f:   dispatch(fulfillPlotIntent),
 		ext: pb.E_PlotFeature_PlotFeature,
 	},
+	pb.E_PingIntent_PingIntent: {
+		f:   dispatch(fulfillPingIntent),
+		ext: pb.E_PingFeature_PingFeature,
+	},
 }
 
 // Fulfill dispatches the fulfillment to the intent fulfiller using the intent

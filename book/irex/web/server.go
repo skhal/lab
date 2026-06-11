@@ -9,10 +9,15 @@ import (
 	"context"
 	"errors"
 	"log"
+	"net"
 	"net/http"
 	"time"
 
-	"github.com/skhal/lab/book/irex/web/internal/serve"
+	"github.com/skhal/lab/book/irex/intent"
+	"github.com/skhal/lab/book/irex/pb"
+	"github.com/skhal/lab/book/irex/query"
+	"github.com/skhal/lab/book/irex/render"
+	"github.com/skhal/lab/book/irex/web/queryparam"
 )
 
 // ErrServerRuns means the web server already runs (see [Server.Serve]).
@@ -30,9 +35,12 @@ var (
 type Server struct {
 	err        error
 	httpServer *http.Server
+	addr       string
+}
 
-	// Address is the host:port to serve HTTP on.
-	Address string
+// Addr returns the address the server listens on.
+func (s *Server) Addr() string {
+	return s.addr
 }
 
 // Err returns the error from [http.Server.ListenAndServe] if any.
@@ -40,15 +48,37 @@ func (s *Server) Err() error {
 	return s.err
 }
 
-// Serve starts HTTP server listening on [Server.Address] in a goroutine. Use
-// [Server.Err] to check for errors.
-func (s *Server) Serve() error {
+// ListenAndServe starts HTTP server listening on the addr in a goroutine. It
+// pickss up a random port of the address does not have have or set to 0.
+//
+// It returns an error if it fails to bind to the address. Use [Server.Err] to
+// check for server errors.
+func (s *Server) ListenAndServe(addr string) error {
 	if s.httpServer != nil {
 		return ErrServerRuns
 	}
-	h := s.handler()
-	s.serve(h)
+	l, err := net.Listen("tcp", addr)
+	if err != nil {
+		return err
+	}
+	s.addr = l.Addr().String()
+	s.serve(l)
 	return nil
+}
+
+func (s *Server) serve(l net.Listener) {
+	s.httpServer = &http.Server{
+		Addr:         s.addr,
+		Handler:      s.handler(),
+		ReadTimeout:  defaultServerReadTimeout,
+		WriteTimeout: defaultServerWriteTimeout,
+	}
+	go func() {
+		err := s.httpServer.Serve(l)
+		if !errors.Is(err, http.ErrServerClosed) {
+			s.err = err
+		}
+	}()
 }
 
 func (s *Server) handler() http.Handler {
@@ -56,23 +86,8 @@ func (s *Server) handler() http.Handler {
 		return withTimeout(defaultHandleTimeout, handleError(h))
 	}
 	mux := http.NewServeMux()
-	mux.HandleFunc("GET /{$}", wrap(serve.Root))
+	mux.HandleFunc("GET /{$}", wrap(s.handleRoot))
 	return mux
-}
-
-func (s *Server) serve(h http.Handler) {
-	s.httpServer = &http.Server{
-		Addr:         s.Address,
-		Handler:      h,
-		ReadTimeout:  defaultServerReadTimeout,
-		WriteTimeout: defaultServerWriteTimeout,
-	}
-	go func() {
-		err := s.httpServer.ListenAndServe()
-		if !errors.Is(err, http.ErrServerClosed) {
-			s.err = err
-		}
-	}()
 }
 
 // Shutdown gracefully shuts down the server. It returns the error from
@@ -100,4 +115,20 @@ func handleError(h handlerFunc) http.HandlerFunc {
 			log.Println(err)
 		}
 	}
+}
+
+func (s *Server) handleRoot(w http.ResponseWriter, req *http.Request) error {
+	q, ok := queryparam.Query(req)
+	if !ok {
+		return render.Render(pb.Page_builder{}.Build(), w, req)
+	}
+	queryIntent, err := query.Understand(q)
+	if err != nil {
+		return err
+	}
+	page, err := intent.Fulfill(queryIntent)
+	if err != nil {
+		return err
+	}
+	return render.Render(page, w, req)
 }

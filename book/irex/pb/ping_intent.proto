@@ -1,0 +1,26 @@
+// Copyright 2026 Samvel Khalatyan. All rights reserved.
+//
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
+edition = "2024";
+
+package book.irex;
+
+import "google/protobuf/go_features.proto";
+import "book/irex/pb/intent.proto";
+
+option features.(.pb.go).api_level = API_OPAQUE;
+option go_package = "github.com/skhal/lab/book/irex/pb";
+
+// PingIntent describes a user intent to ping the server.
+//
+// Next ID: 2
+message PingIntent {
+  extend Intent {
+    PingIntent ping_intent = 525000002;
+  }
+  // message is the ping command pamaeters, e.g. "hello world" from
+  // "&q=ping+hello+world".
+  string message = 1;
+}

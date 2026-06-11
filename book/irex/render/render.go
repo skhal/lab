@@ -15,6 +15,7 @@ import (
 	"net/http"
 
 	"github.com/skhal/lab/book/irex/pb"
+	"github.com/skhal/lab/book/irex/render/feature/ping"
 	"github.com/skhal/lab/book/irex/render/feature/plot"
 	"github.com/skhal/lab/book/irex/web/queryparam"
 	"google.golang.org/protobuf/proto"
@@ -50,6 +51,7 @@ type renderFunc func(proto.Message) (Renderer, error)
 
 var featureRenderers = map[protoreflect.ExtensionType]renderFunc{
 	pb.E_PlotFeature_PlotFeature: dispatch(plot.NewRenderer),
+	pb.E_PingFeature_PingFeature: dispatch(ping.NewRenderer),
 }
 
 // Render renders features included in the page. It preserves the features

@@ -1,0 +1,50 @@
+
+
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>IrEx</title>
+		<style>
+			.main-col {
+				width: 900;
+				margin: 0 auto;
+			}
+			.header {
+				padding-bottom: 10;
+				width: 100%;
+			}
+			.header #search-label {
+				font-size: 2em;
+				padding: 1em;
+			}
+			.header #search-input {
+				font-size: 1.5em;
+			}
+		</style>
+		<script>
+			document.addEventListener('keydown', function(e) {
+				if (e.key == '/') {
+					var el = document.getElementById('search-input');
+					el.focus();
+					e.preventDefault();
+				}
+				});
+		</script>
+	</head>
+	<body>
+		<div style="text-align:center;">
+			<div class="main-col">
+				
+<div class="header">
+	<form action="/" method="GET">
+		<label for="search" id="search-label">IrEx</label>
+		<input type="search" id="search-input" name="q" value="">
+		<button id="search-button" hidden>Search</button>
+	</form>
+</div>
+
+				
+			</div>
+		</div>
+	</body>
+</html>

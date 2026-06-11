@@ -100,10 +100,10 @@ func (cmd *cmdServe) runMarketServer() (waitFunc, error) {
 	}
 	s := market.NewServer(data)
 
-	fmt.Println("market server: start")
 	if err := s.Serve(); err != nil {
 		return nil, err
 	}
+	fmt.Println("market server: started")
 
 	var wg sync.WaitGroup
 	wg.Go(func() {
@@ -140,12 +140,12 @@ func (cmd *cmdServe) loadMarketData() (*pb.Market, error) {
 }
 
 func (cmd *cmdServe) runWebServer() (waitFunc, error) {
-	s := &web.Server{Address: cmd.addr}
+	s := new(web.Server)
 
-	fmt.Printf("web server: start on %s\n", cmd.addr)
-	if err := s.Serve(); err != nil {
+	if err := s.ListenAndServe(cmd.addr); err != nil {
 		return nil, err
 	}
+	fmt.Printf("web server: started at %s\n", s.Addr())
 
 	var (
 		wg  sync.WaitGroup
