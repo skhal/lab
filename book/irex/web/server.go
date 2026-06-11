@@ -57,7 +57,6 @@ func (s *Server) handler() http.Handler {
 	}
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /{$}", wrap(serve.Root))
-	mux.HandleFunc("/", wrap(serve.NotFound))
 	return mux
 }
 

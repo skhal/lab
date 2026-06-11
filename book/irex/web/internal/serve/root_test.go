@@ -58,3 +58,9 @@ func TestRoot(t *testing.T) {
 		}
 	}
 }
+
+type status int
+
+func (s status) String() string {
+	return http.StatusText(int(s))
+}

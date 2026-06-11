@@ -6,7 +6,6 @@
 package serve
 
 import (
-	"embed"
 	"net/http"
 
 	"github.com/skhal/lab/book/irex/intent"
@@ -14,16 +13,6 @@ import (
 	"github.com/skhal/lab/book/irex/query"
 	"github.com/skhal/lab/book/irex/render"
 	"github.com/skhal/lab/book/irex/web/queryparam"
-)
-
-const (
-	headerContentType   = "Content-Type"
-	contentTypeTextHTML = "text/html;charset=utf-8"
-)
-
-var (
-	//go:embed static
-	efs embed.FS
 )
 
 // Root serves main page.
