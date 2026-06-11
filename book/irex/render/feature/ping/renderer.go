@@ -33,10 +33,10 @@ func NewRenderer(msg *pb.PingFeature) *renderer {
 
 // Render renders the PingFeature.
 // It returns an error if rendering fails.
-func (fr *renderer) Render() (template.HTML, error) {
+func (fr *renderer) Render() (template.HTML, template.JS, error) {
 	var b strings.Builder
 	if err := tmpl.Execute(&b, fr.msg); err != nil {
-		return "", err
+		return "", "", err
 	}
-	return template.HTML(b.String()), nil
+	return template.HTML(b.String()), "", nil
 }

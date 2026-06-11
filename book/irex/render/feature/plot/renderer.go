@@ -70,14 +70,19 @@ func NewRenderer(msg *pb.PlotFeature) *renderer {
 
 // Render plots the feature and returns an SVG with plot.
 // It returns an error if rendering fails.
-func (fr *renderer) Render() (template.HTML, error) {
+func (fr *renderer) Render() (template.HTML, template.JS, error) {
 	d := fr.generateTemplateData()
 	var b strings.Builder
 	if err := tmplPlotFeature.Execute(&b, d); err != nil {
-		return "", err
+		return "", "", err
 	}
-	s := strings.TrimLeftFunc(b.String(), unicode.IsSpace)
-	return template.HTML(s), nil
+	html := strings.TrimLeftFunc(b.String(), unicode.IsSpace)
+	b.Reset()
+	if err := tmplsPlotFeatureJS.Execute(&b, struct{}{}); err != nil {
+		return "", "", err
+	}
+	mjs := b.String()
+	return template.HTML(html), template.JS(mjs), nil
 }
 
 func (fr *renderer) generateTemplateData() *TemplateData {

@@ -44,7 +44,7 @@ var (
 type Renderer interface {
 	// Render renders the feature into HTML. It returns an error if rendering
 	// fails.
-	Render() (template.HTML, error)
+	Render() (template.HTML, template.JS, error)
 }
 
 type renderFunc func(proto.Message) (Renderer, error)
@@ -60,11 +60,15 @@ func Render(p *pb.Page, w http.ResponseWriter, req *http.Request) error {
 	type Header struct {
 		Search string
 	}
+	type Feature struct {
+		HTML     template.HTML
+		JSModule template.JS
+	}
 	d := struct {
-		Header    Header
-		Renderers []Renderer
+		Header   Header
+		Features []*Feature
 	}{
-		Renderers: make([]Renderer, len(p.GetFeatures())),
+		Features: make([]*Feature, len(p.GetFeatures())),
 	}
 	if q, ok := queryparam.Query(req); ok {
 		d.Header.Search = q
@@ -74,7 +78,14 @@ func Render(p *pb.Page, w http.ResponseWriter, req *http.Request) error {
 		if err != nil {
 			return err
 		}
-		d.Renderers[idx] = fr
+		html, mjs, err := fr.Render()
+		if err != nil {
+			return err
+		}
+		d.Features[idx] = &Feature{
+			HTML:     html,
+			JSModule: mjs,
+		}
 	}
 	return tmplPage.Execute(w, d)
 }

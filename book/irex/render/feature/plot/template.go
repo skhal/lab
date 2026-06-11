@@ -84,4 +84,6 @@ var (
 		}
 		return t.Funcs(fmap).ParseFS(efs, "static/index.html")
 	}())
+
+	tmplsPlotFeatureJS = template.Must(template.New("init.js").ParseFS(efs, "static/init.js"))
 )

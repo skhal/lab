@@ -7,6 +7,7 @@ package web
 
 import (
 	"context"
+	"embed"
 	"errors"
 	"log"
 	"net"
@@ -81,12 +82,16 @@ func (s *Server) serve(l net.Listener) {
 	}()
 }
 
+//go:embed static
+var staticFS embed.FS
+
 func (s *Server) handler() http.Handler {
 	wrap := func(h handlerFunc) http.HandlerFunc {
 		return withTimeout(defaultHandleTimeout, handleError(h))
 	}
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /{$}", wrap(s.handleRoot))
+	mux.Handle("GET /static/", http.FileServerFS(staticFS))
 	return mux
 }
 

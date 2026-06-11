@@ -44,36 +44,6 @@
 			fill: none;
 			}
 			]]></style>
-		<script><![CDATA[
-			window.addEventListener("load", (e) => {
-			const svg = document.getElementById("plot-svg");
-			const plotLineGroup = document.getElementById("plot-line-group");
-			const plotLinePath = document.getElementById("plot-line-path");
-			const plotLineRect = document.getElementById("plot-line-rect");
-			const plotLinePointer = document.getElementById("plot-line-pointer");
-			const coords = new Map();
-			for (var d = 0; d < plotLinePath.getTotalLength(); d++) {
-			const p = plotLinePath.getPointAtLength(d);
-			const x = Math.floor(p.x);
-			coords.set(x, p.y);
-			}
-			const pt = svg.createSVGPoint();
-			let lastX = 0;
-			plotLineRect.addEventListener("mousemove", (e) => {
-			pt.x = e.clientX;
-			pt.y = e.clientY;
-			const loc = pt.matrixTransform(plotLineGroup.getScreenCTM().inverse());
-			const x = Math.floor(loc.x);
-			if (lastX == x) { return }
-			lastX = x;
-			if (!coords.has(x)) { return }
-			const y = coords.get(x);
-			plotLinePointer.setAttribute("cx", x);
-			plotLinePointer.setAttribute("cy", y);
-			plotLinePointer.style.visibility="visible";
-			});
-			});
-			]]></script>
 	</defs>
 	<rect x="0" y="0" width="100%" height="100%" class="background"/>
 	{{include "axis" .X | indent "\t"}}

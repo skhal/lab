@@ -20,11 +20,12 @@ var update = flag.Bool("update", false, "update golden files")
 
 func TestRenderer_Render(t *testing.T) {
 	tests := []struct {
-		name    string
-		symbol  *pb.Symbol
-		quotes  []*pb.PlotFeature_Quote
-		golden  labtesting.GoldenFile
-		wantErr error
+		name       string
+		symbol     *pb.Symbol
+		quotes     []*pb.PlotFeature_Quote
+		goldenHTML labtesting.GoldenFile
+		goldenJS   labtesting.GoldenFile
+		wantErr    error
 	}{
 		{
 			name:   "one quote",
@@ -32,7 +33,8 @@ func TestRenderer_Render(t *testing.T) {
 			quotes: []*pb.PlotFeature_Quote{
 				newQuote(t, 1990, time.January, 31, 101),
 			},
-			golden: labtesting.GoldenFile("testdata/one_quote.html"),
+			goldenHTML: labtesting.GoldenFile("testdata/one_quote.html"),
+			goldenJS:   labtesting.GoldenFile("testdata/one_quote.js"),
 		},
 		{
 			name:   "two quotes",
@@ -41,7 +43,8 @@ func TestRenderer_Render(t *testing.T) {
 				newQuote(t, 1990, time.January, 31, 101),
 				newQuote(t, 1990, time.February, 28, 201),
 			},
-			golden: labtesting.GoldenFile("testdata/two_quotes.html"),
+			goldenHTML: labtesting.GoldenFile("testdata/two_quotes.html"),
+			goldenJS:   labtesting.GoldenFile("testdata/two_quotes.js"),
 		},
 	}
 	for _, tc := range tests {
@@ -52,16 +55,20 @@ func TestRenderer_Render(t *testing.T) {
 			}.Build()
 			fr := plot.NewRenderer(msg)
 
-			html, err := fr.Render()
+			html, js, err := fr.Render()
 
 			if !errors.Is(err, tc.wantErr) {
 				t.Errorf("unexpected error '%v'; want '%v'", err, tc.wantErr)
 			}
 			if *update {
-				tc.golden.Write(t, string(html))
+				tc.goldenHTML.Write(t, string(html))
+				tc.goldenJS.Write(t, string(js))
 			}
-			if d := tc.golden.Diff(t, string(html)); d != "" {
-				t.Errorf("mismatch (-want +got):\n%s", d)
+			if d := tc.goldenHTML.Diff(t, string(html)); d != "" {
+				t.Errorf("HTML mismatch (-want +got):\n%s", d)
+			}
+			if d := tc.goldenJS.Diff(t, string(js)); d != "" {
+				t.Errorf("JS mismatch (-want +got):\n%s", d)
 			}
 		})
 	}

@@ -35,14 +35,19 @@
 				}
 				});
 		</script>
+		{{range .Features -}}
+		<script type="module">
+			{{.JSModule}}
+		</script>
+		{{- end}}
 	</head>
 	<body>
 		<div style="text-align:center;">
 			<div class="main-col">
 				{{template "header" .Header}}
-				{{range $r := .Renderers}}
+				{{range .Features}}
 				<div>
-					{{$r.Render}}
+					{{.HTML}}
 				</div>
 				{{end}}
 			</div>
