@@ -16,7 +16,9 @@ class plotter {
     lineGroup;
     linePath;
     lineRect;
-    linePointer;
+    pointerGroup;
+    pointerGuide;
+    pointerCursor;
     coords;
     svgPoint;
     lastX = 0;
@@ -34,9 +36,17 @@ class plotter {
         if (this.lineRect == null) {
             throw new Error(`svg ${this.svg.getAttribute("id")}: missing #plot-line-rect`);
         }
-        this.linePointer = svg.getElementById("plot-line-pointer");
-        if (this.linePointer == null) {
+        this.pointerGroup = svg.getElementById("plot-line-pointer");
+        if (this.pointerGroup == null) {
             throw new Error(`svg ${this.svg.getAttribute("id")}: missing #plot-line-pointer`);
+        }
+        this.pointerGuide = svg.getElementById("plot-line-pointer-guide");
+        if (this.pointerGuide == null) {
+            throw new Error(`svg ${this.svg.getAttribute("id")}: missing #plot-line-guide`);
+        }
+        this.pointerCursor = svg.getElementById("plot-line-pointer-cursor");
+        if (this.pointerCursor == null) {
+            throw new Error(`svg ${this.svg.getAttribute("id")}: missing #plot-line-pointer-cursor`);
         }
         this.coords = coordinatesFrom(this.linePath);
         this.svgPoint = this.svg.createSVGPoint();
@@ -60,9 +70,9 @@ class plotter {
         if (y == undefined) {
             return;
         }
-        this.linePointer.setAttribute("cx", x.toString());
-        this.linePointer.setAttribute("cy", y.toString());
-        this.linePointer.style.visibility = "visible";
+        this.pointerGroup.setAttribute("transform", `translate(${x} 0)`);
+        this.pointerCursor.setAttribute("cy", y.toString());
+        this.pointerGroup.style.visibility = "visible";
     }
 }
 function coordinatesFrom(el) {

@@ -18,7 +18,9 @@ class plotter {
   private lineGroup: SVGGElement;
   private linePath: SVGPathElement;
   private lineRect: SVGRectElement;
-  private linePointer: SVGCircleElement;
+  private pointerGroup: SVGGElement;
+  private pointerGuide: SVGLineElement;
+  private pointerCursor: SVGCircleElement;
   private coords: Map<number, number>;
   private svgPoint: SVGPoint;
   private lastX: number = 0;
@@ -43,12 +45,26 @@ class plotter {
         `svg ${this.svg.getAttribute("id")}: missing #plot-line-rect`,
       );
     }
-    this.linePointer = <SVGCircleElement> svg.getElementById(
-      "plot-line-pointer",
-    );
-    if (this.linePointer == null) {
+    this.pointerGroup = <SVGGElement> svg.getElementById("plot-line-pointer");
+    if (this.pointerGroup == null) {
       throw new Error(
         `svg ${this.svg.getAttribute("id")}: missing #plot-line-pointer`,
+      );
+    }
+    this.pointerGuide = <SVGLineElement> svg.getElementById(
+      "plot-line-pointer-guide",
+    );
+    if (this.pointerGuide == null) {
+      throw new Error(
+        `svg ${this.svg.getAttribute("id")}: missing #plot-line-guide`,
+      );
+    }
+    this.pointerCursor = <SVGCircleElement> svg.getElementById(
+      "plot-line-pointer-cursor",
+    );
+    if (this.pointerCursor == null) {
+      throw new Error(
+        `svg ${this.svg.getAttribute("id")}: missing #plot-line-pointer-cursor`,
       );
     }
     this.coords = coordinatesFrom(this.linePath);
@@ -69,7 +85,7 @@ class plotter {
       this.lineGroup.getScreenCTM()?.inverse(),
     );
     if (loc == null) {
-      throw new Error("failed to get translation matrix")
+      throw new Error("failed to get translation matrix");
     }
     const x = Math.floor(loc.x);
     if (this.lastX == x) {
@@ -80,9 +96,9 @@ class plotter {
     if (y == undefined) {
       return;
     }
-    this.linePointer.setAttribute("cx", x.toString());
-    this.linePointer.setAttribute("cy", y.toString());
-    this.linePointer.style.visibility = "visible";
+    this.pointerGroup.setAttribute("transform", `translate(${x} 0)`);
+    this.pointerCursor.setAttribute("cy", y.toString());
+    this.pointerGroup.style.visibility = "visible";
   }
 }
 

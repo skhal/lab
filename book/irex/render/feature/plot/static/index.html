@@ -8,7 +8,7 @@
 {{define "axis" -}}
 <g>
 	<path d="{{.Line}}" class="axis"/>
-	<path d="{{.Guides}}" class="guide"/>
+	<path d="{{.Guides}}" class="axis-guide"/>
 </g>
 {{- end}}
 
@@ -16,7 +16,10 @@
 <g id="plot-line-group" transform="translate({{.Origin}}) scale(1 -1)">
 	<path id="plot-line-path" d="{{.Path}}" class="line"/>
 	<rect id="plot-line-rect" x="0" y="0" width="100%" height="100%" fill="transparent"/>
-	<circle id="plot-line-pointer" cx="0" cy="0" r="2" stroke="red" stroke-width="1" fill="orange" style="visibility:hidden"/>
+	<g id="plot-line-pointer" style="visibility:hidden">
+		<line id="plot-line-pointer-guide" y2="100%" class="pointer-guide"/>
+		<circle id="plot-line-pointer-cursor" cx="0" cy="0" r="3" class="pointer-cursor"/>
+	</g>
 </g>
 {{- end}}
 
@@ -27,21 +30,30 @@
 			.background {
 			fill: rgb(0 0 200 / 2%);
 			}
-			path.axis {
+			.axis {
 			stroke: black;
 			stroke-width: 0.5;
 			fill: none;
 			}
-			path.guide {
+			.axis-guide {
 			stroke: rgb(121 121 121 / 50%);
 			stroke-width: 0.25;
 			stroke-dasharray: 5 5;
 			fill: none;
 			}
-			path.line {
+			.line {
 			stroke: green;
 			stroke-width: 0.5;
 			fill: none;
+			}
+			.pointer-guide {
+			stroke: rgb(0 200 0 / 20%);
+			stroke-width: 1;
+			}
+			.pointer-cursor {
+			stroke: white;
+			stroke-width: 1;
+			fill: green;
 			}
 			]]></style>
 	</defs>
