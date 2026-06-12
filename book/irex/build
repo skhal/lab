@@ -1,0 +1,81 @@
+#!/bin/sh
+#
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+# build compiles typescript project and runs make on included paths to compress
+# files.
+#
+# SYNOPSIS
+#
+#   build [-w]
+#
+# FLAGS
+#
+#   -w  watch files for changes and build the code along with compression.
+#
+set -e
+
+# includes generates a list of included paths from tsconfig.json.
+includes() {
+  jq '.include[]' ./tsconfig.json \
+    | xargs -n 1 echo \
+    | xargs -n 1 dirname \
+    | xargs -n 1 sh -c 'echo ./$@' sh \
+    | xargs -n 1 ls -1d
+}
+
+# compile compiles typescript project and runs make on the included paths.
+compile() {
+  echo ".. compile typescript"
+  tsgo
+  for p in $(includes); do
+    if [ ! -e ${p}/Makefile ]; then
+      continue
+    fi
+    echo ".. enter $p"
+    make -C ${p}
+  done
+}
+
+# watch compiles typescript project in watch mode and runs make on changed
+# folders.
+watch() {
+  trap "pkill -P $$" INT
+
+  for p in $(includes); do
+    if [ ! -e ${p}/Makefile ]; then
+      continue
+    fi
+    (
+      echo ".. watch ${p}"
+      fswatch -0 -o ${p} \
+        | xargs -0 -n 1 -I {} make -C ${p}
+    ) &
+  done
+
+  echo ".. watch typescript"
+  tsgo -w &
+
+  wait
+}
+
+wflag=false
+while getopts "w" opt; do
+  case "$opt" in
+    w)
+      wflag=true
+      ;;
+    *)
+      ;;
+  esac
+done
+shift $((OPTIND - 1))
+
+if $wflag; then
+  watch
+else
+  compile
+fi

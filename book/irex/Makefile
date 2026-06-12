@@ -6,9 +6,7 @@
 # Flavor: FreeBSD
 
 install: .PHONY
-	@echo ".. compile typescript; \
-		tsgo
+	@./build
 
 watch: .NOTMAIN .PHONY
-	@echo ".. monitor ${.CURDIR} for changes"; \
-		tsgo -w
+	@./build -w
