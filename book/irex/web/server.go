@@ -6,12 +6,15 @@
 package web
 
 import (
+	"compress/gzip"
 	"context"
 	"embed"
 	"errors"
+	"io"
 	"log"
 	"net"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/lpar/gzipped/v2"
@@ -88,7 +91,7 @@ var staticFS embed.FS
 
 func (s *Server) handler() http.Handler {
 	wrap := func(h handlerFunc) http.HandlerFunc {
-		return withTimeout(defaultHandleTimeout, handleError(h))
+		return withTimeout(defaultHandleTimeout, compress(handleError(h)))
 	}
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /{$}", wrap(s.handleRoot))
@@ -121,6 +124,34 @@ func handleError(h handlerFunc) http.HandlerFunc {
 			log.Println(err)
 		}
 	}
+}
+
+func compress(h http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, req *http.Request) {
+		if !acceptEncoding(req) {
+			h(w, req)
+			return
+		}
+		w.Header().Set("Content-Encoding", "gzip")
+		gz := gzip.NewWriter(w)
+		defer gz.Close()
+		gzw := gzipResponseWriter{Writer: gz, ResponseWriter: w}
+		h(gzw, req)
+	}
+}
+
+func acceptEncoding(req *http.Request) bool {
+	return strings.Contains(req.Header.Get("Accept-Encoding"), "gzip")
+}
+
+type gzipResponseWriter struct {
+	io.Writer
+	http.ResponseWriter
+}
+
+// Write implements [io.Writer] interface.
+func (w gzipResponseWriter) Write(b []byte) (int, error) {
+	return w.Writer.Write(b)
 }
 
 func (s *Server) handleRoot(w http.ResponseWriter, req *http.Request) error {
