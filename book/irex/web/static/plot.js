@@ -2,6 +2,7 @@
 //
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
+// Init initializes animation in SVG plot with a given id.
 export function Init(id) {
     const svg = document.getElementById(id);
     if (svg == null) {
