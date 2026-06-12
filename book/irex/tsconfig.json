@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "allowUnreachableCode": false,
+    "allowUnusedLabels": false,
+    "forceConsistentCasingInFileNames": true,
+    "module": "commonjs",
+    "noEmitOnError": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitReturns": true,
+    "paths": { "/static/*": ["./web/static/*"] },
+    "pretty": true,
+    "strict": true,
+    "target": "ES2022"
+  },
+  "include": ["web/static/*.ts", "render/feature/*/static/*.ts"]
+}
