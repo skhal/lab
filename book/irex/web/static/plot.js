@@ -1,11 +1,8 @@
-"use strict";
 // Copyright 2026 Samvel Khalatyan. All rights reserved.
 //
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.Init = Init;
-function Init(id) {
+export function Init(id) {
     const svg = document.getElementById(id);
     if (svg == null) {
         throw new Error(`can't get SVG element #${id}`);
