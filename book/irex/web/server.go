@@ -14,6 +14,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/lpar/gzipped/v2"
 	"github.com/skhal/lab/book/irex/intent"
 	"github.com/skhal/lab/book/irex/pb"
 	"github.com/skhal/lab/book/irex/query"
@@ -91,7 +92,7 @@ func (s *Server) handler() http.Handler {
 	}
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /{$}", wrap(s.handleRoot))
-	mux.Handle("GET /static/", http.FileServerFS(staticFS))
+	mux.Handle("GET /static/", gzipped.FileServer(gzipped.FS(staticFS)))
 	return mux
 }
 
