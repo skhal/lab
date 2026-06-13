@@ -3,12 +3,12 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 // Init initializes animation in SVG plot with a given id.
-export function Init(id) {
+export function Init(id, data) {
     const svg = document.getElementById(id);
     if (svg == null) {
         throw new Error(`can't get SVG element #${id}`);
     }
-    const p = new plotter(svg);
+    const p = new plotter(svg, data);
     p.Run();
 }
 class plotter {
@@ -19,11 +19,15 @@ class plotter {
     pointerGroup;
     pointerGuide;
     pointerCursor;
+    hintVal;
+    hintDate;
     coords;
     svgPoint;
     lastX = 0;
-    constructor(svg) {
+    data;
+    constructor(svg, data) {
         this.svg = svg;
+        this.data = data;
         this.lineGroup = svg.getElementById("plot-line-group");
         if (this.lineGroup == null) {
             throw new Error(`svg ${this.svg.getAttribute("id")}: missing #plot-line-group`);
@@ -47,6 +51,14 @@ class plotter {
         this.pointerCursor = svg.getElementById("plot-line-pointer-cursor");
         if (this.pointerCursor == null) {
             throw new Error(`svg ${this.svg.getAttribute("id")}: missing #plot-line-pointer-cursor`);
+        }
+        this.hintVal = document.getElementById("plot-hint-val");
+        if (this.hintVal == null) {
+            throw new Error(`missing #plot-hint-val`);
+        }
+        this.hintDate = document.getElementById("plot-hint-date");
+        if (this.hintDate == null) {
+            throw new Error(`missing #plot-hint-date`);
         }
         this.coords = coordinatesFrom(this.linePath);
         this.svgPoint = this.svg.createSVGPoint();
@@ -73,6 +85,23 @@ class plotter {
         this.pointerGroup.setAttribute("transform", `translate(${x} 0)`);
         this.pointerCursor.setAttribute("cy", y.toString());
         this.pointerGroup.style.visibility = "visible";
+        const v = this.data.get(x);
+        if (v == undefined) {
+            return;
+        }
+        const val = parseInt(v.c);
+        if (isNaN(val)) {
+            return;
+        }
+        const unix_ts = parseInt(v.d);
+        if (isNaN(unix_ts)) {
+            return;
+        }
+        const quotient = Math.floor(val / 100);
+        const remainder = val % 100;
+        const date = new Date(unix_ts * 1000); // must be milliseconds
+        this.hintDate.textContent = date.toLocaleDateString();
+        this.hintVal.textContent = `${quotient}.${remainder}`;
     }
 }
 function coordinatesFrom(el) {

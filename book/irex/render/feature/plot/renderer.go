@@ -72,13 +72,17 @@ func NewRenderer(msg *pb.PlotFeature) *renderer {
 // It returns an error if rendering fails.
 func (fr *renderer) Render() (template.HTML, template.JS, error) {
 	d := fr.generateTemplateData()
+	return fr.executeTemplates(d)
+}
+
+func (fr *renderer) executeTemplates(d *TemplateData) (template.HTML, template.JS, error) {
 	var b strings.Builder
-	if err := tmplPlotFeature.Execute(&b, d); err != nil {
+	if err := tmplPlotFeature.Execute(&b, d.html); err != nil {
 		return "", "", err
 	}
 	html := strings.TrimLeftFunc(b.String(), unicode.IsSpace)
 	b.Reset()
-	if err := tmplsPlotFeatureJS.Execute(&b, struct{}{}); err != nil {
+	if err := tmplsPlotFeatureJS.Execute(&b, d.js); err != nil {
 		return "", "", err
 	}
 	mjs := b.String()
@@ -86,20 +90,25 @@ func (fr *renderer) Render() (template.HTML, template.JS, error) {
 }
 
 func (fr *renderer) generateTemplateData() *TemplateData {
-	line := fr.plot()
+	line, quotes := fr.plot()
 	return &TemplateData{
-		Title: fr.msg.GetSymbol().String(),
-		ViewBox: &ViewBox{
-			Width:  fr.cfg.ViewBox.Width,
-			Height: fr.cfg.ViewBox.Height,
+		html: &HTMLTemplateData{
+			Title: fr.msg.GetSymbol().String(),
+			ViewBox: &ViewBox{
+				Width:  fr.cfg.ViewBox.Width,
+				Height: fr.cfg.ViewBox.Height,
+			},
+			Origin: &Point{
+				X: fr.cfg.Axis.Width,
+				Y: fr.cfg.ViewBox.Height - fr.cfg.Axis.Width,
+			},
+			X:    fr.plotXaxis(&fr.cfg.Axis),
+			Y:    fr.plotYaxis(&fr.cfg.Axis),
+			Path: line,
 		},
-		Origin: &Point{
-			X: fr.cfg.Axis.Width,
-			Y: fr.cfg.ViewBox.Height - fr.cfg.Axis.Width,
+		js: &JSTemplateData{
+			Quotes: quotes,
 		},
-		X:    fr.plotXaxis(&fr.cfg.Axis),
-		Y:    fr.plotYaxis(&fr.cfg.Axis),
-		Path: line,
 	}
 }
 
@@ -271,7 +280,7 @@ func (fr *renderer) plotYaxis(cfg *AxisConfig) *Axis {
 	}
 }
 
-func (fr *renderer) plot() *Path {
+func (fr *renderer) plot() (*Path, XQuote) {
 	xrange := fr.cfg.ViewBox.Width - fr.cfg.Axis.Width
 	yrange := fr.cfg.ViewBox.Height - fr.cfg.Axis.Width
 	pl := NewPlotter(xrange, yrange)
@@ -287,8 +296,14 @@ type Axis struct {
 	Guides *Path
 }
 
-// TemplateData is the input data to HTML template.
+// TemplateData holds data for HTML and JS templates.
 type TemplateData struct {
+	js   *JSTemplateData
+	html *HTMLTemplateData
+}
+
+// HTMLTemplateData is the input data to HTML template.
+type HTMLTemplateData struct {
 	// ViewBox defines visiple part of the user space in SVG.
 	ViewBox *ViewBox
 
@@ -306,4 +321,10 @@ type TemplateData struct {
 
 	// Title is the name of the plot.
 	Title string
+}
+
+// JSTemplateData is the input data to JS template.
+type JSTemplateData struct {
+	// Quotes associates actual data (Quote) with plot x coordinates.
+	Quotes XQuote
 }

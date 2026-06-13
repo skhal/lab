@@ -7,6 +7,7 @@ package plot
 
 import (
 	"math"
+	"time"
 
 	"github.com/skhal/lab/book/irex/pb"
 )
@@ -25,23 +26,53 @@ func NewPlotter(xrange, yrange int) *plotter {
 	}
 }
 
+// Quote is a data point on the graph. It has a date and the value.
+type Quote struct {
+	// UnixTime is the number of seconds since Jan 1, 1970 UTC.
+	// See [time.Time.Unix].
+	UnixTime int64
+
+	// Cents is the quote value on the date.
+	Cents int32
+}
+
+func newQuote(pbq *pb.PlotFeature_Quote) *Quote {
+	q := &Quote{
+		Cents: pbq.GetCent().GetValue(),
+	}
+	pbd := pbq.GetDate()
+	var hh, mm, ss, ns int
+	d := time.Date(int(pbd.GetYear()), time.Month(pbd.GetMonth()), int(pbd.GetDay()), hh, mm, ss, ns, time.UTC)
+	q.UnixTime = d.Unix()
+	return q
+}
+
+// XQuote is the quote for x coordinate of the line.
+type XQuote map[int]*Quote
+
 // Plot plots the quotes and returns a list of points representing the graph.
-func (pl *plotter) Plot(quotes []*pb.PlotFeature_Quote) *Path {
+func (pl *plotter) Plot(quotes []*pb.PlotFeature_Quote) (*Path, XQuote) {
 	switch len(quotes) {
 	case 0:
-		return nil
+		return nil, nil
 	case 1:
 		// place a single quote in the middle of the plot
-		return &Path{
+		x := int(pl.xrange / 2)
+		p := &Path{
 			Commands: []PathCommand{
 				PathMoveCommand{
 					Point: Point{
-						X: int(pl.xrange / 2),
+						X: x,
 						Y: int(pl.yrange / 2),
 					},
 				},
 			},
 		}
+		q := quotes[0]
+		qq := XQuote{
+			x: newQuote(q),
+		}
+		return p, qq
 	}
 	pl.initAxis(quotes)
 	return pl.plot(quotes)
@@ -60,10 +91,11 @@ func (pl *plotter) initAxis(quotes []*pb.PlotFeature_Quote) {
 	}
 }
 
-func (pl *plotter) plot(quotes []*pb.PlotFeature_Quote) *Path {
+func (pl *plotter) plot(quotes []*pb.PlotFeature_Quote) (*Path, XQuote) {
 	p := &Path{
 		Commands: make([]PathCommand, len(quotes)),
 	}
+	qq := make(XQuote)
 	xtr := NewTransformer(0, pl.xrange/float64(len(quotes)-1))
 	ytr := NewTransformer(pl.ymin, pl.yrange/float64(pl.ymax-pl.ymin))
 	for idx, q := range quotes {
@@ -78,8 +110,9 @@ func (pl *plotter) plot(quotes []*pb.PlotFeature_Quote) *Path {
 				Point: Point{X: round(x), Y: round(y)},
 			}
 		}
+		qq[int(math.Floor(x))] = newQuote(q)
 	}
-	return p
+	return p, qq
 }
 
 func round(x float64) int {
