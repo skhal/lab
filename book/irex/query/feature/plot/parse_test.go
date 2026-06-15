@@ -36,12 +36,12 @@ func TestParse(t *testing.T) {
 		{
 			name: "spx",
 			q:    "spx",
-			want: newPlotIntent(t, newIndexSymbol(t, pb.Symbol_IDX_SPX), nilDate, nilDate),
+			want: newPlotIntent(t, newIndexSymbol(t, pb.Symbol_Index_ID_SPX), nilDate, nilDate),
 		},
 		{
 			name: "since misses date",
 			q:    "spx since",
-			want: newPlotIntent(t, newIndexSymbol(t, pb.Symbol_IDX_SPX), nilDate, nilDate),
+			want: newPlotIntent(t, newIndexSymbol(t, pb.Symbol_Index_ID_SPX), nilDate, nilDate),
 		},
 		{
 			name:    "since has no date",
@@ -51,12 +51,12 @@ func TestParse(t *testing.T) {
 		{
 			name: "with since date",
 			q:    "spx since 1990-01",
-			want: newPlotIntent(t, newIndexSymbol(t, pb.Symbol_IDX_SPX), newDate(t, 1990, time.January, 31), nilDate),
+			want: newPlotIntent(t, newIndexSymbol(t, pb.Symbol_Index_ID_SPX), newDate(t, 1990, time.January, 31), nilDate),
 		},
 		{
 			name: "until misses date",
 			q:    "spx until",
-			want: newPlotIntent(t, newIndexSymbol(t, pb.Symbol_IDX_SPX), nilDate, nilDate),
+			want: newPlotIntent(t, newIndexSymbol(t, pb.Symbol_Index_ID_SPX), nilDate, nilDate),
 		},
 		{
 			name:    "until has no date",
@@ -66,17 +66,17 @@ func TestParse(t *testing.T) {
 		{
 			name: "with until date",
 			q:    "spx until 1990-01",
-			want: newPlotIntent(t, newIndexSymbol(t, pb.Symbol_IDX_SPX), nilDate, newDate(t, 1990, time.January, 31)),
+			want: newPlotIntent(t, newIndexSymbol(t, pb.Symbol_Index_ID_SPX), nilDate, newDate(t, 1990, time.January, 31)),
 		},
 		{
 			name: "index with since and until dates",
 			q:    "spx since 1990-01 until 1995-02",
-			want: newPlotIntent(t, newIndexSymbol(t, pb.Symbol_IDX_SPX), newDate(t, 1990, time.January, 31), newDate(t, 1995, time.February, 28)),
+			want: newPlotIntent(t, newIndexSymbol(t, pb.Symbol_Index_ID_SPX), newDate(t, 1990, time.January, 31), newDate(t, 1995, time.February, 28)),
 		},
 		{
 			name: "index with since and until dates in mixed order",
 			q:    "until 1995-02 spx since 1990-01",
-			want: newPlotIntent(t, newIndexSymbol(t, pb.Symbol_IDX_SPX), newDate(t, 1990, time.January, 31), newDate(t, 1995, time.February, 28)),
+			want: newPlotIntent(t, newIndexSymbol(t, pb.Symbol_Index_ID_SPX), newDate(t, 1990, time.January, 31), newDate(t, 1995, time.February, 28)),
 		},
 	}
 	for _, tc := range tests {
@@ -102,9 +102,13 @@ func newPlotIntent(t *testing.T, s *pb.Symbol, since, until *pb.Date) *pb.PlotIn
 	}.Build()
 }
 
-func newIndexSymbol(t *testing.T, idx pb.Symbol_Index) *pb.Symbol {
+func newIndexSymbol(t *testing.T, idx pb.Symbol_Index_ID) *pb.Symbol {
 	t.Helper()
-	return pb.Symbol_builder{Index: idx.Enum()}.Build()
+	return pb.Symbol_builder{
+		Index: pb.Symbol_Index_builder{
+			Id: &idx,
+		}.Build(),
+	}.Build()
 }
 
 func newDate(t *testing.T, year int32, month time.Month, day int32) *pb.Date {

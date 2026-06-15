@@ -26,55 +26,149 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// Index is a market index, e.g. SPX for S&P500 composite index.
+// ID identifies the market index, e.g. SPX for S&P Composite index.
 //
 // Next ID: 2
-type Symbol_Index int32
+type Symbol_Index_ID int32
 
 const (
-	// IDX_UNSPECIFIED means the index is not set
-	Symbol_IDX_UNSPECIFIED Symbol_Index = 0
-	// IDX_SPX is S&P500 composite index
-	Symbol_IDX_SPX Symbol_Index = 1
+	// ID_UNSPECIFIED means the index is not set.
+	Symbol_Index_ID_UNSPECIFIED Symbol_Index_ID = 0
+	// ID_SPX is S&P Composite index.
+	Symbol_Index_ID_SPX Symbol_Index_ID = 1
 )
 
-// Enum value maps for Symbol_Index.
+// Enum value maps for Symbol_Index_ID.
 var (
-	Symbol_Index_name = map[int32]string{
-		0: "IDX_UNSPECIFIED",
-		1: "IDX_SPX",
+	Symbol_Index_ID_name = map[int32]string{
+		0: "ID_UNSPECIFIED",
+		1: "ID_SPX",
 	}
-	Symbol_Index_value = map[string]int32{
-		"IDX_UNSPECIFIED": 0,
-		"IDX_SPX":         1,
+	Symbol_Index_ID_value = map[string]int32{
+		"ID_UNSPECIFIED": 0,
+		"ID_SPX":         1,
 	}
 )
 
-func (x Symbol_Index) Enum() *Symbol_Index {
-	p := new(Symbol_Index)
+func (x Symbol_Index_ID) Enum() *Symbol_Index_ID {
+	p := new(Symbol_Index_ID)
 	*p = x
 	return p
 }
 
-func (x Symbol_Index) String() string {
+func (x Symbol_Index_ID) String() string {
 	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
 }
 
-func (Symbol_Index) Descriptor() protoreflect.EnumDescriptor {
+func (Symbol_Index_ID) Descriptor() protoreflect.EnumDescriptor {
 	return file_book_irex_pb_symbol_proto_enumTypes[0].Descriptor()
 }
 
-func (Symbol_Index) Type() protoreflect.EnumType {
+func (Symbol_Index_ID) Type() protoreflect.EnumType {
 	return &file_book_irex_pb_symbol_proto_enumTypes[0]
 }
 
-func (x Symbol_Index) Number() protoreflect.EnumNumber {
+func (x Symbol_Index_ID) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Metric identifies one of the financial metrics associated with the index.
+type Symbol_Index_Metric int32
+
+const (
+	// FM_UNSPECIFIED means the metric is not set.
+	Symbol_Index_MET_UNSPECIFIED Symbol_Index_Metric = 0
+	// FM_DIV is dividends.
+	Symbol_Index_MET_DIV Symbol_Index_Metric = 1
+	// FM_EARN is earnings.
+	Symbol_Index_MET_EARN Symbol_Index_Metric = 2
+)
+
+// Enum value maps for Symbol_Index_Metric.
+var (
+	Symbol_Index_Metric_name = map[int32]string{
+		0: "MET_UNSPECIFIED",
+		1: "MET_DIV",
+		2: "MET_EARN",
+	}
+	Symbol_Index_Metric_value = map[string]int32{
+		"MET_UNSPECIFIED": 0,
+		"MET_DIV":         1,
+		"MET_EARN":        2,
+	}
+)
+
+func (x Symbol_Index_Metric) Enum() *Symbol_Index_Metric {
+	p := new(Symbol_Index_Metric)
+	*p = x
+	return p
+}
+
+func (x Symbol_Index_Metric) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (Symbol_Index_Metric) Descriptor() protoreflect.EnumDescriptor {
+	return file_book_irex_pb_symbol_proto_enumTypes[1].Descriptor()
+}
+
+func (Symbol_Index_Metric) Type() protoreflect.EnumType {
+	return &file_book_irex_pb_symbol_proto_enumTypes[1]
+}
+
+func (x Symbol_Index_Metric) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Metric is a market's financial metric.
+//
+// Next ID: 2
+type Symbol_Market_Metric int32
+
+const (
+	// MET_UNSPECIFIED means the metric is not set.
+	Symbol_Market_MET_UNSPECIFIED Symbol_Market_Metric = 0
+	// MET_CPI is the Consumer Price Index.
+	Symbol_Market_MET_CPI Symbol_Market_Metric = 1
+)
+
+// Enum value maps for Symbol_Market_Metric.
+var (
+	Symbol_Market_Metric_name = map[int32]string{
+		0: "MET_UNSPECIFIED",
+		1: "MET_CPI",
+	}
+	Symbol_Market_Metric_value = map[string]int32{
+		"MET_UNSPECIFIED": 0,
+		"MET_CPI":         1,
+	}
+)
+
+func (x Symbol_Market_Metric) Enum() *Symbol_Market_Metric {
+	p := new(Symbol_Market_Metric)
+	*p = x
+	return p
+}
+
+func (x Symbol_Market_Metric) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (Symbol_Market_Metric) Descriptor() protoreflect.EnumDescriptor {
+	return file_book_irex_pb_symbol_proto_enumTypes[2].Descriptor()
+}
+
+func (Symbol_Market_Metric) Type() protoreflect.EnumType {
+	return &file_book_irex_pb_symbol_proto_enumTypes[2]
+}
+
+func (x Symbol_Market_Metric) Number() protoreflect.EnumNumber {
 	return protoreflect.EnumNumber(x)
 }
 
 // Symbol represents one of the market symbols, e.g. index.
 //
-// Next ID: 2
+// Next ID: 3
 type Symbol struct {
 	state                  protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_SymbolOneof isSymbol_SymbolOneof   `protobuf_oneof:"symbol_oneof"`
@@ -107,17 +201,38 @@ func (x *Symbol) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-func (x *Symbol) GetIndex() Symbol_Index {
+func (x *Symbol) GetIndex() *Symbol_Index {
 	if x != nil {
 		if x, ok := x.xxx_hidden_SymbolOneof.(*symbol_Index_); ok {
 			return x.Index
 		}
 	}
-	return Symbol_IDX_UNSPECIFIED
+	return nil
 }
 
-func (x *Symbol) SetIndex(v Symbol_Index) {
+func (x *Symbol) GetMarket() *Symbol_Market {
+	if x != nil {
+		if x, ok := x.xxx_hidden_SymbolOneof.(*symbol_Market_); ok {
+			return x.Market
+		}
+	}
+	return nil
+}
+
+func (x *Symbol) SetIndex(v *Symbol_Index) {
+	if v == nil {
+		x.xxx_hidden_SymbolOneof = nil
+		return
+	}
 	x.xxx_hidden_SymbolOneof = &symbol_Index_{v}
+}
+
+func (x *Symbol) SetMarket(v *Symbol_Market) {
+	if v == nil {
+		x.xxx_hidden_SymbolOneof = nil
+		return
+	}
+	x.xxx_hidden_SymbolOneof = &symbol_Market_{v}
 }
 
 func (x *Symbol) HasSymbolOneof() bool {
@@ -135,6 +250,14 @@ func (x *Symbol) HasIndex() bool {
 	return ok
 }
 
+func (x *Symbol) HasMarket() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.xxx_hidden_SymbolOneof.(*symbol_Market_)
+	return ok
+}
+
 func (x *Symbol) ClearSymbolOneof() {
 	x.xxx_hidden_SymbolOneof = nil
 }
@@ -145,8 +268,15 @@ func (x *Symbol) ClearIndex() {
 	}
 }
 
+func (x *Symbol) ClearMarket() {
+	if _, ok := x.xxx_hidden_SymbolOneof.(*symbol_Market_); ok {
+		x.xxx_hidden_SymbolOneof = nil
+	}
+}
+
 const Symbol_SymbolOneof_not_set_case case_Symbol_SymbolOneof = 0
 const Symbol_Index_case case_Symbol_SymbolOneof = 1
+const Symbol_Market_case case_Symbol_SymbolOneof = 2
 
 func (x *Symbol) WhichSymbolOneof() case_Symbol_SymbolOneof {
 	if x == nil {
@@ -155,6 +285,8 @@ func (x *Symbol) WhichSymbolOneof() case_Symbol_SymbolOneof {
 	switch x.xxx_hidden_SymbolOneof.(type) {
 	case *symbol_Index_:
 		return Symbol_Index_case
+	case *symbol_Market_:
+		return Symbol_Market_case
 	default:
 		return Symbol_SymbolOneof_not_set_case
 	}
@@ -164,7 +296,8 @@ type Symbol_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
 	// Fields of oneof xxx_hidden_SymbolOneof:
-	Index *Symbol_Index
+	Index  *Symbol_Index
+	Market *Symbol_Market
 	// -- end of xxx_hidden_SymbolOneof
 }
 
@@ -173,7 +306,10 @@ func (b0 Symbol_builder) Build() *Symbol {
 	b, x := &b0, m0
 	_, _ = b, x
 	if b.Index != nil {
-		x.xxx_hidden_SymbolOneof = &symbol_Index_{*b.Index}
+		x.xxx_hidden_SymbolOneof = &symbol_Index_{b.Index}
+	}
+	if b.Market != nil {
+		x.xxx_hidden_SymbolOneof = &symbol_Market_{b.Market}
 	}
 	return m0
 }
@@ -193,36 +329,260 @@ type isSymbol_SymbolOneof interface {
 }
 
 type symbol_Index_ struct {
-	Index Symbol_Index `protobuf:"varint,1,opt,name=index,enum=book.irex.Symbol_Index,oneof"`
+	Index *Symbol_Index `protobuf:"bytes,1,opt,name=index,oneof"`
+}
+
+type symbol_Market_ struct {
+	Market *Symbol_Market `protobuf:"bytes,2,opt,name=market,oneof"`
 }
 
 func (*symbol_Index_) isSymbol_SymbolOneof() {}
+
+func (*symbol_Market_) isSymbol_SymbolOneof() {}
+
+// Index describes a market index, e.g. SPX for S&P Composite index. It may
+// include an optional metric such as dividends or earnings.
+//
+// Next ID: 3
+type Symbol_Index struct {
+	state                  protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Id          Symbol_Index_ID        `protobuf:"varint,1,opt,name=id,enum=book.irex.Symbol_Index_ID"`
+	xxx_hidden_Metric      Symbol_Index_Metric    `protobuf:"varint,2,opt,name=metric,enum=book.irex.Symbol_Index_Metric"`
+	XXX_raceDetectHookData protoimpl.RaceDetectHookData
+	XXX_presence           [1]uint32
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
+}
+
+func (x *Symbol_Index) Reset() {
+	*x = Symbol_Index{}
+	mi := &file_book_irex_pb_symbol_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Symbol_Index) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Symbol_Index) ProtoMessage() {}
+
+func (x *Symbol_Index) ProtoReflect() protoreflect.Message {
+	mi := &file_book_irex_pb_symbol_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+func (x *Symbol_Index) GetId() Symbol_Index_ID {
+	if x != nil {
+		if protoimpl.X.Present(&(x.XXX_presence[0]), 0) {
+			return x.xxx_hidden_Id
+		}
+	}
+	return Symbol_Index_ID_UNSPECIFIED
+}
+
+func (x *Symbol_Index) GetMetric() Symbol_Index_Metric {
+	if x != nil {
+		if protoimpl.X.Present(&(x.XXX_presence[0]), 1) {
+			return x.xxx_hidden_Metric
+		}
+	}
+	return Symbol_Index_MET_UNSPECIFIED
+}
+
+func (x *Symbol_Index) SetId(v Symbol_Index_ID) {
+	x.xxx_hidden_Id = v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 2)
+}
+
+func (x *Symbol_Index) SetMetric(v Symbol_Index_Metric) {
+	x.xxx_hidden_Metric = v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 2)
+}
+
+func (x *Symbol_Index) HasId() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 0)
+}
+
+func (x *Symbol_Index) HasMetric() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
+}
+
+func (x *Symbol_Index) ClearId() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 0)
+	x.xxx_hidden_Id = Symbol_Index_ID_UNSPECIFIED
+}
+
+func (x *Symbol_Index) ClearMetric() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
+	x.xxx_hidden_Metric = Symbol_Index_MET_UNSPECIFIED
+}
+
+type Symbol_Index_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// id is the index identifier.
+	Id *Symbol_Index_ID
+	// metric identifies the requested metric for the index.
+	Metric *Symbol_Index_Metric
+}
+
+func (b0 Symbol_Index_builder) Build() *Symbol_Index {
+	m0 := &Symbol_Index{}
+	b, x := &b0, m0
+	_, _ = b, x
+	if b.Id != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 2)
+		x.xxx_hidden_Id = *b.Id
+	}
+	if b.Metric != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 2)
+		x.xxx_hidden_Metric = *b.Metric
+	}
+	return m0
+}
+
+// Market is a broad description of the market.
+//
+// Next ID: 2
+type Symbol_Market struct {
+	state                  protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Metric      Symbol_Market_Metric   `protobuf:"varint,1,opt,name=metric,enum=book.irex.Symbol_Market_Metric"`
+	XXX_raceDetectHookData protoimpl.RaceDetectHookData
+	XXX_presence           [1]uint32
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
+}
+
+func (x *Symbol_Market) Reset() {
+	*x = Symbol_Market{}
+	mi := &file_book_irex_pb_symbol_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Symbol_Market) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Symbol_Market) ProtoMessage() {}
+
+func (x *Symbol_Market) ProtoReflect() protoreflect.Message {
+	mi := &file_book_irex_pb_symbol_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+func (x *Symbol_Market) GetMetric() Symbol_Market_Metric {
+	if x != nil {
+		if protoimpl.X.Present(&(x.XXX_presence[0]), 0) {
+			return x.xxx_hidden_Metric
+		}
+	}
+	return Symbol_Market_MET_UNSPECIFIED
+}
+
+func (x *Symbol_Market) SetMetric(v Symbol_Market_Metric) {
+	x.xxx_hidden_Metric = v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 1)
+}
+
+func (x *Symbol_Market) HasMetric() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 0)
+}
+
+func (x *Symbol_Market) ClearMetric() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 0)
+	x.xxx_hidden_Metric = Symbol_Market_MET_UNSPECIFIED
+}
+
+type Symbol_Market_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Metric is a financial measurement of the market.
+	Metric *Symbol_Market_Metric
+}
+
+func (b0 Symbol_Market_builder) Build() *Symbol_Market {
+	m0 := &Symbol_Market{}
+	b, x := &b0, m0
+	_, _ = b, x
+	if b.Metric != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 1)
+		x.xxx_hidden_Metric = *b.Metric
+	}
+	return m0
+}
 
 var File_book_irex_pb_symbol_proto protoreflect.FileDescriptor
 
 const file_book_irex_pb_symbol_proto_rawDesc = "" +
 	"\n" +
-	"\x19book/irex/pb/symbol.proto\x12\tbook.irex\x1a!google/protobuf/go_features.proto\"t\n" +
+	"\x19book/irex/pb/symbol.proto\x12\tbook.irex\x1a!google/protobuf/go_features.proto\"\xba\x03\n" +
 	"\x06Symbol\x12/\n" +
-	"\x05index\x18\x01 \x01(\x0e2\x17.book.irex.Symbol.IndexH\x00R\x05index\")\n" +
-	"\x05Index\x12\x13\n" +
-	"\x0fIDX_UNSPECIFIED\x10\x00\x12\v\n" +
-	"\aIDX_SPX\x10\x01B\x0e\n" +
+	"\x05index\x18\x01 \x01(\v2\x17.book.irex.Symbol.IndexH\x00R\x05index\x122\n" +
+	"\x06market\x18\x02 \x01(\v2\x18.book.irex.Symbol.MarketH\x00R\x06market\x1a\xcb\x01\n" +
+	"\x05Index\x12*\n" +
+	"\x02id\x18\x01 \x01(\x0e2\x1a.book.irex.Symbol.Index.IDR\x02id\x126\n" +
+	"\x06metric\x18\x02 \x01(\x0e2\x1e.book.irex.Symbol.Index.MetricR\x06metric\"$\n" +
+	"\x02ID\x12\x12\n" +
+	"\x0eID_UNSPECIFIED\x10\x00\x12\n" +
+	"\n" +
+	"\x06ID_SPX\x10\x01\"8\n" +
+	"\x06Metric\x12\x13\n" +
+	"\x0fMET_UNSPECIFIED\x10\x00\x12\v\n" +
+	"\aMET_DIV\x10\x01\x12\f\n" +
+	"\bMET_EARN\x10\x02\x1am\n" +
+	"\x06Market\x127\n" +
+	"\x06metric\x18\x01 \x01(\x0e2\x1f.book.irex.Symbol.Market.MetricR\x06metric\"*\n" +
+	"\x06Metric\x12\x13\n" +
+	"\x0fMET_UNSPECIFIED\x10\x00\x12\v\n" +
+	"\aMET_CPI\x10\x01B\x0e\n" +
 	"\fsymbol_oneofB+Z!github.com/skhal/lab/book/irex/pb\x92\x03\x05\xd2>\x02\x10\x03b\beditionsp\xe9\a"
 
-var file_book_irex_pb_symbol_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_book_irex_pb_symbol_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
+var file_book_irex_pb_symbol_proto_enumTypes = make([]protoimpl.EnumInfo, 3)
+var file_book_irex_pb_symbol_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
 var file_book_irex_pb_symbol_proto_goTypes = []any{
-	(Symbol_Index)(0), // 0: book.irex.Symbol.Index
-	(*Symbol)(nil),    // 1: book.irex.Symbol
+	(Symbol_Index_ID)(0),      // 0: book.irex.Symbol.Index.ID
+	(Symbol_Index_Metric)(0),  // 1: book.irex.Symbol.Index.Metric
+	(Symbol_Market_Metric)(0), // 2: book.irex.Symbol.Market.Metric
+	(*Symbol)(nil),            // 3: book.irex.Symbol
+	(*Symbol_Index)(nil),      // 4: book.irex.Symbol.Index
+	(*Symbol_Market)(nil),     // 5: book.irex.Symbol.Market
 }
 var file_book_irex_pb_symbol_proto_depIdxs = []int32{
-	0, // 0: book.irex.Symbol.index:type_name -> book.irex.Symbol.Index
-	1, // [1:1] is the sub-list for method output_type
-	1, // [1:1] is the sub-list for method input_type
-	1, // [1:1] is the sub-list for extension type_name
-	1, // [1:1] is the sub-list for extension extendee
-	0, // [0:1] is the sub-list for field type_name
+	4, // 0: book.irex.Symbol.index:type_name -> book.irex.Symbol.Index
+	5, // 1: book.irex.Symbol.market:type_name -> book.irex.Symbol.Market
+	0, // 2: book.irex.Symbol.Index.id:type_name -> book.irex.Symbol.Index.ID
+	1, // 3: book.irex.Symbol.Index.metric:type_name -> book.irex.Symbol.Index.Metric
+	2, // 4: book.irex.Symbol.Market.metric:type_name -> book.irex.Symbol.Market.Metric
+	5, // [5:5] is the sub-list for method output_type
+	5, // [5:5] is the sub-list for method input_type
+	5, // [5:5] is the sub-list for extension type_name
+	5, // [5:5] is the sub-list for extension extendee
+	0, // [0:5] is the sub-list for field type_name
 }
 
 func init() { file_book_irex_pb_symbol_proto_init() }
@@ -232,14 +592,15 @@ func file_book_irex_pb_symbol_proto_init() {
 	}
 	file_book_irex_pb_symbol_proto_msgTypes[0].OneofWrappers = []any{
 		(*symbol_Index_)(nil),
+		(*symbol_Market_)(nil),
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_book_irex_pb_symbol_proto_rawDesc), len(file_book_irex_pb_symbol_proto_rawDesc)),
-			NumEnums:      1,
-			NumMessages:   1,
+			NumEnums:      3,
+			NumMessages:   3,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

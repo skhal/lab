@@ -29,7 +29,7 @@ func TestRenderer_Render(t *testing.T) {
 	}{
 		{
 			name:   "one quote",
-			symbol: newIndexSymbol(t, pb.Symbol_IDX_SPX),
+			symbol: newIndexSymbol(t, pb.Symbol_Index_ID_SPX),
 			quotes: []*pb.PlotFeature_Quote{
 				newQuote(t, 1990, time.January, 31, 101),
 			},
@@ -38,7 +38,7 @@ func TestRenderer_Render(t *testing.T) {
 		},
 		{
 			name:   "two quotes",
-			symbol: newIndexSymbol(t, pb.Symbol_IDX_SPX),
+			symbol: newIndexSymbol(t, pb.Symbol_Index_ID_SPX),
 			quotes: []*pb.PlotFeature_Quote{
 				newQuote(t, 1990, time.January, 31, 101),
 				newQuote(t, 1990, time.February, 28, 201),
@@ -74,7 +74,11 @@ func TestRenderer_Render(t *testing.T) {
 	}
 }
 
-func newIndexSymbol(t *testing.T, idx pb.Symbol_Index) *pb.Symbol {
+func newIndexSymbol(t *testing.T, idx pb.Symbol_Index_ID) *pb.Symbol {
 	t.Helper()
-	return pb.Symbol_builder{Index: idx.Enum()}.Build()
+	return pb.Symbol_builder{
+		Index: pb.Symbol_Index_builder{
+			Id: &idx,
+		}.Build(),
+	}.Build()
 }

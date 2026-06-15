@@ -26,8 +26,8 @@ func fulfillPlotIntent(msg *pb.PlotIntent) (*pb.PlotFeature, error) {
 }
 
 func fulfillIndexPlotIntent(sym *pb.Symbol, msg *pb.PlotIntent) (*pb.PlotFeature, error) {
-	switch idx := sym.GetIndex(); idx {
-	case pb.Symbol_IDX_SPX:
+	switch idx := sym.GetIndex(); idx.GetId() {
+	case pb.Symbol_Index_ID_SPX:
 		return fulfillSPXPlot(sym, msg)
 	default:
 		err := fmt.Errorf("fulfill plot intent: %w: index %s", ErrPlotSymbol, idx)

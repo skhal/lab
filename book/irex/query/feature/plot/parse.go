@@ -25,8 +25,8 @@ var (
 	ErrUntilDate = errors.New("invalid until date")
 )
 
-var indexByName = map[string]pb.Symbol_Index{
-	"spx": pb.Symbol_IDX_SPX,
+var indexIdentifierByName = map[string]pb.Symbol_Index_ID{
+	"spx": pb.Symbol_Index_ID_SPX,
 }
 
 // Parse parses plot-command parameters. It returns the intent upon successful
@@ -85,11 +85,15 @@ func (p *parser) parse(fields []string) error {
 				return err
 			}
 		default:
-			idx, ok := indexByName[f]
+			idx, ok := indexIdentifierByName[f]
 			if !ok {
 				break
 			}
-			p.symbol = pb.Symbol_builder{Index: &idx}.Build()
+			p.symbol = pb.Symbol_builder{
+				Index: pb.Symbol_Index_builder{
+					Id: &idx,
+				}.Build(),
+			}.Build()
 		}
 	}
 	return nil

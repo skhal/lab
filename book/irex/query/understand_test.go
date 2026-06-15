@@ -46,7 +46,7 @@ func TestUnderstand(t *testing.T) {
 		{
 			name: "plot spx",
 			q:    "plot spx",
-			want: newPlotIntent(t, newIndexSymbol(t, pb.Symbol_IDX_SPX)),
+			want: newPlotIntent(t, newIndexSymbol(t, pb.Symbol_Index_ID_SPX)),
 		},
 	}
 	for _, tc := range tests {
@@ -71,7 +71,11 @@ func newPlotIntent(t *testing.T, s *pb.Symbol) *pb.Intent {
 	return intent
 }
 
-func newIndexSymbol(t *testing.T, idx pb.Symbol_Index) *pb.Symbol {
+func newIndexSymbol(t *testing.T, idx pb.Symbol_Index_ID) *pb.Symbol {
 	t.Helper()
-	return pb.Symbol_builder{Index: idx.Enum()}.Build()
+	return pb.Symbol_builder{
+		Index: pb.Symbol_Index_builder{
+			Id: &idx,
+		}.Build(),
+	}.Build()
 }

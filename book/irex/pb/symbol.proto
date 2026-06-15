@@ -14,20 +14,65 @@ option go_package = "github.com/skhal/lab/book/irex/pb";
 
 // Symbol represents one of the market symbols, e.g. index.
 //
-// Next ID: 2
+// Next ID: 3
 message Symbol {
-  // Index is a market index, e.g. SPX for S&P500 composite index.
+  // Index describes a market index, e.g. SPX for S&P Composite index. It may
+  // include an optional metric such as dividends or earnings.
+  //
+  // Next ID: 3
+  message Index {
+    // ID identifies the market index, e.g. SPX for S&P Composite index.
+    //
+    // Next ID: 2
+    enum ID {
+      // ID_UNSPECIFIED means the index is not set.
+      ID_UNSPECIFIED = 0;
+
+      // ID_SPX is S&P Composite index.
+      ID_SPX = 1;
+    }
+
+    // id is the index identifier.
+    ID id = 1;
+
+    // Metric identifies one of the financial metrics associated with the index.
+    enum Metric {
+      // FM_UNSPECIFIED means the metric is not set.
+      MET_UNSPECIFIED = 0;
+
+      // FM_DIV is dividends.
+      MET_DIV = 1;
+
+      // FM_EARN is earnings.
+      MET_EARN = 2;
+    }
+
+    // metric identifies the requested metric for the index.
+    Metric metric = 2;
+  }
+
+  // Market is a broad description of the market.
   //
   // Next ID: 2
-  enum Index {
-    // IDX_UNSPECIFIED means the index is not set
-    IDX_UNSPECIFIED = 0;
+  message Market {
+    // Metric is a market's financial metric.
+    //
+    // Next ID: 2
+    enum Metric {
+      // MET_UNSPECIFIED means the metric is not set.
+      MET_UNSPECIFIED = 0;
 
-    // IDX_SPX is S&P500 composite index
-    IDX_SPX = 1;
+      // MET_CPI is the Consumer Price Index.
+      MET_CPI = 1;
+    }
+
+    // Metric is a financial measurement of the market.
+    Metric metric = 1;
   }
 
   oneof symbol_oneof {
     Index index = 1;
+
+    Market market = 2;
   }
 }

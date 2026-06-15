@@ -39,7 +39,7 @@ func TestService_Quote(t *testing.T) {
 				newQuote(t, 1990, time.January, 31, 101, 102, 103),
 				newQuote(t, 1990, time.February, 28, 201, 202, 203),
 			},
-			req: pb.QuoteRequest_builder{Symbol: newIndexSymbol(t, pb.Symbol_IDX_SPX)}.Build(),
+			req: pb.QuoteRequest_builder{Symbol: newIndexSymbol(t, pb.Symbol_Index_ID_SPX)}.Build(),
 			wantRes: pb.QuoteResponse_builder{
 				Quotes: []*pb.QuoteResponse_Quote{
 					newResponseQuote(t, 1990, time.January, 31, 101),
@@ -55,7 +55,7 @@ func TestService_Quote(t *testing.T) {
 				newQuote(t, 1990, time.March, 31, 301, 302, 303),
 			},
 			req: pb.QuoteRequest_builder{
-				Symbol: newIndexSymbol(t, pb.Symbol_IDX_SPX),
+				Symbol: newIndexSymbol(t, pb.Symbol_Index_ID_SPX),
 				Since:  newDate(t, 1990, time.February, 28),
 			}.Build(),
 			wantRes: pb.QuoteResponse_builder{
@@ -73,7 +73,7 @@ func TestService_Quote(t *testing.T) {
 				newQuote(t, 1990, time.March, 31, 301, 302, 303),
 			},
 			req: pb.QuoteRequest_builder{
-				Symbol: newIndexSymbol(t, pb.Symbol_IDX_SPX),
+				Symbol: newIndexSymbol(t, pb.Symbol_Index_ID_SPX),
 				Until:  newDate(t, 1990, time.March, 31),
 			}.Build(),
 			wantRes: pb.QuoteResponse_builder{
@@ -91,7 +91,7 @@ func TestService_Quote(t *testing.T) {
 				newQuote(t, 1990, time.March, 31, 301, 302, 303),
 			},
 			req: pb.QuoteRequest_builder{
-				Symbol: newIndexSymbol(t, pb.Symbol_IDX_SPX),
+				Symbol: newIndexSymbol(t, pb.Symbol_Index_ID_SPX),
 				Since:  newDate(t, 1990, time.February, 28),
 				Until:  newDate(t, 1990, time.March, 31),
 			}.Build(),
@@ -145,7 +145,11 @@ func newResponseQuote(t *testing.T, year int32, month time.Month, day int32, cen
 	}.Build()
 }
 
-func newIndexSymbol(t *testing.T, idx pb.Symbol_Index) *pb.Symbol {
+func newIndexSymbol(t *testing.T, idx pb.Symbol_Index_ID) *pb.Symbol {
 	t.Helper()
-	return pb.Symbol_builder{Index: idx.Enum()}.Build()
+	return pb.Symbol_builder{
+		Index: pb.Symbol_Index_builder{
+			Id: &idx,
+		}.Build(),
+	}.Build()
 }

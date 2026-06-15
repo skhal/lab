@@ -36,8 +36,8 @@ func (svc *Service) Quote(ctx context.Context, req *pb.QuoteRequest) (*pb.QuoteR
 }
 
 func (svc *Service) quoteIndex(sym *pb.Symbol, dr *DateRange) (*pb.QuoteResponse, error) {
-	switch idx := sym.GetIndex(); idx {
-	case pb.Symbol_IDX_SPX:
+	switch idx := sym.GetIndex(); idx.GetId() {
+	case pb.Symbol_Index_ID_SPX:
 		return svc.quoteIndexSPX(dr)
 	default:
 		return nil, fmt.Errorf("%w: %s", ErrInvalidSymbol, sym)
