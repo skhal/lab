@@ -16,14 +16,16 @@ import (
 	"google.golang.org/protobuf/testing/protocmp"
 )
 
+type testCase struct {
+	name    string
+	quotes  []*pb.Quote
+	req     *pb.QuoteRequest
+	wantRes *pb.QuoteResponse
+	wantErr error
+}
+
 func TestService_Quote(t *testing.T) {
-	tests := []struct {
-		name    string
-		quotes  []*pb.Quote
-		req     *pb.QuoteRequest
-		wantRes *pb.QuoteResponse
-		wantErr error
-	}{
+	tests := []testCase{
 		{
 			name: "missing symbol",
 			quotes: []*pb.Quote{
@@ -47,7 +49,7 @@ func TestService_Quote(t *testing.T) {
 			wantErr: service.ErrInvalidIndex,
 		},
 		{
-			name: "missing metric",
+			name: "missing index metric",
 			quotes: []*pb.Quote{
 				newQuote(t, 1990, time.January, 31, 101, 102, 103, 104),
 				newQuote(t, 1990, time.February, 28, 201, 202, 203, 204),
@@ -57,6 +59,23 @@ func TestService_Quote(t *testing.T) {
 			}.Build(),
 			wantErr: service.ErrInvalidMetric,
 		},
+		{
+			name: "missing market metric",
+			quotes: []*pb.Quote{
+				newQuote(t, 1990, time.January, 31, 101, 102, 103, 104),
+				newQuote(t, 1990, time.February, 28, 201, 202, 203, 204),
+			},
+			req: pb.QuoteRequest_builder{
+				Symbol: newMarketMetricSymbol(t, pb.Symbol_Market_MET_UNSPECIFIED),
+			}.Build(),
+			wantErr: service.ErrInvalidMetric,
+		},
+	}
+	testServiceQuote(t, tests)
+}
+
+func TestService_Quote_index(t *testing.T) {
+	tests := []testCase{
 		{
 			name: "spx",
 			quotes: []*pb.Quote{
@@ -160,6 +179,86 @@ func TestService_Quote(t *testing.T) {
 			}.Build(),
 		},
 	}
+	testServiceQuote(t, tests)
+}
+
+func TestService_Quote_market(t *testing.T) {
+	tests := []testCase{
+		{
+			name: "cpi",
+			quotes: []*pb.Quote{
+				newQuote(t, 1990, time.January, 31, 101, 102, 103, 104),
+				newQuote(t, 1990, time.February, 28, 201, 202, 203, 204),
+			},
+			req: pb.QuoteRequest_builder{
+				Symbol: newMarketMetricSymbol(t, pb.Symbol_Market_MET_CPI),
+			}.Build(),
+			wantRes: pb.QuoteResponse_builder{
+				Quotes: []*pb.QuoteResponse_Quote{
+					newResponseQuote(t, 1990, time.January, 31, 104),
+					newResponseQuote(t, 1990, time.February, 28, 204),
+				},
+			}.Build(),
+		},
+		{
+			name: "cpi since date",
+			quotes: []*pb.Quote{
+				newQuote(t, 1990, time.January, 31, 101, 102, 103, 104),
+				newQuote(t, 1990, time.February, 28, 201, 202, 203, 204),
+				newQuote(t, 1990, time.March, 31, 301, 302, 303, 304),
+			},
+			req: pb.QuoteRequest_builder{
+				Symbol: newMarketMetricSymbol(t, pb.Symbol_Market_MET_CPI),
+				Since:  newDate(t, 1990, time.February, 28),
+			}.Build(),
+			wantRes: pb.QuoteResponse_builder{
+				Quotes: []*pb.QuoteResponse_Quote{
+					newResponseQuote(t, 1990, time.February, 28, 204),
+					newResponseQuote(t, 1990, time.March, 31, 304),
+				},
+			}.Build(),
+		},
+		{
+			name: "cpi until date",
+			quotes: []*pb.Quote{
+				newQuote(t, 1990, time.January, 31, 101, 102, 103, 104),
+				newQuote(t, 1990, time.February, 28, 201, 202, 203, 204),
+				newQuote(t, 1990, time.March, 31, 301, 302, 303, 304),
+			},
+			req: pb.QuoteRequest_builder{
+				Symbol: newMarketMetricSymbol(t, pb.Symbol_Market_MET_CPI),
+				Until:  newDate(t, 1990, time.March, 31),
+			}.Build(),
+			wantRes: pb.QuoteResponse_builder{
+				Quotes: []*pb.QuoteResponse_Quote{
+					newResponseQuote(t, 1990, time.January, 31, 104),
+					newResponseQuote(t, 1990, time.February, 28, 204),
+				},
+			}.Build(),
+		},
+		{
+			name: "cpi since and until date",
+			quotes: []*pb.Quote{
+				newQuote(t, 1990, time.January, 31, 101, 102, 103, 104),
+				newQuote(t, 1990, time.February, 28, 201, 202, 203, 204),
+				newQuote(t, 1990, time.March, 31, 301, 302, 303, 304),
+			},
+			req: pb.QuoteRequest_builder{
+				Symbol: newMarketMetricSymbol(t, pb.Symbol_Market_MET_CPI),
+				Since:  newDate(t, 1990, time.February, 28),
+				Until:  newDate(t, 1990, time.March, 31),
+			}.Build(),
+			wantRes: pb.QuoteResponse_builder{
+				Quotes: []*pb.QuoteResponse_Quote{
+					newResponseQuote(t, 1990, time.February, 28, 204),
+				},
+			}.Build(),
+		},
+	}
+	testServiceQuote(t, tests)
+}
+
+func testServiceQuote(t *testing.T, tests []testCase) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			s := service.Service{Quotes: tc.quotes}
@@ -218,6 +317,15 @@ func newIndexMetricSymbol(t *testing.T, idx pb.Symbol_Index_ID, m pb.Symbol_Inde
 	return pb.Symbol_builder{
 		Index: pb.Symbol_Index_builder{
 			Id:     &idx,
+			Metric: &m,
+		}.Build(),
+	}.Build()
+}
+
+func newMarketMetricSymbol(t *testing.T, m pb.Symbol_Market_Metric) *pb.Symbol {
+	t.Helper()
+	return pb.Symbol_builder{
+		Market: pb.Symbol_Market_builder{
 			Metric: &m,
 		}.Build(),
 	}.Build()
