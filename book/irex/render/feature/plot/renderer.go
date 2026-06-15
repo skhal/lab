@@ -281,9 +281,9 @@ func (fr *renderer) plotYaxis(cfg *AxisConfig) *Axis {
 }
 
 func (fr *renderer) plot() (*Path, XQuote) {
-	xrange := fr.cfg.ViewBox.Width - fr.cfg.Axis.Width
-	yrange := fr.cfg.ViewBox.Height - fr.cfg.Axis.Width
-	pl := NewPlotter(xrange, yrange)
+	xrange := float64(fr.cfg.ViewBox.Width - fr.cfg.Axis.Width)
+	yrange := float64(fr.cfg.ViewBox.Height - fr.cfg.Axis.Width)
+	pl := NewPlotter(Scale(xrange, yrange))
 	return pl.Plot(fr.msg.GetQuotes())
 }
 

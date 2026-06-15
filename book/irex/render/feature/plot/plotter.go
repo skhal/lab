@@ -13,17 +13,14 @@ import (
 )
 
 type plotter struct {
-	xrange, yrange float64
-	ymin, ymax     float64
+	tr         Transformer
+	ymin, ymax float64
 }
 
-// NewPlotter creates a plotter to plot the quotes in the box from (0,0) to
-// (xrange, yrange).
-func NewPlotter(xrange, yrange int) *plotter {
-	return &plotter{
-		xrange: float64(xrange),
-		yrange: float64(yrange),
-	}
+// NewPlotter creates a plotter to plot quotes in the virtual coordinates box
+// from (0,0) to (1,1) and translate the coordinates using tr translator.
+func NewPlotter(tr Transformer) *plotter {
+	return &plotter{tr: tr}
 }
 
 // Quote is a data point on the graph. It has a date and the value.
@@ -56,21 +53,22 @@ func (pl *plotter) Plot(quotes []*pb.PlotFeature_Quote) (*Path, XQuote) {
 	case 0:
 		return nil, nil
 	case 1:
+		tr := WithTransformer(pl.tr, Scale(1.0/2, 1.0/2))
 		// place a single quote in the middle of the plot
-		x := int(pl.xrange / 2)
+		x, y := tr.Transform(1, 1)
 		p := &Path{
 			Commands: []PathCommand{
 				PathMoveCommand{
 					Point: Point{
-						X: x,
-						Y: int(pl.yrange / 2),
+						X: round(x),
+						Y: round(y),
 					},
 				},
 			},
 		}
 		q := quotes[0]
 		qq := XQuote{
-			x: newQuote(q),
+			round(x): newQuote(q),
 		}
 		return p, qq
 	}
@@ -96,7 +94,7 @@ func (pl *plotter) plot(quotes []*pb.PlotFeature_Quote) (*Path, XQuote) {
 		Commands: make([]PathCommand, len(quotes)),
 	}
 	qq := make(XQuote)
-	tr := WithTransformer(Translate(0, -pl.ymin), Scale(pl.xrange/float64(len(quotes)-1), pl.yrange/float64(pl.ymax-pl.ymin)))
+	tr := WithTransformer(Translate(0, -pl.ymin), pl.tr, Scale(1/float64(len(quotes)-1), 1/float64(pl.ymax-pl.ymin)))
 	for idx, q := range quotes {
 		x, y := tr.Transform(float64(idx), float64(q.GetCent().GetValue()))
 		if idx == 0 {

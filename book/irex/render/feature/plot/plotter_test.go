@@ -32,11 +32,11 @@ func TestPlotter_Plot(t *testing.T) {
 	}{
 		{
 			name: "no quotes",
-			pl:   plot.NewPlotter(xrange, yrange),
+			pl:   plot.NewPlotter(plot.Scale(xrange, yrange)),
 		},
 		{
 			name: "one quote",
-			pl:   plot.NewPlotter(xrange, yrange),
+			pl:   plot.NewPlotter(plot.Scale(xrange, yrange)),
 			quotes: []*pb.PlotFeature_Quote{
 				newQuote(t, 1990, time.January, 31, 101),
 			},
@@ -56,7 +56,7 @@ func TestPlotter_Plot(t *testing.T) {
 		},
 		{
 			name: "two quotes ascend",
-			pl:   plot.NewPlotter(xrange, yrange),
+			pl:   plot.NewPlotter(plot.Scale(xrange, yrange)),
 			quotes: []*pb.PlotFeature_Quote{
 				newQuote(t, 1990, time.January, 31, 101),
 				newQuote(t, 1990, time.February, 28, 102),
@@ -82,7 +82,7 @@ func TestPlotter_Plot(t *testing.T) {
 		},
 		{
 			name: "two quotes descend",
-			pl:   plot.NewPlotter(xrange, yrange),
+			pl:   plot.NewPlotter(plot.Scale(xrange, yrange)),
 			quotes: []*pb.PlotFeature_Quote{
 				newQuote(t, 1990, time.January, 31, 101),
 				newQuote(t, 1990, time.February, 28, 100),
@@ -108,7 +108,7 @@ func TestPlotter_Plot(t *testing.T) {
 		},
 		{
 			name: "three quotes",
-			pl:   plot.NewPlotter(xrange, yrange),
+			pl:   plot.NewPlotter(plot.Scale(xrange, yrange)),
 			quotes: []*pb.PlotFeature_Quote{
 				newQuote(t, 1990, time.January, 31, 101),
 				newQuote(t, 1990, time.February, 28, 102),
