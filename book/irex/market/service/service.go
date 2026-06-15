@@ -13,8 +13,16 @@ import (
 	"github.com/skhal/lab/book/irex/pb"
 )
 
-// ErrInvalidSymbols means the requested symbol is invalid or unsupported.
-var ErrInvalidSymbol = errors.New("invalid symbol")
+var (
+	// ErrInvalidSymbols means the requested symbol is invalid or unsupported.
+	ErrInvalidSymbol = errors.New("invalid symbol")
+
+	// ErrInvalidIndex means the requested index is invalid or unsupported.
+	ErrInvalidIndex = errors.New("invalid index")
+
+	// ErrInvalidMetric means the requested metric is invalid or unsupported.
+	ErrInvalidMetric = errors.New("invalid metric")
+)
 
 // Service implements MarketService
 type Service struct {
@@ -38,18 +46,29 @@ func (svc *Service) Quote(ctx context.Context, req *pb.QuoteRequest) (*pb.QuoteR
 func (svc *Service) quoteIndex(sym *pb.Symbol, dr *DateRange) (*pb.QuoteResponse, error) {
 	switch idx := sym.GetIndex(); idx.GetId() {
 	case pb.Symbol_Index_ID_SPX:
-		return svc.quoteIndexSPX(dr)
+		return svc.quoteIndexSPX(idx, dr)
 	default:
-		return nil, fmt.Errorf("%w: %s", ErrInvalidSymbol, sym)
+		return nil, fmt.Errorf("%w: %s", ErrInvalidIndex, sym)
 	}
 }
 
-func (svc *Service) quoteIndexSPX(dr *DateRange) (*pb.QuoteResponse, error) {
+func (svc *Service) quoteIndexSPX(idx *pb.Symbol_Index, dr *DateRange) (*pb.QuoteResponse, error) {
+	cents := (*pb.Quote).GetSpx
+	if idx.HasMetric() {
+		switch m := idx.GetMetric(); m {
+		case pb.Symbol_Index_MET_DIV:
+			cents = (*pb.Quote).GetDiv
+		case pb.Symbol_Index_MET_EARN:
+			cents = (*pb.Quote).GetEarn
+		default:
+			return nil, fmt.Errorf("%w: %s", ErrInvalidMetric, m)
+		}
+	}
 	var quotes []*pb.QuoteResponse_Quote
 	for q := range dr.Quotes(svc.Quotes) {
 		quotes = append(quotes, pb.QuoteResponse_Quote_builder{
 			Date: q.GetDate(),
-			Cent: q.GetSpx(),
+			Cent: cents(q),
 		}.Build())
 	}
 	res := pb.QuoteResponse_builder{
