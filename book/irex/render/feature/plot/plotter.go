@@ -13,8 +13,7 @@ import (
 )
 
 type plotter struct {
-	tr         Transformer
-	ymin, ymax float64
+	tr Transformer
 }
 
 // NewPlotter creates a plotter to plot quotes in the virtual coordinates box
@@ -53,8 +52,8 @@ func (pl *plotter) Plot(quotes []*pb.PlotFeature_Quote) (*Path, XQuote) {
 	case 0:
 		return nil, nil
 	case 1:
-		tr := WithTransformer(pl.tr, Scale(1.0/2, 1.0/2))
 		// place a single quote in the middle of the plot
+		tr := WithTransformer(Scale(1.0/2, 1.0/2), pl.tr)
 		x, y := tr.Transform(1, 1)
 		p := &Path{
 			Commands: []PathCommand{
@@ -72,29 +71,31 @@ func (pl *plotter) Plot(quotes []*pb.PlotFeature_Quote) (*Path, XQuote) {
 		}
 		return p, qq
 	}
-	pl.initAxis(quotes)
-	return pl.plot(quotes)
+	tr := pl.initTransformer(quotes)
+	return pl.plot(quotes, tr)
 }
 
-func (pl *plotter) initAxis(quotes []*pb.PlotFeature_Quote) {
-	pl.ymin, pl.ymax = math.MaxFloat64, 0
+func (pl *plotter) initTransformer(quotes []*pb.PlotFeature_Quote) Transformer {
+	var ymin, ymax float64 = math.MaxFloat64, 0
 	for _, q := range quotes {
 		v := float64(q.GetCent().GetValue())
-		if v > pl.ymax {
-			pl.ymax = v
+		if v > ymax {
+			ymax = v
 		}
-		if v < pl.ymin {
-			pl.ymin = v
+		if v < ymin {
+			ymin = v
 		}
 	}
+	sx := 1 / float64(len(quotes)-1)
+	sy := 1 / float64(ymax-ymin)
+	return WithTransformer(Translate(0, -ymin), Scale(sx, sy), pl.tr)
 }
 
-func (pl *plotter) plot(quotes []*pb.PlotFeature_Quote) (*Path, XQuote) {
+func (pl *plotter) plot(quotes []*pb.PlotFeature_Quote, tr Transformer) (*Path, XQuote) {
 	p := &Path{
 		Commands: make([]PathCommand, len(quotes)),
 	}
 	qq := make(XQuote)
-	tr := WithTransformer(Translate(0, -pl.ymin), pl.tr, Scale(1/float64(len(quotes)-1), 1/float64(pl.ymax-pl.ymin)))
 	for idx, q := range quotes {
 		x, y := tr.Transform(float64(idx), float64(q.GetCent().GetValue()))
 		if idx == 0 {
