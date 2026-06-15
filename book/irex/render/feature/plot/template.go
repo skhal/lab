@@ -87,3 +87,45 @@ var (
 
 	tmplsPlotFeatureJS = template.Must(template.New("init.js").ParseFS(efs, "static/init.js"))
 )
+
+// TemplateData holds data for HTML and JS templates.
+type TemplateData struct {
+	js   *JSTemplateData
+	html *HTMLTemplateData
+}
+
+// HTMLTemplateData is the input data to HTML template.
+type HTMLTemplateData struct {
+	// ViewBox defines visiple part of the user space in SVG.
+	ViewBox *ViewBox
+
+	// Origin defines the location of the graph origin on the SVG canvas.
+	Origin *Point
+
+	// X defines x-axis.
+	X *Axis
+
+	// Y defines y-axis.
+	Y *Axis
+
+	// Path is the plotted line of the quotes.
+	Path *Path
+
+	// Title is the name of the plot.
+	Title string
+}
+
+// Axis describes a single axis.
+type Axis struct {
+	// Line draws the axis line.
+	Line *Path
+
+	// Guides is a set of the axis guide lines.
+	Guides *Path
+}
+
+// JSTemplateData is the input data to JS template.
+type JSTemplateData struct {
+	// Quotes associates actual data (Quote) with plot x coordinates.
+	Quotes XQuote
+}
