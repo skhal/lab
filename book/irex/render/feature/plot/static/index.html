@@ -57,7 +57,7 @@
 	</defs>
 	{{include "axis" .X | indent "\t"}}
 	{{include "axis" .Y | indent "\t"}}
-	<g id="plot-line-group" transform="translate({{.Origin}}) scale(1 -1)">
+	<g id="plot-line-group">
 		<path id="plot-line-path" d="{{.Path}}" class="line"/>
 		<rect id="plot-line-rect" x="0" y="0" width="100%" height="100%" fill="transparent"/>
 		<g id="plot-line-pointer" style="visibility:hidden">

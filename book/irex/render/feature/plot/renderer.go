@@ -281,10 +281,41 @@ func (fr *renderer) plotYaxis(cfg *AxisConfig) *Axis {
 }
 
 func (fr *renderer) plot() (*Path, XQuote) {
-	xrange := float64(fr.cfg.ViewBox.Width - fr.cfg.Axis.Width)
-	yrange := float64(fr.cfg.ViewBox.Height - fr.cfg.Axis.Width)
-	pl := NewPlotter(Scale(xrange, yrange))
+	pl := NewPlotter(fr.newTransformer())
 	return pl.Plot(fr.msg.GetQuotes())
+}
+
+// newTransformer creates a transformer to convert cartesian coordinates with
+// the graph in the rectangle (0,0)-(1,1) to SVG rectangle with flipped y-axis.
+//
+// The SVG graph rectangle is the graph visible area without axis, padding,
+// etc. It has the following dimensions:
+//
+//	x: [Axis.Width, ViewBox.Width]
+//	y: [0, ViewBox.Height - Axis.Width]
+//
+// Keep in mind that y-axis runs top-down, i.e. it is flipped.
+//
+// newTransformer transforms the graph into the graph rectangle using two
+// transformations:
+//
+//  1. flip the graph and scale it to the graph rectangle diemsions
+//  2. translate the flipped graph to the left-bottom corner of the graph
+//     rectangle.
+func (fr *renderer) newTransformer() Transformer {
+	// scale up the plot to the graph range and flip the y-axis
+	scale := func() Transformer {
+		xrange := float64(fr.cfg.ViewBox.Width - fr.cfg.Axis.Width)
+		yrange := float64(fr.cfg.ViewBox.Height - fr.cfg.Axis.Width)
+		return Scale(xrange, -yrange)
+	}
+	// move the graph to the left-bottom corner of the graph range.
+	translate := func() Transformer {
+		dx := float64(fr.cfg.Axis.Width)
+		dy := float64(fr.cfg.ViewBox.Height - fr.cfg.Axis.Width)
+		return Translate(dx, dy)
+	}
+	return WithTransformer(scale(), translate())
 }
 
 // Axis describes a single axis.
