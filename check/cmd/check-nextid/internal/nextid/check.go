@@ -207,6 +207,10 @@ func getLastID(node ast.CompositeNode) (uint64, error) {
 			if id := n.Tag.Val; id > lastid {
 				lastid = id
 			}
+		case *ast.OneofNode:
+			if oneofLastID := getOneofLastID(n); oneofLastID > lastid {
+				lastid = oneofLastID
+			}
 		case *ast.ReservedNode:
 			for _, r := range n.Ranges {
 				id, err := getRangeLastID(r)
@@ -220,6 +224,19 @@ func getLastID(node ast.CompositeNode) (uint64, error) {
 		}
 	}
 	return lastid, nil
+}
+
+func getOneofLastID(n *ast.OneofNode) uint64 {
+	var lastid uint64
+	for _, child := range n.Children() {
+		switch c := child.(type) {
+		case *ast.FieldNode:
+			if id := c.Tag.Val; id > lastid {
+				lastid = id
+			}
+		}
+	}
+	return lastid
 }
 
 func getRangeLastID(rn *ast.RangeNode) (uint64, error) {

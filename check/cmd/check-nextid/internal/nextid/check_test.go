@@ -195,6 +195,79 @@ message Test {
 	}
 }
 
+func TestCheckFileNode_oneof(t *testing.T) {
+	tests := []struct {
+		name string
+		code string
+		want error
+	}{
+		{
+			name: "message no next-id",
+			code: `
+edition = "2024";
+package test;
+// a comment without next id
+message Test {
+	oneof test_oneof {
+		int test_one = 1;
+	}
+}
+`,
+		},
+		{
+			name: "message valid next-id",
+			code: `
+edition = "2024";
+package test;
+// Next ID: 2
+message Test {
+	oneof test_oneof {
+		int test_one = 1;
+	}
+}
+`,
+		},
+		{
+			name: "message invalid next-id",
+			code: `
+edition = "2024";
+package test;
+// Next ID: 3
+message Test {
+	oneof test_oneof {
+		int test_one = 1;
+	}
+}
+`,
+			want: nextid.ErrNextID,
+		},
+		{
+			name: "message with next-id and reserved ids",
+			code: `
+edition = "2024";
+package test;
+// Next ID: 3
+message Test {
+	oneof test_oneof {
+		int test_one = 2;
+	}
+	reserved 1;
+}
+`,
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			err := nextid.CheckFileNode(mustParse(t, tc.code))
+
+			if !errors.Is(err, tc.want) {
+				t.Errorf("nextid.CheckFileNode() unexpected error %v; want %v", err, tc.want)
+				t.Log(tc.code)
+			}
+		})
+	}
+}
+
 func TestCheckFileNode_enum(t *testing.T) {
 	tests := []struct {
 		name string
