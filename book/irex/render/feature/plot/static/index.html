@@ -12,17 +12,6 @@
 </g>
 {{- end}}
 
-{{define "plot" -}}
-<g id="plot-line-group" transform="translate({{.Origin}}) scale(1 -1)">
-	<path id="plot-line-path" d="{{.Path}}" class="line"/>
-	<rect id="plot-line-rect" x="0" y="0" width="100%" height="100%" fill="transparent"/>
-	<g id="plot-line-pointer" style="visibility:hidden">
-		<line id="plot-line-pointer-guide" y2="100%" class="pointer-guide"/>
-		<circle id="plot-line-pointer-cursor" cx="0" cy="0" r="3" class="pointer-cursor"/>
-	</g>
-</g>
-{{- end}}
-
 <div style="display: flex;">
 	<div style="flex-grow: 6">
 		<span>{{.Title}}</span>
@@ -68,5 +57,12 @@
 	</defs>
 	{{include "axis" .X | indent "\t"}}
 	{{include "axis" .Y | indent "\t"}}
-	{{include "plot" .  | indent "\t"}}
+	<g id="plot-line-group" transform="translate({{.Origin}}) scale(1 -1)">
+		<path id="plot-line-path" d="{{.Path}}" class="line"/>
+		<rect id="plot-line-rect" x="0" y="0" width="100%" height="100%" fill="transparent"/>
+		<g id="plot-line-pointer" style="visibility:hidden">
+			<line id="plot-line-pointer-guide" y2="100%" class="pointer-guide"/>
+			<circle id="plot-line-pointer-cursor" cx="0" cy="0" r="3" class="pointer-cursor"/>
+		</g>
+	</g>
 </svg>
