@@ -3,7 +3,8 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package intent
+// Package plot fulfills the plot feature.
+package plot
 
 import (
 	"errors"
@@ -16,7 +17,9 @@ import (
 // ErrPlotSymbol means the financial identifier is unsupported.
 var ErrPlotSymbol = errors.New("unsupported symbol")
 
-func fulfillPlotIntent(msg *pb.PlotIntent) (*pb.PlotFeature, error) {
+// Fulfill returns a list of quotes for the requested symbol. It returns an
+// error if the requested symbol is not supported.
+func Fulfill(msg *pb.PlotIntent) (*pb.PlotFeature, error) {
 	switch sym := msg.GetSymbol(); sym.WhichSymbolOneof() {
 	case pb.Symbol_Index_case:
 		return fulfillIndexPlotIntent(sym, msg)

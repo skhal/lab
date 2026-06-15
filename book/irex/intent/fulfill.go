@@ -9,6 +9,8 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/skhal/lab/book/irex/intent/feature/ping"
+	"github.com/skhal/lab/book/irex/intent/feature/plot"
 	"github.com/skhal/lab/book/irex/pb"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protoreflect"
@@ -31,11 +33,11 @@ type fulfillInfo struct {
 
 var fulfillInfos = map[protoreflect.ExtensionType]fulfillInfo{
 	pb.E_PlotIntent_PlotIntent: {
-		f:   dispatch(fulfillPlotIntent),
+		f:   dispatch(plot.Fulfill),
 		ext: pb.E_PlotFeature_PlotFeature,
 	},
 	pb.E_PingIntent_PingIntent: {
-		f:   dispatch(fulfillPingIntent),
+		f:   dispatch(ping.Fulfill),
 		ext: pb.E_PingFeature_PingFeature,
 	},
 }

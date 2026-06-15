@@ -3,7 +3,8 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package intent
+// Package ping fulfills the ping feature.
+package ping
 
 import (
 	"strings"
@@ -12,8 +13,13 @@ import (
 	"github.com/skhal/lab/book/irex/pb"
 )
 
-func fulfillPingIntent(msg *pb.PingIntent) (*pb.PingFeature, error) {
+// Fulfilll reverses the message in the ping intent. The returned ping feature
+// includes the requested message (ping) along with the reversed value (pong).
+func Fulfill(msg *pb.PingIntent) (*pb.PingFeature, error) {
 	s := msg.GetMessage()
+	if s == "" {
+		return &pb.PingFeature{}, nil
+	}
 	return pb.PingFeature_builder{
 		Ping: &s,
 		Pong: new(reverse(s)),
