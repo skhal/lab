@@ -23,7 +23,7 @@ message Market {
 
 // Quote represents a market state as of a given date.
 //
-// Next ID: 5
+// Next ID: 6
 message Quote {
   // date is the day of the year when the quote applies.
   Date date = 1;
@@ -34,8 +34,11 @@ message Quote {
   // div is dividends.
   Cent div = 3;
 
+  // earn are SPX corporate earnings.
+  Cent earn = 4;
+
   // cpi is Consumer Price Index
-  Cent cpi = 4;
+  Cent cpi = 5;
 }
 
 // Date represents a calendar date with year, month, and day.

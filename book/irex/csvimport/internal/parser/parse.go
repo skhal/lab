@@ -52,6 +52,15 @@ var (
 )
 
 var (
+	// ErrNoEarnings means Earnings are missing in the record.
+	ErrNoEarnings = errors.New("missing CPI")
+
+	// ErrEarnings means Earnings has invalid format. See [ErrSPX] for
+	// format description.
+	ErrEarnings = errors.New("invalid CPI")
+)
+
+var (
 	// ErrNoCPI means Consumer Price Index is missing in the record.
 	ErrNoCPI = errors.New("missing CPI")
 
@@ -90,11 +99,15 @@ func ParseQuote(rec []string) (*pb.Quote, error) {
 	if err != nil {
 		return nil, err
 	}
+	earn, err := record(rec).Earnings()
+	if err != nil {
+		return nil, err
+	}
 	cpi, err := record(rec).CPI()
 	if err != nil {
 		return nil, err
 	}
-	q := pb.Quote_builder{Date: date, Spx: spx, Div: div, Cpi: cpi}.Build()
+	q := pb.Quote_builder{Date: date, Spx: spx, Div: div, Earn: earn, Cpi: cpi}.Build()
 	return q, nil
 }
 
@@ -105,6 +118,7 @@ const (
 	idxDate = iota
 	idxSPX
 	idxDividend
+	idxEarnings
 	idxCPI
 )
 
@@ -230,6 +244,19 @@ func (rec record) Dividend() (*pb.Cent, error) {
 	c, err := ParseCent(rec[idxDividend])
 	if err != nil {
 		return nil, fmt.Errorf("%w: %s", ErrDividend, err)
+	}
+	return c, nil
+}
+
+// Earnings parses Earnings value of the record.
+// It returns an error if the value is missing or invalid.
+func (rec record) Earnings() (*pb.Cent, error) {
+	if len(rec) <= idxEarnings {
+		return nil, ErrNoEarnings
+	}
+	c, err := ParseCent(rec[idxEarnings])
+	if err != nil {
+		return nil, fmt.Errorf("%w: %s", ErrEarnings, err)
 	}
 	return c, nil
 }

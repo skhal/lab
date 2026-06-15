@@ -38,32 +38,32 @@ func TestScanner(t *testing.T) {
 		{
 			name: "one record",
 			csv: `
-1990.01,1.01,1.02,1.03
+1990.01,1.01,1.02,1.03,1.04
 `,
 			want: []*pb.Quote{
-				newQuote(t, 1990, time.January, 31, 101, 102, 103),
+				newQuote(t, 1990, time.January, 31, 101, 102, 103, 104),
 			},
 		},
 		{
 			name:      "one record skip lines",
 			skipLines: 1,
 			csv: `
-1990.01,1.01,1.02,1.03
-1990.02,2.01,2.02,2.03
+1990.01,1.01,1.02,1.03,1.04
+1990.02,2.01,2.02,2.03,2.04
 `,
 			want: []*pb.Quote{
-				newQuote(t, 1990, time.February, 28, 201, 202, 203),
+				newQuote(t, 1990, time.February, 28, 201, 202, 203, 204),
 			},
 		},
 		{
 			name: "two records",
 			csv: `
-1990.01,1.01,1.02,1.03
-1990.02,2.01,2.02,2.03
+1990.01,1.01,1.02,1.03,1.04
+1990.02,2.01,2.02,2.03,2.04
 `,
 			want: []*pb.Quote{
-				newQuote(t, 1990, time.January, 31, 101, 102, 103),
-				newQuote(t, 1990, time.February, 28, 201, 202, 203),
+				newQuote(t, 1990, time.January, 31, 101, 102, 103, 104),
+				newQuote(t, 1990, time.February, 28, 201, 202, 203, 204),
 			},
 		},
 		{
@@ -77,58 +77,65 @@ func TestScanner(t *testing.T) {
 			csv: `
 foo,bar
 baz
-1990.01,1.01,1.02,1.03
+1990.01,1.01,1.02,1.03,1.04
 `,
 			wantErr: scanner.ErrScan,
 		},
 		{
 			name: "stop at invalid line",
 			csv: `
-1990.01,1.01,1.02,1.03
+1990.01,1.01,1.02,1.03,1.04
 1990.02
 `,
 			want: []*pb.Quote{
-				newQuote(t, 1990, time.January, 31, 101, 102, 103),
+				newQuote(t, 1990, time.January, 31, 101, 102, 103, 104),
 			},
 			wantErr: scanner.ErrScan,
 		},
 		{
 			name: "invalid date",
 			csv: `
-abcd.01,1.01,1.02,1.03
+abcd.01,1.01,1.02,1.03,1.04
 `,
 			wantErr: scanner.ErrScan,
 		},
 		{
 			name: "invalid spx",
 			csv: `
-1990.01,1.ab,1.02,1.03
+1990.01,1.ab,1.02,1.03,1.04
 `,
 			wantErr: scanner.ErrScan,
 		},
 		{
 			name: "invalid dividend",
 			csv: `
-1990.01,1.01,1.ab,1.03
+1990.01,1.01,1.ab,1.03,1.04
+`,
+			wantErr: scanner.ErrScan,
+		},
+		{
+			name: "invalid earnings",
+			csv: `
+1990.01,1.01,1.02,1.ab,1.04
 `,
 			wantErr: scanner.ErrScan,
 		},
 		{
 			name: "invalid cpi",
 			csv: `
-1990.01,1.01,1.02,1.ab
+1990.01,1.01,1.02,1.03,1.ab
 `,
 			wantErr: scanner.ErrScan,
 		},
 		{
 			name: "scan one line",
 			csv: `
-1990.01,1.01,1.02,1.03
-1990.02,2.01,2.02,2.03
+1990.01,1.01,1.02,1.03,1.04
+1990.02,2.01,2.02,2.03,2.04
 `,
 			scanLines: 1,
 			want: []*pb.Quote{
-				newQuote(t, 1990, time.January, 31, 101, 102, 103),
+				newQuote(t, 1990, time.January, 31, 101, 102, 103, 104),
 			},
 		},
 	}
@@ -159,9 +166,9 @@ abcd.01,1.01,1.02,1.03
 
 func TestScanner_Next_noop_on_err(t *testing.T) {
 	s := `
-1990.01,1.01,1.02,1.03
-1990.02,1.ab,2.02,2.03
-1990.03,3.01,3.02,3.03
+1990.01,1.01,1.02,1.03,1.04
+1990.02,1.ab,2.02,2.03,2.04
+1990.03,3.01,3.02,3.03,3.04
 `
 	rcsv := csv.NewReader(strings.NewReader(s))
 	sc := scanner.New(rcsv)
@@ -176,7 +183,7 @@ func TestScanner_Next_noop_on_err(t *testing.T) {
 		t.Errorf("unexpected error '%v', want '%v'", err, want)
 	}
 	want := []*pb.Quote{
-		newQuote(t, 1990, time.January, 31, 101, 102, 103),
+		newQuote(t, 1990, time.January, 31, 101, 102, 103, 104),
 	}
 	if d := cmp.Diff(want, got, protocmp.Transform()); d != "" {
 		t.Errorf("mismatch (-want +got):\n%s", d)
@@ -185,8 +192,8 @@ func TestScanner_Next_noop_on_err(t *testing.T) {
 
 func ExampleScanner() {
 	data := `
-1990.01,1.01,1.02,1.03
-1990.02,2.01,2.02,2.03
+1990.01,1.01,1.02,1.03,1.04
+1990.02,2.01,2.02,2.03,2.04
 `
 	r := csv.NewReader(strings.NewReader(data))
 	sc := scanner.New(r)
@@ -203,12 +210,13 @@ func ExampleScanner() {
 	}
 }
 
-func newQuote(t *testing.T, year int32, month time.Month, day int32, spx, div, cpi int32) *pb.Quote {
+func newQuote(t *testing.T, year int32, month time.Month, day int32, spx, div, earn, cpi int32) *pb.Quote {
 	t.Helper()
 	return pb.Quote_builder{
 		Date: newDate(t, year, month, day),
 		Spx:  pb.Cent_builder{Value: &spx}.Build(),
 		Div:  pb.Cent_builder{Value: &div}.Build(),
+		Earn: pb.Cent_builder{Value: &earn}.Build(),
 		Cpi:  pb.Cent_builder{Value: &cpi}.Build(),
 	}.Build()
 }
