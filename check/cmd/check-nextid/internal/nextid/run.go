@@ -5,12 +5,13 @@
 
 package nextid
 
+import "errors"
+
 // Run checks every file and returns an error on the first failed file.
 func Run(files []string) error {
+	var ee []error
 	for _, f := range files {
-		if err := CheckFile(f); err != nil {
-			return err
-		}
+		ee = append(ee, CheckFile(f))
 	}
-	return nil
+	return errors.Join(ee...)
 }
