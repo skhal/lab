@@ -15,18 +15,45 @@ import (
 )
 
 var (
-	// ErrNoSymbol means the plot command does not have a symbol parameter.
+	// ErrNoSymbol means the query does not have a symbol parameter, e.g.:
+	//		plot
 	ErrNoSymbol = errors.New("missing symbol")
 
-	// ErrSinceDate means since date has unsupported format.
+	// ErrMultipleSymbol means the query has multiple symbols, e.g.:
+	//		plot idx idx
+	ErrMultipleSymbol = errors.New("multiple symbols")
+
+	// ErrMultipleIndexMetric means the query has multiple index metrics, e.g.:
+	// 		plot idx div earn
+	ErrMultipleIndexMetric = errors.New("multiple symbol metrics")
+
+	// ErrNotIndex means the symbol is not an index when parsing an index metric,
+	// e.g.:
+	//		plot cpi div
+	ErrNotIndex = errors.New("not index")
+
+	// ErrSinceDate means since date has unsupported format, e.g.:
+	//		plot spx since 98-01
 	ErrSinceDate = errors.New("invalid since date")
 
-	// ErrUntilDate means until date has unsupported format.
+	// ErrUntilDate means until date has unsupported format, e.g.:
+	//		plot spx until 98-01
 	ErrUntilDate = errors.New("invalid until date")
 )
 
 var indexIdentifierByName = map[string]pb.Symbol_Index_ID{
 	"spx": pb.Symbol_Index_ID_SPX,
+}
+
+var indexMetricByName = map[string]pb.Symbol_Index_Metric{
+	// keep-sorted start
+	"div":  pb.Symbol_Index_MET_DIV,
+	"earn": pb.Symbol_Index_MET_EARN,
+	// keep-sorted end
+}
+
+var marketMetricByName = map[string]pb.Symbol_Market_Metric{
+	"cpi": pb.Symbol_Market_MET_CPI,
 }
 
 // Parse parses plot-command parameters. It returns the intent upon successful
@@ -85,17 +112,65 @@ func (p *parser) parse(fields []string) error {
 				return err
 			}
 		default:
-			idx, ok := indexIdentifierByName[f]
-			if !ok {
-				break
+			if err := p.parseSymbol(f); err != nil {
+				return err
 			}
-			p.symbol = pb.Symbol_builder{
-				Index: pb.Symbol_Index_builder{
-					Id: &idx,
-				}.Build(),
-			}.Build()
 		}
 	}
+	return nil
+}
+
+func (p *parser) parseSymbol(s string) error {
+	if idx, ok := indexIdentifierByName[s]; ok {
+		return p.setIndex(idx)
+	}
+
+	if m, ok := indexMetricByName[s]; ok {
+		return p.setIndexMetric(m)
+	}
+
+	if m, ok := marketMetricByName[s]; ok {
+		return p.setMarketMetric(m)
+	}
+
+	return nil
+}
+
+func (p *parser) setIndex(idx pb.Symbol_Index_ID) error {
+	if p.symbol != nil {
+		return fmt.Errorf("%w: %s - new %s", ErrMultipleSymbol, p.symbol, idx)
+	}
+	p.symbol = pb.Symbol_builder{
+		Index: pb.Symbol_Index_builder{
+			Id: &idx,
+		}.Build(),
+	}.Build()
+	return nil
+}
+
+func (p *parser) setIndexMetric(m pb.Symbol_Index_Metric) error {
+	if p.symbol == nil {
+		return fmt.Errorf("%w: index metric %s", ErrNoSymbol, m)
+	}
+	if !p.symbol.HasIndex() {
+		return fmt.Errorf("%w: %s - index metric %s", ErrNotIndex, p.symbol, m)
+	}
+	if p.symbol.GetIndex().HasMetric() {
+		return fmt.Errorf("%w: %s - new metric %s", ErrMultipleIndexMetric, p.symbol, m)
+	}
+	p.symbol.GetIndex().SetMetric(m)
+	return nil
+}
+
+func (p *parser) setMarketMetric(m pb.Symbol_Market_Metric) error {
+	if p.symbol != nil {
+		return fmt.Errorf("%w: %s - market metric %s", ErrMultipleSymbol, p.symbol, m)
+	}
+	p.symbol = pb.Symbol_builder{
+		Market: pb.Symbol_Market_builder{
+			Metric: &m,
+		}.Build(),
+	}.Build()
 	return nil
 }
 
