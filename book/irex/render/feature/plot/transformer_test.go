@@ -18,40 +18,49 @@ const floatRelativeDifferencePcent = 0.001
 
 func TestTransformer(t *testing.T) {
 	tests := []struct {
-		name string
-		x    float64
-		tr   *plot.Transformer
-		want float64
+		name  string
+		x, y  float64
+		tr    plot.Transformer
+		wantX float64
+		wantY float64
 	}{
 		{
-			name: "zero offset non-zero scale",
-			x:    1,
-			tr:   plot.NewTransformer(0, 3),
-			want: func() float64 { return (1 - 0) * 3 }(),
+			name:  "translate",
+			x:     1,
+			y:     2,
+			tr:    plot.Translate(3, 4),
+			wantX: 1 + 3,
+			wantY: 2 + 4,
 		},
 		{
-			name: "non-zero offset zero scale",
-			x:    1,
-			tr:   plot.NewTransformer(2, 0),
-			want: func() float64 { return (1 - 2) * 0 }(),
+			name:  "scale",
+			x:     1,
+			y:     2,
+			tr:    plot.Scale(3, 4),
+			wantX: 1 * 3,
+			wantY: 2 * 4,
 		},
 		{
-			name: "non-zero offset non-zero scale",
-			x:    1,
-			tr:   plot.NewTransformer(2, 3),
-			want: func() float64 { return (1 - 2) * 3 }(),
+			name:  "queue",
+			x:     1,
+			y:     2,
+			tr:    plot.WithTransformer(plot.Translate(3, 4), plot.Scale(5, 6)),
+			wantX: (1 + 3) * 5,
+			wantY: (2 + 4) * 6,
 		},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			got := tc.tr.Transform(tc.x)
+			x, y := tc.tr.Transform(tc.x, tc.y)
 
 			opts := []cmp.Option{
 				cmpopts.EquateApprox(floatRelativeDifferencePcent, 0),
 			}
-			if d := cmp.Diff(tc.want, got, opts...); d != "" {
-				t.Errorf("mismatch (-want +got):\n%s", d)
-				t.Logf("%#v", tc.tr)
+			if dx := cmp.Diff(tc.wantX, x, opts...); dx != "" {
+				t.Errorf("X mismatch (-want +got):\n%s", dx)
+			}
+			if dy := cmp.Diff(tc.wantY, y, opts...); dy != "" {
+				t.Errorf("Y mismatch (-want +got):\n%s", dy)
 			}
 		})
 	}

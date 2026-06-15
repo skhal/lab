@@ -96,11 +96,9 @@ func (pl *plotter) plot(quotes []*pb.PlotFeature_Quote) (*Path, XQuote) {
 		Commands: make([]PathCommand, len(quotes)),
 	}
 	qq := make(XQuote)
-	xtr := NewTransformer(0, pl.xrange/float64(len(quotes)-1))
-	ytr := NewTransformer(pl.ymin, pl.yrange/float64(pl.ymax-pl.ymin))
+	tr := WithTransformer(Translate(0, -pl.ymin), Scale(pl.xrange/float64(len(quotes)-1), pl.yrange/float64(pl.ymax-pl.ymin)))
 	for idx, q := range quotes {
-		x := xtr.Transform(float64(idx))
-		y := ytr.Transform(float64(q.GetCent().GetValue()))
+		x, y := tr.Transform(float64(idx), float64(q.GetCent().GetValue()))
 		if idx == 0 {
 			p.Commands[idx] = PathMoveCommand{
 				Point: Point{X: round(x), Y: round(y)},
@@ -110,7 +108,7 @@ func (pl *plotter) plot(quotes []*pb.PlotFeature_Quote) (*Path, XQuote) {
 				Point: Point{X: round(x), Y: round(y)},
 			}
 		}
-		qq[int(math.Floor(x))] = newQuote(q)
+		qq[round(x)] = newQuote(q)
 	}
 	return p, qq
 }
