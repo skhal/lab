@@ -149,7 +149,7 @@ func (fr *renderer) plotXaxis(cfg *AxisConfig) *Axis {
 		}
 		for i, x := range guidePositions {
 			tickWidth := cfg.TickWidth
-			if i > 0 && i+1 < len(guidePositions) {
+			if i > 0 && i+1 < guideCount {
 				tickWidth /= 2
 			}
 			p.Commands = append(p.Commands,
@@ -233,7 +233,7 @@ func (fr *renderer) plotYaxis(cfg *AxisConfig, ymin, ymax float64) *Axis {
 		}
 		for i, y := range guidePositions {
 			tickWidth := cfg.TickWidth
-			if i > 0 && i+1 < len(guidePositions) {
+			if i > 0 && i+1 < guideCount {
 				tickWidth /= 2
 			}
 			p.Commands = append(p.Commands,
@@ -278,16 +278,16 @@ func (fr *renderer) plotYaxis(cfg *AxisConfig, ymin, ymax float64) *Axis {
 			n /= 100
 			return fmt.Sprintf("%.0f", n)
 		}
-		ll := make([]Text, len(guidePositions))
+		ll := make([]Text, guideCount)
 		const x = 15
-		dy := (ymax - ymin) / float64(len(guidePositions)-1)
+		dy := (ymax - ymin) / float64(guideCount-1)
 		var s string
 		for i, y := range guidePositions {
 			switch {
 			case i == 0:
 				y += 10 // shift down
 				s = cents(ymax)
-			case i+1 == len(guidePositions):
+			case i+1 == guideCount:
 				s = cents(ymin)
 			default:
 				y += 4 // shift down
