@@ -53,25 +53,25 @@ func (pl *plotter) Plot(quotes []*pb.PlotFeature_Quote) (*Path, XQuote) {
 		return nil, nil
 	case 1:
 		// place a single quote in the middle of the plot
-		tr := WithTransformer(Scale(1.0/2, 1.0/2), pl.tr)
+		tr := roundTransformer{WithTransformer(Scale(1.0/2, 1.0/2), pl.tr)}
 		x, y := tr.Transform(1, 1)
 		p := &Path{
 			Commands: []PathCommand{
 				PathMoveCommand{
 					Point: Point{
-						X: round(x),
-						Y: round(y),
+						X: x,
+						Y: y,
 					},
 				},
 			},
 		}
 		q := quotes[0]
 		qq := XQuote{
-			round(x): newQuote(q),
+			x: newQuote(q),
 		}
 		return p, qq
 	}
-	tr := pl.initTransformer(quotes)
+	tr := roundTransformer{pl.initTransformer(quotes)}
 	return pl.plot(quotes, tr)
 }
 
@@ -91,7 +91,7 @@ func (pl *plotter) initTransformer(quotes []*pb.PlotFeature_Quote) Transformer {
 	return WithTransformer(Translate(0, -ymin), Scale(sx, sy), pl.tr)
 }
 
-func (pl *plotter) plot(quotes []*pb.PlotFeature_Quote, tr Transformer) (*Path, XQuote) {
+func (pl *plotter) plot(quotes []*pb.PlotFeature_Quote, tr roundTransformer) (*Path, XQuote) {
 	p := &Path{
 		Commands: make([]PathCommand, len(quotes)),
 	}
@@ -100,18 +100,28 @@ func (pl *plotter) plot(quotes []*pb.PlotFeature_Quote, tr Transformer) (*Path, 
 		x, y := tr.Transform(float64(idx), float64(q.GetCent().GetValue()))
 		if idx == 0 {
 			p.Commands[idx] = PathMoveCommand{
-				Point: Point{X: round(x), Y: round(y)},
+				Point: Point{X: x, Y: y},
 			}
 		} else {
 			p.Commands[idx] = PathLineCommand{
-				Point: Point{X: round(x), Y: round(y)},
+				Point: Point{X: x, Y: y},
 			}
 		}
-		qq[round(x)] = newQuote(q)
+		qq[x] = newQuote(q)
 	}
 	return p, qq
 }
 
 func round(x float64) int {
 	return int(math.Floor(x))
+}
+
+type roundTransformer struct {
+	t Transformer
+}
+
+// Transform applies transformation of (x,y) and then rounds the result.
+func (rt roundTransformer) Transform(x, y float64) (int, int) {
+	x, y = rt.t.Transform(x, y)
+	return round(x), round(y)
 }
