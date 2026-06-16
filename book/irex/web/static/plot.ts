@@ -134,7 +134,10 @@ class plotter {
     const quotient = Math.floor(val / 100);
     const remainder = val % 100;
     const date = new Date(unix_ts * 1000); // must be milliseconds
-    this.hintDate.textContent = date.toLocaleDateString();
+    this.hintDate.textContent = date.toLocaleDateString(undefined, {
+      year: "numeric",
+      month: "short",
+    });
     this.hintVal.textContent = `${quotient}.${remainder}`;
   }
 }
