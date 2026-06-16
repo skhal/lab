@@ -53,14 +53,14 @@ func TestServer_serve(t *testing.T) {
 	if err := s.ListenAndServe("127.0.0.1:0"); err != nil {
 		t.Fatalf("unexpected server start error '%v'", err)
 	}
-	t.Cleanup(func() {
+	defer func() {
 		if err := s.Shutdown(t.Context()); err != nil {
 			t.Errorf("unexpected server shutdown error '%v'", err)
 		}
 		if err := s.Err(); err != nil {
 			t.Errorf("unexpected server error '%v'", err)
 		}
-	})
+	}()
 	addr := address(s.Addr())
 	tests := []struct {
 		name     string
