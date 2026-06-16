@@ -99,9 +99,6 @@ type HTMLTemplateData struct {
 	// ViewBox defines visiple part of the user space in SVG.
 	ViewBox *ViewBox
 
-	// Origin defines the location of the graph origin on the SVG canvas.
-	Origin *Point
-
 	// X defines x-axis.
 	X *Axis
 

@@ -98,10 +98,6 @@ func (fr *renderer) generateTemplateData() *TemplateData {
 				Width:  fr.cfg.ViewBox.Width,
 				Height: fr.cfg.ViewBox.Height,
 			},
-			Origin: &Point{
-				X: fr.cfg.Axis.Width,
-				Y: fr.cfg.ViewBox.Height - fr.cfg.Axis.Width,
-			},
 			X:    fr.plotXaxis(&fr.cfg.Axis),
 			Y:    fr.plotYaxis(&fr.cfg.Axis),
 			Path: line,
