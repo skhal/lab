@@ -10,6 +10,7 @@ import (
 	"html/template"
 	"math"
 	"strings"
+	"time"
 	"unicode"
 
 	"github.com/skhal/lab/book/irex/pb"
@@ -27,8 +28,8 @@ type PlotConfig struct {
 	// ViewBox is the configuration for SVG view box.
 	ViewBox ViewBoxConfig
 
-	// Axis configures X and Y axes.
-	Axis AxisConfig
+	// Axes holds configuration for x- and y- axes.
+	Axes AxesConfig
 }
 
 // ViewBoxConfig defines the SVG's view box.
@@ -40,13 +41,31 @@ type ViewBoxConfig struct {
 	Height int
 }
 
+// AxesConfig configurations for x- and y- axes.
+type AxesConfig struct {
+	// X is the x-axis configuration.
+	X AxisConfig
+
+	// Y is the y-axis configuration.
+	Y AxisConfig
+}
+
 // AxisConfig configures an axis.
 type AxisConfig struct {
-	// Offset is the axis offset from the plot to make axes stand out.
-	Offset int
+	// X is the x-coordinate of the axis
+	X int
 
-	// Width is the width of the axis.
+	// Y is the y-coordinate of the axis
+	Y int
+
+	// Width of the axis, excluding the offset.
 	Width int
+
+	// Height of the axis, excluding the offset.
+	Height int
+
+	// Padding is the axis offset from the plot to make axes stand out.
+	Padding int
 
 	// TickWidth is the tick width of the axis.
 	TickWidth int
@@ -54,17 +73,31 @@ type AxisConfig struct {
 
 // NewRenderer creates a renderer for PlotFeature.
 func NewRenderer(msg *pb.PlotFeature) *renderer {
+	vb := ViewBoxConfig{
+		Width:  400,
+		Height: 200,
+	}
+	xaxis := AxisConfig{
+		Height:    30,
+		Padding:   3,
+		TickWidth: 5,
+	}
+	yaxis := AxisConfig{
+		Width:     50,
+		Height:    vb.Height - xaxis.Height,
+		Padding:   3,
+		TickWidth: 5,
+	}
+	xaxis.X = yaxis.Width
+	xaxis.Y = vb.Height - xaxis.Height
+	xaxis.Width = vb.Width - yaxis.Width
 	return &renderer{
 		msg: msg,
 		cfg: PlotConfig{
-			ViewBox: ViewBoxConfig{
-				Width:  400,
-				Height: 200,
-			},
-			Axis: AxisConfig{
-				Offset:    3,
-				Width:     10,
-				TickWidth: 5,
+			ViewBox: vb,
+			Axes: AxesConfig{
+				X: xaxis,
+				Y: yaxis,
 			},
 		},
 	}
@@ -100,14 +133,14 @@ func (fr *renderer) generateTemplateData() *TemplateData {
 				Width:  fr.cfg.ViewBox.Width,
 				Height: fr.cfg.ViewBox.Height,
 			},
-			X:    fr.plotXaxis(&fr.cfg.Axis),
-			Y:    fr.plotYaxis(&fr.cfg.Axis, info.Ymin, info.Ymax),
+			X:    fr.plotXaxis(&fr.cfg.Axes.X, info.Quotes),
+			Y:    fr.plotYaxis(&fr.cfg.Axes.Y, info.Ymin, info.Ymax),
 			Path: info.Path,
 			Graph: &Graph{
-				X:      fr.cfg.Axis.Width,
+				X:      fr.cfg.Axes.Y.Width,
 				Y:      0,
-				Width:  fr.cfg.ViewBox.Width - fr.cfg.Axis.Width,
-				Height: fr.cfg.ViewBox.Height - fr.cfg.Axis.Width,
+				Width:  fr.cfg.ViewBox.Width - fr.cfg.Axes.Y.Width,
+				Height: fr.cfg.ViewBox.Height - fr.cfg.Axes.X.Height,
 			},
 		},
 		js: &JSTemplateData{
@@ -116,18 +149,29 @@ func (fr *renderer) generateTemplateData() *TemplateData {
 	}
 }
 
-func (fr *renderer) plotXaxis(cfg *AxisConfig) *Axis {
-	const guideCount = 3
+func (fr *renderer) plotXaxis(cfg *AxisConfig, quotes XQuote) *Axis {
+	guideCount := func() int {
+		for n := range 5 {
+			if n < 3 {
+				continue
+			}
+			if len(quotes)%n == 0 {
+				return n
+			}
+		}
+		return 2
+	}()
 	guidePositions := func() []int {
+		step := cfg.Width / (guideCount - 1)
 		xx := make([]int, guideCount)
 		position := func(i int) int {
 			switch i {
 			case 0:
-				return cfg.Width
+				return cfg.X
 			case guideCount - 1:
-				return fr.cfg.ViewBox.Width
+				return cfg.X + cfg.Width
 			default:
-				return cfg.Width + (fr.cfg.ViewBox.Width-cfg.Width)/(guideCount-1)*i
+				return cfg.X + i*step
 			}
 		}
 		for i := range guideCount {
@@ -136,23 +180,25 @@ func (fr *renderer) plotXaxis(cfg *AxisConfig) *Axis {
 		return xx
 	}()
 	line := func() *Path {
-		y := fr.cfg.ViewBox.Height + cfg.Offset
+		y := cfg.Y + cfg.Padding
+		// main line
 		p := &Path{
 			Commands: []PathCommand{
 				PathMoveCommand{
 					Point: Point{
-						X: cfg.Width,
-						Y: y - cfg.Width,
+						X: cfg.X,
+						Y: y,
 					},
 				},
 				PathLineCommand{
 					Point: Point{
-						X: fr.cfg.ViewBox.Width,
-						Y: y - cfg.Width,
+						X: cfg.X + cfg.Width,
+						Y: y,
 					},
 				},
 			},
 		}
+		// guides
 		for i, x := range guidePositions {
 			tickWidth := cfg.TickWidth
 			if i > 0 && i+1 < guideCount {
@@ -162,13 +208,13 @@ func (fr *renderer) plotXaxis(cfg *AxisConfig) *Axis {
 				PathMoveCommand{
 					Point: Point{
 						X: x,
-						Y: y - cfg.Width,
+						Y: y,
 					},
 				},
 				PathLineCommand{
 					Point: Point{
 						X: x,
-						Y: y - cfg.Width + tickWidth,
+						Y: y + tickWidth,
 					},
 				})
 		}
@@ -188,30 +234,60 @@ func (fr *renderer) plotXaxis(cfg *AxisConfig) *Axis {
 			p.Commands[2*i+1] = PathLineCommand{
 				Point: Point{
 					X: x,
-					Y: fr.cfg.ViewBox.Height - cfg.Width,
+					Y: cfg.Y,
 				},
 			}
 		}
 		return p
 	}
+	labels := func() []Text {
+		ll := make([]Text, guideCount)
+		fontHeight := 13
+		y := cfg.Y + cfg.Padding + cfg.TickWidth + fontHeight
+		for i, x := range guidePositions {
+			quote, ok := quotes[x]
+			if !ok {
+				fmt.Printf("label at %d: failed to get the quote\n", x)
+				continue
+			}
+			t := time.Unix(quote.UnixTime, 0)
+			switch i {
+			case 0:
+			case guideCount - 1:
+				// shift left
+				x -= 50
+			default:
+				// shift left
+				x -= 25
+			}
+			ll[i] = Text{
+				X:   x,
+				Y:   y,
+				Val: t.Format("Jan 2006"),
+			}
+		}
+		return ll
+	}
 	return &Axis{
 		Line:   line(),
 		Guides: guides(),
+		Labels: labels(),
 	}
 }
 
 func (fr *renderer) plotYaxis(cfg *AxisConfig, ymin, ymax float64) *Axis {
 	const guideCount = 4
 	guidePositions := func() []int {
+		step := cfg.Height / (guideCount - 1)
 		yy := make([]int, guideCount)
 		position := func(i int) int {
 			switch i {
 			case 0:
-				return 0
+				return cfg.Y
 			case guideCount - 1:
-				return fr.cfg.ViewBox.Height - cfg.Width
+				return cfg.Y + cfg.Height
 			default:
-				return (fr.cfg.ViewBox.Height - cfg.Width) / (guideCount - 1) * i
+				return cfg.Y + i*step
 			}
 		}
 		for i := range guideCount {
@@ -220,23 +296,25 @@ func (fr *renderer) plotYaxis(cfg *AxisConfig, ymin, ymax float64) *Axis {
 		return yy
 	}()
 	line := func() *Path {
-		x := cfg.Width - cfg.Offset
+		x := cfg.Width - cfg.Padding
+		// main line
 		p := &Path{
 			Commands: []PathCommand{
 				PathMoveCommand{
 					Point: Point{
 						X: x,
-						Y: 0,
+						Y: cfg.Y,
 					},
 				},
 				PathLineCommand{
 					Point: Point{
 						X: x,
-						Y: fr.cfg.ViewBox.Height - cfg.Width,
+						Y: cfg.Y + cfg.Height,
 					},
 				},
 			},
 		}
+		// guides
 		for i, y := range guidePositions {
 			tickWidth := cfg.TickWidth
 			if i > 0 && i+1 < guideCount {
@@ -339,14 +417,14 @@ func (fr *renderer) plot() *PlotInfo {
 func (fr *renderer) newTransformer() Transformer {
 	// scale up the plot to the graph range and flip the y-axis
 	scale := func() Transformer {
-		xrange := float64(fr.cfg.ViewBox.Width - fr.cfg.Axis.Width)
-		yrange := float64(fr.cfg.ViewBox.Height - fr.cfg.Axis.Width)
+		xrange := float64(fr.cfg.ViewBox.Width - fr.cfg.Axes.Y.Width)
+		yrange := float64(fr.cfg.ViewBox.Height - fr.cfg.Axes.X.Height)
 		return Scale(xrange, -yrange)
 	}
 	// move the graph to the left-bottom corner of the graph range.
 	translate := func() Transformer {
-		dx := float64(fr.cfg.Axis.Width)
-		dy := float64(fr.cfg.ViewBox.Height - fr.cfg.Axis.Width)
+		dx := float64(fr.cfg.Axes.Y.Width)
+		dy := float64(fr.cfg.ViewBox.Height - fr.cfg.Axes.X.Height)
 		return Translate(dx, dy)
 	}
 	return WithTransformer(scale(), translate())
