@@ -25,6 +25,9 @@
 			stroke-dasharray: 5 5;
 			fill: none;
 			}
+			.axis-label {
+			font-size: 0.8em;
+			}
 			.line {
 			stroke: green;
 			stroke-width: 0.5;
@@ -48,6 +51,10 @@
 	<g>
 		<path d="M 7 0 L 7 190 M 2 0 L 7 0 M 5 63 L 7 63 M 5 126 L 7 126 M 2 190 L 7 190" class="axis"/>
 		<path d="M 10 0 L 400 0 M 10 63 L 400 63 M 10 126 L 400 126 M 10 190 L 400 190" class="axis-guide"/>
+		<text x="15" y="10" class="axis-label">1</text>
+		<text x="15" y="67" class="axis-label">1</text>
+		<text x="15" y="130" class="axis-label">1</text>
+		<text x="15" y="190" class="axis-label">1</text>
 	</g>
 	<g id="plot-line-group">
 		<path id="plot-line-path" d="M 205 95" class="line"/>

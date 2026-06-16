@@ -6,7 +6,9 @@
 package plot
 
 import (
+	"fmt"
 	"html/template"
+	"math"
 	"strings"
 	"unicode"
 
@@ -90,7 +92,7 @@ func (fr *renderer) executeTemplates(d *TemplateData) (template.HTML, template.J
 }
 
 func (fr *renderer) generateTemplateData() *TemplateData {
-	line, quotes := fr.plot()
+	info := fr.plot()
 	return &TemplateData{
 		html: &HTMLTemplateData{
 			Title: fr.msg.GetSymbol().String(),
@@ -99,11 +101,11 @@ func (fr *renderer) generateTemplateData() *TemplateData {
 				Height: fr.cfg.ViewBox.Height,
 			},
 			X:    fr.plotXaxis(&fr.cfg.Axis),
-			Y:    fr.plotYaxis(&fr.cfg.Axis),
-			Path: line,
+			Y:    fr.plotYaxis(&fr.cfg.Axis, info.Ymin, info.Ymax),
+			Path: info.Path,
 		},
 		js: &JSTemplateData{
-			Quotes: quotes,
+			Quotes: info.Quotes,
 		},
 	}
 }
@@ -192,7 +194,7 @@ func (fr *renderer) plotXaxis(cfg *AxisConfig) *Axis {
 	}
 }
 
-func (fr *renderer) plotYaxis(cfg *AxisConfig) *Axis {
+func (fr *renderer) plotYaxis(cfg *AxisConfig, ymin, ymax float64) *Axis {
 	const guideCount = 4
 	guidePositions := func() []int {
 		yy := make([]int, guideCount)
@@ -270,13 +272,43 @@ func (fr *renderer) plotYaxis(cfg *AxisConfig) *Axis {
 		}
 		return p
 	}
+	labels := func() []Text {
+		cents := func(n float64) string {
+			n -= math.Mod(n, 100)
+			n /= 100
+			return fmt.Sprintf("%.0f", n)
+		}
+		ll := make([]Text, len(guidePositions))
+		const x = 15
+		dy := (ymax - ymin) / float64(len(guidePositions)-1)
+		var s string
+		for i, y := range guidePositions {
+			switch {
+			case i == 0:
+				y += 10 // shift down
+				s = cents(ymax)
+			case i+1 == len(guidePositions):
+				s = cents(ymin)
+			default:
+				y += 4 // shift down
+				s = cents(ymax - float64(i)*dy)
+			}
+			ll[i] = Text{
+				X:   x,
+				Y:   y,
+				Val: s,
+			}
+		}
+		return ll
+	}
 	return &Axis{
 		Line:   line(),
 		Guides: guides(),
+		Labels: labels(),
 	}
 }
 
-func (fr *renderer) plot() (*Path, XQuote) {
+func (fr *renderer) plot() *PlotInfo {
 	pl := NewPlotter(fr.newTransformer())
 	return pl.Plot(fr.msg.GetQuotes())
 }

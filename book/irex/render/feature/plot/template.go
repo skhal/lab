@@ -119,6 +119,21 @@ type Axis struct {
 
 	// Guides is a set of the axis guide lines.
 	Guides *Path
+
+	// Labels are axis values for guides.
+	Labels []Text
+}
+
+// Text represents an SVG text element.
+type Text struct {
+	// Val is the text value.
+	Val string
+
+	// X is the text x-coordinate.
+	X int
+
+	// Y is the text y-coordinate.
+	Y int
 }
 
 // JSTemplateData is the input data to JS template.

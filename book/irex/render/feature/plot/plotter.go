@@ -12,6 +12,11 @@ import (
 	"github.com/skhal/lab/book/irex/pb"
 )
 
+// PlotPaddingPercent is the padding size to be added to the plot as per cent
+// of the plot's y-range, the distance between the plot's max and minimum
+// values.
+const PlotPaddingPercent = 0.02
+
 type plotter struct {
 	tr Transformer
 }
@@ -46,36 +51,63 @@ func newQuote(pbq *pb.PlotFeature_Quote) *Quote {
 // XQuote is the quote for x coordinate of the line.
 type XQuote map[int]*Quote
 
+// PlotInfo holds generated plot.
+type PlotInfo struct {
+	// Path is the plot line.
+	Path *Path
+
+	// Quotes are plot data points.
+	Quotes XQuote
+
+	// Ymin is the minimum range of the axis.
+	Ymin float64
+
+	// Ymax is the maximum range of the axis.
+	Ymax float64
+}
+
 // Plot plots the quotes and returns a list of points representing the graph.
-func (pl *plotter) Plot(quotes []*pb.PlotFeature_Quote) (*Path, XQuote) {
+func (pl *plotter) Plot(quotes []*pb.PlotFeature_Quote) *PlotInfo {
 	switch len(quotes) {
 	case 0:
-		return nil, nil
+		return nil
 	case 1:
 		// place a single quote in the middle of the plot
 		tr := roundTransformer{WithTransformer(Scale(1.0/2, 1.0/2), pl.tr)}
 		x, y := tr.Transform(1, 1)
-		p := &Path{
-			Commands: []PathCommand{
-				PathMoveCommand{
-					Point: Point{
-						X: x,
-						Y: y,
+		p := &PlotInfo{
+			Path: &Path{
+				Commands: []PathCommand{
+					PathMoveCommand{
+						Point: Point{
+							X: x,
+							Y: y,
+						},
 					},
 				},
 			},
+			Quotes: XQuote{
+				x: newQuote(quotes[0]),
+			},
 		}
-		q := quotes[0]
-		qq := XQuote{
-			x: newQuote(q),
-		}
-		return p, qq
+		p.Ymin, p.Ymax = pl.yrange(quotes)
+		return p
+	default:
+		p := &PlotInfo{}
+		p.Ymin, p.Ymax = pl.yrange(quotes)
+		tr := roundTransformer{pl.initTransformer(quotes, p.Ymin, p.Ymax)}
+		p.Path, p.Quotes = pl.plot(quotes, tr)
+		return p
 	}
-	tr := roundTransformer{pl.initTransformer(quotes)}
-	return pl.plot(quotes, tr)
 }
 
-func (pl *plotter) initTransformer(quotes []*pb.PlotFeature_Quote) Transformer {
+func (pl *plotter) initTransformer(quotes []*pb.PlotFeature_Quote, ymin, ymax float64) Transformer {
+	sx := 1 / float64(len(quotes)-1)
+	sy := 1 / float64(ymax-ymin)
+	return WithTransformer(Translate(0, -ymin), Scale(sx, sy), pl.tr)
+}
+
+func (pl *plotter) yrange(quotes []*pb.PlotFeature_Quote) (float64, float64) {
 	var ymin, ymax float64 = math.MaxFloat64, 0
 	for _, q := range quotes {
 		v := float64(q.GetCent().GetValue())
@@ -86,9 +118,9 @@ func (pl *plotter) initTransformer(quotes []*pb.PlotFeature_Quote) Transformer {
 			ymin = v
 		}
 	}
-	sx := 1 / float64(len(quotes)-1)
-	sy := 1 / float64(ymax-ymin)
-	return WithTransformer(Translate(0, -ymin), Scale(sx, sy), pl.tr)
+	scaler := Autoscaler{Padding: PlotPaddingPercent}
+	ymin, ymax = scaler.Scale(ymin, ymax)
+	return ymin, ymax
 }
 
 func (pl *plotter) plot(quotes []*pb.PlotFeature_Quote, tr roundTransformer) (*Path, XQuote) {
