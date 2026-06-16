@@ -103,6 +103,12 @@ func (fr *renderer) generateTemplateData() *TemplateData {
 			X:    fr.plotXaxis(&fr.cfg.Axis),
 			Y:    fr.plotYaxis(&fr.cfg.Axis, info.Ymin, info.Ymax),
 			Path: info.Path,
+			Graph: &Graph{
+				X:      fr.cfg.Axis.Width,
+				Y:      0,
+				Width:  fr.cfg.ViewBox.Width - fr.cfg.Axis.Width,
+				Height: fr.cfg.ViewBox.Height - fr.cfg.Axis.Width,
+			},
 		},
 		js: &JSTemplateData{
 			Quotes: info.Quotes,

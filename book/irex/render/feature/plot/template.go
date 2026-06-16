@@ -108,6 +108,9 @@ type HTMLTemplateData struct {
 	// Path is the plotted line of the quotes.
 	Path *Path
 
+	// Graph describes the main area in the plot with graph.
+	Graph *Graph
+
 	// Title is the name of the plot.
 	Title string
 }
@@ -134,6 +137,21 @@ type Text struct {
 
 	// Y is the text y-coordinate.
 	Y int
+}
+
+// Graph defines properties of the graph area in the plot.
+type Graph struct {
+	// X is the x-coordinate of the top-left corner.
+	X int
+
+	// Y is the y-coordinate of the top-left corner.
+	Y int
+
+	// Width is the width of the graph area.
+	Width int
+
+	// Height is the height of the graph area.
+	Height int
 }
 
 // JSTemplateData is the input data to JS template.

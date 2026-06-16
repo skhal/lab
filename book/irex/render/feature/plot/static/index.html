@@ -65,9 +65,9 @@
 	{{include "axis" .Y | indent "\t"}}
 	<g id="plot-line-group">
 		<path id="plot-line-path" d="{{.Path}}" class="line"/>
-		<rect id="plot-line-rect" x="0" y="0" width="100%" height="100%" fill="transparent"/>
+		<rect id="plot-line-rect" x="{{.Graph.X}}" y="{{.Graph.Y}}" width="{{.Graph.Width}}" height="{{.Graph.Height}}" fill="transparent"/>
 		<g id="plot-line-pointer" style="visibility:hidden">
-			<line id="plot-line-pointer-guide" y2="100%" class="pointer-guide"/>
+			<line id="plot-line-pointer-guide" y2="{{.Graph.Height}}" class="pointer-guide"/>
 			<circle id="plot-line-pointer-cursor" cx="0" cy="0" r="3" class="pointer-cursor"/>
 		</g>
 	</g>
