@@ -1,0 +1,41 @@
+- name: RC isolate configurations
+  hosts: nuc.lab.net
+  become: true
+  become_method: community.general.doas
+
+  tasks:
+    - name: Remove syslogd_flags from rc.conf
+      community.general.sysrc:
+        name: syslogd_flags
+        state: absent
+
+    - name: Add syslogd_flags to syslogd config
+      community.general.sysrc:
+        path: /etc/rc.conf.d/syslogd
+        name: syslogd_flags
+        value: -ss
+
+    - name: Enable console logs
+      ansible.builtin.lineinfile:
+        path: /etc/syslog.conf
+        regexp: '^#console.info'
+        line: 'console.info'
+      register: syslog_enable_console_log
+
+    - name: Restart syslogd
+      ansible.builtin.service:
+        name: syslogd
+        state: restarted
+      when: syslog_enable_console_log.changed
+
+    - name: Cron uses sh(1)
+      ansible.builtin.cron:
+        name: SHELL
+        env: yes
+        value: /bin/sh
+
+    - name: Rotate logs every hour
+      ansible.builtin.cron:
+        name: "rotate logs"
+        hour: 0
+        job: "newsyslog -t DEFAULT"

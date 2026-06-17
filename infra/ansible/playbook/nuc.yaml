@@ -2,3 +2,4 @@
 - import_playbook: "internal/autoboot.yaml"
 - import_playbook: "internal/pkg.yaml"
 - import_playbook: "internal/ntp.yaml"
+- import_playbook: "internal/syslog.yaml"

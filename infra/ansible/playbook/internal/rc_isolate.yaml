@@ -88,17 +88,6 @@
         name: sshd_enable
         value: yes
 
-    - name: Remove syslogd_flags
-      community.general.sysrc:
-        name: syslogd_flags
-        state: absent
-
-    - name: Add syslogd_flags
-      community.general.sysrc:
-        path: /etc/rc.conf.d/syslogd
-        name: syslogd_flags
-        value: -ss
-
     - name: Remove zfs_enable
       community.general.sysrc:
         name: zfs_enable
