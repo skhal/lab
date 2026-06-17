@@ -61,23 +61,22 @@ Disk /dev/disk6 ejected
 
 Boot from the USB drive and follow the instructions:
 
-- Keyboard: default layout (US)
+- Keyboard: `us.macbook.kbd`
 - Hostname: `nuc.lab.net`
 - Installation type: Packages (aka pkgbase)
 - Network: `igc0` IPv4 DHCP
 - Partition: guided ZFS
   - Stripe with 1 disk
   - [4g swap size](https://forums.freebsd.org/threads/swap-size-on-zfs-with-high-amount-of-ram.71059/) (increase for Kernel development)
-- Packages to install: base, lib32
+- Packages to install: base
 - Set root password
 - Time zone: America / USA / Central
 - Services at boot:
-  - `dumpdev` - dump kernel crashes to `/var/crash`
   - `ntpd` - clock synchronization
   - `ntpd_sync_on_start` - sync time on `ntpd` start
   - `powerd` - system power control utility
   - `sshd` - SSH server
-- Turn on security hardening:
+- Turn on security hardening (enable ALL):
   - `hide_uids` hide processes as other users
   - `hide_gids` hide processes as other groups
   - `hide_jail` hide processes in jails
@@ -87,6 +86,7 @@ Boot from the USB drive and follow the instructions:
   - `clear_tmp` clean `/tmp` on startup
   - `disable_syslogd` no syslogd network socket
   - `secure_console` console password prompt
+  - `disable_ddtrace` disallow DTrace destructive-mode
 - Install firmware packages: none (skip WiFi, we'll install it later, as needed)
 - Add users: yes
   - Name: op
