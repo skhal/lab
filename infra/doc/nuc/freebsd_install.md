@@ -106,18 +106,17 @@ Keep an eye on the version of installed Kernel (-k), running Kernel (-r), and in
 
 ```console
 % freebsd-version -kru
-15.0-RELEASE
-15.0-RELEASE
-15.0-RELEASE
+15.1-RELEASE
+15.1-RELEASE
+15.1-RELEASE
 ```
 
-The list of installed packages is minimal. It includes the kernel, minimal packages set to run multi-user environment, base user land, and 32-bit compatibility libraries:
+The list of installed packages is minimal. It includes the kernel, minimal packages set to run multi-user environment, and base user land:
 
 ```console
 % pkg prime-list
 FreeBSD-kernel-generic
 FreeBSD-set-base
-FreeBSD-set-lib32
 FreeBSD-set-minimal
 pkg
 ```
