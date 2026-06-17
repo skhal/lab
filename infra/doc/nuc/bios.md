@@ -20,9 +20,11 @@ Installed: v0028
 - Disable PCIe ASPM Support, [ref](https://superuser.com/questions/1822809/why-does-disabling-active-power-management-in-bios-double-nvme-speed)
 - Disable Bluetooth
 
-# Update
+# Upgrade
 
-The update runs for about 5 minutes.
+The upgrade runs for about 5 minutes. Some versions of BIOS (579.0030) may
+reject to upgrade components like thunderbolt when the monitor is connected
+via USB Type-C - connect the monitor on HDMI port.
 
 1. Format a USB drive as FAT32
 2. Download "BIOS Full Package" archive (`.zip`) from the [Support](https://www.asus.com/us/supportonly/nuc15crsu7/helpdesk_bios/) page.
