@@ -1,3 +1,22 @@
+- name: Setup root
+  hosts: nuc.lab.net
+  become: true
+  become_method: su
+
+  tasks:
+    - name: Change shell to tcsh(1)
+      ansible.builtin.user:
+        name: root
+        shell: /bin/tcsh
+
+    - name: Copy tcshrc
+      ansible.builtin.template:
+        src: ../templates/root/dot.cshrc
+        dest: /root/.cshrc
+        owner: root
+        group: wheel
+        mode: u=rw,g=r,o=r
+
 - name: Setup doas(1)
   hosts: nuc.lab.net
   become: true
