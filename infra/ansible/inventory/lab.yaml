@@ -1,0 +1,6 @@
+lab:
+  hosts:
+    nuc.lab.net
+  vars:
+    ansible_python_interpreter: /usr/local/bin/python
+    ansible_user: op
