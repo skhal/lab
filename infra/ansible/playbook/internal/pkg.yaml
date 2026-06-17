@@ -1,0 +1,15 @@
+- name: Configure pkg(1)
+  hosts: nuc.lab.net
+  become: true
+  become_method: community.general.doas
+
+  tasks:
+    - name: Use latest branch
+      ansible.builtin.template:
+        src: ../../templates/usr/local/etc/pkg/repos/FreeBSD.conf
+        dest: /usr/local/etc/pkg/repos/FreeBSD.conf
+        owner: root
+        group: wheel
+        mode: u=rw,g=r,o=r
+
+

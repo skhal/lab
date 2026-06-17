@@ -1,0 +1,12 @@
+- name: RC isolate configurations
+  hosts: nuc.lab.net
+  become: true
+  become_method: community.general.doas
+
+  tasks:
+    - name: Remove autoboot delay
+      community.general.sysrc:
+        path: /boot/loader.conf
+        name: autoboot_delay
+        value: 0
+
