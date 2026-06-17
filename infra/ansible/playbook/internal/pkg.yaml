@@ -12,4 +12,19 @@
         group: wheel
         mode: u=rw,g=r,o=r
 
+    - name: Add outdated alias
+      ansible.builtin.lineinfile:
+        path: /usr/local/etc/pkg.conf
+        insertafter: '^\s*orphans ='
+        line: '    outdated = "version -vL=";'
 
+    - name: Add vital alias
+      ansible.builtin.lineinfile:
+        path: /usr/local/etc/pkg.conf
+        insertafter: '^\s*unmaintained ='
+        line: '    vital = "query -e \"%V=1\" %n";'
+
+    - name: Install NeoVim
+      community.general.pkgng:
+        name: neovim
+        state: present
