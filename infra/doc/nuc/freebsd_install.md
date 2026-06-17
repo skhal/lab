@@ -64,7 +64,11 @@ Boot from the USB drive and follow the instructions:
 - Keyboard: `us.macbook.kbd`
 - Hostname: `nuc.lab.net`
 - Installation type: Packages (aka pkgbase)
-- Network: `igc0` IPv4 DHCP
+- Network: `igc0` with manual IPv4
+    - IP: `192.168.10.101`
+    - Mask: `255.255.255.0`
+    - Gateway: `192.168.10.1`
+    - NDS Server: `192.168.10.1`
 - Partition: guided ZFS
   - Stripe with 1 disk
   - [4g swap size](https://forums.freebsd.org/threads/swap-size-on-zfs-with-high-amount-of-ram.71059/) (increase for Kernel development)
