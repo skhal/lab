@@ -1,8 +1,12 @@
 - import_playbook: "internal/autoboot.yaml"
 - import_playbook: "internal/rc_isolate.yaml"
 
+# keep-sorted start
 - import_playbook: "internal/ntp.yaml"
+- import_playbook: "internal/periodic.yaml"
+- import_playbook: "internal/pf.yaml"
 - import_playbook: "internal/pkg.yaml"
 - import_playbook: "internal/ssh.yaml"
 - import_playbook: "internal/syslog.yaml"
-- import_playbook: "internal/pf.yaml"
+- import_playbook: "internal/zfs.yaml"
+# keep-sorted end
