@@ -11,7 +11,11 @@ set ellipsis
 # ref: https://en.wikipedia.org/wiki/ANSI_escape_code
 set esc_green_ = "%{\033[;32m%}"
 set esc_reset_ = "%{\033[m%}"
+if ( -f /etc/os-release ) then
 set os_ = (`/bin/sh -c '. /etc/os-release; echo $ID $VERSION_ID'`)
+else
+set os_ = (`sw_vers | head -2 | awk '{print $2}' | xargs`)
+endif
 set prompt = "${os_} ${esc_green_}%N${esc_reset_}@%m:%c03 %# "
 set promptchars = "%#"
 unset esc_green_ esc_reset_
