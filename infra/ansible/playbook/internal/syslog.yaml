@@ -1,4 +1,4 @@
-- name: RC isolate configurations
+- name: Syslog
   hosts: nuc.lab.net
   become: true
   become_method: community.general.doas

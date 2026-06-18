@@ -1,0 +1,37 @@
+- name: Secure Shell
+  hosts: nuc.lab.net
+  become: true
+  become_method: community.general.doas
+
+  tasks:
+    - name: Remove sshd_enable from rc.conf
+      community.general.sysrc:
+        name: sshd_enable
+        state: absent
+
+    - name: Add sshd_enable to service config
+      community.general.sysrc:
+        path: /etc/rc.conf.d/sshd
+        name: sshd_enable
+        value: yes
+
+    - name: Listen on bridge interfaces
+      ansible.builtin.lineinfile:
+        path: /etc/ssh/sshd_config
+        line: "ListenAddress={{ ansible_facts[item].ipv4 | map(attribute='address') | flatten | first}}"
+      loop: "{{ ansible_facts.interfaces | select('match', '^bridge') }}"
+      register: sshd_listen_on_bridge
+
+    - name: Allow op
+      ansible.builtin.lineinfile:
+        path: /etc/ssh/sshd_config
+        line: "AllowUsers=op"
+      register: sshd_allow_op
+
+
+    - name: Restart SSH server
+      ansible.builtin.service:
+        name: sshd
+        state: restarted
+      when: sshd_listen_on_bridge.changed or sshd_allow_op.changed
+

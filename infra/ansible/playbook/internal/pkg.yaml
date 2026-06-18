@@ -1,4 +1,4 @@
-- name: Configure pkg(1)
+- name: Packages
   hosts: nuc.lab.net
   become: true
   become_method: community.general.doas

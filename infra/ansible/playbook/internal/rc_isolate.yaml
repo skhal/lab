@@ -77,17 +77,6 @@
         name: powerd_enable
         value: yes
 
-    - name: Remove sshd_enable
-      community.general.sysrc:
-        name: sshd_enable
-        state: absent
-
-    - name: Add sshd_enable
-      community.general.sysrc:
-        path: /etc/rc.conf.d/sshd
-        name: sshd_enable
-        value: yes
-
     - name: Remove zfs_enable
       community.general.sysrc:
         name: zfs_enable
