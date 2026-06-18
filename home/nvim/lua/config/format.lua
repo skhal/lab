@@ -5,11 +5,14 @@
 
 local conform = require("conform")
 
+local macos = vim.uv.os_uname().sysname:lower():find("darwin")
+local clang_format_cmd = macos and "clang-format" or "clang-format21"
+
 conform.setup({
 	formatters = {
 		-- keep-sorted start block=yes
 		["clang-format"] = {
-			command = "clang-format21",
+			command = clang_format_cmd,
 		},
 		["markdownfmt"] = {
 			append_args = { "-soft-wraps" },
