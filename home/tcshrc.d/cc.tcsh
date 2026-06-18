@@ -6,6 +6,9 @@
 if ( ! $?prompt ) exit
 
 set prefix_ = "/usr/local/llvm19"
+if ( `uname` == "Darwin" ) then
+  set prefix_ = "/opt/homebrew/opt/llvm@21"
+endif
 if ( ! $?TMUX && -d ${prefix_} ) then
   set path = (${path} ${prefix_}/bin)
 endif
