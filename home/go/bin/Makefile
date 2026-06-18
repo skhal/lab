@@ -7,6 +7,9 @@
 
 GO_BIN_PATH = ${HOME}/go/bin
 GO_INSTALL_OPTS = -ldflags "-s -w -linkmode external -extldflags -static"
+.if ${.MAKE.OS} == Darwin
+GO_INSTALL_OPTS =
+.endif
 
 PACKAGES_FILE = packages.txt
 # Package line in packages.txt:
