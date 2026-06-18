@@ -1,0 +1,42 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+#
+# List of FreeBSD packages to install. Keep one package per line.
+
+# keep-sorted start
+bash
+buf
+catch2
+ccache
+cmake
+deno
+fswatch
+fzf
+git
+go
+graphviz
+groff
+jq
+llvm@21
+lua-language-server
+luacheck
+neovim
+npm
+protobuf
+protoc-gen-go
+pre-commit
+ty
+python
+ripgrep
+rsync
+rust
+superhtml
+tmux
+tree
+universal-ctags
+unzip
+# keep-sorted end
+
+# typescript-go

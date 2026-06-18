@@ -5,14 +5,19 @@
 #
 # Flavor: FreeBSD
 
-INSTALL_PATHS = ctags.d go npm nvim pkg rust tcshrc.d vim vimrc.d
+PACKAGES = pkg
+.if ${.MAKE.OS} == "Darwin"
+PACKAGES = brew
+.endif
+
+INSTALL_PATHS = ctags.d go npm nvim ${PACKAGES} rust tcshrc.d vim vimrc.d
 SOURCES = tcshrc vimrc tmux.conf gitconfig
 INSTALL_TARGETS = ${SOURCES:S,^,${HOME}/.,}
 
 install: ${INSTALL_TARGETS} ${INSTALL_PATHS} .PHONY
 
-# Following paths use one of the binaries installed by pkg(1).
-go npm rust: pkg
+# Following paths use one of the binaries installed by OS packaging system
+go npm rust: ${PACKAGES}
 
 # install vimrc before adding packs
 vim: ${HOME}/.vimrc vimrc.d
