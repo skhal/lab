@@ -18,8 +18,9 @@
     - name: Enable console logs
       ansible.builtin.lineinfile:
         path: /etc/syslog.conf
-        regexp: '^#console.info'
-        line: 'console.info'
+        regexp: '^#(console.info.*)$'
+        line: '\1'
+        backrefs: yes
       register: syslog_enable_console_log
 
     - name: Restart syslogd
