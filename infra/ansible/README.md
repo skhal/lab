@@ -9,7 +9,6 @@
 
 **ansible** - configure LAB cluster with Ansible
 
-
 # DESCRIPTION
 
 Use Ansible (https://docs.ansible.com) to configure Lab cluster from

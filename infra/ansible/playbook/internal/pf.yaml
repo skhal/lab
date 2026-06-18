@@ -1,54 +1,59 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
 - name: Packet filter
   hosts: nuc.lab.net
   become: true
   become_method: community.general.doas
 
   tasks:
-    - name: Enable gateway
-      community.general.sysrc:
-        path: /etc/rc.conf.d/routing
-        name: gateway_enable
-        value: yes
-      register: gateway_enable
+  - name: Enable gateway
+    community.general.sysrc:
+      path: /etc/rc.conf.d/routing
+      name: gateway_enable
+      value: yes
+    register: gateway_enable
 
-    - name: Restart routing
-      ansible.builtin.service:
-        name: routing
-        state: restarted
-      when: gateway_enable.changed
-      
-    - name: Enable pf
-      community.general.sysrc:
-        path: /etc/rc.conf.d/pf
-        name: pf_enable
-        value: yes
-      register: pf_enable
+  - name: Restart routing
+    ansible.builtin.service:
+      name: routing
+      state: restarted
+    when: gateway_enable.changed
 
-    - name: Enable pflog
-      community.general.sysrc:
-        path: /etc/rc.conf.d/pflog
-        name: pflog_enable
-        value: yes
-      register: pflog_enable
+  - name: Enable pf
+    community.general.sysrc:
+      path: /etc/rc.conf.d/pf
+      name: pf_enable
+      value: yes
+    register: pf_enable
 
-    - name: Restart pflog
-      ansible.builtin.service:
-        name: pflog
-        state: restarted
-      when: pflog_enable.changed
+  - name: Enable pflog
+    community.general.sysrc:
+      path: /etc/rc.conf.d/pflog
+      name: pflog_enable
+      value: yes
+    register: pflog_enable
 
-    - name: Setup pf.conf
-      ansible.builtin.template:
-        src: ../../templates/etc/pf.conf
-        dest: /etc/pf.conf
-        owner: root
-        group: wheel
-        mode: u=rw,g=r,o=r
-        validate: /sbin/pfctl -nf %s
-      register: pf_conf
+  - name: Restart pflog
+    ansible.builtin.service:
+      name: pflog
+      state: restarted
+    when: pflog_enable.changed
 
-    - name: Restart pf
-      ansible.builtin.service:
-        name: pf
-        state: restarted
-      when: pf_conf.changed or pf_enable.changed
+  - name: Setup pf.conf
+    ansible.builtin.template:
+      src: ../../templates/etc/pf.conf
+      dest: /etc/pf.conf
+      owner: root
+      group: wheel
+      mode: u=rw,g=r,o=r
+      validate: /sbin/pfctl -nf %s
+    register: pf_conf
+
+  - name: Restart pf
+    ansible.builtin.service:
+      name: pf
+      state: restarted
+    when: pf_conf.changed or pf_enable.changed

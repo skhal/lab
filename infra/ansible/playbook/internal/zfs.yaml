@@ -1,18 +1,22 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
 - name: ZFS
   hosts: nuc.lab.net
   become: true
   become_method: community.general.doas
 
   tasks:
-    - name: Scrub every 2w
-      community.general.sysrc:
-        path: /etc/periodic.conf
-        name: daily_scrub_zfs_default_threshold
-        value: 14
+  - name: Scrub every 2w
+    community.general.sysrc:
+      path: /etc/periodic.conf
+      name: daily_scrub_zfs_default_threshold
+      value: 14
 
-    - name: Enable periodic scrub
-      community.general.sysrc:
-        path: /etc/periodic.conf
-        name: daily_scrub_zfs_enable
-        value: yes
-
+  - name: Enable periodic scrub
+    community.general.sysrc:
+      path: /etc/periodic.conf
+      name: daily_scrub_zfs_enable
+      value: yes

@@ -1,11 +1,16 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
 - name: Periodic
   hosts: nuc.lab.net
   become: true
   become_method: community.general.doas
 
   tasks:
-    - name: Daily log to /var/log/daily.log
-      community.general.sysrc:
-        path: /etc/periodic.conf
-        name: daily_output
-        value: /var/log/daily.log
+  - name: Daily log to /var/log/daily.log
+    community.general.sysrc:
+      path: /etc/periodic.conf
+      name: daily_output
+      value: /var/log/daily.log
