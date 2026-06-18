@@ -29,7 +29,7 @@ Make sure that NUC has the following setup:
 Install Ansible on the laptop:
 
 ```console
-# brea install ansible
+# brew install ansible
 ```
 
 ## Configure
