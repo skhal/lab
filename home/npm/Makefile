@@ -23,6 +23,10 @@ install: ${INSTALL_TARGETS} .PHONY
 .for package in ${PACKAGES}
 target=${package:${M_target}}
 ${target}: ${PACKAGE_LIST}
-	echo ".. install ${.TARGET:T}" to ${.TARGET}; \
-		${DOAS_CMD} npm install --global ${package:${M_no_target}}
+	@if which ${.TARGET:T} >/dev/null; then \
+		echo ".. skip ${.TARGET:T}"; \
+	 else \
+		echo ".. install ${.TARGET:T}" to ${.TARGET}; \
+		${DOAS_CMD} npm install --global ${package:${M_no_target}}; \
+	 fi
 .endfor

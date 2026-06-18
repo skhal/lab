@@ -14,7 +14,9 @@ install: ${INSTALL_TARGETS} .PHONY
 
 .for package in ${INSTALL_TARGETS}
 ${package}: ${PACKAGE_LIST}
-	@if ! pkg info -e ${.TARGET}; then \
+	@if brew list -q ${.TARGET} >/dev/null; then \
+		echo ".. skip ${.TARGET}"; \
+	 else \
 		echo ".. install ${.TARGET}"; \
 		brew install -y ${.TARGET}; \
 	 fi
