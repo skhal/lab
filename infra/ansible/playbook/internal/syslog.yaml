@@ -34,7 +34,7 @@
         env: yes
         value: /bin/sh
 
-    - name: Rotate logs every hour
+    - name: Rotate logs every day
       ansible.builtin.cron:
         name: "rotate logs"
         hour: 0
