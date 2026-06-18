@@ -6,6 +6,10 @@
 # Flavor: FreeBSD
 
 BIN_PATH=/usr/local/bin
+DOAS_CMD=/usr/local/bin/doas
+.if ${.MAKE.OS} == Darwin
+DOAS_CMD=/usr/bin/sudo
+.endif
 
 PACKAGE_LIST = packages.txt
 PACKAGES = ${grep -v '^\#' ${PACKAGE_LIST}:L:sh:M?*}
@@ -20,5 +24,5 @@ install: ${INSTALL_TARGETS} .PHONY
 target=${package:${M_target}}
 ${target}: ${PACKAGE_LIST}
 	echo ".. install ${.TARGET:T}" to ${.TARGET}; \
-		doas npm install --global ${package:${M_no_target}}
+		${DOAS_CMD} npm install --global ${package:${M_no_target}}
 .endfor
