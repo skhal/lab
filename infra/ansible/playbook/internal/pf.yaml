@@ -52,8 +52,14 @@
       validate: /sbin/pfctl -nf %s
     register: pf_conf
 
-  - name: Restart pf
+  - name: Start pf
     ansible.builtin.service:
       name: pf
-      state: restarted
-    when: pf_conf.changed or pf_enable.changed
+      state: started
+    when: pf_enable.changed
+
+  - name: Reload pf.conf
+    ansible.builtin.service:
+      name: pf
+      state: reloaded
+    when: pf_conf.changed and not pf_enable.changed
