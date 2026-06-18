@@ -19,11 +19,6 @@ Make sure that NUC has the following setup:
 - User `op` is a member of `wheel` group.
 - Running SSH server with `op` SSH key installed to let Ansible run
   commands without password prompts.
-- Python 3.11 installed.
-
-```console
-# pkg install -y python
-```
 
 Install Ansible on the laptop:
 
@@ -33,7 +28,15 @@ Install Ansible on the laptop:
 
 ## Configure
 
+Bootstrap NUC with Ansible to install python and setup user environment (`-K`
+to prompt for NUC root-password):
+
 ```console
 $ ansible-playbook -K -i ./inventory ./playbook/nuc_bootstrap.yaml
+```
+
+Configure NUC without root privileges:
+
+```console
 $ ansible-playbook -i ./inventory ./playbook/nuc.yaml
 ```
