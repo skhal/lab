@@ -6,6 +6,8 @@
 # List of FreeBSD packages to install. Keep one package per line.
 
 # keep-sorted start
+ansible-language-server
+ansible-lint
 bash
 buf
 catch2
@@ -24,10 +26,9 @@ lua-language-server
 luacheck
 neovim
 npm
+pre-commit
 protobuf
 protoc-gen-go
-pre-commit
-ty
 python
 ripgrep
 rsync
@@ -35,6 +36,7 @@ rust
 superhtml
 tmux
 tree
+ty
 universal-ctags
 unzip
 # keep-sorted end
