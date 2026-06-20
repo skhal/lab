@@ -27,7 +27,7 @@
 
   - name: Copy root tcsh(1) rc
     ansible.builtin.template:
-      src: ../templates/root/dot.cshrc
+      src: ./templates/root/dot.cshrc
       dest: /root/.cshrc
       owner: root
       group: wheel
@@ -40,7 +40,7 @@
 
   - name: Copy op tcsh(1) rc
     ansible.builtin.template:
-      src: ../templates/home/op/dot.cshrc
+      src: ./templates/home/op/dot.cshrc
       dest: /home/op/.cshrc
       owner: op
       group: op

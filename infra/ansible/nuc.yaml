@@ -1,0 +1,17 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+- import_playbook: "playbook/internal/autoboot.yaml"
+- import_playbook: "playbook/internal/rc_isolate.yaml"
+
+# keep-sorted start
+- import_playbook: "playbook/internal/ntp.yaml"
+- import_playbook: "playbook/internal/periodic.yaml"
+- import_playbook: "playbook/internal/pf.yaml"
+- import_playbook: "playbook/internal/pkg.yaml"
+- import_playbook: "playbook/internal/ssh.yaml"
+- import_playbook: "playbook/internal/syslog.yaml"
+- import_playbook: "playbook/internal/zfs.yaml"
+# keep-sorted end

@@ -32,11 +32,11 @@ Bootstrap NUC with Ansible to install python and setup user environment (`-K`
 to prompt for NUC root-password):
 
 ```console
-$ ansible-playbook -K -i ./inventory ./playbook/nuc_bootstrap.yaml
+$ ansible-playbook -K ./nuc_bootstrap.yaml
 ```
 
 Configure NUC without root privileges:
 
 ```console
-$ ansible-playbook -i ./inventory ./playbook/nuc.yaml
+$ ansible-playbook ./nuc.yaml
 ```
