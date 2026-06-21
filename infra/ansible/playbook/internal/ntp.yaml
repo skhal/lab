@@ -1,3 +1,4 @@
+---
 # Copyright 2026 Samvel Khalatyan. All rights reserved.
 #
 # Use of this source code is governed by a BSD-style
@@ -9,42 +10,42 @@
   become_method: community.general.doas
 
   tasks:
-  - name: Remove ntpd_enable from rc.conf
-    community.general.sysrc:
-      name: ntpd_enable
-      state: absent
+    - name: Remove ntpd_enable from rc.conf
+      community.general.sysrc:
+        name: ntpd_enable
+        state: absent
 
-  - name: Add ntpd_enable to ntpd config
-    community.general.sysrc:
-      path: /etc/rc.conf.d/ntpd
-      name: ntpd_enable
-      value: yes
+    - name: Add ntpd_enable to ntpd config
+      community.general.sysrc:
+        path: /etc/rc.conf.d/ntpd
+        name: ntpd_enable
+        value: true
 
-  - name: Remove ntpd_sync_on_start from rc.conf
-    community.general.sysrc:
-      name: ntpd_sync_on_start
-      state: absent
+    - name: Remove ntpd_sync_on_start from rc.conf
+      community.general.sysrc:
+        name: ntpd_sync_on_start
+        state: absent
 
-  - name: Add ntpd_sync_on_start to ntpd config
-    community.general.sysrc:
-      path: /etc/rc.conf.d/ntpd
-      name: ntpd_sync_on_start
-      value: yes
+    - name: Add ntpd_sync_on_start to ntpd config
+      community.general.sysrc:
+        path: /etc/rc.conf.d/ntpd
+        name: ntpd_sync_on_start
+        value: true
 
-  - name: Ignore wildcard interface
-    ansible.builtin.lineinfile:
-      path: /etc/ntp.conf
-      line: "interface ignore wildcard"
-    register: ntp_ignore_wildcard
+    - name: Ignore wildcard interface
+      ansible.builtin.lineinfile:
+        path: /etc/ntp.conf
+        line: "interface ignore wildcard"
+      register: ntp_ignore_wildcard
 
-  - name: Listen on loopback
-    ansible.builtin.lineinfile:
-      path: /etc/ntp.conf
-      line: "interface listen 127.0.0.1"
-    register: ntp_listen_loopback
+    - name: Listen on loopback
+      ansible.builtin.lineinfile:
+        path: /etc/ntp.conf
+        line: "interface listen 127.0.0.1"
+      register: ntp_listen_loopback
 
-  - name: Restart ntpd
-    ansible.builtin.service:
-      name: ntpd
-      state: restarted
-    when: ntp_ignore_wildcard.changed or ntp_listen_loopback.changed
+    - name: Restart ntpd
+      ansible.builtin.service:
+        name: ntpd
+        state: restarted
+      when: ntp_ignore_wildcard.changed or ntp_listen_loopback.changed

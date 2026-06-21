@@ -1,3 +1,4 @@
+---
 # Copyright 2026 Samvel Khalatyan. All rights reserved.
 #
 # Use of this source code is governed by a BSD-style
@@ -9,8 +10,8 @@
   become_method: community.general.doas
 
   tasks:
-  - name: Remove autoboot delay
-    community.general.sysrc:
-      path: /boot/loader.conf
-      name: autoboot_delay
-      value: 0
+    - name: Remove autoboot delay
+      community.general.sysrc:
+        path: /boot/loader.conf
+        name: autoboot_delay
+        value: 0

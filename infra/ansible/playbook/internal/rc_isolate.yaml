@@ -1,3 +1,4 @@
+---
 # Copyright 2026 Samvel Khalatyan. All rights reserved.
 #
 # Use of this source code is governed by a BSD-style
@@ -9,86 +10,86 @@
   become_method: community.general.doas
 
   tasks:
-  - name: Remove dumpdev
-    community.general.sysrc:
-      name: dumpdev
-      state: absent
+    - name: Remove dumpdev
+      community.general.sysrc:
+        name: dumpdev
+        state: absent
 
-  - name: Remove defaultrouter
-    community.general.sysrc:
-      name: defaultrouter
-      state: absent
+    - name: Remove defaultrouter
+      community.general.sysrc:
+        name: defaultrouter
+        state: absent
 
-  - name: Add defaultrouter
-    community.general.sysrc:
-      path: /etc/rc.conf.d/routing
-      name: defaultrouter
-      value: 192.168.10.1
+    - name: Add defaultrouter
+      community.general.sysrc:
+        path: /etc/rc.conf.d/routing
+        name: defaultrouter
+        value: 192.168.10.1
 
-  - name: Remove hostname
-    community.general.sysrc:
-      name: hostname
-      state: absent
+    - name: Remove hostname
+      community.general.sysrc:
+        name: hostname
+        state: absent
 
-  - name: Add hostname
-    community.general.sysrc:
-      path: /etc/rc.conf.d/hostname
-      name: hostname
-      value: nuc.lab.net
+    - name: Add hostname
+      community.general.sysrc:
+        path: /etc/rc.conf.d/hostname
+        name: hostname
+        value: nuc.lab.net
 
-  - name: Remove moused_nondefault_enable
-    community.general.sysrc:
-      name: moused_nondefault_enable
-      state: absent
+    - name: Remove moused_nondefault_enable
+      community.general.sysrc:
+        name: moused_nondefault_enable
+        state: absent
 
-  - name: Add moused_nondefault_enable
-    community.general.sysrc:
-      path: /etc/rc.conf.d/moused
-      name: moused_nondefault_enable
-      value: no
+    - name: Add moused_nondefault_enable
+      community.general.sysrc:
+        path: /etc/rc.conf.d/moused
+        name: moused_nondefault_enable
+        value: false
 
-  - name: Remove ifconfig_igc0
-    community.general.sysrc:
-      name: ifconfig_igc0
-      state: absent
+    - name: Remove ifconfig_igc0
+      community.general.sysrc:
+        name: ifconfig_igc0
+        state: absent
 
-  - name: Add ifconfig_igc0
-    community.general.sysrc:
-      path: /etc/rc.conf.d/network
-      name: ifconfig_igc0
-      value: up
+    - name: Add ifconfig_igc0
+      community.general.sysrc:
+        path: /etc/rc.conf.d/network
+        name: ifconfig_igc0
+        value: up
 
-  - name: Add bridge0
-    community.general.sysrc:
-      path: /etc/rc.conf.d/network
-      name: cloned_interfaces
-      state: value_present
-      value: bridge0
+    - name: Add bridge0
+      community.general.sysrc:
+        path: /etc/rc.conf.d/network
+        name: cloned_interfaces
+        state: value_present
+        value: bridge0
 
-  - name: Configure bridge0
-    community.general.sysrc:
-      path: /etc/rc.conf.d/network
-      name: ifconfig_bridge0
-      value: "inet 192.168.10.101/24 addm igc0 up descr jail:ext"
+    - name: Configure bridge0
+      community.general.sysrc:
+        path: /etc/rc.conf.d/network
+        name: ifconfig_bridge0
+        value: "inet 192.168.10.101/24 addm igc0 up descr jail:ext"
 
-  - name: Remove powerd_enable
-    community.general.sysrc:
-      name: powerd_enable
-      state: absent
+    - name: Remove powerd_enable
+      community.general.sysrc:
+        name: powerd_enable
+        state: absent
 
-  - name: Add powerd_enable
-    community.general.sysrc:
-      path: /etc/rc.conf.d/powerd
-      name: powerd_enable
-      value: yes
+    - name: Add powerd_enable
+      community.general.sysrc:
+        path: /etc/rc.conf.d/powerd
+        name: powerd_enable
+        value: true
 
-  - name: Remove zfs_enable
-    community.general.sysrc:
-      name: zfs_enable
-      state: absent
+    - name: Remove zfs_enable
+      community.general.sysrc:
+        name: zfs_enable
+        state: absent
 
-  - name: Add zfs_enable
-    community.general.sysrc:
-      path: /etc/rc.conf.d/zfs
-      name: zfs_enable
-      value: yes
+    - name: Add zfs_enable
+      community.general.sysrc:
+        path: /etc/rc.conf.d/zfs
+        name: zfs_enable
+        value: true

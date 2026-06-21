@@ -1,3 +1,4 @@
+---
 # Copyright 2026 Samvel Khalatyan. All rights reserved.
 #
 # Use of this source code is governed by a BSD-style
@@ -7,41 +8,41 @@
   hosts: nuc.lab.net
   gather_facts: false
   become: true
-  become_method: su
+  become_method: ansible.builtin.su
 
   tasks:
-  - name: Install Python 3
-    community.general.pkgng:
-      name: python3
-      state: present
+    - name: Install Python 3
+      community.general.pkgng:
+        name: python3
+        state: present
 
-  - name: Install doas
-    community.general.pkgng:
-      name: doas
-      state: present
+    - name: Install doas
+      community.general.pkgng:
+        name: doas
+        state: present
 
-  - name: Change root shell to tcsh(1)
-    ansible.builtin.user:
-      name: root
-      shell: /bin/tcsh
+    - name: Change root shell to tcsh(1)
+      ansible.builtin.user:
+        name: root
+        shell: /bin/tcsh
 
-  - name: Copy root tcsh(1) rc
-    ansible.builtin.template:
-      src: ./templates/root/dot.cshrc
-      dest: /root/.cshrc
-      owner: root
-      group: wheel
-      mode: u=rw,g=r,o=r
+    - name: Copy root tcsh(1) rc
+      ansible.builtin.template:
+        src: ./templates/root/dot.cshrc
+        dest: /root/.cshrc
+        owner: root
+        group: wheel
+        mode: u=rw,g=r,o=r
 
-  - name: Change op shell to tcsh(1)
-    ansible.builtin.user:
-      name: op
-      shell: /bin/tcsh
+    - name: Change op shell to tcsh(1)
+      ansible.builtin.user:
+        name: op
+        shell: /bin/tcsh
 
-  - name: Copy op tcsh(1) rc
-    ansible.builtin.template:
-      src: ./templates/home/op/dot.cshrc
-      dest: /home/op/.cshrc
-      owner: op
-      group: op
-      mode: u=rw,g=r,o=r
+    - name: Copy op tcsh(1) rc
+      ansible.builtin.template:
+        src: ./templates/home/op/dot.cshrc
+        dest: /home/op/.cshrc
+        owner: op
+        group: op
+        mode: u=rw,g=r,o=r

@@ -1,3 +1,4 @@
+---
 # Copyright 2026 Samvel Khalatyan. All rights reserved.
 #
 # Use of this source code is governed by a BSD-style
@@ -9,27 +10,27 @@
   become_method: community.general.doas
 
   tasks:
-  - name: Use latest branch
-    ansible.builtin.template:
-      src: ../../templates/usr/local/etc/pkg/repos/FreeBSD.conf
-      dest: /usr/local/etc/pkg/repos/FreeBSD.conf
-      owner: root
-      group: wheel
-      mode: u=rw,g=r,o=r
+    - name: Use latest branch
+      ansible.builtin.template:
+        src: templates/usr/local/etc/pkg/repos/FreeBSD.conf
+        dest: /usr/local/etc/pkg/repos/FreeBSD.conf
+        owner: root
+        group: wheel
+        mode: u=rw,g=r,o=r
 
-  - name: Add outdated alias
-    ansible.builtin.lineinfile:
-      path: /usr/local/etc/pkg.conf
-      insertafter: '^\s*orphans ='
-      line: '    outdated = "version -vL=";'
+    - name: Add outdated alias
+      ansible.builtin.lineinfile:
+        path: /usr/local/etc/pkg.conf
+        insertafter: "^\\s*orphans ="
+        line: '    outdated = "version -vL=";'
 
-  - name: Add vital alias
-    ansible.builtin.lineinfile:
-      path: /usr/local/etc/pkg.conf
-      insertafter: '^\s*unmaintained ='
-      line: '    vital = "query -e \"%V=1\" %n";'
+    - name: Add vital alias
+      ansible.builtin.lineinfile:
+        path: /usr/local/etc/pkg.conf
+        insertafter: "^\\s*unmaintained ="
+        line: '    vital = "query -e \"%V=1\" %n";'
 
-  - name: Install NeoVim
-    community.general.pkgng:
-      name: neovim
-      state: present
+    - name: Install NeoVim
+      community.general.pkgng:
+        name: neovim
+        state: present

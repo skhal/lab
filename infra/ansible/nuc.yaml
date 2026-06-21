@@ -1,17 +1,24 @@
+---
 # Copyright 2026 Samvel Khalatyan. All rights reserved.
 #
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 
-- import_playbook: "playbook/internal/autoboot.yaml"
-- import_playbook: "playbook/internal/rc_isolate.yaml"
-
-# keep-sorted start
-- import_playbook: "playbook/internal/ntp.yaml"
-- import_playbook: "playbook/internal/periodic.yaml"
-- import_playbook: "playbook/internal/pf.yaml"
-- import_playbook: "playbook/internal/pkg.yaml"
-- import_playbook: "playbook/internal/ssh.yaml"
-- import_playbook: "playbook/internal/syslog.yaml"
-- import_playbook: "playbook/internal/zfs.yaml"
-# keep-sorted end
+- name: Speed up autoboot
+  import_playbook: "playbook/internal/autoboot.yaml"
+- name: Break rc.conf into per-service configurations
+  import_playbook: "playbook/internal/rc_isolate.yaml"
+- name: Configure packages
+  import_playbook: "playbook/internal/pkg.yaml"
+- name: Configure Network Time Protorol (NTP)
+  import_playbook: "playbook/internal/ntp.yaml"
+- name: Configure periodic
+  import_playbook: "playbook/internal/periodic.yaml"
+- name: Configure Packet Filter
+  import_playbook: "playbook/internal/pf.yaml"
+- name: Configure SSH
+  import_playbook: "playbook/internal/ssh.yaml"
+- name: Configure system logging
+  import_playbook: "playbook/internal/syslog.yaml"
+- name: Configure ZFS
+  import_playbook: "playbook/internal/zfs.yaml"
