@@ -273,7 +273,7 @@ repos:
   - id: yaml-fmt
     name: "YAML format"
     description: "format YAML files"
-    entry: yamlfmt
+    entry: ./check/yaml-lint
     language: system
     types_or: [yaml]
 

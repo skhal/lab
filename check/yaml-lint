@@ -1,0 +1,50 @@
+#!/bin/sh
+#
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+# Yaml-lint runs different linters and formatter for ordinary ans Ansible YAML
+# files. A YAML file is Ansible YAML if it resides in an Ansible project, i.e.
+# a folder with ansible.cfg file.
+set -e
+
+# is_ansible returns true if the file is in Ansible project, else false.
+is_ansible() {
+  local p=${1:?'is_ansible: missing file'}
+  for _ in $(seq 1 5); do
+    if [ ${p} == "." ]; then
+      return 1
+    fi
+    p=$(dirname ${p})
+    if [ -e ${p}/ansible.cfg ]; then
+      return 0
+    fi
+  done
+}
+
+yaml_files=
+yaml_ansible_files=
+for f; do
+  if $(is_ansible ${f}); then
+    yaml_ansible_files="${yaml_ansible_files} ${f}"
+  else
+    yaml_files="${yaml_files} ${f}"
+  fi
+done
+
+rc=0
+if [ -n "${yaml_ansible_files}" ]; then
+  if ! ansible-lint -f brief -qq --fix=all ${yaml_ansible_files}; then
+    rc=1
+  fi
+fi
+
+if [ -n "${yaml_files}" ]; then
+  if ! yamlfmt ${yaml_files}; then
+    rc=1
+  fi
+fi
+
+exit ${rc}
