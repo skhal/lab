@@ -65,6 +65,7 @@ func TestRun_empty(t *testing.T) {
 		{filename: "test.txtpb", holder: "Tester", want: wantShell},
 		{filename: "test.vim", holder: "Tester", want: wantVim},
 		{filename: "test.yaml", holder: "Tester", want: wantShell},
+		{filename: "test.yml", holder: "Tester", want: wantShell},
 		// keep-sorted end
 	}
 	for _, tc := range tests {
@@ -144,6 +145,7 @@ test
 		{data: "test\n", filename: "test.txtpb", holder: "Tester", want: wantShell},
 		{data: "test\n", filename: "test.vim", holder: "Tester", want: wantVim},
 		{data: "test\n", filename: "test.yaml", holder: "Tester", want: wantShell},
+		{data: "test\n", filename: "test.yml", holder: "Tester", want: wantShell},
 		// keep-sorted end
 	}
 	for _, tc := range tests {
