@@ -32,8 +32,10 @@ conform.setup({
 	},
 	formatters_by_ft = {
 		-- keep-sorted start
+		["yaml.ansible"] = { "keep-sorted" },
 		bzl = { "buildifier", "keep-sorted" },
 		c = { "clang-format", "keep-sorted" },
+		cfg = { "keep-sorted" },
 		cpp = { "clang-format", "keep-sorted" },
 		go = { "goimports", "keep-sorted" },
 		html = { "superhtml", "keep-sorted" },
