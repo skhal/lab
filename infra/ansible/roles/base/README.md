@@ -13,9 +13,11 @@ Base configures a FreeBSD server with following changes:
 - pkg: use latest packages, add `outdated` and `vital` aliases, install NeoVim.
 - syslog: migrate RC variable to /etc/rc.conf.d/syslogd and enable console
   logging.
-- ntp: migrate RC variables to /etc/rc.conf.d/ntpd and listen on local IP.
-- ssh: listen on bridge interfaces and restrict users to `op`.
+- ntp: migrate rc-vars to /etc/rc.conf.d/ntpd and listen on local IP.
+- ssh: migrate rc-vars to /etc/rc.conf.d/sshd, listen on bridge interfaces, and
+  restrict allowed users to `op`.
 - periodic: save daily logs.
+- zfs: migrate rc-vars to /etc/rc.conf.d/zfs and enable scrubs every 2 weeks.
 
 ## Requirements
 

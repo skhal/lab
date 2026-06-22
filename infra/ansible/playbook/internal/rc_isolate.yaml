@@ -82,14 +82,3 @@
         path: /etc/rc.conf.d/powerd
         name: powerd_enable
         value: true
-
-    - name: Remove zfs_enable
-      community.general.sysrc:
-        name: zfs_enable
-        state: absent
-
-    - name: Add zfs_enable
-      community.general.sysrc:
-        path: /etc/rc.conf.d/zfs
-        name: zfs_enable
-        value: true

@@ -22,5 +22,3 @@
 #   import_playbook: "playbook/internal/rc_isolate.yaml"
 # - name: Configure Packet Filter
 #   import_playbook: "playbook/internal/pf.yaml"
-# - name: Configure ZFS
-#   import_playbook: "playbook/internal/zfs.yaml"

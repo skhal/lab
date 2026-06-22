@@ -21,3 +21,6 @@
 
 - name: Configure periorid
   ansible.builtin.import_tasks: "main_periodic.yml"
+
+- name: Configure periorid
+  ansible.builtin.import_tasks: "main_zfs.yml"
