@@ -5,36 +5,13 @@
 
 ---
 - name: Configure autoboot
-  ansible.builtin.import_tasks: "loader_autoboot.yml"
+  ansible.builtin.import_tasks: "main_autoboot.yml"
 
 - name: Configure packages
-  block:
-    - name: Use latest packages
-      ansible.builtin.import_tasks: "pkg_latest.yml"
-
-    - name: Add pkg alias
-      ansible.builtin.import_tasks: "pkg_alias.yml"
-      vars:
-        base_pkg:
-          alias:
-            name: outdated
-            value: "version -vL="
-
-    - name: Add pkg alias
-      ansible.builtin.import_tasks: "pkg_alias.yml"
-      vars:
-        base_pkg:
-          alias:
-            name: vital
-            value: 'query -e \"%V=1\" %n'
-
-    - name: Install NeoVim
-      community.general.pkgng:
-        name: neovim
-        state: latest
+  ansible.builtin.import_tasks: "main_pkg.yml"
 
 - name: Configure syslog
-  ansible.builtin.import_tasks: "syslog.yml"
+  ansible.builtin.import_tasks: "main_syslog.yml"
 
 - name: Configure NTP
-  ansible.builtin.import_tasks: "ntp.yml"
+  ansible.builtin.import_tasks: "main_ntp.yml"
