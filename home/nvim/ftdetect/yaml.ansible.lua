@@ -3,7 +3,10 @@
 -- Use of this source code is governed by a BSD-style
 -- license that can be found in the LICENSE file.
 
----@param path string path to file
+---is_ansible checks whether a file belongs to an ansible project, i.e. one of
+---the parent folders holds ansible.cfg configuration file.
+---@param p string path to file.
+---@return boolean true if the file is under ansible path, else false.
 local function is_ansible(p)
 	p = vim.fs.normalize(vim.fs.abspath(p))
 	p = vim.fs.dirname(p)
@@ -18,14 +21,14 @@ local function is_ansible(p)
 end
 
 vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
-  pattern = { '*' },
-  callback = function(ev)
-    if vim.bo.filetype ~= "yaml" then
-      return vim.bo.filetype
+	pattern = { "*" },
+	callback = function(ev)
+		if vim.bo.filetype ~= "yaml" then
+			return vim.bo.filetype
 		end
 		if not is_ansible(ev.file) then
 			return vim.bo.filetype
 		end
 		vim.bo.filetype = "yaml.ansible"
-  end,
+	end,
 })
