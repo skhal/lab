@@ -6,21 +6,28 @@
 ---
 - name: Configure autoboot
   ansible.builtin.import_tasks: "main_autoboot.yml"
+  tags: autoboot
 
 - name: Configure packages
   ansible.builtin.import_tasks: "main_pkg.yml"
+  tags: pkg
 
 - name: Configure syslog
   ansible.builtin.import_tasks: "main_syslog.yml"
+  tags: syslog
 
 - name: Configure NTP
   ansible.builtin.import_tasks: "main_ntp.yml"
+  tags: ntp
 
 - name: Configure SSH
   ansible.builtin.import_tasks: "main_ssh.yml"
+  tags: ssh
 
 - name: Configure periorid
   ansible.builtin.import_tasks: "main_periodic.yml"
+  tags: periodic
 
 - name: Configure periorid
   ansible.builtin.import_tasks: "main_zfs.yml"
+  tags: zfs
