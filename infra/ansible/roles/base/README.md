@@ -13,6 +13,7 @@ Base configures a FreeBSD server with following changes:
 - pkg: use latest packages, add `outdated` and `vital` aliases, install NeoVim.
 - syslog: migrate RC variable to /etc/rc.conf.d/syslogd and enable console
   logging.
+- ntp: migrate RC variables to /etc/rc.conf.d/ntpd and listen on local IP.
 
 ## Requirements
 

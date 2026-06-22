@@ -1,0 +1,35 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+- name: Migrate ntpd_enable
+  ansible.builtin.import_tasks: "sysrc_migrate.yml"
+  vars:
+    base_sysrc:
+      migrate:
+        name: ntpd_enable
+        path: /etc/rc.conf.d/ntpd
+
+- name: Migrate ntpd_sync_on_start
+  ansible.builtin.import_tasks: "sysrc_migrate.yml"
+  vars:
+    base_sysrc:
+      migrate:
+        name: ntpd_sync_on_start
+        path: /etc/rc.conf.d/ntpd
+
+- name: Update configuration
+  block:
+    - name: NTP config - ignore wildcard interface
+      ansible.builtin.lineinfile:
+        path: /etc/ntp.conf
+        line: "interface ignore wildcard"
+      notify: "restart ntpd"
+
+    - name: NTP config - listen on loopback
+      ansible.builtin.lineinfile:
+        path: /etc/ntp.conf
+        line: "interface listen 127.0.0.1"
+      notify: "restart ntpd"

@@ -35,3 +35,6 @@
 
 - name: Configure syslog
   ansible.builtin.import_tasks: "syslog.yml"
+
+- name: Configure NTP
+  ansible.builtin.import_tasks: "ntp.yml"

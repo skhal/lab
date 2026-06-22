@@ -16,8 +16,6 @@
 # TODO(github.com/skhal/lab/issues/324): migrate these playbooks
 # - name: Break rc.conf into per-service configurations
 #   import_playbook: "playbook/internal/rc_isolate.yaml"
-# - name: Configure Network Time Protorol (NTP)
-#   import_playbook: "playbook/internal/ntp.yaml"
 # - name: Configure periodic
 #   import_playbook: "playbook/internal/periodic.yaml"
 # - name: Configure Packet Filter
