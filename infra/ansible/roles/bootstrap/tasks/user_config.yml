@@ -7,12 +7,12 @@
 - name: "Change shell to tcsh(1) for {{ bootstrap_user_name }}"
   ansible.builtin.user:
     name: "{{ bootstrap_user_name }}"
-    shell: "/bin/tcsh"
+    shell: /bin/tcsh
 
 - name: "Copy tcsh(1) rc for {{ bootstrap_user_name }}"
-  ansible.builtin.template:
+  ansible.builtin.copy:
     src: "./templates/user/{{ bootstrap_user_name }}/dot.cshrc"
     dest: "{{ bootstrap_user_home }}/.cshrc"
     owner: "{{ bootstrap_user_name }}"
     group: "{{ bootstrap_user_group }}"
-    mode: "u=rw,g=r,o=r"
+    mode: u=rw,g=r,o=r
