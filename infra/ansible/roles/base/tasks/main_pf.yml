@@ -1,0 +1,36 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+- name: Enable gateway
+  community.general.sysrc:
+    path: /etc/rc.conf.d/routing
+    name: gateway_enable
+    value: true
+  notify: "restart routing"
+
+- name: Enable pf
+  community.general.sysrc:
+    path: /etc/rc.conf.d/pf
+    name: pf_enable
+    value: true
+  notify: "start pf"
+
+- name: Enable pflog
+  community.general.sysrc:
+    path: /etc/rc.conf.d/pflog
+    name: pflog_enable
+    value: true
+  notify: "start pflog"
+
+- name: Configure pf
+  ansible.builtin.copy:
+    src: files/etc/pf.conf
+    dest: /etc/pf.conf
+    owner: root
+    group: wheel
+    mode: u=rw,g=r,o=r
+    validate: /sbin/pfctl -nf %s
+  notify: "reload pf.conf"

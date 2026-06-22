@@ -18,6 +18,7 @@ Base configures a FreeBSD server with following changes:
   restrict allowed users to `op`.
 - periodic: save daily logs.
 - zfs: migrate rc-vars to /etc/rc.conf.d/zfs and enable scrubs every 2 weeks.
+- pf: enable pf, pflog, and configure with bridge0
 
 ## Requirements
 

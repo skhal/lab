@@ -31,3 +31,7 @@
 - name: Configure periorid
   ansible.builtin.import_tasks: "main_zfs.yml"
   tags: zfs
+
+- name: Configure packet filter
+  ansible.builtin.import_tasks: "main_pf.yml"
+  tags: pf

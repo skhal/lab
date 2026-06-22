@@ -27,3 +27,27 @@
     name: sshd
     state: restarted
   listen: "restart sshd"
+
+- name: Restart routing
+  ansible.builtin.service:
+    name: routing
+    state: restarted
+  listen: "restart routing"
+
+- name: Start pf
+  ansible.builtin.service:
+    name: pf
+    state: started
+  listen: "start pf"
+
+- name: Reload pf.conf
+  ansible.builtin.service:
+    name: pf
+    state: reloaded
+  listen: "reload pf.conf"
+
+- name: Start pflog
+  ansible.builtin.service:
+    name: pflog
+    state: started
+  listen: "start pflog"
