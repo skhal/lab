@@ -1,0 +1,12 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+galaxy_info:
+  author: Samvel Khalatyan
+  description: FreeBSD server base setup
+  license: BSD-3-Clause
+  issue_tracker_url: https://github.com/skhal/lab/issues
+  min_ansible_version: "2.2"
