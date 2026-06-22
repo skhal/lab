@@ -11,6 +11,8 @@ Base configures a FreeBSD server with following changes:
 
 - boot: remove boot delay.
 - pkg: use latest packages, add `outdated` and `vital` aliases, install NeoVim.
+- syslog: migrate RC variable to /etc/rc.conf.d/syslogd and enable console
+  logging.
 
 ## Requirements
 

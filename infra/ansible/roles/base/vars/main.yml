@@ -7,3 +7,8 @@
 base_pkg_alias:
   name: ""
   value: ""
+
+base_sysrc:
+  migrate:
+    path: ""
+    name: ""

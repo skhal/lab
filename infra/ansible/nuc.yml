@@ -24,7 +24,5 @@
 #   import_playbook: "playbook/internal/pf.yaml"
 # - name: Configure SSH
 #   import_playbook: "playbook/internal/ssh.yaml"
-# - name: Configure system logging
-#   import_playbook: "playbook/internal/syslog.yaml"
 # - name: Configure ZFS
 #   import_playbook: "playbook/internal/zfs.yaml"

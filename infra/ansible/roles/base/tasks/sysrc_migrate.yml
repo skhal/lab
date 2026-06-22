@@ -1,0 +1,26 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+- name: "Migrate {{ base_sysrc.migrate.name }}"
+  block:
+    - name: "Get value of {{ base_sysrc.migrate.name }}"
+      ansible.builtin.command:
+        cmd: "sysrc -n {{ base_sysrc.migrate.name }}"
+      register: base_sysrc_migrate_value
+      changed_when: false
+      check_mode: false
+
+    - name: "Remove {{ base_sysrc.migrate.name }}"
+      community.general.sysrc:
+        name: "{{ base_sysrc.migrate.name }}"
+        state: absent
+
+    - name: "Add {{ base_sysrc.migrate.name }}"
+      community.general.sysrc:
+        path: "{{ base_sysrc.migrate.path }}"
+        name: "{{ base_sysrc.migrate.name }}"
+        value: "{{ base_sysrc_migrate_value.stdout }}"
+      when: base_sysrc_migrate_value is succeeded

@@ -28,3 +28,6 @@
   community.general.pkgng:
     name: neovim
     state: latest
+
+- name: Configure syslog
+  ansible.builtin.import_tasks: "syslog.yml"
