@@ -14,12 +14,8 @@
     - role: base
 
 # TODO(github.com/skhal/lab/issues/324): migrate these playbooks
-# - name: Speed up autoboot
-#   import_playbook: "playbook/internal/autoboot.yaml"
 # - name: Break rc.conf into per-service configurations
 #   import_playbook: "playbook/internal/rc_isolate.yaml"
-# - name: Configure packages
-#   import_playbook: "playbook/internal/pkg.yaml"
 # - name: Configure Network Time Protorol (NTP)
 #   import_playbook: "playbook/internal/ntp.yaml"
 # - name: Configure periodic

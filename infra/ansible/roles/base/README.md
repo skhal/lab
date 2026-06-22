@@ -7,7 +7,10 @@
 
 # Base
 
-Base configures a FreeBSD server.
+Base configures a FreeBSD server with following changes:
+
+- boot: remove boot delay.
+- pkg: use latest packages, add `outdated` and `vital` aliases, install NeoVim.
 
 ## Requirements
 
