@@ -4,32 +4,34 @@
 # license that can be found in the LICENSE file.
 
 ---
-- name: Configure Autoboot
+- name: Configure autoboot
   ansible.builtin.import_tasks: "loader_autoboot.yml"
 
-- name: Use latest packages
-  ansible.builtin.import_tasks: "pkg_latest.yml"
+- name: Configure packages
+  block:
+    - name: Use latest packages
+      ansible.builtin.import_tasks: "pkg_latest.yml"
 
-- name: Add pkg alias
-  ansible.builtin.import_tasks: "pkg_alias.yml"
-  vars:
-    base_pkg:
-      alias:
-        name: outdated
-        value: "version -vL="
+    - name: Add pkg alias
+      ansible.builtin.import_tasks: "pkg_alias.yml"
+      vars:
+        base_pkg:
+          alias:
+            name: outdated
+            value: "version -vL="
 
-- name: Add pkg alias
-  ansible.builtin.import_tasks: "pkg_alias.yml"
-  vars:
-    base_pkg:
-      alias:
-        name: vital
-        value: 'query -e \"%V=1\" %n'
+    - name: Add pkg alias
+      ansible.builtin.import_tasks: "pkg_alias.yml"
+      vars:
+        base_pkg:
+          alias:
+            name: vital
+            value: 'query -e \"%V=1\" %n'
 
-- name: Install NeoVim
-  community.general.pkgng:
-    name: neovim
-    state: latest
+    - name: Install NeoVim
+      community.general.pkgng:
+        name: neovim
+        state: latest
 
 - name: Configure syslog
   ansible.builtin.import_tasks: "syslog.yml"
