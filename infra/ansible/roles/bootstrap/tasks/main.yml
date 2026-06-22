@@ -1,0 +1,33 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+- name: "Configure Python 3"
+  ansible.builtin.import_tasks: "pkg_install.yml"
+  vars:
+    bootstrap_package: python3
+
+- name: "Configure doas(1)"
+  ansible.builtin.import_tasks: "pkg_install.yml"
+  vars:
+    bootstrap_package: doas
+
+- name: "Configure root user"
+  ansible.builtin.import_tasks: "user_config.yml"
+  vars:
+    # keep-sorted start
+    bootstrap_user_group: wheel
+    bootstrap_user_home: /root
+    bootstrap_user_name: root
+    # keep-sorted end
+
+- name: "Configure op user"
+  ansible.builtin.import_tasks: "user_config.yml"
+  vars:
+    # keep-sorted start
+    bootstrap_user_group: op
+    bootstrap_user_home: /home/op
+    bootstrap_user_name: op
+    # keep-sorted end

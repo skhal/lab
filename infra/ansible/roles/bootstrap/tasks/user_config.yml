@@ -1,0 +1,18 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+- name: "Change shell to tcsh(1) for {{ bootstrap_user_name }}"
+  ansible.builtin.user:
+    name: "{{ bootstrap_user_name }}"
+    shell: "/bin/tcsh"
+
+- name: "Copy tcsh(1) rc for {{ bootstrap_user_name }}"
+  ansible.builtin.template:
+    src: "./templates/user/{{ bootstrap_user_name }}/dot.cshrc"
+    dest: "{{ bootstrap_user_home }}/.cshrc"
+    owner: "{{ bootstrap_user_name }}"
+    group: "{{ bootstrap_user_group }}"
+    mode: "u=rw,g=r,o=r"
