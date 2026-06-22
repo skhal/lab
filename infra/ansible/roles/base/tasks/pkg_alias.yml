@@ -4,8 +4,8 @@
 # license that can be found in the LICENSE file.
 
 ---
-- name: "Add alias - {{ base_pkg_alias.name }}"
+- name: "Add alias - {{ base_pkg.alias.name }}"
   ansible.builtin.lineinfile:
     path: /usr/local/etc/pkg.conf
     insertafter: "^ALIAS {"
-    line: '    {{ base_pkg_alias.name }} = "{{ base_pkg_alias.value }}";'
+    line: '    {{ base_pkg.alias.name }} = "{{ base_pkg.alias.value }}";'

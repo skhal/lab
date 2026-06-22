@@ -13,16 +13,18 @@
 - name: Add pkg alias
   ansible.builtin.import_tasks: "pkg_alias.yml"
   vars:
-    base_pkg_alias:
-      name: outdated
-      value: "version -vL="
+    base_pkg:
+      alias:
+        name: outdated
+        value: "version -vL="
 
 - name: Add pkg alias
   ansible.builtin.import_tasks: "pkg_alias.yml"
   vars:
-    base_pkg_alias:
-      name: vital
-      value: 'query -e \"%V=1\" %n'
+    base_pkg:
+      alias:
+        name: vital
+        value: 'query -e \"%V=1\" %n'
 
 - name: Install NeoVim
   community.general.pkgng:
