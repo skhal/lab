@@ -14,6 +14,7 @@ Base configures a FreeBSD server with following changes:
 - syslog: migrate RC variable to /etc/rc.conf.d/syslogd and enable console
   logging.
 - ntp: migrate RC variables to /etc/rc.conf.d/ntpd and listen on local IP.
+- ssh: listen on bridge interfaces and restrict users to `op`.
 
 ## Requirements
 

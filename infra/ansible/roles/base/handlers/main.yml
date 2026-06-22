@@ -21,3 +21,9 @@
     name: ntpd
     state: restarted
   listen: "restart ntpd"
+
+- name: Restart sshd
+  ansible.builtin.service:
+    name: sshd
+    state: restarted
+  listen: "restart sshd"

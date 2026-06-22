@@ -6,7 +6,11 @@
 ---
 - name: Configure NUC
   hosts: nuc.lab.net
-  gather_facts: false
+
+  gather_facts: true
+  gather_subset:
+    - network
+
   become: true
   become_method: community.general.doas
 
@@ -20,7 +24,5 @@
 #   import_playbook: "playbook/internal/periodic.yaml"
 # - name: Configure Packet Filter
 #   import_playbook: "playbook/internal/pf.yaml"
-# - name: Configure SSH
-#   import_playbook: "playbook/internal/ssh.yaml"
 # - name: Configure ZFS
 #   import_playbook: "playbook/internal/zfs.yaml"

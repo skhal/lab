@@ -15,3 +15,6 @@
 
 - name: Configure NTP
   ansible.builtin.import_tasks: "main_ntp.yml"
+
+- name: Configure SSH
+  ansible.builtin.import_tasks: "main_ssh.yml"
