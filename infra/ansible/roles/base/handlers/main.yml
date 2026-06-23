@@ -4,56 +4,20 @@
 # license that can be found in the LICENSE file.
 
 ---
-- name: Upgrade packages
-  ansible.builtin.service:
-    name: "*"
-    state: latest
-  listen: "upgrade_packages"
+- name: Handle pkg
+  ansible.builtin.import_tasks: "sub_pkg.yml"
 
-- name: Restart syslogd
-  ansible.builtin.service:
-    name: syslogd
-    state: restarted
-  listen: "restart_syslogd"
+- name: Handle syslog
+  ansible.builtin.import_tasks: "sub_syslog.yml"
 
-- name: Restart ntpd
-  ansible.builtin.service:
-    name: ntpd
-    state: restarted
-  listen: "restart_ntpd"
+- name: Handle ntp
+  ansible.builtin.import_tasks: "sub_ntp.yml"
 
-- name: Restart sshd
-  ansible.builtin.service:
-    name: sshd
-    state: restarted
-  listen: "restart_sshd"
+- name: Handle ssh
+  ansible.builtin.import_tasks: "sub_ssh.yml"
 
-- name: Restart routing
-  ansible.builtin.service:
-    name: routing
-    state: restarted
-  listen: "restart_routing"
+- name: Handle packet filter
+  ansible.builtin.import_tasks: "sub_pf.yml"
 
-- name: Start pf
-  ansible.builtin.service:
-    name: pf
-    state: started
-  listen: "start_pf"
-
-- name: Reload pf.conf
-  ansible.builtin.service:
-    name: pf
-    state: reloaded
-  listen: "reload_pf_conf"
-
-- name: Start pflog
-  ansible.builtin.service:
-    name: pflog
-    state: started
-  listen: "start_pflog"
-
-- name: Restart network
-  ansible.builtin.service:
-    name: network
-    state: restarted
-  listen: "restart_network"
+- name: Handle network
+  ansible.builtin.import_tasks: "sub_network.yml"

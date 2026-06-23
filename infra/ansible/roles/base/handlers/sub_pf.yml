@@ -1,0 +1,23 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+- name: Start pf
+  ansible.builtin.service:
+    name: pf
+    state: started
+  listen: "start_pf"
+
+- name: Reload pf.conf
+  ansible.builtin.service:
+    name: pf
+    state: reloaded
+  listen: "reload_pf_conf"
+
+- name: Start pflog
+  ansible.builtin.service:
+    name: pflog
+    state: started
+  listen: "start_pflog"
