@@ -12,6 +12,10 @@
   ansible.builtin.import_tasks: "main_hostname.yml"
   tags: hostname
 
+- name: Configure moused
+  ansible.builtin.import_tasks: "main_moused.yml"
+  tags: moused
+
 - name: Configure routing
   ansible.builtin.import_tasks: "main_routing.yml"
   tags: routing
