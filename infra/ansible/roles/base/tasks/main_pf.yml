@@ -9,14 +9,14 @@
     path: /etc/rc.conf.d/routing
     name: gateway_enable
     value: true
-  notify: "restart routing"
+  notify: "restart_routing"
 
 - name: "Enable pflog"
   community.general.sysrc:
     path: /etc/rc.conf.d/pflog
     name: pflog_enable
     value: true
-  notify: "start pflog"
+  notify: "start_pflog"
 
 - name: "Configure pf"
   block:
@@ -25,7 +25,7 @@
         path: /etc/rc.conf.d/pf
         name: pf_enable
         value: true
-      notify: "start pf"
+      notify: "start_pf"
 
     - name: "Configure pf"
       ansible.builtin.copy:
@@ -35,4 +35,4 @@
         group: wheel
         mode: u=rw,g=r,o=r
         validate: /sbin/pfctl -nf %s
-      notify: "reload pf.conf"
+      notify: "reload_pf_conf"

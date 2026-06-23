@@ -20,4 +20,4 @@
     path: /etc/rc.conf.d/routing
     name: defaultrouter
     value: "{{ router.ip }}"
-  notify: "restart routing"
+  notify: "restart_routing"

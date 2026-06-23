@@ -18,10 +18,10 @@
         path: /etc/ssh/sshd_config
         line: "ListenAddress={{ ansible_facts[item].ipv4 | map(attribute='address') | flatten | first }}"
       loop: "{{ ansible_facts.interfaces | select('match', '^bridge') }}"
-      notify: "restart sshd"
+      notify: "restart_sshd"
 
     - name: "SSH allow op user"
       ansible.builtin.lineinfile:
         path: /etc/ssh/sshd_config
         line: "AllowUsers=op"
-      notify: "restart sshd"
+      notify: "restart_sshd"

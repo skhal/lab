@@ -24,7 +24,7 @@
     path: /etc/rc.conf.d/network
     name: "ifconfig_{{ network.ethernet_iface }}"
     value: up
-  notify: "restart network"
+  notify: "restart_network"
 
 - name: Configure bridges
   ansible.builtin.include_tasks: "ifconfig_bridge.yml"

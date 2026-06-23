@@ -8,52 +8,52 @@
   ansible.builtin.service:
     name: "*"
     state: latest
-  listen: "upgrade packages"
+  listen: "upgrade_packages"
 
 - name: Restart syslogd
   ansible.builtin.service:
     name: syslogd
     state: restarted
-  listen: "restart syslogd"
+  listen: "restart_syslogd"
 
 - name: Restart ntpd
   ansible.builtin.service:
     name: ntpd
     state: restarted
-  listen: "restart ntpd"
+  listen: "restart_ntpd"
 
 - name: Restart sshd
   ansible.builtin.service:
     name: sshd
     state: restarted
-  listen: "restart sshd"
+  listen: "restart_sshd"
 
 - name: Restart routing
   ansible.builtin.service:
     name: routing
     state: restarted
-  listen: "restart routing"
+  listen: "restart_routing"
 
 - name: Start pf
   ansible.builtin.service:
     name: pf
     state: started
-  listen: "start pf"
+  listen: "start_pf"
 
 - name: Reload pf.conf
   ansible.builtin.service:
     name: pf
     state: reloaded
-  listen: "reload pf.conf"
+  listen: "reload_pf_conf"
 
 - name: Start pflog
   ansible.builtin.service:
     name: pflog
     state: started
-  listen: "start pflog"
+  listen: "start_pflog"
 
 - name: Restart network
   ansible.builtin.service:
     name: network
     state: restarted
-  listen: "restart network"
+  listen: "restart_network"

@@ -24,10 +24,10 @@
       ansible.builtin.lineinfile:
         path: /etc/ntp.conf
         line: interface ignore wildcard
-      notify: restart ntpd
+      notify: "restart_ntpd"
 
     - name: "NTP config - listen on loopback"
       ansible.builtin.lineinfile:
         path: /etc/ntp.conf
         line: interface listen 127.0.0.1
-      notify: restart ntpd
+      notify: "restart_ntpd"

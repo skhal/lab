@@ -17,4 +17,4 @@
     regexp: "^#(console.info.*)$"
     line: "\\1"
     backrefs: true
-  notify: "restart syslogd"
+  notify: "restart_syslogd"

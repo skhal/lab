@@ -25,11 +25,11 @@
     name: cloned_interfaces
     state: value_present
     value: "{{ bridge.name }}"
-  notify: "restart network"
+  notify: "restart_network"
 
 - name: "Configure {{ bridge.name }}"
   community.general.sysrc:
     path: /etc/rc.conf.d/network
     name: "ifconfig_{{ bridge.name }}"
     value: "inet {{ bridge.ip }} addm {{ bridge.member }} up descr {{ bridge.descr }}"
-  notify: "restart network"
+  notify: "restart_network"
