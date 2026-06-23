@@ -3,10 +3,14 @@
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 
+# VARIABLES
+#
+# bootstrap_vars struct {
+#   // packages is a list of pkg(1) names to install.
+#   packages []string
+# }
 ---
 - name: Install python and doas
   community.general.pkgng:
-    name:
-      - python3
-      - doas
+    name: "{{ bootstrap_vars.packages }}"
     state: present

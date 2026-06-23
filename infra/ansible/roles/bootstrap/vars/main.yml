@@ -4,4 +4,7 @@
 # license that can be found in the LICENSE file.
 
 ---
-bootstrap_package: ""
+bootstrap_vars:
+  packages:
+    - python3
+    - doas
