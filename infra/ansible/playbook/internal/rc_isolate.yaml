@@ -26,17 +26,6 @@
         name: defaultrouter
         value: 192.168.10.1
 
-    - name: Remove hostname
-      community.general.sysrc:
-        name: hostname
-        state: absent
-
-    - name: Add hostname
-      community.general.sysrc:
-        path: /etc/rc.conf.d/hostname
-        name: hostname
-        value: nuc.lab.net
-
     - name: Remove moused_nondefault_enable
       community.general.sysrc:
         name: moused_nondefault_enable

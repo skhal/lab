@@ -8,6 +8,10 @@
   ansible.builtin.import_tasks: "main_autoboot.yml"
   tags: autoboot
 
+- name: Configure hostname
+  ansible.builtin.import_tasks: "main_hostname.yml"
+  tags: hostname
+
 - name: Configure packages
   ansible.builtin.import_tasks: "main_pkg.yml"
   tags: pkg
