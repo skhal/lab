@@ -40,3 +40,12 @@ Configure NUC without root privileges:
 ```console
 $ ansible-playbook ./nuc.yaml
 ```
+
+## Test
+
+Test configuration with:
+
+```console
+$ ansible-playbook nuc.yml --check --diff
+$ ansible-playbook nuc.yml --check --diff --tags dumpdev
+```
