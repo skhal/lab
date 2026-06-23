@@ -12,6 +12,10 @@
   ansible.builtin.import_tasks: "main_hostname.yml"
   tags: hostname
 
+- name: Configure dumpdev
+  ansible.builtin.import_tasks: "main_dumpdev.yml"
+  tags: dumpdev
+
 - name: Configure moused
   ansible.builtin.import_tasks: "main_moused.yml"
   tags: moused
