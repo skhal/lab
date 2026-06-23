@@ -9,6 +9,7 @@
 
 Base configures a FreeBSD server with following changes:
 
+- users: configure `root` and `op` users with tcsh(1).
 - boot: remove boot delay.
 - hostname: migrate rc-vars to /etc/rc.conf.d/hostname.
 - moused: migrate rc-vars to /etc/rc.conf.d/moused.

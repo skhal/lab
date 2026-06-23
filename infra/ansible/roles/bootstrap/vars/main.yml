@@ -4,9 +4,4 @@
 # license that can be found in the LICENSE file.
 
 ---
-# keep-sorted start
 bootstrap_package: ""
-bootstrap_user_group: ""
-bootstrap_user_home: ""
-bootstrap_user_name: ""
-# keep-sorted end

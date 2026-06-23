@@ -4,6 +4,10 @@
 # license that can be found in the LICENSE file.
 
 ---
+- name: Configure users
+  ansible.builtin.import_tasks: "main_users.yml"
+  tags: users
+
 - name: Configure autoboot
   ansible.builtin.import_tasks: "main_autoboot.yml"
   tags: autoboot
