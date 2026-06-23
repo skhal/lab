@@ -16,14 +16,14 @@
 #   home string
 # }
 ---
-- name: Setup users with tcsh
+- name: "Setup users with tcsh"
   block:
-    - name: Change shell to tcsh for {{ user.name }}
+    - name: "Change shell to tcsh for {{ user.name }}"
       ansible.builtin.user:
         name: "{{ user.name }}"
         shell: /bin/tcsh
 
-    - name: Copy cshrc for {{ user.name }}
+    - name: "Copy cshrc for {{ user.name }}"
       ansible.builtin.copy:
         src: ./files/{{ user.home }}/dot.cshrc
         dest: "{{ user.home }}/.cshrc"

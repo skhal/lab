@@ -4,24 +4,23 @@
 # license that can be found in the LICENSE file.
 
 ---
-- name: Migrate sshd_enable
+- name: "Migrate sshd_enable"
   ansible.builtin.import_tasks: "sysrc_migrate.yml"
   vars:
-    base_sysrc:
-      migrate:
-        name: sshd_enable
-        path: /etc/rc.conf.d/sshd
+    migrate:
+      name: sshd_enable
+      path: /etc/rc.conf.d/sshd
 
-- name: Update configuration
+- name: "Update configuration"
   block:
-    - name: Listen on bridge interfaces
+    - name: "SSH listen on bridge interfaces"
       ansible.builtin.lineinfile:
         path: /etc/ssh/sshd_config
         line: "ListenAddress={{ ansible_facts[item].ipv4 | map(attribute='address') | flatten | first }}"
       loop: "{{ ansible_facts.interfaces | select('match', '^bridge') }}"
       notify: "restart sshd"
 
-    - name: Allow op
+    - name: "SSH allow op user"
       ansible.builtin.lineinfile:
         path: /etc/ssh/sshd_config
         line: "AllowUsers=op"

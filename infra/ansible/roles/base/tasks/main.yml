@@ -31,6 +31,9 @@
 - name: Configure routing
   ansible.builtin.import_tasks: "main_routing.yml"
   tags: routing
+  vars:
+    router:
+      ip: base_vars.network.defaultrouter_ip
 
 - name: Configure packages
   ansible.builtin.import_tasks: "main_pkg.yml"
@@ -48,17 +51,19 @@
   ansible.builtin.import_tasks: "main_ssh.yml"
   tags: ssh
 
-- name: Configure periorid
+- name: Configure periodic
   ansible.builtin.import_tasks: "main_periodic.yml"
   tags: periodic
 
-- name: Configure periorid
+- name: Configure zfs
   ansible.builtin.import_tasks: "main_zfs.yml"
   tags: zfs
 
 - name: Configure network
   ansible.builtin.import_tasks: "main_network.yml"
   tags: network
+  vars:
+    network: "{{ base_vars.network }}"
 
 - name: Configure packet filter
   ansible.builtin.import_tasks: "main_pf.yml"

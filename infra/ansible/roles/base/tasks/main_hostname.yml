@@ -4,10 +4,9 @@
 # license that can be found in the LICENSE file.
 
 ---
-- name: Migrate hostname
-  ansible.builtin.import_tasks: "sysrc_migrate.yml"
+- name: "Migrate hostname"
+  ansible.builtin.include_tasks: "sysrc_migrate.yml"
   vars:
-    base_sysrc:
-      migrate:
-        name: hostname
-        path: /etc/rc.conf.d/hostname
+    migrate:
+      name: hostname
+      path: /etc/rc.conf.d/hostname

@@ -4,7 +4,7 @@
 # license that can be found in the LICENSE file.
 
 ---
-- name: Send daily logs to /var/log/daily.log
+- name: "Send daily logs to /var/log/daily.log"
   community.general.sysrc:
     path: /etc/periodic.conf
     name: daily_output

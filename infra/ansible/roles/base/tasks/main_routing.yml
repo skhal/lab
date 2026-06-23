@@ -3,15 +3,21 @@
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 
+# VARIABLES
+#
+# router struct {
+#   // ip is the default router's IP address.
+#   ip string
+# }
 ---
-- name: Remove defaultrouter
+- name: "Remove defaultrouter from /etc/rc.conf"
   community.general.sysrc:
     name: defaultrouter
     state: absent
 
-- name: "Set defaultrouter to {{ base_network.defaultrouter_ip }}"
+- name: Set defaultrouter to {{ router.ip }}
   community.general.sysrc:
     path: /etc/rc.conf.d/routing
     name: defaultrouter
-    value: "{{ base_network.defaultrouter_ip }}"
+    value: "{{ router.ip }}"
   notify: "restart routing"

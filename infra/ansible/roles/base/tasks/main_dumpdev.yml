@@ -4,7 +4,7 @@
 # license that can be found in the LICENSE file.
 
 ---
-- name: Remove dumpdev
+- name: "Remove dumpdev from /etc/rc.conf"
   community.general.sysrc:
     name: dumpdev
     state: absent

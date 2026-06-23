@@ -3,18 +3,33 @@
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 
+# VARIABLES
+#
+# bridge struct {
+#   // name is the bridge name, e.g. bridge0.
+#   name string
+#
+#   // ip is the bridge ip with sub-network, e.g. 1.2.3.4/24
+#   ip string
+#
+#   // member is the member interface.
+#   member
+#
+#   // descr is the bridge description.
+#   descr
+# }
 ---
-- name: "Add {{ base_bridge.name }}"
+- name: "Add {{ bridge.name }}"
   community.general.sysrc:
     path: /etc/rc.conf.d/network
     name: cloned_interfaces
     state: value_present
-    value: "{{ base_bridge.name }}"
+    value: "{{ bridge.name }}"
   notify: "restart network"
 
-- name: "Configure {{ base_bridge.name }}"
+- name: "Configure {{ bridge.name }}"
   community.general.sysrc:
     path: /etc/rc.conf.d/network
-    name: "ifconfig_{{ base_bridge.name }}"
-    value: "inet {{ base_bridge.ip }} addm {{ base_bridge.member_iface }} up descr {{ base_bridge.description }}"
+    name: "ifconfig_{{ bridge.name }}"
+    value: "inet {{ bridge.ip }} addm {{ bridge.member }} up descr {{ bridge.descr }}"
   notify: "restart network"

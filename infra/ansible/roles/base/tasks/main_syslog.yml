@@ -7,12 +7,11 @@
 - name: "Migrate syslogd_flags"
   ansible.builtin.import_tasks: "sysrc_migrate.yml"
   vars:
-    base_sysrc:
-      migrate:
-        name: syslogd_flags
-        path: /etc/rc.conf.d/syslogd
+    migrate:
+      name: syslogd_flags
+      path: /etc/rc.conf.d/syslogd
 
-- name: Enable console logs
+- name: "Enable console logs"
   ansible.builtin.lineinfile:
     path: /etc/syslog.conf
     regexp: "^#(console.info.*)$"

@@ -4,21 +4,20 @@
 # license that can be found in the LICENSE file.
 
 ---
-- name: Migrate zfs_enable
+- name: "Migrate zfs_enable"
   ansible.builtin.import_tasks: "sysrc_migrate.yml"
   vars:
-    base_sysrc:
-      migrate:
-        name: zfs_enable
-        path: /etc/rc.conf.d/zfs
+    migrate:
+      name: zfs_enable
+      path: /etc/rc.conf.d/zfs
 
-- name: Scrub every 2 weeks
+- name: "Scrub every 2 weeks"
   community.general.sysrc:
     path: /etc/periodic.conf
     name: daily_scrub_zfs_default_threshold
     value: 14
 
-- name: Enable periodic scrub
+- name: "Enable periodic scrub"
   community.general.sysrc:
     path: /etc/periodic.conf
     name: daily_scrub_zfs_enable

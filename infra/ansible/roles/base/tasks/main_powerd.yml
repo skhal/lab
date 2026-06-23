@@ -4,12 +4,12 @@
 # license that can be found in the LICENSE file.
 
 ---
-- name: Remove powerd_enable
+- name: "Remove powerd_enable from /etc/rc.conf"
   community.general.sysrc:
     name: powerd_enable
     state: absent
 
-- name: Add powerd_enable
+- name: "Add powerd_enable to /etc/rc.conf.d/powerd"
   community.general.sysrc:
     path: /etc/rc.conf.d/powerd
     name: powerd_enable

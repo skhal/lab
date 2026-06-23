@@ -3,24 +3,35 @@
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 
+# VARIABLES
+#
+# migrate struct {
+#   // name is the rc-variable name to migrate.
+#   name string
+#
+#   // path is the destination rc.conf file to place the variable to.
+#   path string
+# }
 ---
-- name: "Migrate {{ base_sysrc.migrate.name }}"
+- name: "Migrate rc-vars"
   block:
-    - name: "Get value of {{ base_sysrc.migrate.name }}"
+    # noqa: var-naming[no-role-prefix] name[template]
+    - name: "Retrieve {{ migrate.name }} from /etc/rc.conf"
       ansible.builtin.command:
-        cmd: "sysrc -n {{ base_sysrc.migrate.name }}"
-      register: base_sysrc_migrate_value
+        cmd: "sysrc -n {{ migrate.name }}"
+      register: migrate_value
       changed_when: false
       check_mode: false
 
-    - name: "Remove {{ base_sysrc.migrate.name }}"
+    - name: "Remove {{ migrate.name }} from /etc/rc.conf"
       community.general.sysrc:
-        name: "{{ base_sysrc.migrate.name }}"
+        name: "{{ migrate.name }}"
         state: absent
 
-    - name: "Add {{ base_sysrc.migrate.name }}"
+    # noqa: name[template]
+    - name: "Store {{ migrate.name }} in {{ migrate.path }}"
       community.general.sysrc:
-        path: "{{ base_sysrc.migrate.path }}"
-        name: "{{ base_sysrc.migrate.name }}"
-        value: "{{ base_sysrc_migrate_value.stdout }}"
-      when: base_sysrc_migrate_value is succeeded
+        name: "{{ migrate.name }}"
+        value: "{{ migrate_value.stdout }}"
+        path: "{{ migrate.path }}"
+      when: migrate_value is succeeded

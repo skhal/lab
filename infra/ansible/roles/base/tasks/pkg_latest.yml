@@ -4,7 +4,7 @@
 # license that can be found in the LICENSE file.
 
 ---
-- name: Use latest branch
+- name: "Use latest branch"
   ansible.builtin.copy:
     src: ./files/usr/local/etc/pkg/repos/FreeBSD.conf
     dest: /usr/local/etc/pkg/repos/FreeBSD.conf
