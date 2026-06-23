@@ -13,5 +13,17 @@ base_sysrc:
     path: ""
     name: ""
 
-base_routing:
-  router_ip: "192.168.10.1"
+base_bridge:
+  name: "" # bridge0
+  ip: "" # 1.2.3.4/24
+  member_iface: "" # igc0
+  description: "" # text
+
+base_network:
+  defaultrouter_ip: "" # 1.2.3.1
+  ethernet_iface: "" # igc0
+  bridges:
+    - name: "" # bridge0
+      ip: "" # 1.2.3.4/24
+      member_iface: "" # igc0
+      description: "" # text

@@ -1,0 +1,27 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+- name: "Remove ifconfig_{{ base_network.ethernet_iface }}"
+  community.general.sysrc:
+    name: "ifconfig_{{ base_network.ethernet_iface }}"
+    state: absent
+
+- name: "Add ifconfig_{{ base_network.ethernet_iface }}"
+  community.general.sysrc:
+    path: /etc/rc.conf.d/network
+    name: "ifconfig_{{ base_network.ethernet_iface }}"
+    value: up
+  notify: "restart network"
+
+- name: "Configure bridges"
+  ansible.builtin.include_tasks: "ifconfig_bridge.yml"
+  vars:
+    base_bridge:
+      name: "{{ item.name }}"
+      ip: "{{ item.ip }}"
+      member_iface: "{{ item.member_iface }}"
+      description: "{{ item.description }}"
+  loop: "{{ base_network.bridges }}"

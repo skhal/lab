@@ -48,6 +48,10 @@
   ansible.builtin.import_tasks: "main_zfs.yml"
   tags: zfs
 
+- name: Configure network
+  ansible.builtin.import_tasks: "main_network.yml"
+  tags: network
+
 - name: Configure packet filter
   ansible.builtin.import_tasks: "main_pf.yml"
   tags: pf

@@ -17,8 +17,14 @@
   roles:
     - role: base
       vars:
-        base_routing:
-          router_ip: 192.168.10.1
+        base_network:
+          defaultrouter_ip: 192.168.10.1
+          ethernet_iface: igc0
+          bridges:
+            - name: bridge0
+              ip: 192.168.10.101/24
+              member_iface: igc0
+              description: jail:ext
 
 # TODO(github.com/skhal/lab/issues/324): migrate these playbooks
 # - name: Break rc.conf into per-service configurations

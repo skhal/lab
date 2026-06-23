@@ -51,3 +51,9 @@
     name: pflog
     state: started
   listen: "start pflog"
+
+- name: Restart network
+  ansible.builtin.service:
+    name: network
+    state: restarted
+  listen: "restart network"

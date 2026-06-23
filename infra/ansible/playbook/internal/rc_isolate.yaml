@@ -14,27 +14,3 @@
       community.general.sysrc:
         name: dumpdev
         state: absent
-
-    - name: Remove ifconfig_igc0
-      community.general.sysrc:
-        name: ifconfig_igc0
-        state: absent
-
-    - name: Add ifconfig_igc0
-      community.general.sysrc:
-        path: /etc/rc.conf.d/network
-        name: ifconfig_igc0
-        value: up
-
-    - name: Add bridge0
-      community.general.sysrc:
-        path: /etc/rc.conf.d/network
-        name: cloned_interfaces
-        state: value_present
-        value: bridge0
-
-    - name: Configure bridge0
-      community.general.sysrc:
-        path: /etc/rc.conf.d/network
-        name: ifconfig_bridge0
-        value: "inet 192.168.10.101/24 addm igc0 up descr jail:ext"
