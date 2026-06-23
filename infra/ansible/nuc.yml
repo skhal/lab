@@ -16,9 +16,10 @@
 
   roles:
     - role: base
+      vars:
+        base_routing:
+          router_ip: 192.168.10.1
 
 # TODO(github.com/skhal/lab/issues/324): migrate these playbooks
 # - name: Break rc.conf into per-service configurations
 #   import_playbook: "playbook/internal/rc_isolate.yaml"
-# - name: Configure Packet Filter
-#   import_playbook: "playbook/internal/pf.yaml"

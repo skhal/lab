@@ -15,17 +15,6 @@
         name: dumpdev
         state: absent
 
-    - name: Remove defaultrouter
-      community.general.sysrc:
-        name: defaultrouter
-        state: absent
-
-    - name: Add defaultrouter
-      community.general.sysrc:
-        path: /etc/rc.conf.d/routing
-        name: defaultrouter
-        value: 192.168.10.1
-
     - name: Remove moused_nondefault_enable
       community.general.sysrc:
         name: moused_nondefault_enable
