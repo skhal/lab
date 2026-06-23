@@ -4,12 +4,9 @@
 # license that can be found in the LICENSE file.
 
 ---
-- name: "Configure Python 3"
-  ansible.builtin.import_tasks: "pkg_install.yml"
-  vars:
-    bootstrap_package: python3
-
-- name: "Configure doas(1)"
-  ansible.builtin.import_tasks: "pkg_install.yml"
-  vars:
-    bootstrap_package: doas
+- name: Install python and doas
+  community.general.pkgng:
+    name:
+      - python3
+      - doas
+    state: present
