@@ -10,7 +10,7 @@
 #   packages []string
 # }
 ---
-- name: Install python and doas
+- name: "Install python and doas"
   community.general.pkgng:
     name: "{{ bootstrap_vars.packages }}"
     state: present
