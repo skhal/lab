@@ -12,7 +12,10 @@ end
 
 vim.filetype.add({
 	extension = {
+		-- keep-sorted start
+		["yaml.ansible"] = "yaml.ansible",
 		yaml = detect_filetype,
 		yml = detect_filetype,
+		-- keep-sorted end
 	},
 })
