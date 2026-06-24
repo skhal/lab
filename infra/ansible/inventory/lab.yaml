@@ -3,8 +3,20 @@
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 
+---
 lab:
   hosts: nuc.lab.net
   vars:
+    # keep-sorted start
+    # ansible_async_dir is the location to store async job ids for async_status
+    # to check for the job status. It is usually per-user and async jobs that
+    # where run with `become_method: doas` go under root-user even if
+    # become_user is not set. In result, an async_status can't find the async
+    # jid unless it is run with "become_user: root".
+    # To solve the issue, we place .ansible_async somewhere on the file system,
+    # in user-independent location, that persists across reboots (see hier(7)).
+    # https://github.com/skhal/lab/issues/325#issuecomment-4791597578
+    ansible_async_dir: /var/tmp/.ansible_async
     ansible_python_interpreter: /usr/local/bin/python
     ansible_user: op
+    # keep-sorted end
