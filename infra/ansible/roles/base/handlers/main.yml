@@ -4,20 +4,31 @@
 # license that can be found in the LICENSE file.
 
 ---
-- name: Handle pkg
-  ansible.builtin.import_tasks: "sub_pkg.yml"
+# pre-network handlers don't need network access and can run before network
+# changes take place.
+- name: "Pre-network tasks"
+  block:
+    - name: Handle syslog
+      ansible.builtin.import_tasks: "sub_syslog.yml"
 
-- name: Handle syslog
-  ansible.builtin.import_tasks: "sub_syslog.yml"
+    - name: Handle ntp
+      ansible.builtin.import_tasks: "sub_ntp.yml"
 
-- name: Handle ntp
-  ansible.builtin.import_tasks: "sub_ntp.yml"
+# network changes modify network settings: routing, interfaces, packet filter,
+# etc.
+- name: "Network changes"
+  block:
+    - name: Handle network
+      ansible.builtin.import_tasks: "sub_network.yml"
 
-- name: Handle ssh
-  ansible.builtin.import_tasks: "sub_ssh.yml"
+    - name: Handle packet filter
+      ansible.builtin.import_tasks: "sub_pf.yml"
 
-- name: Handle packet filter
-  ansible.builtin.import_tasks: "sub_pf.yml"
+# post-network changes use modified network stack.
+- name: "Post-network changes"
+  block:
+    - name: Handle pkg
+      ansible.builtin.import_tasks: "sub_pkg.yml"
 
-- name: Handle network
-  ansible.builtin.import_tasks: "sub_network.yml"
+    - name: Handle ssh
+      ansible.builtin.import_tasks: "sub_ssh.yml"
