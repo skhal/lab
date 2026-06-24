@@ -4,14 +4,36 @@
 # license that can be found in the LICENSE file.
 
 ---
-- name: Restart routing
+- name: "Restart routing"
+  listen: "restart_routing"
   ansible.builtin.service:
     name: routing
     state: restarted
-  listen: "restart_routing"
+  async: 30
+  poll: 5
+  register: base_restart_routing_job
 
-- name: Restart network
-  ansible.builtin.service:
-    name: network
-    state: restarted
+- name: "Wait for routing to restart"
+  listen: "restart_routing"
+  ansible.builtin.async_status:
+    jid: "{{ base_restart_routing_job.ansible_job_id }}"
+  retries: 10
+  register: base_restart_routing_result
+  until: base_restart_routing_result is finished
+
+- name: "Restart network"
   listen: "restart_network"
+  ansible.builtin.service:
+    name: netif
+    state: restarted
+  async: 30
+  poll: 5
+  register: base_restart_network_job
+
+- name: "Wait for network to restart"
+  listen: "restart_network"
+  ansible.builtin.async_status:
+    jid: "{{ base_restart_network_job.ansible_job_id }}"
+  retries: 10
+  register: base_restart_routing_result
+  until: base_restart_routing_result is finished
