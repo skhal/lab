@@ -5,22 +5,20 @@
 
 ---
 base_vars:
-  network:
-    defaultrouter_ip: 192.168.10.1
-    ethernet_iface: igc0
-    bridges:
-      - name: bridge0
-        ip: 192.168.10.101/24
-        member_iface: igc0
-        description: jail:ext
-  users:
-    - name: root
-      group: wheel
-      home: /root
-    - name: op
+  # keep-sorted start
   pkg:
     aliases:
+      # keep-sorted start
       - name: outdated
         value: "version -vL="
       - name: vital
         value: 'query -e \"%V=1\" %n'
+      # keep-sorted end
+  users:
+    # keep-sorted start
+    - name: op
+    - name: root
+      group: wheel
+      home: /root
+    # keep-sorted end
+  # keep-sorted end

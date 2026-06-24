@@ -19,4 +19,17 @@ lab:
     ansible_async_dir: /var/tmp/.ansible_async
     ansible_python_interpreter: /usr/local/bin/python
     ansible_user: op
+    base_vars:
+      # keep-sorted start
+      network:
+        defaultrouter_ip: 192.168.10.1
+        ethernet_iface: igc0
+        bridges:
+          # keep-sorted start
+          - name: bridge0
+            ip: 192.168.10.101/24
+            member_iface: igc0
+            description: jail:ext
+          # keep-sorted end
+      # keep-sorted end
     # keep-sorted end
