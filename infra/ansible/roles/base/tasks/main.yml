@@ -4,67 +4,84 @@
 # license that can be found in the LICENSE file.
 
 ---
-- name: Configure users
-  ansible.builtin.import_tasks: "sub_users.yml"
-  tags: users
+# pre-network tasks don't need network access and can run before network
+# changes take place.
+- name: "Pre-network tasks"
+  block:
+    - name: Configure users
+      ansible.builtin.import_tasks: "sub_users.yml"
+      tags: users
 
-- name: Configure autoboot
-  ansible.builtin.import_tasks: "sub_autoboot.yml"
-  tags: autoboot
+    - name: Configure autoboot
+      ansible.builtin.import_tasks: "sub_autoboot.yml"
+      tags: autoboot
 
-- name: Configure hostname
-  ansible.builtin.import_tasks: "sub_hostname.yml"
-  tags: hostname
+    - name: Configure hostname
+      ansible.builtin.import_tasks: "sub_hostname.yml"
+      tags: hostname
 
-- name: Configure dumpdev
-  ansible.builtin.import_tasks: "sub_dumpdev.yml"
-  tags: dumpdev
+    - name: Configure dumpdev
+      ansible.builtin.import_tasks: "sub_dumpdev.yml"
+      tags: dumpdev
 
-- name: Configure moused
-  ansible.builtin.import_tasks: "sub_moused.yml"
-  tags: moused
+    - name: Configure moused
+      ansible.builtin.import_tasks: "sub_moused.yml"
+      tags: moused
 
-- name: Configure powerd
-  ansible.builtin.import_tasks: "sub_powerd.yml"
-  tags: powerd
+    - name: Configure powerd
+      ansible.builtin.import_tasks: "sub_powerd.yml"
+      tags: powerd
 
-- name: Configure routing
-  ansible.builtin.import_tasks: "sub_routing.yml"
-  tags: routing
-  vars:
-    router:
-      ip: base_vars.network.defaultrouter_ip
+    - name: Configure syslog
+      ansible.builtin.import_tasks: "sub_syslog.yml"
+      tags: syslog
 
-- name: Configure packages
-  ansible.builtin.import_tasks: "sub_pkg.yml"
-  tags: pkg
+    - name: Configure NTP
+      ansible.builtin.import_tasks: "sub_ntp.yml"
+      tags: ntp
 
-- name: Configure syslog
-  ansible.builtin.import_tasks: "sub_syslog.yml"
-  tags: syslog
+    - name: Configure periodic
+      ansible.builtin.import_tasks: "sub_periodic.yml"
+      tags: periodic
 
-- name: Configure NTP
-  ansible.builtin.import_tasks: "sub_ntp.yml"
-  tags: ntp
+    - name: Configure zfs
+      ansible.builtin.import_tasks: "sub_zfs.yml"
+      tags: zfs
 
-- name: Configure SSH
-  ansible.builtin.import_tasks: "sub_ssh.yml"
-  tags: ssh
+    - name: "Flush changes"
+      ansible.builtin.meta: flush_handlers
 
-- name: Configure periodic
-  ansible.builtin.import_tasks: "sub_periodic.yml"
-  tags: periodic
+# network changes modify network settings: routing, interfaces, packet filter,
+# etc.
+- name: "Network changes"
+  block:
+    - name: Configure routing
+      ansible.builtin.import_tasks: "sub_routing.yml"
+      tags: routing
+      vars:
+        router:
+          ip: base_vars.network.defaultrouter_ip
 
-- name: Configure zfs
-  ansible.builtin.import_tasks: "sub_zfs.yml"
-  tags: zfs
+    - name: Configure network
+      ansible.builtin.import_tasks: "sub_network.yml"
+      tags: network
+      vars:
+        network: "{{ base_vars.network }}"
 
-- name: Configure network
-  ansible.builtin.import_tasks: "sub_network.yml"
-  tags: network
-  vars:
-    network: "{{ base_vars.network }}"
+    - name: Configure packet filter
+      ansible.builtin.import_tasks: "sub_pf.yml"
+      tags: pf
 
-- name: Configure packet filter
-  ansible.builtin.import_tasks: "sub_pf.yml"
-  tags: pf
+    - name: "Flush network changes"
+      ansible.builtin.meta: flush_handlers
+
+# post-network changes use modified network stack.
+- name: "Post-network changes"
+  block:
+    - name: Configure packages
+      ansible.builtin.import_tasks: "sub_pkg.yml"
+      tags: pkg
+
+    - name: Configure SSH
+      ansible.builtin.import_tasks: "sub_ssh.yml"
+      tags: ssh
