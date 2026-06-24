@@ -19,8 +19,9 @@ lab:
     ansible_async_dir: /var/tmp/.ansible_async
     ansible_python_interpreter: /usr/local/bin/python
     ansible_user: op
+    # keep-sorted end
+
     base_vars:
-      # keep-sorted start
       network:
         defaultrouter_ip: 192.168.10.1
         ethernet_iface: igc0
@@ -31,5 +32,10 @@ lab:
             member_iface: igc0
             description: jail:ext
           # keep-sorted end
-      # keep-sorted end
-    # keep-sorted end
+
+    jail_vars:
+      network:
+        bridge:
+          name: bridge1
+          ip: 10.0.0.1/24
+          descr: jail:int
