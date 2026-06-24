@@ -30,6 +30,11 @@ skel.setup({
 
 local registrations = {
 	-- keep-sorted start block=yes
+	["yaml.ansible"] = {
+		find = function(_, _)
+			return "new.yaml"
+		end,
+	},
 	c = {
 		find = function(file, _)
 			local f = "new.c"
