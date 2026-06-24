@@ -23,5 +23,5 @@ ${TARGET_PATH}: .NOTMAIN
 .for target in ${INSTALL_TARGETS}
 ${target}: ${TARGET_PATH} ${.TARGET:T}
 	@echo ".. install ${.TARGET:T} to ${.TARGET}"; \
-		install -C ${.TARGET:T} ${.TARGET}
+		install -m 0644 -C ${.TARGET:T} ${.TARGET}
 .endfor
