@@ -16,3 +16,7 @@
 
   roles:
     - role: base
+      tags: role_base
+
+    - role: jail
+      tags: role_jail

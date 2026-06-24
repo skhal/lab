@@ -1,0 +1,14 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+- name: "Bootstrap jails"
+  ansible.builtin.import_tasks: "sub_bootstrap.yml"
+  vars:
+    # keep-sorted start
+    conf: "{{ jail_vars.conf }}"
+    network: "{{ jail_vars.network }}"
+    zfs: "{{ jail_vars.zfs }}"
+    # keep-sorted end

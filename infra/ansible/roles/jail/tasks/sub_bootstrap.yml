@@ -1,0 +1,83 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+# VARIABLES
+#
+# zfs struct {
+#   dataset struct {
+#     name string
+#   }
+# }
+#
+# conf struct {
+#   prefix string
+# }
+#
+# network struct {
+#   bridge struct {
+#     name string
+#     ip string
+#     descr string
+#   }
+# }
+---
+- name: "Configure ZFS"
+  block:
+    - name: "Create zfs dataset"
+      community.general.zfs:
+        name: "{{ zfs.dataset.name }}"
+        state: present
+        extra_zfs_properties:
+          # keep-sorted start
+          canmount: "off"
+          readonly: "on"
+          # keep-sorted end
+
+- name: "Create /etc/jail.conf"
+  ansible.builtin.template:
+    src: templates/etc/jail.conf.j2
+    dest: /etc/jail.conf
+    owner: root
+    group: wheel
+    mode: u=rw,g=r,o=r
+    validate: /usr/bin/jail -f /etc/jail.conf -e ' '
+  vars:
+    prefix: "{{ conf.prefix }}"
+
+- name: "Configure jail service"
+  block:
+    - name: "Enable jail"
+      community.general.sysrc:
+        path: /etc/rc.conf.d/jail
+        name: jail_enable
+        value: true
+      notify: "start_jail"
+
+    - name: "Stop jails in reverse order"
+      community.general.sysrc:
+        path: /etc/rc.conf.d/jail
+        name: jail_reverse_stop
+        value: true
+
+- name: "Configure network"
+  block:
+    - name: "Create bridge"
+      community.general.sysrc:
+        path: /etc/rc.conf.d/network
+        name: cloned_interfaces
+        state: value_present
+        value: "{{ network.bridge.name }}"
+      notify: "restart_network"
+
+    - name: "Configure {{ network.bridge.name }}"
+      community.general.sysrc:
+        path: /etc/rc.conf.d/network
+        name: "ifconfig_{{ network.bridge.name }}"
+        value: "inet {{ network.bridge.ip }} up descr {{ network.bridge.descr }}"
+      notify: "restart_network"
+
+# Restart services
+- name: "Flush handlers"
+  ansible.builtin.meta: flush_handlers

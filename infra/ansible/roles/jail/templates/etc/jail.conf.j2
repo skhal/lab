@@ -1,0 +1,20 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+# keep-sorted start
+allow.raw_sockets;
+devfs_ruleset = 4;
+enforce_statfs = 2;
+exec.clean;
+exec.consolelog = "/var/log/jail_${name}.log";
+exec.start = "/bin/sh /etc/rc";
+exec.stop = "/bin/sh /etc/rc.shutdown";
+host.hostname = "${name}.lab.net";
+mount.devfs;
+path = "{{ prefix }}/$name";
+vnet;
+# keep-sorted end
+
+.include "/etc/jail.conf.d/*.conf";
