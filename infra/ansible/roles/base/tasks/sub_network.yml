@@ -32,6 +32,6 @@
     bridge:
       name: "{{ item.name }}"
       ip: "{{ item.ip }}"
-      member: "{{ item.member_iface }}"
+      member: "{{ item.member_iface | default(omit) }}"
       descr: "{{ item.description }}"
   loop: "{{ network.bridges }}"

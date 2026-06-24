@@ -61,23 +61,6 @@
         name: jail_reverse_stop
         value: true
 
-- name: "Configure network"
-  block:
-    - name: "Create bridge"
-      community.general.sysrc:
-        path: /etc/rc.conf.d/network
-        name: cloned_interfaces
-        state: value_present
-        value: "{{ network.bridge.name }}"
-      notify: "restart_network"
-
-    - name: "Configure {{ network.bridge.name }}"
-      community.general.sysrc:
-        path: /etc/rc.conf.d/network
-        name: "ifconfig_{{ network.bridge.name }}"
-        value: "inet {{ network.bridge.ip }} up descr {{ network.bridge.descr }}"
-      notify: "restart_network"
-
 # Restart services
 - name: "Flush handlers"
   ansible.builtin.meta: flush_handlers

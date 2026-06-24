@@ -31,5 +31,5 @@
   community.general.sysrc:
     path: /etc/rc.conf.d/network
     name: "ifconfig_{{ bridge.name }}"
-    value: "inet {{ bridge.ip }} addm {{ bridge.member }} up descr {{ bridge.descr }}"
+    value: "inet {{ bridge.ip }} {{ 'addm {}'.format(bridge.member) if bridge.member }} up descr {{ bridge.descr }}"
   notify: "restart_network"
