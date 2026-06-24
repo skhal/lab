@@ -6,5 +6,7 @@
 ---
 bootstrap_vars:
   packages:
-    - python3
+    # keep-sorted start
     - doas
+    - python3
+    # keep-sorted end
