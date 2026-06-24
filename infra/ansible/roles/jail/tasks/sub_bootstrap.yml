@@ -7,20 +7,14 @@
 #
 # zfs struct {
 #   dataset struct {
+#     // name is the parent dataset to store jails.
 #     name string
 #   }
 # }
 #
 # conf struct {
+#   // prefix is the path to jails on the file system (e.g. /usr/jails)
 #   prefix string
-# }
-#
-# network struct {
-#   bridge struct {
-#     name string
-#     ip string
-#     descr string
-#   }
 # }
 ---
 - name: "Configure ZFS"
@@ -60,7 +54,3 @@
         path: /etc/rc.conf.d/jail
         name: jail_reverse_stop
         value: true
-
-# Restart services
-- name: "Flush handlers"
-  ansible.builtin.meta: flush_handlers

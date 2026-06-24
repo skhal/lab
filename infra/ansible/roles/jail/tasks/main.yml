@@ -9,6 +9,5 @@
   vars:
     # keep-sorted start
     conf: "{{ jail_vars.conf }}"
-    network: "{{ jail_vars.network }}"
     zfs: "{{ jail_vars.zfs }}"
     # keep-sorted end
