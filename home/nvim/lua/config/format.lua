@@ -36,6 +36,7 @@ conform.setup({
 		bzl = { "buildifier", "keep-sorted" },
 		c = { "clang-format", "keep-sorted" },
 		cfg = { "keep-sorted" },
+		conf = { "keep-sorted" },
 		cpp = { "clang-format", "keep-sorted" },
 		go = { "goimports", "keep-sorted" },
 		html = { "superhtml", "keep-sorted" },
