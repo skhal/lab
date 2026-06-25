@@ -73,6 +73,18 @@
 # post-network changes use modified network stack.
 - name: "Post-network changes"
   block:
+    # pf must be enabled and "started" (/etc/rc.d/pf loads pf.ko) for pfctl to
+    # work
+    - name: "Configure pf"
+      ansible.builtin.copy:
+        src: files/etc/pf.conf
+        dest: /etc/pf.conf
+        owner: root
+        group: wheel
+        mode: u=rw,g=r,o=r
+        validate: /sbin/pfctl -nf %s
+      notify: "reload_pf_conf"
+
     - name: Configure packages
       ansible.builtin.import_tasks: "sub_pkg.yml"
       tags: pkg
