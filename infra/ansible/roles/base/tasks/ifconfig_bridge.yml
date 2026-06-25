@@ -19,7 +19,7 @@
 #   desc
 # }
 ---
-- name: "Add {{ bridge.name }}"
+- name: "Update /etc/rc.conf.d/network - add {{ bridge.name }}"
   community.general.sysrc:
     path: /etc/rc.conf.d/network
     name: cloned_interfaces
@@ -27,13 +27,14 @@
     value: "{{ bridge.name }}"
   notify: "restart_network"
 
-- name: "Configure {{ bridge.name }}"
+- name: "Update /etc/rc.conf.d/network - configure {{ bridge.name }}"
   community.general.sysrc:
     path: /etc/rc.conf.d/network
     name: "ifconfig_{{ bridge.name }}"
+    # noqa jinja[spacing]
     value: >-
       inet {{ bridge.cidr }}
-      {% for m in bridge.addm %} addm {{ m }}{% endfor %}
+      {%- for m in bridge.get('addm', []) %} addm {{ m }}{% endfor %}
       up
-      {% if bridge.desc is defined %} desc {{ d }}{% endif %}
+      {%- if 'desc' in bridge %} desc {{ bridge.desc }}{% endif %}
   notify: "restart_network"

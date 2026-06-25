@@ -4,12 +4,12 @@
 # license that can be found in the LICENSE file.
 
 ---
-- name: "Remove ifconfig_{{ base_network_ethernet_if }}"
+- name: "Clean /etc/rc.conf - remove ifconfig_{{ base_network_ethernet_if }}"
   community.general.sysrc:
     name: "ifconfig_{{ base_network_ethernet_if }}"
     state: absent
 
-- name: "Add ifconfig_{{ base_network_ethernet_if }}"
+- name: "Update /etc/rc.conf.d/network - add ifconfig_{{ base_network_ethernet_if }}"
   community.general.sysrc:
     path: /etc/rc.conf.d/network
     name: "ifconfig_{{ base_network_ethernet_if }}"
