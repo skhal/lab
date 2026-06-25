@@ -36,5 +36,5 @@
       inet {{ bridge.cidr }}
       {%- for m in bridge.get('addm', []) %} addm {{ m }}{% endfor %}
       up
-      {%- if 'desc' in bridge %} desc {{ bridge.desc }}{% endif %}
+      {%- if 'desc' in bridge %} descr {{ bridge.desc }}{% endif %}
   notify: "restart_network"
