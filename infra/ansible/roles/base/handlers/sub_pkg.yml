@@ -5,7 +5,7 @@
 
 ---
 - name: Upgrade packages
-  ansible.builtin.service:
+  community.general.pkgng:
     name: "*"
     state: latest
   listen: "upgrade_packages"
