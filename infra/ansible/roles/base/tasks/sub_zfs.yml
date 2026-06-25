@@ -5,7 +5,7 @@
 
 ---
 - name: "Migrate zfs_enable"
-  ansible.builtin.import_tasks: "sysrc_migrate.yml"
+  ansible.builtin.include_tasks: "sysrc_migrate.yml"
   vars:
     migrate:
       name: zfs_enable

@@ -7,7 +7,7 @@
 - name: "Update rc-config"
   block:
     - name: "Migrate ntpd_enable"
-      ansible.builtin.import_tasks: "sysrc_migrate.yml"
+      ansible.builtin.include_tasks: "sysrc_migrate.yml"
       vars:
         migrate:
           name: ntpd_enable
@@ -15,7 +15,7 @@
           path: /etc/rc.conf.d/ntpd
 
     - name: "Migrate ntpd_sync_on_start"
-      ansible.builtin.import_tasks: "sysrc_migrate.yml"
+      ansible.builtin.include_tasks: "sysrc_migrate.yml"
       vars:
         migrate:
           name: ntpd_sync_on_start

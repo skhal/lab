@@ -5,7 +5,7 @@
 
 ---
 - name: "Migrate ifconfig_{{ base_network_ethernet_if }}"
-  ansible.builtin.import_tasks: "sysrc_migrate.yml"
+  ansible.builtin.include_tasks: "sysrc_migrate.yml"
   notify: "restart_network"
   vars:
     migrate:
