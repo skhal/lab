@@ -7,6 +7,7 @@
 # pre-network tasks don't need network access and can run before network
 # changes take place.
 - name: "Pre-network tasks"
+  tags: base.prenet
   block:
     - name: Configure users
       ansible.builtin.import_tasks: "sub_users.yml"
@@ -54,6 +55,7 @@
 # network changes modify network settings: routing, interfaces, packet filter,
 # etc.
 - name: "Network changes"
+  tags: base.net
   block:
     - name: Configure routing
       ansible.builtin.import_tasks: "sub_routing.yml"
@@ -72,6 +74,7 @@
 
 # post-network changes use modified network stack.
 - name: "Post-network changes"
+  tags: base.postnet
   block:
     # pf must be enabled and "started" (/etc/rc.d/pf loads pf.ko) for pfctl to
     # work
