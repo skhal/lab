@@ -1,0 +1,17 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+- name: Configure NUC
+  hosts: nuc.lab.net
+
+  gather_facts: false
+
+  become: true
+  become_method: community.general.doas
+
+  roles:
+    - role: jail
+      tags: role_jail
