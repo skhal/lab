@@ -14,6 +14,9 @@
 #
 #   // path is the destination rc.conf file to place the variable to.
 #   path string
+#
+#   // notify is the optional notification to send.
+#   notify string?
 # }
 ---
 - name: "Migrate rc-var"
@@ -29,3 +32,4 @@
         name: "{{ migrate.name }}"
         value: "{{ migrate.value }}"
         path: "{{ migrate.path }}"
+      notify: "{{ migrate.notify | default(omit) }}"
