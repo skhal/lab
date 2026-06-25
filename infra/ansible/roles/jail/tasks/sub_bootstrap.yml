@@ -23,7 +23,7 @@
     owner: root
     group: wheel
     mode: u=rw,g=r,o=r
-    validate: /usr/bin/jail -f /etc/jail.conf -e ' '
+    validate: /usr/sbin/jail -f %s -e ' '
   vars:
     prefix: "{{ jail_prefix }}"
 
