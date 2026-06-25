@@ -4,20 +4,31 @@
 # license that can be found in the LICENSE file.
 
 ---
-- name: Start pf
+- name: "Start pf"
+  listen: "start_pf"
   ansible.builtin.service:
     name: pf
     state: started
-  listen: "start_pf"
 
-- name: Reload pf.conf
+- name: "Reload pf.conf"
+  listen: "reload_pf_conf"
   ansible.builtin.service:
     name: pf
     state: reloaded
-  listen: "reload_pf_conf"
+  async: 10
+  poll: 0
+  register: base_reload_pf_conf_job
 
-- name: Start pflog
+- name: "Wait for pf to reload"
+  listen: "reload_pf_conf"
+  ansible.builtin.async_status:
+    jid: "{{ base_reload_pf_conf_job.ansible_job_id }}"
+  retries: 10
+  register: base_reload_pf_conf_result
+  until: base_reload_pf_conf_result is finished
+
+- name: "Start pflog"
+  listen: "start_pflog"
   ansible.builtin.service:
     name: pflog
     state: started
-  listen: "start_pflog"
