@@ -24,3 +24,12 @@
     name: pf_enable
     value: true
   notify: "start_pf"
+
+- name: "Create /etc/pf.conf"
+  ansible.builtin.file:
+    path: /etc/pf.conf
+    state: touch
+    owner: root
+    group: wheel
+    mode: u=rw,g=r,o=r
+  notify: "start_pf"
