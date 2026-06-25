@@ -4,7 +4,7 @@
 # license that can be found in the LICENSE file.
 
 ---
-- name: "Remove autoboot delay from /boot/loader.conf"
+- name: "Update /boot/loader.conf - remove autoboot delay"
   community.general.sysrc:
     path: /boot/loader.conf
     name: autoboot_delay
