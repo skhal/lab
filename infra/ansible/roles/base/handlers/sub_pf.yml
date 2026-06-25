@@ -4,17 +4,32 @@
 # license that can be found in the LICENSE file.
 
 ---
+# Warning: do not use ansible.builtin.service to manager PF as it affects SSH
+# connections. Instead, run async tasks with command.
+#
+# Ref: https://superuser.com/a/1777486
+# noqa command-instead-of-module command-instead-of-shell
 - name: "Start pf"
   listen: "start_pf"
-  ansible.builtin.service:
-    name: pf
-    state: started
+  ansible.builtin.shell:
+    cmd: ((sleep 1; nohup service pf start ) & )
+  async: 10
+  poll: 0
+  register: base_start_pf_job
 
-- name: "Reload pf.conf"
+- name: "Wait for pf to start"
+  listen: "start_pf"
+  ansible.builtin.async_status:
+    jid: "{{ base_start_pf_job.ansible_job_id }}"
+  retries: 10
+  register: base_start_pf_result
+  until: base_start_pf_result is finished
+
+# noqa command-instead-of-module command-instead-of-shell
+- name: "Reload pf"
   listen: "reload_pf_conf"
-  ansible.builtin.service:
-    name: pf
-    state: reloaded
+  ansible.builtin.shell:
+    cmd: ((sleep 1; nohup service pf reload ) & )
   async: 10
   poll: 0
   register: base_reload_pf_conf_job
