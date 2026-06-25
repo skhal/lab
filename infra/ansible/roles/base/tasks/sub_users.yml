@@ -3,26 +3,10 @@
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 
-# VARIABLES
-#
-# base_vars struct {
-#   // users is a list of users to configure on the system.
-#   users []struct {
-#     // name is the user name.
-#     name string
-#
-#     // group is the user group. Defaults to user.name if not set.
-#     group string?
-#
-#     // home is the user home folder. Default to "/home/<user.name>" if not
-#     // set.
-#     home string?
-#   }
-# }
 ---
 - name: "Configure users"
   ansible.builtin.include_tasks: "user_config.yml"
-  loop: "{{ base_vars.users }}"
+  loop: "{{ base_users }}"
   vars:
     user:
       name: "{{ item.name }}"

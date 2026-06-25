@@ -4,18 +4,22 @@
 # license that can be found in the LICENSE file.
 
 ---
-- name: "Use latest packages"
-  ansible.builtin.import_tasks: "pkg_latest.yml"
+- name: "Use latest branch"
+  ansible.builtin.copy:
+    src: ./files/usr/local/etc/pkg/repos/FreeBSD.conf
+    dest: /usr/local/etc/pkg/repos/FreeBSD.conf
+    owner: root
+    group: wheel
+    mode: u=rw,g=r,o=r
+  notify: "upgrade_packages"
 
 - name: "Add pkg aliases"
   ansible.builtin.include_tasks: "pkg_alias.yml"
-  loop: "{{ base_vars.pkg.aliases }}"
-  vars:
-    alias:
-      name: "{{ item.name }}"
-      value: "{{ item.value }}"
+  loop: "{{ base_pkg_aliases }}"
+  loop_control:
+    loop_var: alias
 
-- name: "Install NeoVim"
+- name: "Install packages"
   community.general.pkgng:
-    name: neovim
+    name: "{{ base_pkg_list }}"
     state: latest

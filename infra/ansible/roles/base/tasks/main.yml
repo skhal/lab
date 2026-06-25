@@ -58,15 +58,10 @@
     - name: Configure routing
       ansible.builtin.import_tasks: "sub_routing.yml"
       tags: routing
-      vars:
-        router:
-          ip: base_vars.network.defaultrouter_ip
 
     - name: Configure network
       ansible.builtin.import_tasks: "sub_network.yml"
       tags: network
-      vars:
-        network: "{{ base_vars.network }}"
 
     - name: Configure packet filter
       ansible.builtin.import_tasks: "sub_pf.yml"

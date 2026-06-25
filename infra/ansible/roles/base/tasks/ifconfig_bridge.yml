@@ -9,14 +9,14 @@
 #   // name is the bridge name, e.g. bridge0.
 #   name string
 #
-#   // ip is the bridge ip with sub-network, e.g. 1.2.3.4/24
-#   ip string
+#   // cidr is the bridge ip with sub-network, e.g. 1.2.3.4/24
+#   cidr string
 #
-#   // member is the member interface.
-#   member
+#   // memb is the member interface to add to the bridge (optional).
+#   memb
 #
-#   // descr is the bridge description.
-#   descr
+#   // desc is the bridge description (optional).
+#   desc
 # }
 ---
 - name: "Add {{ bridge.name }}"
@@ -31,5 +31,9 @@
   community.general.sysrc:
     path: /etc/rc.conf.d/network
     name: "ifconfig_{{ bridge.name }}"
-    value: "inet {{ bridge.ip }} {{ 'addm {}'.format(bridge.member) if bridge.member }} up descr {{ bridge.descr }}"
+    value: >-
+      inet {{ bridge.cidr }}
+      {% for m in bridge.addm %} addm {{ m }}{% endfor %}
+      up
+      {% if bridge.desc is defined %} desc {{ d }}{% endif %}
   notify: "restart_network"

@@ -16,8 +16,8 @@
     - name: "SSH listen on bridge interfaces"
       ansible.builtin.lineinfile:
         path: /etc/ssh/sshd_config
-        line: "ListenAddress={{ ansible_facts[item].ipv4 | map(attribute='address') | flatten | first }}"
-      loop: "{{ ansible_facts.interfaces | select('match', '^bridge') }}"
+        line: "ListenAddress={{ item.cidr | ansible.utils.ipaddr('address') }}"
+      loop: "{{ base_network_bridges }}"
       notify: "restart_sshd"
 
     - name: "SSH allow op user"

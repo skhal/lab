@@ -6,8 +6,3 @@
 ---
 - name: "Bootstrap jails"
   ansible.builtin.import_tasks: "sub_bootstrap.yml"
-  vars:
-    # keep-sorted start
-    conf: "{{ jail_vars.conf }}"
-    zfs: "{{ jail_vars.zfs }}"
-    # keep-sorted end

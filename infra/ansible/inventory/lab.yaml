@@ -17,21 +17,21 @@ lab:
     # in user-independent location, that persists across reboots (see hier(7)).
     # https://github.com/skhal/lab/issues/325#issuecomment-4791597578
     ansible_async_dir: /var/tmp/.ansible_async
-    ansible_python_interpreter: /usr/local/bin/python
+    ansible_python_interpreter: /usr/local/bin/python3
     ansible_user: op
     # keep-sorted end
 
-    base_vars:
-      network:
-        defaultrouter_ip: 192.168.10.1
-        ethernet_iface: igc0
-        bridges:
-          # keep-sorted start
-          - name: bridge0
-            ip: 192.168.10.101/24
-            member_iface: igc0
-            description: jail:ext
-          - name: bridge1
-            ip: 10.0.0.1/24
-            description: jail:int
-          # keep-sorted end
+    # keep-sorted start
+    base_network_bridges:
+      - name: bridge0
+        cidr: 192.168.10.101/24
+        addm: igc0
+        desc: jail:ext
+      - name: bridge1
+        cidr: 10.0.0.1/24
+        desc: jail:int
+    base_network_defaultrouter: 192.168.10.1
+    base_network_ethernet_if: igc0
+    base_pkg_list:
+      - neovim
+    # keep-sorted end

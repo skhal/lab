@@ -4,21 +4,45 @@
 # license that can be found in the LICENSE file.
 
 ---
-base_vars:
+# base_network_defaultrouter is the IPv4 address for the default route.
+base_network_defaultrouter: ""
+
+# base_network_ethernet_if is the ethernet interface on the server.
+base_network_ethernet_if: ""
+
+# base_network_bridges is the list of bridges to configure. Each bridge has
+# the following structure:
+#
+#   name  string  bridge name
+#   cidr  string  bridge IP address with sub-net mask in CIDR format
+#   addm  string  (optional) members interfaces to add
+#   desc  string  (optional) description to be added to the bridge
+base_network_bridges:
+  -
+
+# base_pkg_aliases is a list of pkg(8) aliases to add. Each alias has the
+# following structure:
+#
+#   name  string  alias name
+#   value string  alias command
+base_pkg_aliases:
+  - name: outdated
+    value: "version -vL="
+  - name: vital
+    value: 'query -e \"%V=1\" %n'
+
+# base_pkg_list is a list of packages to install
+base_pkg_list: []
+# base_users is a list of users to configure with tcsh(1). Each user has the
+# foolowing structure:
+#
+#   name  string  user name
+#   group string  (optional) user group (default: <name>)
+#   home  string  (optional) user home folder (default /home/<name>)
+base_users:
   # keep-sorted start
-  pkg:
-    aliases:
-      # keep-sorted start
-      - name: outdated
-        value: "version -vL="
-      - name: vital
-        value: 'query -e \"%V=1\" %n'
-      # keep-sorted end
-  users:
-    # keep-sorted start
-    - name: op
-    - name: root
-      group: wheel
-      home: /root
-    # keep-sorted end
+  - name: op
+  - name: root
+    group: wheel
+    home: /root
   # keep-sorted end

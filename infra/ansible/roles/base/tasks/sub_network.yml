@@ -3,35 +3,21 @@
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 
-# VARIABLES
-#
-# network struct {
-#   // ethernet_iface is the interface name of ethernet card, e.g. igc0.
-#   ethernet_iface string
-#
-#   // bridges is a list of bridges to setup. See ifconfig_bridge.yml for
-#   // the bridge structure schema.
-#   bridges []struct
-# }
 ---
-- name: "Remove ifconfig_{{ network.ethernet_iface }}"
+- name: "Remove ifconfig_{{ base_network_ethernet_if }}"
   community.general.sysrc:
-    name: "ifconfig_{{ network.ethernet_iface }}"
+    name: "ifconfig_{{ base_network_ethernet_if }}"
     state: absent
 
-- name: "Add ifconfig_{{ network.ethernet_iface }}"
+- name: "Add ifconfig_{{ base_network_ethernet_if }}"
   community.general.sysrc:
     path: /etc/rc.conf.d/network
-    name: "ifconfig_{{ network.ethernet_iface }}"
+    name: "ifconfig_{{ base_network_ethernet_if }}"
     value: up
   notify: "restart_network"
 
 - name: Configure bridges
   ansible.builtin.include_tasks: "ifconfig_bridge.yml"
-  vars:
-    bridge:
-      name: "{{ item.name }}"
-      ip: "{{ item.ip }}"
-      member: "{{ item.member_iface | default(omit) }}"
-      descr: "{{ item.description }}"
-  loop: "{{ network.bridges }}"
+  loop: "{{ base_network_bridges }}"
+  loop_control:
+    loop_var: bridge
