@@ -95,3 +95,6 @@
     - name: Configure SSH
       ansible.builtin.import_tasks: "sub_ssh.yml"
       tags: ssh
+
+    - name: "Flush changes"
+      ansible.builtin.meta: flush_handlers
