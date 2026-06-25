@@ -10,7 +10,7 @@
     name: netif
     state: restarted
   async: 30
-  poll: 5
+  poll: 0
   register: base_restart_network_job
 
 - name: "Wait for network to restart"
@@ -27,7 +27,7 @@
     name: routing
     state: restarted
   async: 30
-  poll: 5
+  poll: 0
   register: base_restart_routing_job
 
 - name: "Wait for routing to restart"
