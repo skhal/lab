@@ -3,14 +3,10 @@
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 
-# VARIABLES
-#
-# bootstrap_vars struct {
-#   // packages is a list of pkg(1) names to install.
-#   packages []string
-# }
 ---
+# can't use community.general.pkgng because the system does not have it
+# installed yet.
 - name: "Install python and doas"
-  community.general.pkgng:
-    name: "{{ bootstrap_vars.packages }}"
-    state: present
+  ansible.builtin.raw: "pkg install -y {{ bootstrap_vars.packages | join(' ') }}"
+  register: bootstrap_install
+  changed_when: bootstrap_install.rc != 0
