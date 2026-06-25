@@ -4,11 +4,12 @@
 # license that can be found in the LICENSE file.
 
 ---
-- name: "Migrate syslogd_flags"
-  ansible.builtin.import_tasks: "sysrc_migrate.yml"
+- name: "Migrate syslog"
+  ansible.builtin.include_tasks: "sysrc_migrate.yml"
   vars:
     migrate:
       name: syslogd_flags
+      value: "-ss"
       path: /etc/rc.conf.d/syslogd
 
 - name: "Enable console logs"

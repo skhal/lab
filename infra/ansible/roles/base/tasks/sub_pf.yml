@@ -18,21 +18,9 @@
     value: true
   notify: "start_pflog"
 
-- name: "Configure pf"
-  block:
-    - name: "Enable pf"
-      community.general.sysrc:
-        path: /etc/rc.conf.d/pf
-        name: pf_enable
-        value: true
-      notify: "start_pf"
-
-    - name: "Configure pf"
-      ansible.builtin.copy:
-        src: files/etc/pf.conf
-        dest: /etc/pf.conf
-        owner: root
-        group: wheel
-        mode: u=rw,g=r,o=r
-        validate: /sbin/pfctl -nf %s
-      notify: "reload_pf_conf"
+- name: "Enable pf"
+  community.general.sysrc:
+    path: /etc/rc.conf.d/pf
+    name: pf_enable
+    value: true
+  notify: "start_pf"

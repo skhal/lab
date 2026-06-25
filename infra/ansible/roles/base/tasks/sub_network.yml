@@ -4,17 +4,14 @@
 # license that can be found in the LICENSE file.
 
 ---
-- name: "Clean /etc/rc.conf - remove ifconfig_{{ base_network_ethernet_if }}"
-  community.general.sysrc:
-    name: "ifconfig_{{ base_network_ethernet_if }}"
-    state: absent
-
-- name: "Update /etc/rc.conf.d/network - add ifconfig_{{ base_network_ethernet_if }}"
-  community.general.sysrc:
-    path: /etc/rc.conf.d/network
-    name: "ifconfig_{{ base_network_ethernet_if }}"
-    value: up
+- name: "Migrate ifconfig_{{ base_network_ethernet_if }}"
+  ansible.builtin.import_tasks: "sysrc_migrate.yml"
   notify: "restart_network"
+  vars:
+    migrate:
+      name: "ifconfig_{{ base_network_ethernet_if }}"
+      value: up
+      path: /etc/rc.conf.d/network
 
 - name: Configure bridges
   ansible.builtin.include_tasks: "ifconfig_bridge.yml"

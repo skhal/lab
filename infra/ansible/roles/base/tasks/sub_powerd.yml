@@ -4,13 +4,10 @@
 # license that can be found in the LICENSE file.
 
 ---
-- name: "Remove powerd_enable from /etc/rc.conf"
-  community.general.sysrc:
-    name: powerd_enable
-    state: absent
-
-- name: "Add powerd_enable to /etc/rc.conf.d/powerd"
-  community.general.sysrc:
-    path: /etc/rc.conf.d/powerd
-    name: powerd_enable
-    value: true
+- name: "Migrate powerd"
+  ansible.builtin.include_tasks: "sysrc_migrate.yml"
+  vars:
+    migrate:
+      name: powerd_enable
+      path: /etc/rc.conf.d/powerd
+      value: true

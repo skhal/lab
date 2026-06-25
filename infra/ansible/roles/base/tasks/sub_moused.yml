@@ -4,13 +4,10 @@
 # license that can be found in the LICENSE file.
 
 ---
-- name: "Remove moused_nondefault_enable from /etc/rc.conf"
-  community.general.sysrc:
-    name: moused_nondefault_enable
-    state: absent
-
-- name: "Add moused_nondefault_enable to /etc/rc.conf.d/moused"
-  community.general.sysrc:
-    path: /etc/rc.conf.d/moused
-    name: moused_nondefault_enable
-    value: false
+- name: "Migrate moused_nondefault_enable"
+  ansible.builtin.include_tasks: "sysrc_migrate.yml"
+  vars:
+    migrate:
+      name: moused_nondefault_enable
+      path: /etc/rc.conf.d/moused
+      value: false

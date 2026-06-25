@@ -22,6 +22,7 @@ lab:
     # keep-sorted end
 
     # keep-sorted start
+    base_hostname: "nuc.lab.net"
     base_network_bridges:
       - name: bridge0
         cidr: 192.168.10.101/24

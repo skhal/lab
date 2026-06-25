@@ -9,29 +9,23 @@
 #   // name is the rc-variable name to migrate.
 #   name string
 #
+#   // value is the rc-variable value to set.
+#   value string
+#
 #   // path is the destination rc.conf file to place the variable to.
 #   path string
 # }
 ---
-- name: "Migrate rc-vars"
+- name: "Migrate rc-var"
   block:
-    # noqa: var-naming[no-role-prefix] name[template]
-    - name: "Retrieve {{ migrate.name }} from /etc/rc.conf"
-      ansible.builtin.command:
-        cmd: "sysrc -n {{ migrate.name }}"
-      register: migrate_value
-      changed_when: false
-      check_mode: false
-
-    - name: "Remove {{ migrate.name }} from /etc/rc.conf"
+    - name: "Update /etc/rc.conf - remove {{ migrate.name }}"
       community.general.sysrc:
         name: "{{ migrate.name }}"
         state: absent
 
     # noqa: name[template]
-    - name: "Store {{ migrate.name }} in {{ migrate.path }}"
+    - name: "Update {{ migrate.path }} - set {{ migrate.name }}"
       community.general.sysrc:
         name: "{{ migrate.name }}"
-        value: "{{ migrate_value.stdout }}"
+        value: "{{ migrate.value }}"
         path: "{{ migrate.path }}"
-      when: migrate_value is succeeded

@@ -9,6 +9,7 @@
   vars:
     migrate:
       name: sshd_enable
+      value: true
       path: /etc/rc.conf.d/sshd
 
 - name: "Update configuration"
