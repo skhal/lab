@@ -6,3 +6,6 @@
 ---
 - name: "Bootstrap jails"
   ansible.builtin.import_tasks: "sub_bootstrap.yml"
+
+- name: "Create a template"
+  ansible.builtin.import_tasks: "sub_template.yml"

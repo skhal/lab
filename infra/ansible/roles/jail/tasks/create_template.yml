@@ -1,0 +1,66 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+- name: "Install pkg keys"
+  vars:
+    keys_path: "{{ path }}/usr/share"
+  block:
+    - name: "Create keys folder"
+      ansible.builtin.file:
+        path: "{{ keys_path }}"
+        state: directory
+        owner: root
+        group: wheel
+        mode: u=rwx,g=rx,o=rx
+
+    - name: "Copy keys from /usr/share/keys"
+      ansible.builtin.copy:
+        src: /usr/share/keys
+        dest: "{{ keys_path }}/"
+        owner: root
+        group: wheel
+        mode: u=rwx,g=rx,o=rx
+        remote_src: true
+
+- name: "Install with pkg database"
+  vars:
+    db_path: "{{ path }}/var/db/pkg/repos"
+  block:
+    - name: "Create pkg db at {{ db_path }}"
+      ansible.builtin.file:
+        path: "{{ db_path }}"
+        state: directory
+        owner: root
+        group: wheel
+        mode: u=rwx,g=rx,o=rx
+
+    - name: "Mount metadata cache at {{ db_path }}"
+      ansible.posix.mount:
+        path: "{{ db_path }}"
+        src: tmpfs
+        fstype: tmpfs
+        state: present
+
+    - name: "Install FreeBSD-set-minimal-jail to {{ path }}"
+      community.general.pkgng:
+        rootdir: "{{ path }}"
+        name: "FreeBSD-set-minimal-jail pkg"
+        state: latest
+
+    - name: "Get template version at {{ path }}"
+      ansible.builtin.command:
+        cmd: chroot {{ path }} freebsd-version -u
+      register: jail_template_freebsd_version
+      changed_when: false
+
+    - name: "Template version at {{ path }}"
+      ansible.builtin.debug:
+        msg: "userland: {{ jail_template_freebsd_version.stdout }}"
+  always:
+    - name: "Unmount metadata cache at {{ db_path }}"
+      ansible.posix.mount:
+        path: "{{ db_path }}"
+        state: unmounted
