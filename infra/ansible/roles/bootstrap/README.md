@@ -7,33 +7,40 @@
 
 # Bootstrap
 
-Bootstrap prepares a FreeBSD server for Ansible automation. It installs Python3
-and doas(1).
+Bootstrap configures FreeBSD server for Ansible automation.
+
+This role installs Python3 and doas(1).
 
 ## Requirements
 
-A FreeBSD server must have:
+The FreeBSD server must have:
 
-- an SSH server running.
+- a running SSH server.
 
-- an `op` user with `wheel` group membership and SSH access with SSH keys
+- an `op` user with `wheel` group membership, SSH access, and SSH keys
   installed.
 
 ## Example Playbook
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
-
-```
-- name: Bootstrap example server
+```yaml
+# file: bootstrap.yml
+---
+- name: Bootstrap
 
   hosts: example
   gather_facts: false
 
   become: true
-  become_method: community.general.su
+  become_method: ansible.builtin.su
 
   roles:
-     - role: bootstrap
+    - role: bootstrap
+```
+
+Run the playbook with become-pass:
+
+```console
+$ ansible-playbook -K ./bootstrap.yml
 ```
 
 ## License
