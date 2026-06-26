@@ -4,9 +4,9 @@
 # license that can be found in the LICENSE file.
 
 ---
-bootstrap_vars:
-  packages:
-    # keep-sorted start
-    - doas
-    - python3
-    # keep-sorted end
+# bootstrap_packages lists packages to install on the system.
+bootstrap_packages:
+  # keep-sorted start
+  - doas
+  - python3
+  # keep-sorted end
