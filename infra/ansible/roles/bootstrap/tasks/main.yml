@@ -4,17 +4,24 @@
 # license that can be found in the LICENSE file.
 
 ---
-# can't use community.general.pkgng because the system does not have it
-# installed yet.
-- name: "Install python"
-  ansible.builtin.raw: "pkg install --quiet --yes {{ packages }}"
-  register: bootstrap_install_python
-  changed_when: bootstrap_install_python.rc == 0
+# Install Python with ansible.builtin.raw because the node is assumed to be
+# clean with base installation.
+- name: "Install packages"
   vars:
-    packages: "{{ bootstrap_packages | select('match', 'python') | join(' ') }}"
+    pkg_python: >-
+      {{ bootstrap_packages | select('match', 'python') | join(' ') }}
+    pkg_not_python: >-
+      {{ bootstrap_packages | reject('match', 'python') | join(' ') }}
+  block:
+    - name: "Install {{ pkg_python }}"
+      ansible.builtin.raw: "pkg install --quiet --yes {{ pkg_python }}"
+      register: bootstrap_install_python
+      changed_when:
+        - bootstrap_install_python.rc == 0
+        - '"already installed" not in bootstrap_install_python.stdout'
 
-- name: "Install other packages"
-  community.general.pkgng:
-    name: "{{ packages }}"
-  vars:
-    packages: "{{ bootstrap_packages | reject('match', 'python') | join(' ') }}"
+    # Python is installed in the previous step. Can use
+    # community.general.pkgng now to install non-Python packages.
+    - name: "Install {{ pkg_not_python }}"
+      community.general.pkgng:
+        name: "{{ pkg_not_python }}"
