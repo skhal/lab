@@ -6,7 +6,15 @@
 ---
 # can't use community.general.pkgng because the system does not have it
 # installed yet.
-- name: "Install python and doas"
-  ansible.builtin.raw: "pkg install -y {{ bootstrap_packages | join(' ') }}"
-  register: bootstrap_install
-  changed_when: bootstrap_install.rc != 0
+- name: "Install python"
+  ansible.builtin.raw: "pkg install --quiet --yes {{ packages }}"
+  register: bootstrap_install_python
+  changed_when: bootstrap_install_python.rc == 0
+  vars:
+    packages: "{{ bootstrap_packages | select('match', 'python') | join(' ') }}"
+
+- name: "Install other packages"
+  community.general.pkgng:
+    name: "{{ packages }}"
+  vars:
+    packages: "{{ bootstrap_packages | reject('match', 'python') | join(' ') }}"
