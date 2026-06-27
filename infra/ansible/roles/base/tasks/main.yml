@@ -33,10 +33,6 @@
       ansible.builtin.import_tasks: "sub_powerd.yml"
       tags: powerd
 
-    - name: Configure syslog
-      ansible.builtin.import_tasks: "sub_syslog.yml"
-      tags: syslog
-
     - name: Configure NTP
       ansible.builtin.import_tasks: "sub_ntp.yml"
       tags: ntp

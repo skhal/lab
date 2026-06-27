@@ -8,9 +8,6 @@
 # changes take place.
 - name: "Pre-network tasks"
   block:
-    - name: Handle syslog
-      ansible.builtin.import_tasks: "sub_syslog.yml"
-
     - name: Handle ntp
       ansible.builtin.import_tasks: "sub_ntp.yml"
 

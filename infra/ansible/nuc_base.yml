@@ -16,6 +16,9 @@
     - role: periodic
       tags: periodic
 
+    - role: syslog
+      tags: syslog
+
     - role: routing
       tags: routing
 

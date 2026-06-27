@@ -5,9 +5,10 @@
 
 ---
 - name: "Migrate syslog"
-  ansible.builtin.include_tasks: "sysrc_migrate.yml"
+  ansible.builtin.include_role:
+    name: sysrc
   vars:
-    migrate:
+    sysrc_migrate:
       name: syslogd_flags
       value: "-ss"
       path: /etc/rc.conf.d/syslogd
