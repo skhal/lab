@@ -16,5 +16,8 @@
     - role: base
       tags: role_base
 
+    - role: pkg
+      tags: role_pkg
+
     - role: ssh
       tags: role_ssh

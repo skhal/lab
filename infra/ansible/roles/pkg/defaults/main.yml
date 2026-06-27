@@ -1,0 +1,23 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+# pkg_aliases is a list of pkg(8) aliases to add. Each alias has the
+# following structure:
+#
+#   name  string  alias name
+#   value string  alias command
+pkg_aliases:
+  - name: outdated
+    value: "version -vL="
+  - name: vital
+    value: 'query -e \"%V=1\" %n'
+
+# pkg_conf_path is the path to the pkg(8) configuration file.
+pkg_conf_path: /usr/local/etc/pkg.conf
+
+# pkg_install is a list of packages to install.
+pkg_install:
+  -

@@ -3,18 +3,9 @@
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 
-# VARIABLES
-#
-# alias struct {
-#   // name is the alias name.
-#   name string
-#
-#   // value is the alias expansion (aka arguments in `pkg alias`).
-#   value string
-# }
 ---
-- name: "Add alias {{ alias.name }}"
+- name: "Add pkg alias {{ alias.name }}"
   ansible.builtin.lineinfile:
-    path: /usr/local/etc/pkg.conf
+    path: "{{ pkg_conf_path }}"
     insertafter: "^ALIAS {"
     line: '    {{ alias.name }} = "{{ alias.value }}";'

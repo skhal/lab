@@ -23,9 +23,3 @@
 
     - name: Handle packet filter
       ansible.builtin.import_tasks: "sub_pf.yml"
-
-# post-network changes use modified network stack.
-- name: "Post-network changes"
-  block:
-    - name: Handle pkg
-      ansible.builtin.import_tasks: "sub_pkg.yml"

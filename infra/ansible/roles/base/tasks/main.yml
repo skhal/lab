@@ -88,9 +88,5 @@
         validate: /sbin/pfctl -nf %s
       notify: "reload_pf_conf"
 
-    - name: Configure packages
-      ansible.builtin.import_tasks: "sub_pkg.yml"
-      tags: pkg
-
     - name: "Flush changes"
       ansible.builtin.meta: flush_handlers

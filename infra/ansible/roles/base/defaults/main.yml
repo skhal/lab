@@ -23,19 +23,6 @@ base_network_ethernet_if: ""
 base_network_bridges:
   -
 
-# base_pkg_aliases is a list of pkg(8) aliases to add. Each alias has the
-# following structure:
-#
-#   name  string  alias name
-#   value string  alias command
-base_pkg_aliases:
-  - name: outdated
-    value: "version -vL="
-  - name: vital
-    value: 'query -e \"%V=1\" %n'
-
-# base_pkg_list is a list of packages to install
-base_pkg_list: []
 # base_users is a list of users to configure with tcsh(1). Each user has the
 # foolowing structure:
 #

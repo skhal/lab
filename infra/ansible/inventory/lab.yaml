@@ -34,7 +34,7 @@ lab:
         desc: jail:int
     base_network_defaultrouter: 192.168.10.1
     base_network_ethernet_if: igc0
-    base_pkg_list:
+    pkg_install:
       - neovim
     ssh_allow_users:
       - op
