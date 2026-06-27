@@ -13,6 +13,9 @@
   become_method: community.general.doas
 
   roles:
+    - role: periodic
+      tags: periodic
+
     - role: routing
       tags: routing
 

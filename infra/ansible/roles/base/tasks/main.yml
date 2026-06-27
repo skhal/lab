@@ -41,10 +41,6 @@
       ansible.builtin.import_tasks: "sub_ntp.yml"
       tags: ntp
 
-    - name: Configure periodic
-      ansible.builtin.import_tasks: "sub_periodic.yml"
-      tags: periodic
-
     - name: Configure zfs
       ansible.builtin.import_tasks: "sub_zfs.yml"
       tags: zfs
