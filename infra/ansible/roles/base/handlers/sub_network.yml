@@ -20,20 +20,3 @@
   retries: 10
   register: base_restart_network_result
   until: base_restart_network_result is finished
-
-- name: "Restart routing"
-  listen: "restart_routing"
-  ansible.builtin.service:
-    name: routing
-    state: restarted
-  async: 30
-  poll: 0
-  register: base_restart_routing_job
-
-- name: "Wait for routing to restart"
-  listen: "restart_routing"
-  ansible.builtin.async_status:
-    jid: "{{ base_restart_routing_job.ansible_job_id }}"
-  retries: 10
-  register: base_restart_routing_result
-  until: base_restart_routing_result is finished

@@ -1,0 +1,22 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+- name: "Restart routing"
+  listen: "restart_routing"
+  ansible.builtin.service:
+    name: routing
+    state: restarted
+  async: 30
+  poll: 0
+  register: routing_restart_job
+
+- name: "Wait for routing to restart"
+  listen: "restart_routing"
+  ansible.builtin.async_status:
+    jid: "{{ routing_restart_job.ansible_job_id }}"
+  retries: 10
+  register: routing_restart_result
+  until: routing_restart_result is finished

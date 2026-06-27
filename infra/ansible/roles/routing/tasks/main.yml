@@ -5,10 +5,11 @@
 
 ---
 - name: "Migrate defaultrouter"
-  ansible.builtin.include_tasks: "sysrc_migrate.yml"
+  ansible.builtin.include_role:
+    name: sysrc
   vars:
-    migrate:
+    sysrc_migrate:
       name: defaultrouter
-      value: "{{ base_network_defaultrouter }}"
+      value: "{{ routing_defaultrouter }}"
       path: /etc/rc.conf.d/routing
       notify: "restart_routing"

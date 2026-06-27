@@ -57,10 +57,6 @@
 - name: "Network changes"
   tags: base.net
   block:
-    - name: Configure routing
-      ansible.builtin.import_tasks: "sub_routing.yml"
-      tags: routing
-
     - name: Configure network
       ansible.builtin.import_tasks: "sub_network.yml"
       tags: network

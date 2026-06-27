@@ -13,11 +13,14 @@
   become_method: community.general.doas
 
   roles:
+    - role: routing
+      tags: routing
+
     - role: base
-      tags: role_base
+      tags: base
 
     - role: pkg
-      tags: role_pkg
+      tags: pkg
 
     - role: ssh
-      tags: role_ssh
+      tags: ssh
