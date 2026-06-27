@@ -22,7 +22,7 @@ lab:
     # keep-sorted end
 
     # keep-sorted start
-    base_hostname: "nuc.lab.net"
+    hostname_name: "nuc.lab.net"
     netif_clones:
       - name: bridge0
         cidr: 192.168.10.101/24

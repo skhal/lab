@@ -4,9 +4,6 @@
 # license that can be found in the LICENSE file.
 
 ---
-# base_hostname sets the hostname
-base_hostname: ""
-
 # base_network_defaultrouter is the IPv4 address for the default route.
 base_network_defaultrouter: ""
 

@@ -17,10 +17,6 @@
       ansible.builtin.import_tasks: "sub_autoboot.yml"
       tags: autoboot
 
-    - name: Configure hostname
-      ansible.builtin.import_tasks: "sub_hostname.yml"
-      tags: hostname
-
     - name: Configure dumpdev
       ansible.builtin.import_tasks: "sub_dumpdev.yml"
       tags: dumpdev

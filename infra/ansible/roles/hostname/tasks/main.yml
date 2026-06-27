@@ -5,9 +5,10 @@
 
 ---
 - name: "Migrate hostname"
-  ansible.builtin.include_tasks: "sysrc_migrate.yml"
+  ansible.builtin.include_role:
+    name: sysrc
   vars:
-    migrate:
+    sysrc_migrate:
       name: hostname
       path: /etc/rc.conf.d/hostname
-      value: "{{ base_hostname }}"
+      value: "{{ hostname_name }}"
