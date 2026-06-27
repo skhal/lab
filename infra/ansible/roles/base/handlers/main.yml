@@ -4,16 +4,5 @@
 # license that can be found in the LICENSE file.
 
 ---
-# pre-network handlers don't need network access and can run before network
-# changes take place.
-- name: "Pre-network tasks"
-  block:
-    - name: Handle ntp
-      ansible.builtin.import_tasks: "sub_ntp.yml"
-
-# network changes modify network settings: routing, interfaces, packet filter,
-# etc.
-- name: "Network changes"
-  block:
-    - name: Handle packet filter
-      ansible.builtin.import_tasks: "sub_pf.yml"
+- name: Handle packet filter
+  ansible.builtin.import_tasks: "sub_pf.yml"

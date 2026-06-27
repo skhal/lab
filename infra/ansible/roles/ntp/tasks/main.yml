@@ -1,0 +1,30 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+- name: "Update rc-config"
+  ansible.builtin.include_role:
+    name: sysrc
+  vars:
+    sysrc_migrate: "{{ item }}"
+  loop:
+    - name: ntpd_enable
+      value: true
+      path: /etc/rc.conf.d/ntpd
+    - name: ntpd_sync_on_start
+      value: true
+      path: /etc/rc.conf.d/ntpd
+
+- name: "Update /etc/ntp.conf - ignore wildcard interface"
+  ansible.builtin.lineinfile:
+    path: /etc/ntp.conf
+    line: interface ignore wildcard
+  notify: "restart_ntpd"
+
+- name: "Update /etc/ntp.conf - listen on loopback"
+  ansible.builtin.lineinfile:
+    path: /etc/ntp.conf
+    line: interface listen 127.0.0.1
+  notify: "restart_ntpd"

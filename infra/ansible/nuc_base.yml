@@ -22,6 +22,9 @@
     - role: syslog
       tags: syslog
 
+    - role: ntp
+      tags: ntp
+
     - role: routing
       tags: routing
 

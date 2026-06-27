@@ -29,10 +29,6 @@
       ansible.builtin.import_tasks: "sub_powerd.yml"
       tags: powerd
 
-    - name: Configure NTP
-      ansible.builtin.import_tasks: "sub_ntp.yml"
-      tags: ntp
-
     - name: Configure zfs
       ansible.builtin.import_tasks: "sub_zfs.yml"
       tags: zfs
