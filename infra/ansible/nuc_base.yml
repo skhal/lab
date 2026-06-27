@@ -16,6 +16,9 @@
     - role: routing
       tags: routing
 
+    - role: netif
+      tags: network
+
     - role: base
       tags: base
 

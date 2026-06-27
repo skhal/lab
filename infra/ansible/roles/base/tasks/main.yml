@@ -57,10 +57,6 @@
 - name: "Network changes"
   tags: base.net
   block:
-    - name: Configure network
-      ansible.builtin.import_tasks: "sub_network.yml"
-      tags: network
-
     - name: Configure packet filter
       ansible.builtin.import_tasks: "sub_pf.yml"
       tags: pf

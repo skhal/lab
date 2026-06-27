@@ -1,0 +1,18 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+# netif_ethernet_if is the ethernet interface on the server.
+netif_ethernet_if: ""
+
+# netif_clones is the list of interfaces to configure. Each iface has the
+# following structure:
+#
+#   name  string  iface name
+#   cidr  string  iface IP address with sub-net mask in CIDR format
+#   addm  string  (optional) members interfaces to add (e.g. bridge)
+#   desc  string  (optional) iface description
+netif_clones:
+  -

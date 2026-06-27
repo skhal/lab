@@ -10,19 +10,6 @@ base_hostname: ""
 # base_network_defaultrouter is the IPv4 address for the default route.
 base_network_defaultrouter: ""
 
-# base_network_ethernet_if is the ethernet interface on the server.
-base_network_ethernet_if: ""
-
-# base_network_bridges is the list of bridges to configure. Each bridge has
-# the following structure:
-#
-#   name  string  bridge name
-#   cidr  string  bridge IP address with sub-net mask in CIDR format
-#   addm  string  (optional) members interfaces to add
-#   desc  string  (optional) description to be added to the bridge
-base_network_bridges:
-  -
-
 # base_users is a list of users to configure with tcsh(1). Each user has the
 # foolowing structure:
 #

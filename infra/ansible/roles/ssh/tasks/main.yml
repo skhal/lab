@@ -15,11 +15,11 @@
 
 - name: "Update configuration"
   block:
-    - name: "SSH listen on bridge interfaces in {{ ssh_server_config }}"
+    - name: "SSH listen on cloned interfaces in {{ ssh_server_config }}"
       ansible.builtin.lineinfile:
         path: /etc/ssh/sshd_config
         line: "ListenAddress={{ item.cidr | ansible.utils.ipaddr('address') }}"
-      loop: "{{ base_network_bridges }}"
+      loop: "{{ netif_clones }}"
       notify: "restart_sshd"
 
     - name: "SSH allow op user in {{ ssh_server_config }}"

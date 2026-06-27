@@ -23,7 +23,7 @@ lab:
 
     # keep-sorted start
     base_hostname: "nuc.lab.net"
-    base_network_bridges:
+    netif_clones:
       - name: bridge0
         cidr: 192.168.10.101/24
         addm:
@@ -32,7 +32,7 @@ lab:
       - name: bridge1
         cidr: 10.0.0.1/24
         desc: jail:int
-    base_network_ethernet_if: igc0
+    netif_ethernet_if: igc0
     pkg_install:
       - neovim
     routing_defaultrouter: 192.168.10.1

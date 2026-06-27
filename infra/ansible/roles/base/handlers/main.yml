@@ -18,8 +18,5 @@
 # etc.
 - name: "Network changes"
   block:
-    - name: Handle network
-      ansible.builtin.import_tasks: "sub_network.yml"
-
     - name: Handle packet filter
       ansible.builtin.import_tasks: "sub_pf.yml"

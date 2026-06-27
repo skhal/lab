@@ -1,0 +1,25 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+- name: "Update /etc/rc.conf.d/network - clone {{ iface.name }}"
+  community.general.sysrc:
+    path: /etc/rc.conf.d/network
+    name: cloned_interfaces
+    state: value_present
+    value: "{{ iface.name }}"
+  notify: "restart_network"
+
+- name: "Update /etc/rc.conf.d/network - configure {{ iface.name }}"
+  community.general.sysrc:
+    path: /etc/rc.conf.d/network
+    name: "ifconfig_{{ iface.name }}"
+    # noqa jinja[spacing]
+    value: >-
+      inet {{ iface.cidr }}
+      {%- for m in iface.get('addm', []) %} addm {{ m }}{% endfor %}
+      up
+      {%- if 'desc' in iface %} descr {{ iface.desc }}{% endif %}
+  notify: "restart_network"
