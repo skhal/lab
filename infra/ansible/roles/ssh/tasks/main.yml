@@ -5,24 +5,25 @@
 
 ---
 - name: "Migrate sshd_enable"
-  ansible.builtin.import_tasks: "sysrc_migrate.yml"
+  ansible.builtin.include_role:
+    name: sysrc
   vars:
-    migrate:
+    sysrc_migrate:
       name: sshd_enable
       value: true
       path: /etc/rc.conf.d/sshd
 
 - name: "Update configuration"
   block:
-    - name: "SSH listen on bridge interfaces"
+    - name: "SSH listen on bridge interfaces in {{ ssh_server_config }}"
       ansible.builtin.lineinfile:
         path: /etc/ssh/sshd_config
         line: "ListenAddress={{ item.cidr | ansible.utils.ipaddr('address') }}"
       loop: "{{ base_network_bridges }}"
       notify: "restart_sshd"
 
-    - name: "SSH allow op user"
+    - name: "SSH allow op user in {{ ssh_server_config }}"
       ansible.builtin.lineinfile:
-        path: /etc/ssh/sshd_config
-        line: "AllowUsers=op"
+        path: "{{ ssh_server_config }}"
+        line: "AllowUsers={{ ssh_allow_users | join(' ') }}"
       notify: "restart_sshd"

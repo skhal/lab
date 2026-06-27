@@ -29,6 +29,3 @@
   block:
     - name: Handle pkg
       ansible.builtin.import_tasks: "sub_pkg.yml"
-
-    - name: Handle ssh
-      ansible.builtin.import_tasks: "sub_ssh.yml"

@@ -1,0 +1,20 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+- name: "Migrate rc-var {{ sysrc_migrate.name }}"
+  block:
+    - name: "Update /etc/rc.conf - remove {{ sysrc_migrate.name }}"
+      community.general.sysrc:
+        name: "{{ sysrc_migrate.name }}"
+        state: absent
+
+    # noqa: name[template]
+    - name: "Update {{ sysrc_migrate.path }} - set {{ sysrc_migrate.name }}"
+      community.general.sysrc:
+        name: "{{ sysrc_migrate.name }}"
+        value: "{{ sysrc_migrate.value }}"
+        path: "{{ sysrc_migrate.path }}"
+      notify: "{{ sysrc_migrate.notify | default(omit) }}"

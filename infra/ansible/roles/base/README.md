@@ -48,11 +48,3 @@ All variables are internal.
   roles:
     - role: base
 ```
-
-## License
-
-BSD-3-Clause
-
-## Author Information
-
-[Samvel Khalatyan](https://github.com/skhal)

@@ -15,3 +15,6 @@
   roles:
     - role: base
       tags: role_base
+
+    - role: ssh
+      tags: role_ssh

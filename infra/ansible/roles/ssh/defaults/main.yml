@@ -1,0 +1,12 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+# ssh_server_config points at sshd_config file.
+ssh_server_config: /etc/ssh/sshd_config
+
+# ssh_allow_users lists user names to allow for ssh. It translates to
+# sshd_config.AllowUsers configuration parameter.
+ssh_allow_users: []

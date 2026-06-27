@@ -36,4 +36,6 @@ lab:
     base_network_ethernet_if: igc0
     base_pkg_list:
       - neovim
+    ssh_allow_users:
+      - op
     # keep-sorted end
