@@ -23,7 +23,3 @@
 - name: Configure powerd
   ansible.builtin.import_tasks: "sub_powerd.yml"
   tags: powerd
-
-- name: Configure zfs
-  ansible.builtin.import_tasks: "sub_zfs.yml"
-  tags: zfs

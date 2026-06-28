@@ -40,6 +40,9 @@
     - role: base
       tags: base
 
+    - role: zfs
+      tags: zfs
+
     - role: ssh
       tags: ssh
 

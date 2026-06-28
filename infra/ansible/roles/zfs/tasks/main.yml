@@ -1,0 +1,27 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+- name: "Migrate zfs_enable"
+  ansible.builtin.include_role:
+    name: sysrc
+  vars:
+    sysrc_migrate:
+      name: zfs_enable
+      value: true
+      path: /etc/rc.conf.d/zfs
+
+- name: "Update /etc/periodic.conf - enable zfs scrubs"
+  community.general.sysrc:
+    path: /etc/periodic.conf
+    name: daily_scrub_zfs_enable
+    value: true
+
+# noqa name[template]
+- name: "Update /etc/periodic.conf - set zfs scrub threshold to {{ zfs_scrub_days }} days"
+  community.general.sysrc:
+    path: /etc/periodic.conf
+    name: daily_scrub_zfs_default_threshold
+    value: "{{ zfs_scrub_days }}"
