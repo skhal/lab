@@ -4,7 +4,9 @@
 # license that can be found in the LICENSE file.
 
 ---
-- name: "Update /etc/rc.conf - remove dumpdev"
+# noqa name[template]
+- name: "Update {{ var.path }} - set {{ var.name }}"
   community.general.sysrc:
-    name: dumpdev
-    state: absent
+    name: "{{ var.name }}"
+    value: "{{ var.value }}"
+    path: "{{ var.path }}"

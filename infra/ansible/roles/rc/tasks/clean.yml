@@ -4,8 +4,7 @@
 # license that can be found in the LICENSE file.
 
 ---
-- name: "Update /boot/loader.conf - remove autoboot delay"
+- name: "Update /etc/rc.conf - remove {{ name }}"
   community.general.sysrc:
-    path: /boot/loader.conf
-    name: autoboot_delay
-    value: 0
+    name: "{{ name }}"
+    state: absent

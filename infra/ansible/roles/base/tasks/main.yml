@@ -4,22 +4,11 @@
 # license that can be found in the LICENSE file.
 
 ---
-- name: Configure users
-  ansible.builtin.import_tasks: "sub_users.yml"
-  tags: users
-
-- name: Configure autoboot
-  ansible.builtin.import_tasks: "sub_autoboot.yml"
-  tags: autoboot
-
-- name: Configure dumpdev
-  ansible.builtin.import_tasks: "sub_dumpdev.yml"
-  tags: dumpdev
-
-- name: Configure moused
-  ansible.builtin.import_tasks: "sub_moused.yml"
-  tags: moused
-
-- name: Configure powerd
-  ansible.builtin.import_tasks: "sub_powerd.yml"
-  tags: powerd
+- name: "Configure users"
+  ansible.builtin.include_tasks: "user_config.yml"
+  vars:
+    user:
+      name: "{{ item.name }}"
+      group: "{{ item.group is defined | ternary(item.group, item.name) }}"
+      home: "{{ item.home is defined | ternary(item.home, '/home/' + item.name) }}"
+  loop: "{{ base_users }}"

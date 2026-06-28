@@ -7,6 +7,7 @@
 # keep-sorted start
 hostname_name: "nuc.lab.net"
 netif_clones:
+  # keep-sorted start
   - name: bridge0
     cidr: 192.168.10.101/24
     addm:
@@ -15,10 +16,26 @@ netif_clones:
   - name: bridge1
     cidr: 10.0.0.1/24
     desc: jail:int
+  # keep-sorted end
 netif_ethernet_if: igc0
 pflog_enable: true
 pkg_install:
   - neovim
+rc_migrate:
+  # keep-sorted start
+  - name: moused_nondefault_enable
+    value: false
+    path: /etc/rc.conf.d/moused
+  - name: powerd_enable
+    path: /etc/rc.conf.d/powerd
+    value: true
+  # keep-sorted end
+rc_remove:
+  - dumpdev
+rc_update:
+  - name: autoboot_delay
+    value: 0
+    path: /boot/loader.conf
 routing_defaultrouter: 192.168.10.1
 ssh_allow_users:
   - op

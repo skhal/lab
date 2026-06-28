@@ -1,0 +1,24 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+# rc_migrate is a list of rc-vars to migrate. Each variable must have a
+# structure outlined in roles/sysrc/defaults/main.yml.
+rc_migrate:
+  -
+
+# rc_remove is a list of rc-vars to remove from /etc/rc.conf, e.g. a variable
+# is set in /etc/rc.conf with default value from /etc/defaults/rc.conf.
+rc_remove:
+  -
+
+# rc_update is a list of rc-vars to update. Each item has the following
+# structure:
+#
+#   name  string  rc-var name
+#   value string  rc-var value
+#   path  string  rc-file to update
+rc_update:
+  -

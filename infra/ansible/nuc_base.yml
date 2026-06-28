@@ -40,6 +40,9 @@
     - role: base
       tags: base
 
+    - role: rc
+      tags: rc
+
     - role: zfs
       tags: zfs
 

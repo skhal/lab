@@ -1,0 +1,24 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+- name: "Clean /etc/rc.conf"
+  ansible.builtin.include_tasks: "clean.yml"
+  loop: "{{ rc_remove }}"
+  loop_control:
+    loop_var: name
+
+- name: "Migrate rc-vars from /etc/rc.conf"
+  ansible.builtin.include_role:
+    name: sysrc
+  loop: "{{ rc_migrate }}"
+  loop_control:
+    loop_var: sysrc_migrate
+
+- name: "Update rc-vars"
+  ansible.builtin.include_tasks: "update.yml"
+  loop: "{{ rc_update }}"
+  loop_control:
+    loop_var: var
