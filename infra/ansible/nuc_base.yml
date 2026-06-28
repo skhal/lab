@@ -13,11 +13,17 @@
   become_method: community.general.doas
 
   roles:
-    - role: hostname
-      tags: hostname
+    - role: routing
+      tags: routing
 
-    - role: periodic
-      tags: periodic
+    - role: netif
+      tags: network
+
+    - role: pflog
+      tags: pflog
+
+    - role: pf
+      tags: pf
 
     - role: syslog
       tags: syslog
@@ -25,17 +31,17 @@
     - role: ntp
       tags: ntp
 
-    - role: routing
-      tags: routing
+    - role: hostname
+      tags: hostname
 
-    - role: netif
-      tags: network
+    - role: periodic
+      tags: periodic
 
     - role: base
       tags: base
 
-    - role: pkg
-      tags: pkg
-
     - role: ssh
       tags: ssh
+
+    - role: pkg
+      tags: pkg

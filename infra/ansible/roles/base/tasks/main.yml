@@ -4,65 +4,26 @@
 # license that can be found in the LICENSE file.
 
 ---
-# pre-network tasks don't need network access and can run before network
-# changes take place.
-- name: "Pre-network tasks"
-  tags: base.prenet
-  block:
-    - name: Configure users
-      ansible.builtin.import_tasks: "sub_users.yml"
-      tags: users
+- name: Configure users
+  ansible.builtin.import_tasks: "sub_users.yml"
+  tags: users
 
-    - name: Configure autoboot
-      ansible.builtin.import_tasks: "sub_autoboot.yml"
-      tags: autoboot
+- name: Configure autoboot
+  ansible.builtin.import_tasks: "sub_autoboot.yml"
+  tags: autoboot
 
-    - name: Configure dumpdev
-      ansible.builtin.import_tasks: "sub_dumpdev.yml"
-      tags: dumpdev
+- name: Configure dumpdev
+  ansible.builtin.import_tasks: "sub_dumpdev.yml"
+  tags: dumpdev
 
-    - name: Configure moused
-      ansible.builtin.import_tasks: "sub_moused.yml"
-      tags: moused
+- name: Configure moused
+  ansible.builtin.import_tasks: "sub_moused.yml"
+  tags: moused
 
-    - name: Configure powerd
-      ansible.builtin.import_tasks: "sub_powerd.yml"
-      tags: powerd
+- name: Configure powerd
+  ansible.builtin.import_tasks: "sub_powerd.yml"
+  tags: powerd
 
-    - name: Configure zfs
-      ansible.builtin.import_tasks: "sub_zfs.yml"
-      tags: zfs
-
-    - name: "Flush changes"
-      ansible.builtin.meta: flush_handlers
-
-# network changes modify network settings: routing, interfaces, packet filter,
-# etc.
-- name: "Network changes"
-  tags: base.net
-  block:
-    - name: Configure packet filter
-      ansible.builtin.import_tasks: "sub_pf.yml"
-      tags: pf
-
-    - name: "Flush network changes"
-      ansible.builtin.meta: flush_handlers
-
-# post-network changes use modified network stack.
-- name: "Post-network changes"
-  tags: base.postnet
-  block:
-    # pf must be enabled and "started" (/etc/rc.d/pf loads pf.ko) for pfctl to
-    # work
-    - name: "Configure pf"
-      ansible.builtin.copy:
-        src: files/etc/pf.conf
-        dest: /etc/pf.conf
-        owner: root
-        group: wheel
-        mode: u=rw,g=r,o=r
-        validate: /sbin/pfctl -nf %s
-      notify: "reload_pf_conf"
-
-    - name: "Flush changes"
-      ansible.builtin.meta: flush_handlers
+- name: Configure zfs
+  ansible.builtin.import_tasks: "sub_zfs.yml"
+  tags: zfs

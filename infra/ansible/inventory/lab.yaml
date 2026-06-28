@@ -33,6 +33,7 @@ lab:
         cidr: 10.0.0.1/24
         desc: jail:int
     netif_ethernet_if: igc0
+    pflog_enable: true
     pkg_install:
       - neovim
     routing_defaultrouter: 192.168.10.1

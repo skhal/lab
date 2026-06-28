@@ -4,46 +4,40 @@
 # license that can be found in the LICENSE file.
 
 ---
-# Warning: do not use ansible.builtin.service to manager PF as it affects SSH
-# connections. Instead, run async tasks with command.
+# WARNING
+#
+# Do not use ansible.builtin.service to manage PF because it affects SSH
+# connections. Instead, run async task.
 #
 # Ref: https://superuser.com/a/1777486
-# noqa command-instead-of-module command-instead-of-shell
 - name: "Start pf"
   listen: "start_pf"
   ansible.builtin.shell:
     cmd: ((sleep 1; nohup service pf start ) & )
   async: 10
   poll: 0
-  register: base_start_pf_job
+  register: pf_start_job
 
 - name: "Wait for pf to start"
   listen: "start_pf"
   ansible.builtin.async_status:
-    jid: "{{ base_start_pf_job.ansible_job_id }}"
+    jid: "{{ pf_start_job.ansible_job_id }}"
   retries: 10
-  register: base_start_pf_result
-  until: base_start_pf_result is finished
+  register: pf_start_result
+  until: pf_start_result is finished
 
-# noqa command-instead-of-module command-instead-of-shell
 - name: "Reload pf"
   listen: "reload_pf_conf"
   ansible.builtin.shell:
     cmd: ((sleep 1; nohup service pf reload ) & )
   async: 10
   poll: 0
-  register: base_reload_pf_conf_job
+  register: pf_reload_conf_job
 
 - name: "Wait for pf to reload"
   listen: "reload_pf_conf"
   ansible.builtin.async_status:
-    jid: "{{ base_reload_pf_conf_job.ansible_job_id }}"
+    jid: "{{ pf_reload_conf_job.ansible_job_id }}"
   retries: 10
-  register: base_reload_pf_conf_result
-  until: base_reload_pf_conf_result is finished
-
-- name: "Start pflog"
-  listen: "start_pflog"
-  ansible.builtin.service:
-    name: pflog
-    state: started
+  register: pf_reload_conf_result
+  until: pf_reload_conf_result is finished

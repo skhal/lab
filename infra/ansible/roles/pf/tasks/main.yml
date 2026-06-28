@@ -1,0 +1,55 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+- name: "Enable routing gateway"
+  ansible.builtin.include_role:
+    name: routing
+  vars:
+    routing_enable_gateway: true
+
+- name: "Enable pflog"
+  ansible.builtin.include_role:
+    name: pflog
+  vars:
+    pflog_enable: true
+
+- name: "Stat /etc/pf.conf"
+  ansible.builtin.file:
+    path: /etc/pf.conf
+    state: file
+  register: pf_conf_stat
+  ignore_errors: true
+
+- name: "Create /etc/pf.conf"
+  ansible.builtin.file:
+    path: /etc/pf.conf
+    state: touch
+    owner: root
+    group: wheel
+    mode: u=rw,g=r,o=r
+  when: pf_conf_stat is failed
+
+- name: "Enable pf"
+  community.general.sysrc:
+    path: /etc/rc.conf.d/pf
+    name: pf_enable
+    value: true
+  notify: "start_pf"
+
+# pf must be enabled and "started" (/etc/rc.d/pf loads pf.ko) for pfctl to
+# work
+- name: "Flush pf changes"
+  ansible.builtin.meta: flush_handlers
+
+- name: "Configure pf"
+  ansible.builtin.copy:
+    src: etc/pf.conf
+    dest: /etc/pf.conf
+    owner: root
+    group: wheel
+    mode: u=rw,g=r,o=r
+    validate: /sbin/pfctl -nf %s
+  notify: "reload_pf_conf"

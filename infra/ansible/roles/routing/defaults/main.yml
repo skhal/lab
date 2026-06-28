@@ -4,4 +4,9 @@
 # license that can be found in the LICENSE file.
 
 ---
+# routing_defaultrouter sets the default route.
 routing_defaultrouter: ""
+
+# routing_enable_gateway enables IP forwarding between interfaces (see sysctl
+# net.inet.ip.forwarding).
+routing_enable_gateway: false

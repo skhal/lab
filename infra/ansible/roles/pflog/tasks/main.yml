@@ -4,5 +4,10 @@
 # license that can be found in the LICENSE file.
 
 ---
-- name: Handle packet filter
-  ansible.builtin.import_tasks: "sub_pf.yml"
+- name: "Enable pflog"
+  community.general.sysrc:
+    path: /etc/rc.conf.d/pflog
+    name: pflog_enable
+    value: true
+  when: pflog_enable
+  notify: "start_pflog"
