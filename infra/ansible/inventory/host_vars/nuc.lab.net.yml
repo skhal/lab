@@ -39,4 +39,13 @@ rc_update:
 routing_defaultrouter: 192.168.10.1
 ssh_allow_users:
   - op
+user_list:
+  # keep-sorted start
+  - name: op
+    shell: /bin/tcsh
+  - name: root
+    group: wheel
+    home: /root
+    shell: /bin/tcsh
+  # keep-sorted end
 # keep-sorted end

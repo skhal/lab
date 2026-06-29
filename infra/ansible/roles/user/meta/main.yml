@@ -6,7 +6,7 @@
 ---
 galaxy_info:
   author: Samvel Khalatyan
-  description: FreeBSD server base setup
+  description: Configure users with shell and copy skeleton files
   license: BSD-3-Clause
   issue_tracker_url: https://github.com/skhal/lab/issues
   min_ansible_version: "2.2"

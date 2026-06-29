@@ -4,16 +4,14 @@
 # license that can be found in the LICENSE file.
 
 ---
-# base_users is a list of users to configure with tcsh(1). Each user has the
-# foolowing structure:
+# user_list holds users to configure. Each user has the foolowing structure:
 #
 #   name  string  user name
 #   group string  (optional) user group (default: <name>)
 #   home  string  (optional) user home folder (default /home/<name>)
-base_users:
-  # keep-sorted start
-  - name: op
-  - name: root
-    group: wheel
-    home: /root
-  # keep-sorted end
+#   shell string  (optional) user shell (default: <user_default_shell>)
+user_list:
+  -
+
+# user_default_shell is the default shell to set for users.
+user_default_shell: /bin/sh

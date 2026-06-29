@@ -1,0 +1,18 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+- name: "Configure users"
+  ansible.builtin.include_tasks: "configure.yml"
+  vars:
+    default:
+      name: "{{ it.name }}"
+      group: "{{ it.name }}"
+      home: "/home/{{ it.name }}"
+      shell: "{{ user_default_shell }}"
+    user: "{{ default | combine(it, recursive=True) }}"
+  loop: "{{ user_list }}"
+  loop_control:
+    loop_var: it

@@ -37,8 +37,8 @@
     - role: periodic
       tags: periodic
 
-    - role: base
-      tags: base
+    - role: user
+      tags: user
 
     - role: rc
       tags: rc

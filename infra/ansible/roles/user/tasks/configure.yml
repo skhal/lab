@@ -1,0 +1,25 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+# noqa name[template]
+- name: "User {{ user.name }} - set shell to {{ user.shell }}"
+  ansible.builtin.user:
+    name: "{{ user.name }}"
+    shell: "{{ user.shell }}"
+
+- name: "User {{ user.name }} - copy skeleton" # noqa name[template]
+  ansible.builtin.include_tasks: "copy.yml"
+  vars:
+    src: "{{ file }}"
+    dst: >-
+      {{ user.home }}/{{ file | basename | regex_replace('^dot', '', count=1) }}
+    owner: "{{ user.name }}"
+    group: "{{ user.group }}"
+    mode: u=rw,g=r,o=r
+  loop: >-
+    {{ query('fileglob', role_path ~ '/files/' ~ user.home ~ '/dot.*') | sort }}
+  loop_control:
+    loop_var: file
