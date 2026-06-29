@@ -13,6 +13,9 @@
   become_method: community.general.doas
 
   roles:
+    - role: rc
+      tags: rc
+
     - role: routing
       tags: routing
 
@@ -39,9 +42,6 @@
 
     - role: user
       tags: user
-
-    - role: rc
-      tags: rc
 
     - role: zfs
       tags: zfs

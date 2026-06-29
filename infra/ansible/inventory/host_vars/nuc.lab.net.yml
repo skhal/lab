@@ -27,15 +27,21 @@ rc_migrate:
     value: false
     path: /etc/rc.conf.d/moused
   - name: powerd_enable
-    path: /etc/rc.conf.d/powerd
     value: true
+    path: /etc/rc.conf.d/powerd
   # keep-sorted end
 rc_remove:
   - dumpdev
 rc_update:
+  # keep-sorted start
   - name: autoboot_delay
     value: 0
     path: /boot/loader.conf
+  - name: rc_debug
+    value: true
+  - name: rc_info
+    value: true
+  # keep-sorted end
 routing_defaultrouter: 192.168.10.1
 ssh_allow_users:
   - op
