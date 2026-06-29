@@ -20,7 +20,7 @@
       tags: routing
 
     - role: netif
-      tags: network
+      tags: netif
 
     - role: pflog
       tags: pflog
