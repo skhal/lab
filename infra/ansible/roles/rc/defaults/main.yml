@@ -19,6 +19,6 @@ rc_remove:
 #
 #   name  string  rc-var name
 #   value string  rc-var value
-#   path  string  rc-file to update
+#   path  string? (optional) rc-file to update (default: /etc/rc.conf)
 rc_update:
   -

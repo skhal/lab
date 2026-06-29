@@ -9,4 +9,4 @@
   community.general.sysrc:
     name: "{{ var.name }}"
     value: "{{ var.value }}"
-    path: "{{ var.path }}"
+    path: "{{ var.path | default(omit) }}"
