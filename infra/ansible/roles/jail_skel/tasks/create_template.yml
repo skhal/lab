@@ -53,12 +53,12 @@
     - name: "Get template version at {{ path }}"
       ansible.builtin.command:
         cmd: chroot {{ path }} freebsd-version -u
-      register: jail_template_freebsd_version
+      register: jail_skel_os_version
       changed_when: false
 
     - name: "Template version at {{ path }}"
       ansible.builtin.debug:
-        msg: "userland: {{ jail_template_freebsd_version.stdout }}"
+        msg: "userland: {{ jail_skel_os_version.stdout }}"
   always:
     - name: "Unmount metadata cache at {{ db_path }}"
       ansible.posix.mount:

@@ -13,5 +13,5 @@
   become_method: community.general.doas
 
   roles:
-    - role: jail
-      tags: jail
+    - role: jail_skel
+      tags: jail_skel

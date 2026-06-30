@@ -8,7 +8,7 @@
   block:
     - name: "Create zfs dataset"
       community.general.zfs:
-        name: "{{ jail_zfs_dataset }}"
+        name: "{{ jail_skel_zfs_dataset }}"
         state: present
         extra_zfs_properties:
           # keep-sorted start
@@ -18,7 +18,7 @@
 
     - name: "Get zfs dataset facts"
       community.general.zfs_facts:
-        name: "{{ jail_zfs_dataset }}"
+        name: "{{ jail_skel_zfs_dataset }}"
         type: filesystem
         properties: "name,mountpoint"
 
@@ -33,7 +33,7 @@
   vars:
     prefix: >-
       ansible_zfs_datasets
-        | selectattr("name", "equalto", jail_zfs_dataset)
+        | selectattr("name", "equalto", jail_skel_zfs_dataset)
         | map(attribute="mountpoint")
         | first
         | default(omit)
