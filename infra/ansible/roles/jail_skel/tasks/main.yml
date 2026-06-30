@@ -48,19 +48,20 @@
         fail_msg: "{{ jail_skel_zfs_dataset }} is not mounted"
         quiet: true
 
+    - name: "ZFS skeleton dataset mountpoint"
+      ansible.builtin.set_fact:
+        jail_skel_path: >-
+          {{
+            jail_skel_zfs_dataset_facts.ansible_facts.ansible_zfs_datasets
+              | selectattr('name', 'equalto', jail_skel_zfs_dataset)
+              | map(attribute='mountpoint')
+              | first
+              | dirname
+              | default(omit)
+          }}
+
+
 - name: "Configure jail service"
-  vars:
-    # prefix is the path to ALL jails, e.g. /usr/jail in the jail skeleton
-    # /usr/jail/15.1
-    prefix: >-
-      {{
-        jail_skel_zfs_dataset_facts.ansible_facts.ansible_zfs_datasets
-          | selectattr('name', 'equalto', jail_skel_zfs_dataset)
-          | map(attribute='mountpoint')
-          | first
-          | dirname
-          | default(omit)
-      }}
   block:
     - name: "Create /etc/jail.conf"
       ansible.builtin.template:
@@ -85,20 +86,10 @@
         value: true
 
 - name: "Install packages"
-  vars:
-    # prefix is the path to the skeleton
-    prefix: >-
-      {{
-        jail_skel_zfs_dataset_facts.ansible_facts.ansible_zfs_datasets
-          | selectattr('name', 'equalto', jail_skel_zfs_dataset)
-          | map(attribute='mountpoint')
-          | first
-          | default(omit)
-      }}
   block:
     - name: "Install pkg keys"
       vars:
-        keys_path: "{{ prefix }}/usr/share"
+        keys_path: "{{ jail_skel_path }}/usr/share"
       block:
         - name: "Create keys folder"
           ansible.builtin.file:
@@ -119,7 +110,7 @@
 
     - name: "Install with pkg database"
       vars:
-        db_path: "{{ prefix }}/var/db/pkg/repos"
+        db_path: "{{ jail_skel_path }}/var/db/pkg/repos"
       block:
         - name: "Create pkg db at {{ db_path }}"
           ansible.builtin.file:
@@ -136,19 +127,19 @@
             fstype: tmpfs
             state: present
 
-        - name: "Install FreeBSD-set-minimal-jail to {{ prefix }}"
+        - name: "Install FreeBSD-set-minimal-jail to {{ jail_skel_path }}"
           community.general.pkgng:
-            rootdir: "{{ prefix }}"
+            rootdir: "{{ jail_skel_path }}"
             name: "FreeBSD-set-minimal-jail pkg"
             state: latest
 
-        - name: "Get template version at {{ prefix }}"
+        - name: "Get template version at {{ jail_skel_path }}"
           ansible.builtin.command:
-            cmd: chroot {{ prefix }} freebsd-version -u
+            cmd: chroot {{ jail_skel_path }} freebsd-version -u
           register: jail_skel_os_version
           changed_when: false
 
-        - name: "Template version at {{ prefix }}"
+        - name: "Template version at {{ jail_skel_path }}"
           ansible.builtin.debug:
             msg: "userland: {{ jail_skel_os_version.stdout }}"
       always:
