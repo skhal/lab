@@ -44,6 +44,19 @@
 - name: "Flush pf changes"
   ansible.builtin.meta: flush_handlers
 
+- name: "PF status"
+  ansible.builtin.raw: pfctl -s Running
+  register: pf_status
+  changed_when: false
+
+- name: "PF must be running"
+  ansible.builtin.assert:
+    that:
+      - "pf_status.rc == 0"
+      - "'Enabled' in pf_status.stdout"
+    fail_msg: "Firewall is disabled"
+    success_msg: "Firewall is enabled"
+
 - name: "Configure pf"
   ansible.builtin.copy:
     src: etc/pf.conf
