@@ -39,6 +39,18 @@
       register: jail_skel_zfs_dataset_facts
 
 - name: "Configure jail service"
+  vars:
+    # prefix is the path to ALL jails, e.g. /usr/jail in the jail skeleton
+    # /usr/jail/15.1
+    prefix: >-
+      {{
+        jail_skel_zfs_dataset_facts.ansible_facts.ansible_zfs_datasets
+          | selectattr('name', 'equalto', jail_skel_zfs_dataset)
+          | map(attribute='mountpoint')
+          | first
+          | dirname
+          | default(omit)
+      }}
   block:
     - name: "Create /etc/jail.conf"
       ansible.builtin.template:
@@ -48,18 +60,6 @@
         group: wheel
         mode: u=rw,g=r,o=r
         validate: /usr/sbin/jail -f %s -e ' '
-      vars:
-        # prefix is the path to ALL jails, e.g. /usr/jail in the jail skeleton
-        # /usr/jail/15.1
-        prefix: >-
-          {{
-            jail_skel_zfs_dataset_facts.ansible_facts.ansible_zfs_datasets
-              | selectattr('name', 'equalto', jail_skel_zfs_dataset)
-              | map(attribute='mountpoint')
-              | first
-              | dirname
-              | default(omit)
-          }}
 
     - name: "Enable jail service"
       community.general.sysrc:
