@@ -56,7 +56,6 @@
               | selectattr('name', 'equalto', jail_skel_zfs_dataset)
               | map(attribute='mountpoint')
               | first
-              | dirname
               | default(omit)
           }}
 
