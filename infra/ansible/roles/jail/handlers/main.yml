@@ -4,5 +4,8 @@
 # license that can be found in the LICENSE file.
 
 ---
-- name: Jail service
-  ansible.builtin.import_tasks: "sub_jail.yml"
+- name: Start jail
+  ansible.builtin.service:
+    name: jail
+    state: started
+  listen: "start_jail"
