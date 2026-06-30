@@ -14,4 +14,4 @@
 
   roles:
     - role: jail
-      tags: role_jail
+      tags: jail

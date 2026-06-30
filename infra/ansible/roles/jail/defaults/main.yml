@@ -4,9 +4,6 @@
 # license that can be found in the LICENSE file.
 
 ---
-# jail_prefix is the jails' location on the filesystem.
-jail_prefix: /usr/jail
-
 # jail_zfs_dataset is the jails' parent dataset.
 jail_zfs_dataset: zroot/usr/jail
 

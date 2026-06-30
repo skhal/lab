@@ -16,16 +16,27 @@
           readonly: "on"
           # keep-sorted end
 
+    - name: "Get zfs dataset facts"
+      community.general.zfs_facts:
+        name: "{{ jail_zfs_dataset }}"
+        type: filesystem
+        properties: "name,mountpoint"
+
 - name: "Create /etc/jail.conf"
   ansible.builtin.template:
-    src: templates/etc/jail.conf.j2
+    src: etc/jail.conf.j2
     dest: /etc/jail.conf
     owner: root
     group: wheel
     mode: u=rw,g=r,o=r
     validate: /usr/sbin/jail -f %s -e ' '
   vars:
-    prefix: "{{ jail_prefix }}"
+    prefix: >-
+      ansible_zfs_datasets
+        | selectattr("name", "equalto", jail_zfs_dataset)
+        | map(attribute="mountpoint")
+        | first
+        | default(omit)
 
 - name: "Configure jail service"
   block:
