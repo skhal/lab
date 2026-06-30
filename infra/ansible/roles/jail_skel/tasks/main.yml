@@ -75,7 +75,6 @@
         value: true
 
 - name: "Install packages"
-  ansible.builtin.include_tasks: "create_template.yml"
   vars:
     # prefix is the path to the skeleton
     prefix: >-
@@ -91,3 +90,64 @@
       | selectattr("name", "equalto", jail_skel_zfs_dataset)
       | selectattr("mounted", "equalto", "yes")
       | count == 1
+  block:
+    - name: "Install pkg keys"
+      vars:
+        keys_path: "{{ prefix }}/usr/share"
+      block:
+        - name: "Create keys folder"
+          ansible.builtin.file:
+            path: "{{ keys_path }}"
+            state: directory
+            owner: root
+            group: wheel
+            mode: u=rwx,g=rx,o=rx
+
+        - name: "Copy keys from /usr/share/keys"
+          ansible.builtin.copy:
+            src: /usr/share/keys
+            dest: "{{ keys_path }}/"
+            owner: root
+            group: wheel
+            mode: u=rwx,g=rx,o=rx
+            remote_src: true
+
+    - name: "Install with pkg database"
+      vars:
+        db_path: "{{ prefix }}/var/db/pkg/repos"
+      block:
+        - name: "Create pkg db at {{ db_path }}"
+          ansible.builtin.file:
+            path: "{{ db_path }}"
+            state: directory
+            owner: root
+            group: wheel
+            mode: u=rwx,g=rx,o=rx
+
+        - name: "Mount metadata cache at {{ db_path }}"
+          ansible.posix.mount:
+            path: "{{ db_path }}"
+            src: tmpfs
+            fstype: tmpfs
+            state: present
+
+        - name: "Install FreeBSD-set-minimal-jail to {{ prefix }}"
+          community.general.pkgng:
+            rootdir: "{{ prefix }}"
+            name: "FreeBSD-set-minimal-jail pkg"
+            state: latest
+
+        - name: "Get template version at {{ prefix }}"
+          ansible.builtin.command:
+            cmd: chroot {{ prefix }} freebsd-version -u
+          register: jail_skel_os_version
+          changed_when: false
+
+        - name: "Template version at {{ prefix }}"
+          ansible.builtin.debug:
+            msg: "userland: {{ jail_skel_os_version.stdout }}"
+      always:
+        - name: "Unmount metadata cache at {{ db_path }}"
+          ansible.posix.mount:
+            path: "{{ db_path }}"
+            state: unmounted
