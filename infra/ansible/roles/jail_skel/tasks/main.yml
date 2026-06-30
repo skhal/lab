@@ -38,6 +38,16 @@
         properties: "name,mounted,mountpoint"
       register: jail_skel_zfs_dataset_facts
 
+    - name: "ZFS skeleton must be mounted"
+      ansible.builtin.assert:
+        that: >-
+          jail_skel_zfs_dataset_facts.ansible_facts.ansible_zfs_datasets
+            | selectattr("name", "equalto", jail_skel_zfs_dataset)
+            | selectattr("mounted", "equalto", "yes")
+            | count == 1
+        fail_msg: "{{ jail_skel_zfs_dataset }} is not mounted"
+        quiet: true
+
 - name: "Configure jail service"
   vars:
     # prefix is the path to ALL jails, e.g. /usr/jail in the jail skeleton
@@ -85,11 +95,6 @@
           | first
           | default(omit)
       }}
-  when: >-
-    jail_skel_zfs_dataset_facts.ansible_facts.ansible_zfs_datasets
-      | selectattr("name", "equalto", jail_skel_zfs_dataset)
-      | selectattr("mounted", "equalto", "yes")
-      | count == 1
   block:
     - name: "Install pkg keys"
       vars:
