@@ -3,29 +3,25 @@
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 
----
 # WARNING
 #
 # Do not use ansible.builtin.service to manage PF because it affects SSH
 # connections. Instead, run async task.
 #
 # Ref: https://superuser.com/a/1777486
+---
+# start_pf enables PF synchronously because it assumes the configuration
+# /etc/pf.conf is empty, effectively no filters applied.
+#
+# noqa command-instead-of-module command-instead-of-shell
 - name: "Start pf"
   listen: "start_pf"
   ansible.builtin.shell:
-    cmd: ((sleep 1; nohup service pf start ) & )
+    cmd: service pf start
   async: 10
   poll: 0
-  register: pf_start_job
 
-- name: "Wait for pf to start"
-  listen: "start_pf"
-  ansible.builtin.async_status:
-    jid: "{{ pf_start_job.ansible_job_id }}"
-  retries: 10
-  register: pf_start_result
-  until: pf_start_result is finished
-
+# reload_pf_conf reloads non-empty /etc/pf.conf and must be done asynchronously.
 - name: "Reload pf"
   listen: "reload_pf_conf"
   ansible.builtin.shell:
