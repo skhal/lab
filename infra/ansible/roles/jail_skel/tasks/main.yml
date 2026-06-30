@@ -6,41 +6,62 @@
 ---
 - name: "Configure ZFS"
   block:
-    - name: "Create zfs dataset"
+    - name: "ZFS create parent datasets"
       community.general.zfs:
-        name: "{{ jail_skel_zfs_dataset }}"
+        name: "{{ jail_skel_zfs_dataset | dirname }}"
         state: present
         extra_zfs_properties:
           # keep-sorted start
           canmount: "off"
           readonly: "on"
           # keep-sorted end
+      when: >-
+        jail_skel_zfs_dataset
+          | dirname
+          | split('/')
+          | count > 1
 
-    - name: "Get zfs dataset facts"
+    - name: "ZFS create skeleton dataset"
+      community.general.zfs:
+        name: "{{ jail_skel_zfs_dataset }}"
+        state: present
+        extra_zfs_properties:
+          # keep-sorted start
+          canmount: "on"
+          readonly: "off"
+          # keep-sorted end
+
+    - name: "ZFS get sekeleton dataset properties"
       community.general.zfs_facts:
         name: "{{ jail_skel_zfs_dataset }}"
         type: filesystem
-        properties: "name,mountpoint"
-
-- name: "Create /etc/jail.conf"
-  ansible.builtin.template:
-    src: etc/jail.conf.j2
-    dest: /etc/jail.conf
-    owner: root
-    group: wheel
-    mode: u=rw,g=r,o=r
-    validate: /usr/sbin/jail -f %s -e ' '
-  vars:
-    prefix: >-
-      ansible_zfs_datasets
-        | selectattr("name", "equalto", jail_skel_zfs_dataset)
-        | map(attribute="mountpoint")
-        | first
-        | default(omit)
+        properties: "name,mounted,mountpoint"
+      register: jail_skel_zfs_dataset_facts
 
 - name: "Configure jail service"
   block:
-    - name: "Enable jail"
+    - name: "Create /etc/jail.conf"
+      ansible.builtin.template:
+        src: etc/jail.conf.j2
+        dest: /etc/jail.conf
+        owner: root
+        group: wheel
+        mode: u=rw,g=r,o=r
+        validate: /usr/sbin/jail -f %s -e ' '
+      vars:
+        # prefix is the path to ALL jails, e.g. /usr/jail in the jail skeleton
+        # /usr/jail/15.1
+        prefix: >-
+          {{
+            jail_skel_zfs_dataset_facts.ansible_facts.ansible_zfs_datasets
+              | selectattr('name', 'equalto', jail_skel_zfs_dataset)
+              | map(attribute='mountpoint')
+              | first
+              | dirname
+              | default(omit)
+          }}
+
+    - name: "Enable jail service"
       community.general.sysrc:
         path: /etc/rc.conf.d/jail
         name: jail_enable
@@ -53,40 +74,20 @@
         name: jail_reverse_stop
         value: true
 
-- name: "Create a dataset"
+- name: "Install packages"
+  ansible.builtin.include_tasks: "create_template.yml"
   vars:
-    dset: "{{ jail_skel_zfs_dataset }}/{{ jail_skel_template_name }}"
-  block:
-    - name: "Create dataset {{ dset }}"
-      community.general.zfs:
-        name: "{{ dset }}"
-        state: present
-        extra_zfs_properties:
-          # keep-sorted start
-          canmount: "on"
-          readonly: "off"
-          # keep-sorted end
-
-    - name: "Get dataset {{ dset }} mount properties" # noqa name[template]
-      community.general.zfs_facts:
-        name: "{{ dset }}"
-        type: filesystem
-        properties: "name,mounted,mountpoint"
-      register: jail_skel_zfs_dataset_facts
-
-    - name: "Install packages"
-      ansible.builtin.include_tasks: "create_template.yml"
-      vars:
-        path: >-
-          {{
-            jail_skel_zfs_dataset_facts.ansible_facts.ansible_zfs_datasets
-              | selectattr('name', 'equalto', dset)
-              | map(attribute='mountpoint')
-              | first
-              | default(omit)
-          }}
-      when: >-
+    # prefix is the path to the skeleton
+    prefix: >-
+      {{
         jail_skel_zfs_dataset_facts.ansible_facts.ansible_zfs_datasets
-          | selectattr("name", "equalto", dset)
-          | selectattr("mounted", "equalto", "yes")
-          | count == 1
+          | selectattr('name', 'equalto', jail_skel_zfs_dataset)
+          | map(attribute='mountpoint')
+          | first
+          | default(omit)
+      }}
+  when: >-
+    jail_skel_zfs_dataset_facts.ansible_facts.ansible_zfs_datasets
+      | selectattr("name", "equalto", jail_skel_zfs_dataset)
+      | selectattr("mounted", "equalto", "yes")
+      | count == 1

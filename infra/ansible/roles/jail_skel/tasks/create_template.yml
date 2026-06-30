@@ -6,7 +6,7 @@
 ---
 - name: "Install pkg keys"
   vars:
-    keys_path: "{{ path }}/usr/share"
+    keys_path: "{{ prefix }}/usr/share"
   block:
     - name: "Create keys folder"
       ansible.builtin.file:
@@ -27,7 +27,7 @@
 
 - name: "Install with pkg database"
   vars:
-    db_path: "{{ path }}/var/db/pkg/repos"
+    db_path: "{{ prefix }}/var/db/pkg/repos"
   block:
     - name: "Create pkg db at {{ db_path }}"
       ansible.builtin.file:
@@ -44,19 +44,19 @@
         fstype: tmpfs
         state: present
 
-    - name: "Install FreeBSD-set-minimal-jail to {{ path }}"
+    - name: "Install FreeBSD-set-minimal-jail to {{ prefix }}"
       community.general.pkgng:
-        rootdir: "{{ path }}"
+        rootdir: "{{ prefix }}"
         name: "FreeBSD-set-minimal-jail pkg"
         state: latest
 
-    - name: "Get template version at {{ path }}"
+    - name: "Get template version at {{ prefix }}"
       ansible.builtin.command:
-        cmd: chroot {{ path }} freebsd-version -u
+        cmd: chroot {{ prefix }} freebsd-version -u
       register: jail_skel_os_version
       changed_when: false
 
-    - name: "Template version at {{ path }}"
+    - name: "Template version at {{ prefix }}"
       ansible.builtin.debug:
         msg: "userland: {{ jail_skel_os_version.stdout }}"
   always:
