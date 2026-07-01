@@ -170,6 +170,16 @@
             user_chroot: "{{ jail_skel_path }}"
             user_list: "{{ jail_skel_users }}"
 
+        - name: "Migrate syslog"
+          ansible.builtin.include_role:
+            name: sysrc
+          vars:
+            sysrc_migrate:
+              name: syslogd_flags
+              value: "-ss"
+              from: "{{ jail_skel_path }}/etc/rc.conf"
+              path: "{{ jail_skel_path }}/etc/rc.conf.d/syslogd"
+
       always:
         - name: "Unmount metadata cache at {{ db_path }}"
           ansible.posix.mount:

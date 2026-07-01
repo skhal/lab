@@ -9,6 +9,8 @@
 #
 #   name    string  rc-variable name
 #   value   string  the value to set
+#   from    string? source rc.conf file to remove the rc-variable (default:
+#                   /etc/rc.conf)
 #   path    string  destination rc.conf file to put the rc-variable.
 #   notify  string? notification to send
 sysrc_migrate: {}
