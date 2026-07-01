@@ -59,7 +59,6 @@
               | default(omit)
           }}
 
-
 - name: "Configure jail service"
   block:
     - name: "Create /etc/jail.conf"
@@ -126,11 +125,21 @@
             fstype: tmpfs
             state: present
 
-        - name: "Install FreeBSD-set-minimal-jail to {{ jail_skel_path }}"
+        - name: "Install packages"
           community.general.pkgng:
             rootdir: "{{ jail_skel_path }}"
-            name: "FreeBSD-set-minimal-jail pkg"
+            name: "{{ jail_skel_default_packages | union(jail_skel_packages) | join(' ') }}"
             state: latest
+
+        - name: "Get installed packages"
+          ansible.builtin.command:
+            cmd: pkg -r {{ jail_skel_path }} leaf
+          register: jail_skel_packages
+          changed_when: false
+
+        - name: "Installed packages"
+          ansible.builtin.debug:
+            var: jail_skel_packages.stdout_lines
 
         - name: "Get template version at {{ jail_skel_path }}"
           ansible.builtin.command:

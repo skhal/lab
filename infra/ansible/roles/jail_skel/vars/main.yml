@@ -1,0 +1,14 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+# jail_skel_default_packages lists packages to be installed in the jail
+# skeleton. The actual set of packages installed is a union of:
+#   - jail_skel_default_packages
+#   - jail_skel_packages
+# Plays and inventory should override jail_skel_packages.
+jail_skel_default_packages:
+  - FreeBSD-set-minimal-jail
+  - pkg

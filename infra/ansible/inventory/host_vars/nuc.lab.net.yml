@@ -6,6 +6,9 @@
 ---
 # keep-sorted start
 hostname_name: "nuc.lab.net"
+jail_skel_packages:
+  - neovim
+  - doas
 netif_clones:
   # keep-sorted start
   - name: bridge0
