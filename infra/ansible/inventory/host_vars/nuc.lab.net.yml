@@ -7,8 +7,12 @@
 # keep-sorted start
 hostname_name: "nuc.lab.net"
 jail_skel_packages:
-  - neovim
+  # keep-sorted start
+  - FreeBSD-csh # for /bin/tcsh
+  - FreeBSD-runtime # for /etc/os-release
   - doas
+  - neovim
+  # keep-sorted end
 netif_clones:
   # keep-sorted start
   - name: bridge0

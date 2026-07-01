@@ -150,6 +150,26 @@
         - name: "Template version at {{ jail_skel_path }}"
           ansible.builtin.debug:
             msg: "userland: {{ jail_skel_os_version.stdout }}"
+
+        # want to reuse server user_list but limit to some users, e.g. root,
+        # then pass the filtered list to included user-role.
+        # We can't set user_list var in include_role that would filter user_list
+        # host variable since it leads to recursion.
+        # Move users filter into a separate task to break the recursion:
+        # 1. filter users
+        # 2. set user_list equal to the filtered user list
+        - name: "Collect users"
+          ansible.builtin.set_fact:
+            jail_skel_users: >-
+              {{ user_list | selectattr('name', 'equalto', 'root') }}
+
+        - name: "Configure users"
+          ansible.builtin.include_role:
+            name: user
+          vars:
+            user_chroot: "{{ jail_skel_path }}"
+            user_list: "{{ jail_skel_users }}"
+
       always:
         - name: "Unmount metadata cache at {{ db_path }}"
           ansible.posix.mount:
