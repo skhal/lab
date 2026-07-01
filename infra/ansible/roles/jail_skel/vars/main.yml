@@ -10,5 +10,8 @@
 #   - jail_skel_packages
 # Plays and inventory should override jail_skel_packages.
 jail_skel_default_packages:
+  # keep-sorted start
+  - FreeBSD-bsdconfig
   - FreeBSD-set-minimal-jail
   - pkg
+  # keep-sorted end

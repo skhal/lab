@@ -8,8 +8,6 @@
 jail_skel_zfs_dataset: zroot/usr/jail/15.1
 
 # jail_skel_packages lists packages to install. These are packages to be
-# installed along the default ones:
-#   - FreeBSD-set-minimal-jail
-#   - pkg
+# installed along the default ones from vars/jail_skel_default_packages
 jail_skel_packages:
   -
