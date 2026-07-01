@@ -44,7 +44,7 @@ if ($?prompt) then
 	# ref: https://en.wikipedia.org/wiki/ANSI_escape_code
 	set esc_color_ = "%{\033[;31m%}"
 	set esc_reset_ = "%{\033[m%}"
-	set os_ = (`/bin/sh -c '. /etc/os-release; echo $ID $VERSION_ID'`)
+	set os_ = (`/bin/sh -c '[ -e /etc/os.release ] && { . /etc/os-release; echo $ID $VERSION_ID; } || echo "unknown os"'`)
 	set prompt = "${os_} ${esc_color_}%N${esc_reset_}@%m:%c03 %# "
 	set promptchars = "%#"
 	unset esc_color_ esc_reset_ os_
