@@ -7,6 +7,11 @@
 # jail_skel_zfs_dataset is ZFS dataset with jail skeleton.
 jail_skel_zfs_dataset: zroot/usr/jail/15.1
 
+# jail_skel_migrate_users lists users to migrate from the server into the jail,
+# e.g. ansible_user. See roles/user_migrate for details.
+jail_skel_migrate_users:
+  -
+
 # jail_skel_packages lists packages to install. These are packages to be
 # installed along the default ones from vars/jail_skel_default_packages
 jail_skel_packages:
