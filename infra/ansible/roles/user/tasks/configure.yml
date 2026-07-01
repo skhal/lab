@@ -5,16 +5,25 @@
 
 ---
 # noqa name[template]
-- name: "User {{ user.name }} - set shell to {{ user.shell }}"
-  ansible.builtin.user:
-    name: "{{ user.name }}"
-    shell: "{{ user.shell }}"
+- name: >-
+    User {{ user.name }} - set shell to {{ user.shell }}
+    {%- if user_chroot != "" %} in {{ user_chroot }}{% endif %}
+  ansible.builtin.command:
+    cmd: >-
+      {% if user_chroot != "" %}chroot {{ user_chroot }}{% endif %}
+      chsh -s {{ user.shell }} {{ user.name }}
+  register: user_chsh
+  changed_when: user_chsh.rc == 0
 
-- name: "User {{ user.name }} - copy skeleton" # noqa name[template]
+# noqa name[template]
+- name: >-
+    User {{ user.name }} - copy skeleton
+    {%- if user_chroot != "" %} in {{ user_chroot }}{% endif %}
   ansible.builtin.include_tasks: "copy.yml"
   vars:
     src: "{{ file }}"
     dst: >-
+      {% if user_chroot != "" %}{{ user_chroot }}{% endif -%}
       {{ user.home }}/{{ file | basename | regex_replace('^dot', '', count=1) }}
     owner: "{{ user.name }}"
     group: "{{ user.group }}"
