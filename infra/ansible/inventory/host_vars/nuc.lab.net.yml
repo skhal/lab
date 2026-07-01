@@ -52,6 +52,7 @@ rc_update:
 routing_defaultrouter: 192.168.10.1
 ssh_allow_users:
   - op
+timezone_name: America/Chicago
 user_list:
   # keep-sorted start
   - name: op
