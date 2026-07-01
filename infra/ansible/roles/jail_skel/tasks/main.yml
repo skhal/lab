@@ -6,7 +6,7 @@
 ---
 - name: "Configure ZFS"
   block:
-    - name: "ZFS create parent datasets"
+    - name: "ZFS create parent dataset {{ jail_skel_zfs_dataset | dirname }}"
       community.general.zfs:
         name: "{{ jail_skel_zfs_dataset | dirname }}"
         state: present
@@ -21,7 +21,7 @@
           | split('/')
           | count > 1
 
-    - name: "ZFS create skeleton dataset"
+    - name: "ZFS create skeleton dataset {{ jail_skel_zfs_dataset }}"
       community.general.zfs:
         name: "{{ jail_skel_zfs_dataset }}"
         state: present
@@ -31,14 +31,14 @@
           readonly: "off"
           # keep-sorted end
 
-    - name: "ZFS get sekeleton dataset properties"
+    - name: "ZFS sekeleton dataset get properties"
       community.general.zfs_facts:
         name: "{{ jail_skel_zfs_dataset }}"
         type: filesystem
         properties: "name,mounted,mountpoint"
       register: jail_skel_zfs_dataset_facts
 
-    - name: "ZFS skeleton must be mounted"
+    - name: "ZFS skeleton dataset must be mounted"
       ansible.builtin.assert:
         that: >-
           jail_skel_zfs_dataset_facts.ansible_facts.ansible_zfs_datasets
@@ -48,7 +48,7 @@
         fail_msg: "{{ jail_skel_zfs_dataset }} is not mounted"
         quiet: true
 
-    - name: "ZFS skeleton dataset mountpoint"
+    - name: "ZFS skeleton dataset get mountpoint"
       ansible.builtin.set_fact:
         jail_skel_path: >-
           {{
@@ -70,14 +70,14 @@
         mode: u=rw,g=r,o=r
         validate: /usr/sbin/jail -f %s -e ' '
 
-    - name: "Enable jail service"
+    - name: "Enable jail service in /etc/rc.conf.d/jail"
       community.general.sysrc:
         path: /etc/rc.conf.d/jail
         name: jail_enable
         value: true
       notify: "start_jail"
 
-    - name: "Stop jails in reverse order"
+    - name: "Stop jails in reverse order in /etc/rc.conf.d/jail"
       community.general.sysrc:
         path: /etc/rc.conf.d/jail
         name: jail_reverse_stop
@@ -89,7 +89,7 @@
       vars:
         keys_path: "{{ jail_skel_path }}/usr/share"
       block:
-        - name: "Create keys folder"
+        - name: "Create keys folder {{ keys_path }}"
           ansible.builtin.file:
             path: "{{ keys_path }}"
             state: directory
@@ -125,19 +125,19 @@
             fstype: tmpfs
             state: present
 
-        - name: "Install packages"
+        - name: "Install packages to {{ jail_skel_path }}"
           community.general.pkgng:
             rootdir: "{{ jail_skel_path }}"
             name: "{{ jail_skel_default_packages | union(jail_skel_packages) | join(' ') }}"
             state: latest
 
-        - name: "Get installed packages"
+        - name: "Get installed packages at {{ jail_skel_path }}"
           ansible.builtin.command:
             cmd: pkg -r {{ jail_skel_path }} leaf
           register: jail_skel_packages
           changed_when: false
 
-        - name: "Installed packages"
+        - name: "Installed packages at {{ jail_skel_path }}"
           ansible.builtin.debug:
             var: jail_skel_packages.stdout_lines
 
