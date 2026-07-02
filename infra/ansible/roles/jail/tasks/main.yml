@@ -1,0 +1,52 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+- name: "Get skeleton snapsthot"
+  block:
+    - name: "ZFS list snapshots for {{ jail_skel_zfs_dataset }}"
+      community.general.zfs_facts:
+        name: "{{ jail_skel_zfs_dataset }}"
+        type: snapshot
+        properties: "name"
+      register: jail_zfs_list_snapshots
+      changed_when: false
+
+    - name: "ZFS last snapshot of {{ jail_skel_zfs_dataset }}"
+      ansible.builtin.set_fact:
+        jail_skel_zfs_dataset_snapshot: "{{ item }}"
+      loop: >-
+        {{
+          jail_zfs_list_snapshots.ansible_facts.ansible_zfs_datasets
+              | map(attribute='name')
+        }}
+      loop_control:
+        extended: true
+      when: ansible_loop.last
+
+- name: "Duplicate skeleton {{ jail_skel_zfs_dataset }}"
+  vars:
+    jail_zfs_dataset: "{{ jail_skel_zfs_dataset | dirname | default(omit) }}/{{ jail_name }}"
+  block:
+    - name: "ZFS dataset stats {{ jail_zfs_dataset }}"
+      community.general.zfs_facts:
+        name: "{{ jail_zfs_dataset }}"
+        type: filesystem
+        properties: "name"
+      register: jail_zfs_facts
+      ignore_errors: true # only want to check if the dataset exists
+      changed_when: false
+
+    # noqa name[template]
+    - name: "ZFS copy {{ jail_zfs_dataset }} from {{ jail_skel_zfs_dataset }}"
+      ansible.builtin.shell:
+        cmd: >-
+          set -o pipefail;
+          zfs send {{ jail_skel_zfs_dataset_snapshot }} |
+            zfs receive {{ jail_zfs_dataset }}
+        executable: /bin/sh
+      register: jail_zfs_copy
+      changed_when: jail_zfs_copy is succeeded
+      when: jail_zfs_facts is failed
