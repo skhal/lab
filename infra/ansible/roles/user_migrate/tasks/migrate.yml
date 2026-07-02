@@ -14,7 +14,7 @@
 
 - name: "Parse user info"
   ansible.builtin.set_fact:
-    user_migrate_user_info:
+    user_migrate_user:
       name: "{{ item[idx_name] }}"
       uid: "{{ item[idx_uid] }}"
       gid: "{{ item[idx_gid] }}"
@@ -36,9 +36,9 @@
     idx_home: 8
     idx_shell: 9
 
-- name: "Get supplemental groups for {{ user_migrate_user_info.name }}"
+- name: "Get supplemental groups for {{ user_migrate_user.name }}"
   ansible.builtin.command:
-    cmd: "id -G {{ user_migrate_user_info.uid }}"
+    cmd: "id -G {{ user_migrate_user.uid }}"
   register: user_migrate_id_groups_job
   changed_when: false
 
@@ -55,7 +55,7 @@
           user_migrate_id_groups_job.stdout_lines
             | first
             | split
-            | reject('equalto', user_migrate_user_info.gid)
+            | reject('equalto', user_migrate_user.gid)
         }}
 
 # add supplemental groups to the user info.
@@ -63,7 +63,7 @@
   ansible.builtin.set_fact:
     user_migrate_user: >-
       {{
-        user_migrate_user_info
+        user_migrate_user
           | combine(user_migrate_supplemental_groups)
       }}
 
