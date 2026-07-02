@@ -13,5 +13,6 @@ jail_skel_default_packages:
   # keep-sorted start
   - FreeBSD-bsdconfig
   - FreeBSD-set-minimal-jail
+  - FreeBSD-ssh
   - pkg
   # keep-sorted end
