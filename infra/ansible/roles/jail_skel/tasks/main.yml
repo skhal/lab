@@ -206,3 +206,10 @@
           ansible.posix.mount:
             path: "{{ db_path }}"
             state: unmounted
+
+- name: "ZFS snapshot skeleton"
+  community.general.zfs:
+    name: "{{ jail_skel_zfs_dataset }}@{{ snapshot }}"
+    state: present
+  vars:
+    snapshot: "{{ '%Y-%m-%d-%T' | strftime }}"

@@ -15,6 +15,7 @@ jail_skel_packages:
   - doas
   - neovim
   # keep-sorted end
+jail_skel_zfs_dataset: zroot/usr/jail/15.1
 netif_clones:
   # keep-sorted start
   - name: bridge0
