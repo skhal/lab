@@ -129,6 +129,15 @@
             value: "inet {{ jail_cidr }}"
             path: "{{ rc_file }}"
 
+    - name: "Configure resolver in {{ jail_path }}/etc/resolv.conf" # noqa name[template]
+      ansible.builtin.lineinfile:
+        path: "{{ jail_path }}/etc/resolv.conf"
+        line: "nameserver {{ routing_defaultrouter }}"
+        owner: root
+        group: wheel
+        mode: u=rw,g=r,o=r
+        create: true
+
 - name: "Enable jail {{ jail_name }}"
   community.general.sysrc:
     name: jail_list
