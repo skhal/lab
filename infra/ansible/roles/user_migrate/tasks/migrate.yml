@@ -85,6 +85,7 @@
 - name: "Get groups at {{ user_migrate_rootdir }}/etc/groups"
   ansible.builtin.include_tasks: "get_groups.yml"
   vars:
+    user_migrate_get_groups_result: {}
     user_migrate_get_groups_rootdir: "{{ user_migrate_rootdir }}"
 
 - name: "Validate existing groups at {{ user_migrate_rootdir }}/etc/groups" # noqa name[template]
