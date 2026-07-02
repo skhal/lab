@@ -69,9 +69,6 @@
 
 - name: "Get groups at /etc/groups"
   ansible.builtin.include_tasks: "get_groups.yml"
-  vars:
-    rootdir: "/"
-    user_migrate_get_groups_result: {}
 
 - name: "User groups"
   ansible.builtin.set_fact:
@@ -88,11 +85,9 @@
 - name: "Get groups at {{ user_migrate_rootdir }}/etc/groups"
   ansible.builtin.include_tasks: "get_groups.yml"
   vars:
-    rootdir: "{{ user_migrate_rootdir }}"
-    user_migrate_get_groups_result: {}
+    user_migrate_get_groups_rootdir: "{{ user_migrate_rootdir }}"
 
-# noqa name[template]
-- name: "Validate existing groups at {{ user_migrate_rootdir }}/etc/groups"
+- name: "Validate existing groups at {{ user_migrate_rootdir }}/etc/groups" # noqa name[template]
   ansible.builtin.assert:
     that: >-
       item.value == user_group_name

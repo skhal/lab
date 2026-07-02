@@ -4,19 +4,24 @@
 # license that can be found in the LICENSE file.
 
 ---
-- name: "Get groups at {{ rootdir }}"
-  ansible.builtin.command:
-    cmd: pw -R {{ rootdir }} groupshow -a
-  register: user_migrate_get_groups_job
-  changed_when: false
-
-- name: "Parse groups"
-  ansible.builtin.set_fact:
-    user_migrate_get_groups_result: >-
-      {{ user_migrate_get_groups_result
-          | default({})
-          | combine({item[idx_gid]: item[idx_name]}) }}
-  loop: "{{ user_migrate_get_groups_job.stdout_lines | map('split', ':') }}"
+- name: "Get groups"
   vars:
-    idx_name: 0
-    idx_gid: 2
+    user_migrate_get_groups_result: {}
+    rootdir: "{{ user_migrate_get_groups_rootdir | default('/') }}"
+  block:
+    - name: "Get groups at {{ rootdir }}"
+      ansible.builtin.command:
+        cmd: pw -R {{ rootdir }} groupshow -a
+      register: user_migrate_get_groups_job
+      changed_when: false
+
+    - name: "Parse groups"
+      ansible.builtin.set_fact:
+        user_migrate_get_groups_result: >-
+          {{ user_migrate_get_groups_result
+              | default({})
+              | combine({item[idx_gid]: item[idx_name]}) }}
+      loop: "{{ user_migrate_get_groups_job.stdout_lines | map('split', ':') }}"
+      vars:
+        idx_name: 0
+        idx_gid: 2
