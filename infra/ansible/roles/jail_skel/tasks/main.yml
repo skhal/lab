@@ -158,6 +158,12 @@
             user_migrate_users: "{{ jail_skel_migrate_users }}"
             user_migrate_rootdir: "{{ jail_skel_path }}"
 
+        - name: "Enable sshd"
+          community.general.sysrc:
+            name: sshd_enable
+            value: true
+            path: "{{ jail_skel_path }}/etc/rc.conf"
+
         # want to reuse server user_list but limit to some users, e.g. root,
         # then pass the filtered list to included user-role.
         # We can't set user_list var in include_role that would filter user_list
