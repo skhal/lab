@@ -4,5 +4,14 @@
 # license that can be found in the LICENSE file.
 
 ---
+# jail_bridge is the jails bridge.
+jail_bridge: ""
+
+# jail_cidr is the IP with network marsk.
+jail_cidr: ""
+
+# jail_defaultrouter sets the IP for default route.
+jail_defaultrouter: ""
+
 # jail_name is the jail name.
 jail_name: ""

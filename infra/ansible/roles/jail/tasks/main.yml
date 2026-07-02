@@ -34,19 +34,112 @@
       community.general.zfs_facts:
         name: "{{ jail_zfs_dataset }}"
         type: filesystem
-        properties: "name"
+        properties: "name,mounted,mountpoint"
       register: jail_zfs_facts
       ignore_errors: true # only want to check if the dataset exists
-      changed_when: false
 
-    # noqa name[template]
-    - name: "ZFS copy {{ jail_zfs_dataset }} from {{ jail_skel_zfs_dataset }}"
-      ansible.builtin.shell:
-        cmd: >-
-          set -o pipefail;
-          zfs send {{ jail_skel_zfs_dataset_snapshot }} |
-            zfs receive {{ jail_zfs_dataset }}
-        executable: /bin/sh
-      register: jail_zfs_copy
-      changed_when: jail_zfs_copy is succeeded
+    - name: "Create ZFS dataset"
       when: jail_zfs_facts is failed
+      block:
+        # noqa name[template]
+        - name: "ZFS copy {{ jail_zfs_dataset }} from {{ jail_skel_zfs_dataset }}"
+          ansible.builtin.shell:
+            cmd: >-
+              set -o pipefail;
+              zfs send {{ jail_skel_zfs_dataset_snapshot }} |
+                zfs receive {{ jail_zfs_dataset }}
+            executable: /bin/sh
+          register: jail_zfs_copy
+          changed_when: jail_zfs_copy is succeeded
+
+        - name: "ZFS update properties {{ jail_zfs_dataset }}"
+          community.general.zfs:
+            name: "{{ jail_zfs_dataset }}"
+            state: present
+            extra_zfs_properties:
+              # keep-sorted start
+              canmount: "on"
+              readonly: "off"
+              # keep-sorted end
+
+        - name: "ZFS dataset stats {{ jail_zfs_dataset }}"
+          community.general.zfs_facts:
+            name: "{{ jail_zfs_dataset }}"
+            type: filesystem
+            properties: "name,mounted,mountpoint"
+          register: jail_zfs_facts_new
+
+    - name: "Get mountpoint"
+      vars:
+        facts: "{{ [jail_zfs_facts_new, jail_zfs_facts] | selectattr('ansible_facts', 'defined') | first }}"
+      block:
+        - name: "ZFS jail dataset must be mounted"
+          ansible.builtin.assert:
+            that: >-
+              facts.ansible_facts.ansible_zfs_datasets
+                | selectattr("name", "equalto", jail_zfs_dataset)
+                | selectattr("mounted", "equalto", "yes")
+                | count == 1
+            fail_msg: "{{ jail_zfs_dataset }} is not mounted"
+            quiet: true
+
+        - name: "ZFS jail dataset get mountpoint"
+          ansible.builtin.set_fact:
+            jail_path: >-
+              {{
+                facts.ansible_facts.ansible_zfs_datasets
+                  | selectattr('name', 'equalto', jail_zfs_dataset)
+                  | map(attribute='mountpoint')
+                  | first
+                  | default(omit)
+              }}
+
+- name: "Configure jail {{ jail_name }}"
+  block:
+    # noqa name[template]
+    - name: "Create jail config /etc/jail.conf.d/{{ jail_name }}.conf"
+      ansible.builtin.template:
+        src: etc/jail.conf.d/jail.conf
+        dest: /etc/jail.conf.d/{{ jail_name }}.conf
+        owner: root
+        group: wheel
+        mode: u=rw,g=r,o=r
+        validate: /usr/sbin/jail -f %s -e ' '
+
+    - name: "Set default router in {{ jail_path }}/etc/rc.conf.d/routing" # noqa name[template]
+      community.general.sysrc:
+        name: defaultrouter
+        value: "{{ jail_defaultrouter }}"
+        path: "{{ jail_path }}/etc/rc.conf.d/routing"
+
+    - name: "Configure network"
+      vars:
+        rc_file: "{{ jail_path }}/etc/rc.conf.d/network"
+      block:
+        # noqa name[template]
+        - name: "Update {{ rc_file }} - name vnet interface"
+          community.general.sysrc:
+            name: ifconfig_e0b_{{ jail_name }}_name
+            value: "vnet0"
+            path: "{{ rc_file }}"
+
+        - name: "Update {{ rc_file }} - configure vnet interface" # noqa name[template]
+          community.general.sysrc:
+            name: ifconfig_vnet0
+            value: "inet {{ jail_cidr }}"
+            path: "{{ rc_file }}"
+
+- name: "Enable jail {{ jail_name }}"
+  community.general.sysrc:
+    name: jail_list
+    value: "{{ jail_name }}"
+    state: value_present
+    path: /etc/rc.conf.d/jail
+  register: jail_rc_enable
+
+# noqa command-instead-of-module
+- name: "Restart jail {{ jail_name }}"
+  ansible.builtin.command:
+    cmd: service jail restart dns
+  register: jail_service_restart_result
+  changed_when: jail_service_restart_result is succeeded

@@ -13,7 +13,12 @@
   become_method: community.general.doas
 
   vars:
+    # keep-sorted start
+    jail_bridge: bridge1
+    jail_cidr: 10.0.0.2/24
+    jail_defaultrouter: 10.0.0.1
     jail_name: dns
+    # keep-sorted end
 
   roles:
     - role: jail
