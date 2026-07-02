@@ -9,10 +9,9 @@
   # is invalid.
   ansible.builtin.command:
     cmd: "pw usershow {{ user_migrate_name }}"
-  register: user_migrate_get_user_info_job
+  register: user_migrate_pw_usershow_job
   changed_when: false
 
-# format: https://github.com/freebsd/freebsd-src/blob/2a4b8fd1dc070e71fbaab6f12c1c9e4452652aa7/lib/libutil/pw_util.c#L400-L403
 - name: "Parse user info"
   ansible.builtin.set_fact:
     user_migrate_user_info:
@@ -22,7 +21,15 @@
       home: "{{ item[idx_home] }}"
       shell: "{{ item[idx_shell] }}"
   vars:
-    item: "{{ user_migrate_get_user_info_job.stdout_lines | first | split(':') }}"
+    # there should be only one line of the output, pick the first line of
+    # stdout.
+    item: >-
+      {{
+        user_migrate_pw_usershow_job.stdout_lines
+          | first
+          | split(':')
+      }}
+    # format: https://github.com/freebsd/freebsd-src/blob/2a4b8fd1dc070e71fbaab6f12c1c9e4452652aa7/lib/libutil/pw_util.c#L400-L403
     idx_name: 0
     idx_uid: 2
     idx_gid: 3
@@ -32,20 +39,26 @@
 - name: "Get supplemental groups for {{ user_migrate_user_info.name }}"
   ansible.builtin.command:
     cmd: "id -G {{ user_migrate_user_info.uid }}"
-  register: user_migrate_get_groups_job
+  register: user_migrate_id_groups_job
   changed_when: false
 
 - name: "Parse supplemental groups"
   ansible.builtin.set_fact:
     user_migrate_supplemental_groups:
+      # there should be only one line of the output, pick the first line of
+      # stdout.
+      # The output lists all groups, including primary and supplemental groups.
+      # Filter out primary group using reject() to only keep supplemental
+      # groups.
       supplemental_gids: >-
         {{
-          user_migrate_get_groups_job.stdout_lines
+          user_migrate_id_groups_job.stdout_lines
             | first
             | split
             | reject('equalto', user_migrate_user_info.gid)
         }}
 
+# add supplemental groups to the user info.
 - name: "Set user info"
   ansible.builtin.set_fact:
     user_migrate_user: >-
