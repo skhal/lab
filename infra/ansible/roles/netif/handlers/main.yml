@@ -11,12 +11,12 @@
     state: restarted
   async: 30
   poll: 0
-  register: netif_restart_network_job
+  register: netif_restart_network_task
 
 - name: "Wait for network to restart"
   listen: "restart_network"
   ansible.builtin.async_status:
-    jid: "{{ netif_restart_network_job.ansible_job_id }}"
+    jid: "{{ netif_restart_network_task.ansible_job_id }}"
   retries: 10
-  register: netif_restart_network_result
-  until: netif_restart_network_result is finished
+  register: netif_wait_restart_network_task
+  until: netif_wait_restart_network_task is finished
