@@ -11,4 +11,4 @@
     sysrc_migrate:
       name: hostname
       path: /etc/rc.conf.d/hostname
-      value: "{{ hostname_name }}"
+      value: "{{ inventory_hostname }}"

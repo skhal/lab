@@ -5,7 +5,6 @@
 
 ---
 # keep-sorted start
-hostname_name: "nuc.lab.net"
 jail_skel_migrate_users:
   - "{{ ansible_user }}"
 jail_skel_packages:
