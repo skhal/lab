@@ -18,4 +18,4 @@
   ansible.builtin.include_tasks: "ifconfig.yml"
   loop: "{{ netif_clones }}"
   loop_control:
-    loop_var: iface
+    loop_var: _iface

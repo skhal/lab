@@ -4,22 +4,27 @@
 # license that can be found in the LICENSE file.
 
 ---
-- name: "Update /etc/rc.conf.d/network - clone {{ iface.name }}"
-  community.general.sysrc:
-    path: /etc/rc.conf.d/network
-    name: cloned_interfaces
-    state: value_present
-    value: "{{ iface.name }}"
-  notify: "restart_network"
+- name: "Update /etc/rc.conf.d/network"
+  vars:
+    _rc_file: /etc/rc.conf.d/network
+  block:
+    # noqa name[template]
+    - name: "Update {{ _rc_file }} - clone {{ _iface.name }}"
+      community.general.sysrc:
+        path: "{{ _rc_file }}"
+        name: cloned_interfaces
+        state: value_present
+        value: "{{ _iface.name }}"
+      notify: "restart_network"
 
-- name: "Update /etc/rc.conf.d/network - configure {{ iface.name }}"
-  community.general.sysrc:
-    path: /etc/rc.conf.d/network
-    name: "ifconfig_{{ iface.name }}"
-    # noqa jinja[spacing]
-    value: >-
-      inet {{ iface.cidr }}
-      {%- for m in iface.get('addm', []) %} addm {{ m }}{% endfor %}
-      up
-      {%- if 'desc' in iface %} descr {{ iface.desc }}{% endif %}
-  notify: "restart_network"
+    - name: "Update {{ _rc_file }} - configure {{ _iface.name }}" # noqa name[template]
+      community.general.sysrc:
+        path: "{{ _rc_file }}"
+        name: "ifconfig_{{ _iface.name }}"
+        # noqa jinja[spacing]
+        value: >-
+          inet {{ _iface.cidr }}
+          {%- for m in _iface.get('addm', []) %} addm {{ m }}{% endfor %}
+          up
+          {%- if 'desc' in _iface %} descr {{ _iface.desc }}{% endif %}
+      notify: "restart_network"
