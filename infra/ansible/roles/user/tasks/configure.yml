@@ -4,16 +4,29 @@
 # license that can be found in the LICENSE file.
 
 ---
-# noqa name[template]
-- name: >-
-    User {{ _user.name }} - set shell to {{ _user.shell }}
-    {% if user_chroot != "" %} in {{ user_chroot }}{% endif %}
-  ansible.builtin.command:
-    cmd: >-
-      {% if user_chroot != "" %}chroot {{ user_chroot }}{% endif %}
-      chsh -s {{ _user.shell }} {{ _user.name }}
-  register: user_chsh
-  changed_when: user_chsh.rc == 0
+- name: "Update shell"
+  block:
+    - name: "User {{ _user.name }} - get info"
+      ansible.builtin.command:
+        cmd: >-
+          {% if user_chroot != "" %}chroot {{ user_chroot }}{% endif %}
+          pw showuser {{ _user.name }}
+      register: user_get_info_task
+      changed_when: false
+
+    # noqa name[template]
+    - name: >-
+        User {{ _user.name }} - set shell to {{ _user.shell }}
+        {% if user_chroot != "" %} in {{ user_chroot }}{% endif %}
+      ansible.builtin.command:
+        cmd: >-
+          {% if user_chroot != "" %}chroot {{ user_chroot }}{% endif %}
+          chsh -s {{ _user.shell }} {{ _user.name }}
+      register: user_chsh
+      changed_when: user_chsh.rc == 0
+      when:
+        - user_get_info_task is succeeded
+        - _user.shell not in user_get_info_task.stdout
 
 # noqa name[template]
 - name: >-
@@ -35,6 +48,9 @@
       group: "{{ _user.group }}"
       mode: u=rw,g=r,o=r
   loop: >-
-    {{ query('fileglob', role_path ~ '/files/' ~ _user.home ~ '/dot.*') | sort }}
+    {{
+      query('fileglob', role_path ~ '/files/' ~ _user.home ~ '/dot.*')
+        | sort
+    }}
   loop_control:
     loop_var: item_file
