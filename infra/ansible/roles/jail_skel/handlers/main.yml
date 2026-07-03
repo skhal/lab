@@ -4,8 +4,18 @@
 # license that can be found in the LICENSE file.
 
 ---
-- name: Start jail
+- name: "Start jail"
   ansible.builtin.service:
     name: jail
     state: started
   listen: "start_jail"
+
+- name: "Snapshot dataset"
+  vars:
+    _snapshot: "{{ jail_skel_zfs_dataset }}@{{ '%Y-%m-%d-%T' | strftime }}"
+  block:
+    - name: "Snapshot dataset {{ _snapshot }}"
+      community.general.zfs:
+        name: "{{ _snapshot }}"
+        state: present
+      listen: "jail_skel_snapshot"

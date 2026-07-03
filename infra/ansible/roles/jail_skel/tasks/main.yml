@@ -5,6 +5,7 @@
 
 ---
 - name: "Configure ZFS"
+  notify: "jail_skel_snapshot"
   block:
     - name: "Create parent datasets {{ jail_skel_zfs_dataset | dirname }}"
       community.general.zfs:
@@ -48,7 +49,7 @@
         fail_msg: "{{ jail_skel_zfs_dataset }} is not mounted"
         quiet: true
 
-    - name: "Extrct dataset mountpoint"
+    - name: "Extract dataset mountpoint"
       ansible.builtin.set_fact:
         jail_skel_path: >-
           {{
@@ -60,6 +61,7 @@
           }}
 
 - name: "Configure jail service"
+  notify: "jail_skel_snapshot"
   vars:
     _rc_file: /etc/rc.conf.d/jail
   block:
@@ -88,6 +90,7 @@
         path: "{{ _rc_file }}"
 
 - name: "Install packages"
+  notify: "jail_skel_snapshot"
   block:
     - name: "Install pkg keys"
       vars:
@@ -164,26 +167,19 @@
           ansible.builtin.debug:
             msg: "userland: {{ jail_skel_get_os_version_task.stdout }}"
 
-- name: "Migrate users"
-  ansible.builtin.include_role:
-    name: user_migrate
-  vars:
-    user_migrate_users: "{{ jail_skel_migrate_users }}"
-    user_migrate_rootdir: "{{ jail_skel_path }}"
-
-- name: "Configure services"
+- name: "Configure users"
+  notify: "jail_skel_snapshot"
   block:
-    - name: "Enable sshd"
-      community.general.sysrc:
-        name: sshd_enable
-        value: true
-        path: "{{ jail_skel_path }}/etc/rc.conf"
+    - name: "Migrate users"
+      ansible.builtin.include_role:
+        name: user_migrate
+      vars:
+        user_migrate_users: "{{ jail_skel_migrate_users }}"
+        user_migrate_rootdir: "{{ jail_skel_path }}"
 
-- name: "Snapshot dataset"
-  vars:
-    _snapshot: "{{ jail_skel_zfs_dataset }}@{{ '%Y-%m-%d-%T' | strftime }}"
-  block:
-    - name: "Snapshot dataset {{ _snapshot }}"
-      community.general.zfs:
-        name: "{{ _snapshot }}"
-        state: present
+- name: "Enable sshd"
+  community.general.sysrc:
+    name: sshd_enable
+    value: true
+    path: "{{ jail_skel_path }}/etc/rc.conf"
+  notify: "jail_skel_snapshot"
