@@ -51,3 +51,6 @@
 
     - role: pkg
       tags: pkg
+
+    - role: jail_skel
+      tags: jail_skel
