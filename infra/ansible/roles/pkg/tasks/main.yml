@@ -17,7 +17,7 @@
   ansible.builtin.include_tasks: "alias.yml"
   loop: "{{ pkg_aliases }}"
   loop_control:
-    loop_var: alias
+    loop_var: _alias
 
 - name: "Install packages {{ pkg_install }}"
   community.general.pkgng:

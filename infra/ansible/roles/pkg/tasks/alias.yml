@@ -4,8 +4,9 @@
 # license that can be found in the LICENSE file.
 
 ---
-- name: "Add pkg alias {{ alias.name }}"
+# noqa name[template]
+- name: "Update {{ pkg_conf_path }} - add alias {{ _alias.name }}"
   ansible.builtin.lineinfile:
     path: "{{ pkg_conf_path }}"
     insertafter: "^ALIAS {"
-    line: '    {{ alias.name }} = "{{ alias.value }}";'
+    line: '    {{ _alias.name }} = "{{ _alias.value }}";'
