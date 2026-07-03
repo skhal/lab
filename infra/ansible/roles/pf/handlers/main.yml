@@ -28,12 +28,12 @@
     cmd: ((sleep 1; nohup service pf reload ) & )
   async: 10
   poll: 0
-  register: pf_reload_conf_job
+  register: pf_reload_conf_task
 
 - name: "Wait for pf to reload"
   listen: "reload_pf_conf"
   ansible.builtin.async_status:
-    jid: "{{ pf_reload_conf_job.ansible_job_id }}"
+    jid: "{{ pf_reload_conf_task.ansible_job_id }}"
   retries: 10
-  register: pf_reload_conf_result
-  until: pf_reload_conf_result is finished
+  register: pf_wait_reload_conf_task
+  until: pf_wait_reload_conf_task is finished
