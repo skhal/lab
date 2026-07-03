@@ -200,16 +200,6 @@
         value: true
         path: "{{ jail_skel_path }}/etc/rc.conf"
 
-    - name: "Migrate syslog"
-      ansible.builtin.include_role:
-        name: sysrc
-      vars:
-        sysrc_migrate:
-          name: syslogd_flags
-          value: "-ss"
-          from: "{{ jail_skel_path }}/etc/rc.conf"
-          path: "{{ jail_skel_path }}/etc/rc.conf.d/syslogd"
-
 - name: "Snapshot dataset"
   vars:
     _snapshot: "{{ jail_skel_zfs_dataset }}@{{ '%Y-%m-%d-%T' | strftime }}"
