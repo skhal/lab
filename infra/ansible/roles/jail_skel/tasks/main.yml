@@ -134,7 +134,14 @@
             rootdir: "{{ jail_skel_path }}"
             name: "{{ jail_skel_default_packages | union(jail_skel_packages) | join(' ') }}"
             state: present
+      always:
+        - name: "Unmount metadata cache at {{ _db_path }}"
+          ansible.posix.mount:
+            path: "{{ _db_path }}"
+            state: unmounted
 
+    - name: "Installed packages"
+      block:
         - name: "List installed packages at {{ jail_skel_path }}"
           ansible.builtin.command:
             cmd: pkg -r {{ jail_skel_path }} leaf
@@ -145,75 +152,77 @@
           ansible.builtin.debug:
             var: jail_skel_list_packages_task.stdout_lines
 
-        - name: "Get installed OS version at {{ jail_skel_path }}"
+    - name: "Installed userland"
+      block:
+        - name: "Get installed userland at {{ jail_skel_path }}"
           ansible.builtin.command:
             cmd: chroot {{ jail_skel_path }} freebsd-version -u
           register: jail_skel_get_os_version_task
           changed_when: false
 
-        - name: "Installed OS version at {{ jail_skel_path }}"
+        - name: "Installed userland at {{ jail_skel_path }}"
           ansible.builtin.debug:
             msg: "userland: {{ jail_skel_get_os_version_task.stdout }}"
 
-        - name: "Migrate users"
-          ansible.builtin.include_role:
-            name: user_migrate
-          vars:
-            user_migrate_users: "{{ jail_skel_migrate_users }}"
-            user_migrate_rootdir: "{{ jail_skel_path }}"
+- name: "Configure users"
+  block:
+    - name: "Migrate users"
+      ansible.builtin.include_role:
+        name: user_migrate
+      vars:
+        user_migrate_users: "{{ jail_skel_migrate_users }}"
+        user_migrate_rootdir: "{{ jail_skel_path }}"
 
-        - name: "Enable sshd"
-          community.general.sysrc:
-            name: sshd_enable
-            value: true
-            path: "{{ jail_skel_path }}/etc/rc.conf"
+    # want to reuse server user_list but limit to some users, e.g. root,
+    # then pass the filtered list to included user-role.
+    # We can't set user_list var in include_role that would filter user_list
+    # host variable since it leads to recursion.
+    # Move users filter into a separate task to break the recursion:
+    # 1. filter users
+    # 2. set user_list equal to the filtered user list
+    - name: "Collect users"
+      ansible.builtin.set_fact:
+        jail_skel_users: >-
+          {{ user_list | selectattr('name', 'equalto', 'root') }}
+        jail_skel_timezone_name: "{{ timezone_name }}"
 
-        # want to reuse server user_list but limit to some users, e.g. root,
-        # then pass the filtered list to included user-role.
-        # We can't set user_list var in include_role that would filter user_list
-        # host variable since it leads to recursion.
-        # Move users filter into a separate task to break the recursion:
-        # 1. filter users
-        # 2. set user_list equal to the filtered user list
-        - name: "Collect users"
-          ansible.builtin.set_fact:
-            jail_skel_users: >-
-              {{ user_list | selectattr('name', 'equalto', 'root') }}
-            jail_skel_timezone_name: "{{ timezone_name }}"
+    - name: "Configure users"
+      ansible.builtin.include_role:
+        name: user
+      vars:
+        user_chroot: "{{ jail_skel_path }}"
+        user_list: "{{ jail_skel_users }}"
 
-        - name: "Configure users"
-          ansible.builtin.include_role:
-            name: user
-          vars:
-            user_chroot: "{{ jail_skel_path }}"
-            user_list: "{{ jail_skel_users }}"
+- name: "Configure services"
+  block:
+    - name: "Enable sshd"
+      community.general.sysrc:
+        name: sshd_enable
+        value: true
+        path: "{{ jail_skel_path }}/etc/rc.conf"
 
-        - name: "Migrate syslog"
-          ansible.builtin.include_role:
-            name: sysrc
-          vars:
-            sysrc_migrate:
-              name: syslogd_flags
-              value: "-ss"
-              from: "{{ jail_skel_path }}/etc/rc.conf"
-              path: "{{ jail_skel_path }}/etc/rc.conf.d/syslogd"
+    - name: "Migrate syslog"
+      ansible.builtin.include_role:
+        name: sysrc
+      vars:
+        sysrc_migrate:
+          name: syslogd_flags
+          value: "-ss"
+          from: "{{ jail_skel_path }}/etc/rc.conf"
+          path: "{{ jail_skel_path }}/etc/rc.conf.d/syslogd"
 
-        - name: "Configure timezone"
-          ansible.builtin.include_role:
-            name: timezone
-          vars:
-            timezone_chroot: "{{ jail_skel_path }}"
-            timezone_name: "{{ jail_skel_timezone_name }}"
-
-      always:
-        - name: "Unmount metadata cache at {{ _db_path }}"
-          ansible.posix.mount:
-            path: "{{ _db_path }}"
-            state: unmounted
-
-- name: "ZFS snapshot skeleton"
-  community.general.zfs:
-    name: "{{ jail_skel_zfs_dataset }}@{{ snapshot }}"
-    state: present
+- name: "Configure timezone"
+  ansible.builtin.include_role:
+    name: timezone
   vars:
-    snapshot: "{{ '%Y-%m-%d-%T' | strftime }}"
+    timezone_chroot: "{{ jail_skel_path }}"
+    timezone_name: "{{ jail_skel_timezone_name }}"
+
+- name: "Snapshot dataset"
+  vars:
+    _snapshot: "{{ jail_skel_zfs_dataset }}@{{ '%Y-%m-%d-%T' | strftime }}"
+  block:
+    - name: "Snapshot dataset {{ _snapshot }}"
+      community.general.zfs:
+        name: "{{ _snapshot }}"
+        state: present
