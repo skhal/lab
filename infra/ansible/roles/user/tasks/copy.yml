@@ -5,10 +5,10 @@
 
 ---
 # noqa name[template]
-- name: "User {{ user.name }} - copy {{ src | basename }}"
+- name: "User {{ _copy.user }} - copy {{ _copy.src | basename }}"
   ansible.builtin.copy:
-    src: "{{ src }}"
-    dest: "{{ dst }}"
-    owner: "{{ owner }}"
-    group: "{{ group }}"
-    mode: "{{ mode }}"
+    src: "{{ _copy.src }}"
+    dest: "{{ _copy.dst }}"
+    owner: "{{ _copy.owner }}"
+    group: "{{ _copy.group }}"
+    mode: "{{ _copy.mode }}"

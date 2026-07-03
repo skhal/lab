@@ -6,29 +6,35 @@
 ---
 # noqa name[template]
 - name: >-
-    User {{ user.name }} - set shell to {{ user.shell }}
-    {%- if user_chroot != "" %} in {{ user_chroot }}{% endif %}
+    User {{ _user.name }} - set shell to {{ _user.shell }}
+    {% if user_chroot != "" %} in {{ user_chroot }}{% endif %}
   ansible.builtin.command:
     cmd: >-
       {% if user_chroot != "" %}chroot {{ user_chroot }}{% endif %}
-      chsh -s {{ user.shell }} {{ user.name }}
+      chsh -s {{ _user.shell }} {{ _user.name }}
   register: user_chsh
   changed_when: user_chsh.rc == 0
 
 # noqa name[template]
 - name: >-
-    User {{ user.name }} - copy skeleton
-    {%- if user_chroot != "" %} in {{ user_chroot }}{% endif %}
+    User {{ _user.name }} - copy skeleton
+    {% if user_chroot != "" %} in {{ user_chroot }}{% endif %}
   ansible.builtin.include_tasks: "copy.yml"
   vars:
-    src: "{{ file }}"
-    dst: >-
-      {% if user_chroot != "" %}{{ user_chroot }}{% endif -%}
-      {{ user.home }}/{{ file | basename | regex_replace('^dot', '', count=1) }}
-    owner: "{{ user.name }}"
-    group: "{{ user.group }}"
-    mode: u=rw,g=r,o=r
+    _copy:
+      user: "{{ _user.name }}"
+      src: "{{ item_file }}"
+      dst: >-
+        {% if user_chroot != "" %}{{ user_chroot }}{% endif -%}
+        {{ _user.home }}/{{
+          item_file
+            | basename
+            | regex_replace('^dot', '', count=1)
+        }}
+      owner: "{{ _user.name }}"
+      group: "{{ _user.group }}"
+      mode: u=rw,g=r,o=r
   loop: >-
-    {{ query('fileglob', role_path ~ '/files/' ~ user.home ~ '/dot.*') | sort }}
+    {{ query('fileglob', role_path ~ '/files/' ~ _user.home ~ '/dot.*') | sort }}
   loop_control:
-    loop_var: file
+    loop_var: item_file
