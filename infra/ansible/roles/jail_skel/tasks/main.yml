@@ -132,7 +132,7 @@
         - name: "Install packages to {{ jail_skel_path }}"
           community.general.pkgng:
             rootdir: "{{ jail_skel_path }}"
-            name: "{{ jail_skel_default_packages | union(jail_skel_packages) | join(' ') }}"
+            name: "{{ jail_skel_default_packages | union(jail_skel_packages) }}"
             state: present
       always:
         - name: "Unmount metadata cache at {{ _db_path }}"
