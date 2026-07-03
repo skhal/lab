@@ -91,11 +91,11 @@
   block:
     - name: "Install pkg keys"
       vars:
-        keys_path: "{{ jail_skel_path }}/usr/share"
+        _keys_path: "{{ jail_skel_path }}/usr/share"
       block:
-        - name: "Create keys folder {{ keys_path }}"
+        - name: "Create keys folder {{ _keys_path }}"
           ansible.builtin.file:
-            path: "{{ keys_path }}"
+            path: "{{ _keys_path }}"
             state: directory
             owner: root
             group: wheel
@@ -104,7 +104,7 @@
         - name: "Copy keys from /usr/share/keys"
           ansible.builtin.copy:
             src: /usr/share/keys
-            dest: "{{ keys_path }}/"
+            dest: "{{ _keys_path }}/"
             owner: root
             group: wheel
             mode: u=rwx,g=rx,o=rx
@@ -112,19 +112,19 @@
 
     - name: "Install with pkg database"
       vars:
-        db_path: "{{ jail_skel_path }}/var/db/pkg/repos"
+        _db_path: "{{ jail_skel_path }}/var/db/pkg/repos"
       block:
-        - name: "Create pkg db at {{ db_path }}"
+        - name: "Create pkg db at {{ _db_path }}"
           ansible.builtin.file:
-            path: "{{ db_path }}"
+            path: "{{ _db_path }}"
             state: directory
             owner: root
             group: wheel
             mode: u=rwx,g=rx,o=rx
 
-        - name: "Mount metadata cache at {{ db_path }}"
+        - name: "Mount metadata cache at {{ _db_path }}"
           ansible.posix.mount:
-            path: "{{ db_path }}"
+            path: "{{ _db_path }}"
             src: tmpfs
             fstype: tmpfs
             state: present
@@ -133,27 +133,27 @@
           community.general.pkgng:
             rootdir: "{{ jail_skel_path }}"
             name: "{{ jail_skel_default_packages | union(jail_skel_packages) | join(' ') }}"
-            state: latest
+            state: present
 
-        - name: "Get installed packages at {{ jail_skel_path }}"
+        - name: "List installed packages at {{ jail_skel_path }}"
           ansible.builtin.command:
             cmd: pkg -r {{ jail_skel_path }} leaf
-          register: jail_skel_packages
+          register: jail_skel_list_packages_task
           changed_when: false
 
         - name: "Installed packages at {{ jail_skel_path }}"
           ansible.builtin.debug:
-            var: jail_skel_packages.stdout_lines
+            var: jail_skel_list_packages_task.stdout_lines
 
-        - name: "Get template version at {{ jail_skel_path }}"
+        - name: "Get installed OS version at {{ jail_skel_path }}"
           ansible.builtin.command:
             cmd: chroot {{ jail_skel_path }} freebsd-version -u
-          register: jail_skel_os_version
+          register: jail_skel_get_os_version_task
           changed_when: false
 
-        - name: "Template version at {{ jail_skel_path }}"
+        - name: "Installed OS version at {{ jail_skel_path }}"
           ansible.builtin.debug:
-            msg: "userland: {{ jail_skel_os_version.stdout }}"
+            msg: "userland: {{ jail_skel_get_os_version_task.stdout }}"
 
         - name: "Migrate users"
           ansible.builtin.include_role:
@@ -206,9 +206,9 @@
             timezone_name: "{{ jail_skel_timezone_name }}"
 
       always:
-        - name: "Unmount metadata cache at {{ db_path }}"
+        - name: "Unmount metadata cache at {{ _db_path }}"
           ansible.posix.mount:
-            path: "{{ db_path }}"
+            path: "{{ _db_path }}"
             state: unmounted
 
 - name: "ZFS snapshot skeleton"
