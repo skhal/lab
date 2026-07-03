@@ -14,16 +14,19 @@
       path: /etc/rc.conf.d/sshd
 
 - name: "Update configuration"
+  vars:
+    _conf_file: "{{ ssh_server_config }}"
   block:
-    - name: "SSH listen on cloned interfaces in {{ ssh_server_config }}"
+    # noqa name[template]
+    - name: "Update {{ _conf_file }} - listen on cloned interfaces"
       ansible.builtin.lineinfile:
-        path: /etc/ssh/sshd_config
+        path: "{{ _conf_file }}"
         line: "ListenAddress={{ item.cidr | ansible.utils.ipaddr('address') }}"
       loop: "{{ netif_clones }}"
       notify: "restart_sshd"
 
-    - name: "SSH allow op user in {{ ssh_server_config }}"
+    - name: "Update {{ _conf_file }} - allow op user" # noqa name[template]
       ansible.builtin.lineinfile:
-        path: "{{ ssh_server_config }}"
+        path: "{{ _conf_file }}"
         line: "AllowUsers={{ ssh_allow_users | join(' ') }}"
       notify: "restart_sshd"
