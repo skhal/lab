@@ -5,8 +5,8 @@
 
 ---
 # noqa name[template]
-- name: "Update {{ var.path }} - set {{ var.name }}"
+- name: "Update {{ _rc_var.path }} - set {{ _rc_var.name }}"
   community.general.sysrc:
-    name: "{{ var.name }}"
-    value: "{{ var.value }}"
-    path: "{{ var.path | default(omit) }}"
+    name: "{{ _rc_var.name }}"
+    value: "{{ _rc_var.value }}"
+    path: "{{ _rc_var.path | default(omit) }}"

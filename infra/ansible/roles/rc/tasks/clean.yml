@@ -4,7 +4,7 @@
 # license that can be found in the LICENSE file.
 
 ---
-- name: "Update /etc/rc.conf - remove {{ name }}"
+- name: "Update /etc/rc.conf - remove {{ _rc_var }}"
   community.general.sysrc:
-    name: "{{ name }}"
+    name: "{{ _rc_var }}"
     state: absent

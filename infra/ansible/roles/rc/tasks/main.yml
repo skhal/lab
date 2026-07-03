@@ -8,9 +8,9 @@
   ansible.builtin.include_tasks: "clean.yml"
   loop: "{{ rc_remove }}"
   loop_control:
-    loop_var: name
+    loop_var: _rc_var
 
-- name: "Migrate rc-vars from /etc/rc.conf"
+- name: "Migrate rc-vars"
   ansible.builtin.include_role:
     name: sysrc
   loop: "{{ rc_migrate }}"
@@ -21,4 +21,4 @@
   ansible.builtin.include_tasks: "update.yml"
   loop: "{{ rc_update }}"
   loop_control:
-    loop_var: var
+    loop_var: _rc_var
