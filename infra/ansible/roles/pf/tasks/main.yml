@@ -17,11 +17,10 @@
     pflog_enable: true
 
 - name: "Stat /etc/pf.conf"
-  ansible.builtin.file:
+  ansible.builtin.stat:
     path: /etc/pf.conf
-    state: file
-  register: pf_conf_stat
-  ignore_errors: true
+    get_checksum: false
+  register: pf_stat_pf_conf_task
 
 - name: "Create /etc/pf.conf"
   ansible.builtin.file:
@@ -30,7 +29,7 @@
     owner: root
     group: wheel
     mode: u=rw,g=r,o=r
-  when: pf_conf_stat is failed
+  when: not pf_stat_pf_conf_task.stat.exists
 
 - name: "Enable pf"
   community.general.sysrc:
