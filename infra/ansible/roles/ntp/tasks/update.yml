@@ -1,0 +1,12 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+# noqa name[template]
+- name: "Update {{ _update.file }} - {{ _update.name }}"
+  ansible.builtin.lineinfile:
+    path: "{{ _update.file }}"
+    line: "{{ _update.line }}"
+  notify: "restart_ntpd"
