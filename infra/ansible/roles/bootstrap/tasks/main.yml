@@ -6,23 +6,23 @@
 ---
 - name: "Install packages"
   vars:
-    pkg_python: >-
+    _pkg_python: >-
       {{ bootstrap_packages | select('match', 'python') | join(' ') }}
-    pkg_not_python: >-
+    _pkg_not_python: >-
       {{ bootstrap_packages | reject('match', 'python') | join(' ') }}
   block:
     # It is assumed the remote node does not have Python available yet and
     # can't use ansible.builtin.{command,shell}.
     # Use low-level ansible.builtin.raw to run commands with shell.
-    - name: "Install {{ pkg_python }}"
-      ansible.builtin.raw: "pkg install --yes {{ pkg_python }}"
-      register: bootstrap_install_python
+    - name: "Install {{ _pkg_python }}"
+      ansible.builtin.raw: "pkg install --yes {{ _pkg_python }}"
+      register: bootstrap_install_python_task
       changed_when:
-        - bootstrap_install_python is succeeded
-        - '"already installed" not in bootstrap_install_python.stdout'
+        - bootstrap_install_python_task is succeeded
+        - '"already installed" not in bootstrap_install_python_task.stdout'
 
     # Python is installed at this point, can use Ansible modules to install
     # other packages.
-    - name: "Install {{ pkg_not_python }}"
+    - name: "Install {{ _pkg_not_python }}"
       community.general.pkgng:
-        name: "{{ pkg_not_python }}"
+        name: "{{ _pkg_not_python }}"
