@@ -60,6 +60,8 @@
           }}
 
 - name: "Configure jail service"
+  vars:
+    _rc_file: /etc/rc.conf.d/jail
   block:
     - name: "Create /etc/jail.conf"
       ansible.builtin.template:
@@ -70,18 +72,18 @@
         mode: u=rw,g=r,o=r
         validate: /usr/sbin/jail -f %s -e ' '
 
-    - name: "Enable jail service in /etc/rc.conf.d/jail"
+    - name: "Update {{ _rc_file }} - enable jail service" # noqa name[template]
       community.general.sysrc:
-        path: /etc/rc.conf.d/jail
         name: jail_enable
         value: true
+        path: "{{ _rc_file }}"
       notify: "start_jail"
 
-    - name: "Stop jails in reverse order in /etc/rc.conf.d/jail"
+    - name: "Update {{ _rc_file }} - stop jails in reverse order" # noqa name[template]
       community.general.sysrc:
-        path: /etc/rc.conf.d/jail
         name: jail_reverse_stop
         value: true
+        path: "{{ _rc_file }}"
 
 - name: "Install packages"
   block:
