@@ -4,8 +4,6 @@
 # license that can be found in the LICENSE file.
 
 ---
-# Install Python with ansible.builtin.raw because the node is assumed to be
-# clean with base installation.
 - name: "Install packages"
   vars:
     pkg_python: >-
@@ -13,6 +11,9 @@
     pkg_not_python: >-
       {{ bootstrap_packages | reject('match', 'python') | join(' ') }}
   block:
+    # It is assumed the remote node does not have Python available yet and
+    # can't use ansible.builtin.{command,shell}.
+    # Use low-level ansible.builtin.raw to run commands with shell.
     - name: "Install {{ pkg_python }}"
       ansible.builtin.raw: "pkg install --yes {{ pkg_python }}"
       register: bootstrap_install_python
@@ -20,8 +21,8 @@
         - bootstrap_install_python is succeeded
         - '"already installed" not in bootstrap_install_python.stdout'
 
-    # Python is installed in the previous step. Can use
-    # community.general.pkgng now to install non-Python packages.
+    # Python is installed at this point, can use Ansible modules to install
+    # other packages.
     - name: "Install {{ pkg_not_python }}"
       community.general.pkgng:
         name: "{{ pkg_not_python }}"
