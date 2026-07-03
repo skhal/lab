@@ -16,20 +16,25 @@
   vars:
     pflog_enable: true
 
-- name: "Stat /etc/pf.conf"
-  ansible.builtin.stat:
-    path: /etc/pf.conf
-    get_checksum: false
-  register: pf_stat_pf_conf_task
+- name: "Create configuration"
+  vars:
+    _conf_file: "/etc/pf.conf"
+  block:
+    - name: "Stat {{ _conf_file }}"
+      ansible.builtin.stat:
+        path: "{{ _conf_file }}"
+        get_checksum: false
+      register: pf_stat_pf_conf_task
 
-- name: "Create /etc/pf.conf"
-  ansible.builtin.file:
-    path: /etc/pf.conf
-    state: touch
-    owner: root
-    group: wheel
-    mode: u=rw,g=r,o=r
-  when: not pf_stat_pf_conf_task.stat.exists
+    - name: "Create /etc/pf.conf"
+      ansible.builtin.file:
+        path: "{{ _conf_file }}"
+        state: touch
+        owner: root
+        group: wheel
+        mode: u=rw,g=r,o=r
+      when: not pf_stat_pf_conf_task.stat.exists
+      notify: "start_pf"
 
 - name: "Enable pf"
   community.general.sysrc:
@@ -38,23 +43,30 @@
     value: true
   notify: "start_pf"
 
-# pf must be enabled and "started" (/etc/rc.d/pf loads pf.ko) for pfctl to
-# work
+# Make sure pf "started" to let /etc/rc.d/pf load pf.ko for pfctl to work in
+# the steps below.
 - name: "Flush pf changes"
   ansible.builtin.meta: flush_handlers
 
-- name: "PF status"
-  ansible.builtin.raw: pfctl -s Running
-  register: pf_status
-  changed_when: false
+# reset_connection is broken in handlers:
+# https://github.com/ansible/ansible/issues/50306
+- name: Reset connection
+  ansible.builtin.meta: reset_connection
 
-- name: "PF must be running"
-  ansible.builtin.assert:
-    that:
-      - "pf_status.rc == 0"
-      - "'Enabled' in pf_status.stdout"
-    fail_msg: "Firewall is disabled"
-    success_msg: "Firewall is enabled"
+- name: "Check status"
+  block:
+    - name: "PF status"
+      ansible.builtin.raw: /sbin/pfctl -s Running
+      register: pf_status_task
+      changed_when: false
+
+    - name: "PF must be running"
+      ansible.builtin.assert:
+        that:
+          - "pf_status_task.rc == 0"
+          - "'Enabled' in pf_status_task.stdout"
+        fail_msg: "Firewall is disabled"
+        success_msg: "Firewall is enabled"
 
 - name: "Configure pf"
   ansible.builtin.copy:
