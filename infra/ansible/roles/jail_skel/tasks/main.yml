@@ -184,7 +184,6 @@
       ansible.builtin.set_fact:
         jail_skel_users: >-
           {{ user_list | selectattr('name', 'equalto', 'root') }}
-        jail_skel_timezone_name: "{{ timezone_name }}"
 
     - name: "Configure users"
       ansible.builtin.include_role:
@@ -210,13 +209,6 @@
           value: "-ss"
           from: "{{ jail_skel_path }}/etc/rc.conf"
           path: "{{ jail_skel_path }}/etc/rc.conf.d/syslogd"
-
-- name: "Configure timezone"
-  ansible.builtin.include_role:
-    name: timezone
-  vars:
-    timezone_chroot: "{{ jail_skel_path }}"
-    timezone_name: "{{ jail_skel_timezone_name }}"
 
 - name: "Snapshot dataset"
   vars:
