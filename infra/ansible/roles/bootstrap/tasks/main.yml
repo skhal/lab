@@ -17,7 +17,7 @@
       ansible.builtin.raw: "pkg install --yes {{ pkg_python }}"
       register: bootstrap_install_python
       changed_when:
-        - bootstrap_install_python.rc == 0
+        - bootstrap_install_python is succeeded
         - '"already installed" not in bootstrap_install_python.stdout'
 
     # Python is installed in the previous step. Can use
