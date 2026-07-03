@@ -14,7 +14,7 @@
       {{ bootstrap_packages | reject('match', 'python') | join(' ') }}
   block:
     - name: "Install {{ pkg_python }}"
-      ansible.builtin.raw: "pkg install --quiet --yes {{ pkg_python }}"
+      ansible.builtin.raw: "pkg install --yes {{ pkg_python }}"
       register: bootstrap_install_python
       changed_when:
         - bootstrap_install_python.rc == 0
