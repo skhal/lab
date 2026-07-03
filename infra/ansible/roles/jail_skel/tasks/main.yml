@@ -6,7 +6,7 @@
 ---
 - name: "Configure ZFS"
   block:
-    - name: "ZFS create parent dataset {{ jail_skel_zfs_dataset | dirname }}"
+    - name: "Create parent datasets {{ jail_skel_zfs_dataset | dirname }}"
       community.general.zfs:
         name: "{{ jail_skel_zfs_dataset | dirname }}"
         state: present
@@ -21,7 +21,7 @@
           | split('/')
           | count > 1
 
-    - name: "ZFS create skeleton dataset {{ jail_skel_zfs_dataset }}"
+    - name: "Create dataset {{ jail_skel_zfs_dataset }}"
       community.general.zfs:
         name: "{{ jail_skel_zfs_dataset }}"
         state: present
@@ -31,28 +31,28 @@
           readonly: "off"
           # keep-sorted end
 
-    - name: "ZFS sekeleton dataset get properties"
+    - name: "Get dataset properties"
       community.general.zfs_facts:
         name: "{{ jail_skel_zfs_dataset }}"
         type: filesystem
         properties: "name,mounted,mountpoint"
-      register: jail_skel_zfs_dataset_facts
+      register: jail_skel_get_dset_props_task
 
-    - name: "ZFS skeleton dataset must be mounted"
+    - name: "Dataset must be mounted"
       ansible.builtin.assert:
         that: >-
-          jail_skel_zfs_dataset_facts.ansible_facts.ansible_zfs_datasets
+          jail_skel_get_dset_props_task.ansible_facts.ansible_zfs_datasets
             | selectattr("name", "equalto", jail_skel_zfs_dataset)
             | selectattr("mounted", "equalto", "yes")
             | count == 1
         fail_msg: "{{ jail_skel_zfs_dataset }} is not mounted"
         quiet: true
 
-    - name: "ZFS skeleton dataset get mountpoint"
+    - name: "Extrct dataset mountpoint"
       ansible.builtin.set_fact:
         jail_skel_path: >-
           {{
-            jail_skel_zfs_dataset_facts.ansible_facts.ansible_zfs_datasets
+            jail_skel_get_dset_props_task.ansible_facts.ansible_zfs_datasets
               | selectattr('name', 'equalto', jail_skel_zfs_dataset)
               | map(attribute='mountpoint')
               | first
