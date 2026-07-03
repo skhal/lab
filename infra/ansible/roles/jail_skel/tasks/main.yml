@@ -64,6 +64,8 @@
     _rc_file: /etc/rc.conf.d/jail
   block:
     - name: "Create /etc/jail.conf"
+      vars:
+        prefix: "{{ jail_skel_path }}"
       ansible.builtin.template:
         src: etc/jail.conf.j2
         dest: /etc/jail.conf
