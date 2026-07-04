@@ -301,11 +301,12 @@ repos:
     exclude: |
       (?x)^(
          MODULE\.bazel\.lock
+        | poetry\.lock
+        |.*_string\.go
         |.*/(test)?data/.*
         |.*\.diff
         |.*\.patch
         |.*\.pb\.go
-        |.*_string\.go
         |go\.(mod|sum)
         |home/vim/templates/skel.*
         |infra/net\.lab.*
