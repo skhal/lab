@@ -38,9 +38,10 @@ pam_mkhomedir
 pkg
 protobuf
 protobuf-go
-py311-pre-commit
-py311-ty
 py312-black
+py312-poetry
+py312-pre-commit
+py312-ty
 python
 ripgrep
 rsync

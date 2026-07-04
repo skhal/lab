@@ -27,6 +27,7 @@ lua-language-server
 luacheck
 neovim
 npm
+poetry
 pre-commit
 protobuf
 protoc-gen-go
