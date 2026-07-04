@@ -243,6 +243,13 @@ repos:
     exclude: "testdata"
     args: ["-skip_all_colons"]
 
+  # Python
+  - id: py-fmt
+    name: "Python format"
+    entry: black
+    language: system
+    types_or: [python]
+
   # Shell
   - id: sh-fmt
     name: "Shell format"

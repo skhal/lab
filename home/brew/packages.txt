@@ -9,6 +9,7 @@
 ansible-language-server
 ansible-lint
 bash
+black
 buf
 catch2
 ccache

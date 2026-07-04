@@ -40,6 +40,7 @@ protobuf
 protobuf-go
 py311-pre-commit
 py311-ty
+py312-black
 python
 ripgrep
 rsync
