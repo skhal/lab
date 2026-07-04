@@ -276,6 +276,24 @@ repos:
         .*\.\\w*sh
       )$
 
+  # TOML
+  - id: toml-fmt
+    name: "TOML format"
+    description: "format TOML files"
+    language: system
+    entry: tombi
+    args:
+    - format
+    types: [toml]
+  - id: toml-lint
+    name: "TOML format"
+    description: "format TOML files"
+    language: system
+    entry: tombi
+    args:
+    - lint
+    types: [toml]
+
   # YAML
   - id: yaml-fmt
     name: "YAML format"

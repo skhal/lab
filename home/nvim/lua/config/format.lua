@@ -49,6 +49,7 @@ conform.setup({
 		sh = { "shfmt", "keep-sorted" },
 		svg = { "superhtml", "keep-sorted" },
 		text = { "keep-sorted" },
+		toml = { "tombi", "keep-sorted" },
 		typescript = { "deno_fmt", "keep-sorted" },
 		yaml = { "yamlfmt", "keep-sorted" },
 		-- keep-sorted end
