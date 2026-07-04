@@ -45,6 +45,7 @@ conform.setup({
 		markdown = { "markdownfmt", "keep-sorted" },
 		pbtxt = { "txtpbfmt" },
 		proto = { "clang-format", "keep-sorted" },
+		python = { "black", "keep-sorted" },
 		sh = { "shfmt", "keep-sorted" },
 		svg = { "superhtml", "keep-sorted" },
 		text = { "keep-sorted" },
