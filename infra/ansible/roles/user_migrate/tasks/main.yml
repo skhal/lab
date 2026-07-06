@@ -5,7 +5,7 @@
 
 ---
 - name: "Migrate users"
-  ansible.builtin.include_tasks: "migrate.yml"
+  migrate:
+    name: "{{ item }}"
+    rootdir: "{{ user_migrate_rootdir }}"
   loop: "{{ user_migrate_users }}"
-  loop_control:
-    loop_var: user_migrate_name
