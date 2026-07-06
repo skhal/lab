@@ -29,8 +29,44 @@ EXAMPLES = r"""
     rootdir: /usr/local/foo
 """
 
+RETURN = r"""
+user:
+    description: User at the rootdir....
+    returned: always
+    type: complex
+    contains:
+        name:
+            description: user name
+            type: string
+            returned: always
+        uid:
+            description: user identifier
+            type: int
+            returned: always
+        gid:
+            description: user group identifier
+            type: int
+            returned: always
+        gecos:
+            description: user gecos field (real name)
+            type: string
+            returned: when present
+        home:
+            description: user home folder
+            type: string
+            returned: always
+        shell:
+            description: user shell
+            type: string
+            returned: always
+        secondary_gids:
+            description: secondary group identifiers
+            type: list
+            returned: when present
+"""
+
 import os
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, asdict
 from typing import NewType, Tuple
 from ansible.module_utils.basic import AnsibleModule
 
@@ -194,14 +230,17 @@ class PW:
 class UserIdentity:
     """Wraps id(1)."""
 
-    def __init__(self, module: AnsibleModule):
+    def __init__(self, module: AnsibleModule, rootdir: str = ""):
         self._module = module
+        self._rootdir = rootdir
 
     def groups(self, name: str) -> list[int]:
         """Gets a list of user groups including primary and secondary groups."""
-        rc, out, err = self._module.run_command(
-            args=["id", "-G", name],
-        )
+        args = []
+        if self._rootdir:
+            args = ["chroot", self._rootdir]
+        args.extend(["id", "-G", name])
+        rc, out, err = self._module.run_command(args)
         if rc != os.EX_OK:
             raise OSError(rc, err)
         return list(int(n) for n in out.strip().split())
@@ -216,30 +255,32 @@ class UserMigrator:
     def migrate(self, name: str, rootdir: str) -> dict:
         """Migrates user with a given name to the rootdir."""
         try:
-            return self._migrate(name, rootdir)
+            user, changed = self._migrate(name, rootdir)
+            return dict(
+                changed=changed,
+                user=asdict(user),
+            )
         except Exception as ex:
             return dict(
                 msg=f"failed to migrate user {name}\n{ex}",
                 failed=True,
             )
 
-    def _migrate(self, name: str, rootdir: str) -> dict:
+    def _migrate(self, name: str, rootdir: str) -> Tuple[User, bool]:
         try:
-            PW(self._module, rootdir).usershow(name)
-            return dict(
-                msg=f"user {name} exists",
-                changed=False,
-            )
+            user = self._get_user(name, rootdir)
+            return user, False
         except NoUserError:
             pass
         user = self._get_user(name)
         self._migrate_groups(user, rootdir)
         self._migrate_user(user, rootdir)
-        return dict(msg=f"user {name} migrated", changed=True)
+        return user, True
 
-    def _get_user(self, name: str) -> User:
-        user = PW(self._module).usershow(name)
-        return user.with_groups(UserIdentity(self._module).groups(name))
+    def _get_user(self, name: str, rootdir: str = "") -> User:
+        user = PW(self._module, rootdir).usershow(name)
+        user_groups = UserIdentity(self._module, rootdir).groups(name)
+        return user.with_groups(user_groups)
 
     def _migrate_groups(self, user: User, rootdir: str):
         src_groups = PW(self._module).groupshow_all()
