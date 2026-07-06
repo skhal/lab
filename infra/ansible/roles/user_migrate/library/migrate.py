@@ -30,7 +30,7 @@ EXAMPLES = r"""
 """
 
 import os
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import NewType, Tuple
 from ansible.module_utils.basic import AnsibleModule
 
@@ -38,11 +38,9 @@ from ansible.module_utils.basic import AnsibleModule
 class NoUserError(Exception):
     """Corresponds to os.EX_NOUSER error."""
 
-    pass
 
-
-class NoGroupError(Exception):
-    pass
+class GroupError(Exception):
+    """Means group mismatch between the source and target rootdirs."""
 
 
 @dataclass
@@ -55,6 +53,27 @@ class User:
     gecos: str
     home: str
     shell: str
+    secondary_gids: list[int] = field(default_factory=list)
+
+    def with_groups(self, gids: list[int]):
+        """Duplicates current user with secondary groups include gids.
+
+        It ensures that user primary group is not included in the secondary
+        groups.
+        """
+        groups = set(gids).union(self.secondary_gids) - {self.gid}
+        return User(
+            name=self.name,
+            uid=self.uid,
+            gid=self.gid,
+            gecos=self.gecos,
+            home=self.home,
+            shell=self.shell,
+            secondary_gids=list(groups),
+        )
+
+    def groups(self) -> list[int]:
+        return [self.gid] + self.secondary_gids
 
 
 @dataclass
@@ -66,17 +85,17 @@ class Group:
 
 
 class PW:
-    """Runs pw(8) to rootdir."""
+    """Runs pw(8) in rootdir."""
 
     _DEFAULT_ROOTDIR = "/"
 
     # Ref: https://github.com/freebsd/freebsd-src/blob/7f5fa76367d78e47d483fdf2cc72e5823d0f7807/lib/libutil/pw_util.c#L400-L403
-    _SHOWUSER_IDX_NAME = 0
-    _SHOWUSER_IDX_UID = 2
-    _SHOWUSER_IDX_GID = 3
-    _SHOWUSER_IDX_GECOS = 7
-    _SHOWUSER_IDX_HOME = 8
-    _SHOWUSER_IDX_SHELL = 9
+    _USERSHOW_IDX_NAME = 0
+    _USERSHOW_IDX_UID = 2
+    _USERSHOW_IDX_GID = 3
+    _USERSHOW_IDX_GECOS = 7
+    _USERSHOW_IDX_HOME = 8
+    _USERSHOW_IDX_SHELL = 9
 
     _GROUPSHOW_IDX_NAME = 0
     _GROUPSHOW_IDX_GID = 2
@@ -101,17 +120,18 @@ class PW:
         if rc != os.EX_OK:
             raise OSError(rc, err)
 
-    def groupshow(self, gid: int) -> dict[int, Group]:
+    def groupshow_all(self) -> dict[int, Group]:
         rc, out, err = self._module.run_command(
-            args=["pw", "-R", self._rootdir, "groupshow", str(gid)],
+            args=["pw", "-R", self._rootdir, "groupshow", "-a"],
         )
         match rc:
-            case os.EX_DATAERR:
-                raise NoGroupError()
             case os.EX_OK:
                 pass
             case _:
                 raise OSError(rc, err)
+        return self._parse_groupshow(out)
+
+    def _parse_groupshow(self, out: str) -> dict[int, Group]:
         groups = dict()
         for line in out.splitlines():
             tokens = line.split(":")
@@ -160,13 +180,29 @@ class PW:
                 raise OSError(rc, err)
         tokens = out.split(":")
         return User(
-            name=tokens[self._SHOWUSER_IDX_NAME],
-            uid=int(tokens[self._SHOWUSER_IDX_UID]),
-            gid=int(tokens[self._SHOWUSER_IDX_GID]),
-            gecos=tokens[self._SHOWUSER_IDX_GECOS],
-            home=tokens[self._SHOWUSER_IDX_HOME],
-            shell=tokens[self._SHOWUSER_IDX_SHELL],
+            name=tokens[self._USERSHOW_IDX_NAME],
+            uid=int(tokens[self._USERSHOW_IDX_UID]),
+            gid=int(tokens[self._USERSHOW_IDX_GID]),
+            gecos=tokens[self._USERSHOW_IDX_GECOS],
+            home=tokens[self._USERSHOW_IDX_HOME],
+            shell=tokens[self._USERSHOW_IDX_SHELL],
         )
+
+
+class UserIdentity:
+    """Wraps id(1)."""
+
+    def __init__(self, module: AnsibleModule):
+        self._module = module
+
+    def groups(self, name: str) -> list[int]:
+        """Gets a list of user groups including primary and secondary groups."""
+        rc, out, err = self._module.run_command(
+            args=["id", "-G", name],
+        )
+        if rc != os.EX_OK:
+            raise OSError(rc, err)
+        return list(int(n) for n in out.split())
 
 
 class UserMigrator:
@@ -194,26 +230,38 @@ class UserMigrator:
             )
         except NoUserError:
             pass
-        user = PW(self._module).usershow(name)
-        self._create_groups(user, rootdir)
-        # TODO(github.com/skhal/lab/issues/400): migrate supplemental groups
-        self._create_user(user, rootdir)
-        return dict(msg=f"user {name} migrated", changed=False)
+        user = self._get_user(name)
+        self._migrate_groups(user, rootdir)
+        self._migrate_user(user, rootdir)
+        return dict(msg=f"user {name} migrated", changed=True)
 
-    def _create_groups(self, user: User, rootdir: str):
-        try:
-            PW(self._module, rootdir).groupshow(user.gid)
-            return
-        except NoGroupError:
-            pass
-        groups = PW(self._module).groupshow(user.gid)
-        for group in groups.values():
+    def _get_user(self, name: str) -> User:
+        user = PW(self._module).usershow(name)
+        return user.with_groups(UserIdentity(self._module).groups(name))
+
+    def _migrate_groups(self, user: User, rootdir: str):
+        src_groups = PW(self._module).groupshow_all()
+        dst_groups = PW(self._module, rootdir).groupshow_all()
+
+        for gid in user.groups():
+            group = src_groups[gid]
+            if self._validate_group(group, dst_groups.get(gid, None)):
+                continue
             self._create_group(group, rootdir)
+
+    def _validate_group(self, src: Group, dst: Group | None):
+        if dst == None:
+            return False
+        if src != dst:
+            raise GroupError(
+                f"group {src.gid} name {dst.name} does not match {src.name}"
+            )
+        return True
 
     def _create_group(self, group: Group, rootdir: str):
         PW(self._module, rootdir).groupadd(group)
 
-    def _create_user(self, user: User, rootdir: str):
+    def _migrate_user(self, user: User, rootdir: str):
         PW(self._module, rootdir).useradd(user)
 
 
