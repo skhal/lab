@@ -41,6 +41,10 @@ class NoUserError(Exception):
     pass
 
 
+class NoGroupError(Exception):
+    pass
+
+
 @dataclass
 class User:
     """Describes a user in passwd database."""
@@ -51,6 +55,14 @@ class User:
     gecos: str
     home: str
     shell: str
+
+
+@dataclass
+class Group:
+    """Describes a group in groups databasae."""
+
+    name: str
+    gid: int
 
 
 class PW:
@@ -66,9 +78,49 @@ class PW:
     _SHOWUSER_IDX_HOME = 8
     _SHOWUSER_IDX_SHELL = 9
 
+    _GROUPSHOW_IDX_NAME = 0
+    _GROUPSHOW_IDX_GID = 2
+
     def __init__(self, module: AnsibleModule, rootdir: str = ""):
         self._module = module
         self._rootdir = rootdir if rootdir else self._DEFAULT_ROOTDIR
+
+    def groupadd(self, group: Group):
+        rc, _, err = self._module.run_command(
+            args=[
+                "pw",
+                "-R",
+                self._rootdir,
+                "groupadd",
+                "-n",
+                group.name,
+                "-g",
+                str(group.gid),
+            ],
+        )
+        if rc != os.EX_OK:
+            raise OSError(rc, err)
+
+    def groupshow(self, gid: int) -> dict[int, Group]:
+        rc, out, err = self._module.run_command(
+            args=["pw", "-R", self._rootdir, "groupshow", str(gid)],
+        )
+        match rc:
+            case os.EX_DATAERR:
+                raise NoGroupError()
+            case os.EX_OK:
+                pass
+            case _:
+                raise OSError(rc, err)
+        groups = dict()
+        for line in out.splitlines():
+            tokens = line.split(":")
+            group = Group(
+                name=tokens[self._GROUPSHOW_IDX_NAME],
+                gid=int(tokens[self._GROUPSHOW_IDX_GID]),
+            )
+            groups[group.gid] = group
+        return groups
 
     def useradd(self, user: User):
         rc, _, err = self._module.run_command(
@@ -80,10 +132,9 @@ class PW:
                 "-n",
                 user.name,
                 "-u",
-                user.uid,
+                str(user.uid),
                 "-g",
-                user.gid,
-                # TODO(github.com/skhal/lab/issues/400): add supplemental groups
+                str(user.gid),
                 "-c",
                 user.gecos,
                 "-d",
@@ -110,8 +161,8 @@ class PW:
         tokens = out.split(":")
         return User(
             name=tokens[self._SHOWUSER_IDX_NAME],
-            uid=tokens[self._SHOWUSER_IDX_UID],
-            gid=tokens[self._SHOWUSER_IDX_GID],
+            uid=int(tokens[self._SHOWUSER_IDX_UID]),
+            gid=int(tokens[self._SHOWUSER_IDX_GID]),
             gecos=tokens[self._SHOWUSER_IDX_GECOS],
             home=tokens[self._SHOWUSER_IDX_HOME],
             shell=tokens[self._SHOWUSER_IDX_SHELL],
@@ -144,9 +195,26 @@ class UserMigrator:
         except NoUserError:
             pass
         user = PW(self._module).usershow(name)
-        # TODO(github.com/skhal/lab/issues/400): migrate groups
-        PW(self._module, rootdir).useradd(user)
+        self._create_groups(user, rootdir)
+        # TODO(github.com/skhal/lab/issues/400): migrate supplemental groups
+        self._create_user(user, rootdir)
         return dict(msg=f"user {name} migrated", changed=False)
+
+    def _create_groups(self, user: User, rootdir: str):
+        try:
+            PW(self._module, rootdir).groupshow(user.gid)
+            return
+        except NoGroupError:
+            pass
+        groups = PW(self._module).groupshow(user.gid)
+        for group in groups.values():
+            self._create_group(group, rootdir)
+
+    def _create_group(self, group: Group, rootdir: str):
+        PW(self._module, rootdir).groupadd(group)
+
+    def _create_user(self, user: User, rootdir: str):
+        PW(self._module, rootdir).useradd(user)
 
 
 def run(module: AnsibleModule):
