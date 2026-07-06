@@ -129,7 +129,7 @@ class PW:
                 pass
             case _:
                 raise OSError(rc, err)
-        return self._parse_groupshow(out)
+        return self._parse_groupshow(out.strip())
 
     def _parse_groupshow(self, out: str) -> dict[int, Group]:
         groups = dict()
@@ -180,7 +180,7 @@ class PW:
                 pass
             case _:
                 raise OSError(rc, err)
-        tokens = out.split(":")
+        tokens = out.strip().split(":")
         return User(
             name=tokens[self._USERSHOW_IDX_NAME],
             uid=int(tokens[self._USERSHOW_IDX_UID]),
@@ -204,7 +204,7 @@ class UserIdentity:
         )
         if rc != os.EX_OK:
             raise OSError(rc, err)
-        return list(int(n) for n in out.split())
+        return list(int(n) for n in out.strip().split())
 
 
 class UserMigrator:
