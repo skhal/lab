@@ -26,7 +26,7 @@ EXAMPLES = r"""
 - name: Migrate user op to /usr/local/foo
   migrate:
     name: op
-    rootdir: /tmp
+    rootdir: /usr/local/foo
 """
 
 import os
@@ -48,34 +48,73 @@ class User:
     name: str
     uid: int
     gid: int
+    gecos: str
+    home: str
+    shell: str
 
 
 class PW:
     """Runs pw(8) to rootdir."""
 
+    _DEFAULT_ROOTDIR = "/"
+
     # Ref: https://github.com/freebsd/freebsd-src/blob/7f5fa76367d78e47d483fdf2cc72e5823d0f7807/lib/libutil/pw_util.c#L400-L403
     _SHOWUSER_IDX_NAME = 0
     _SHOWUSER_IDX_UID = 2
     _SHOWUSER_IDX_GID = 3
+    _SHOWUSER_IDX_GECOS = 7
+    _SHOWUSER_IDX_HOME = 8
+    _SHOWUSER_IDX_SHELL = 9
 
-    def __init__(self, module: AnsibleModule, rootdir: str):
+    def __init__(self, module: AnsibleModule, rootdir: str = ""):
         self._module = module
-        self._rootdir = rootdir
+        self._rootdir = rootdir if rootdir else self._DEFAULT_ROOTDIR
+
+    def useradd(self, user: User):
+        rc, _, err = self._module.run_command(
+            args=[
+                "pw",
+                "-R",
+                self._rootdir,
+                "useradd",
+                "-n",
+                user.name,
+                "-u",
+                user.uid,
+                "-g",
+                user.gid,
+                # TODO(github.com/skhal/lab/issues/400): add supplemental groups
+                "-c",
+                user.gecos,
+                "-d",
+                user.home,
+                "-s",
+                user.shell,
+            ],
+        )
+        if rc != os.EX_OK:
+            raise OSError(rc, err)
 
     def usershow(self, name: str) -> User:
         """Runs pw(8) usershow command to extract user information."""
         rc, out, err = self._module.run_command(
             args=["pw", "-R", self._rootdir, "usershow", name],
         )
-        if rc == os.EX_NOUSER:
-            raise NoUserError()
-        if rc != 0:
-            raise OSError(rc, err)
+        match rc:
+            case os.EX_NOUSER:
+                raise NoUserError()
+            case os.EX_OK:
+                pass
+            case _:
+                raise OSError(rc, err)
         tokens = out.split(":")
         return User(
             name=tokens[self._SHOWUSER_IDX_NAME],
             uid=tokens[self._SHOWUSER_IDX_UID],
             gid=tokens[self._SHOWUSER_IDX_GID],
+            gecos=tokens[self._SHOWUSER_IDX_GECOS],
+            home=tokens[self._SHOWUSER_IDX_HOME],
+            shell=tokens[self._SHOWUSER_IDX_SHELL],
         )
 
 
@@ -88,6 +127,15 @@ class UserMigrator:
     def migrate(self, name: str, rootdir: str) -> dict:
         """Migrates user with a given name to the rootdir."""
         try:
+            return self._migrate(name, rootdir)
+        except Exception as ex:
+            return dict(
+                msg=f"failed to migrate user {name}\n{ex}",
+                failed=True,
+            )
+
+    def _migrate(self, name: str, rootdir: str) -> dict:
+        try:
             PW(self._module, rootdir).usershow(name)
             return dict(
                 msg=f"user {name} exists",
@@ -95,11 +143,9 @@ class UserMigrator:
             )
         except NoUserError:
             pass
-        except Exception as err:
-            return dict(
-                msg=f"failed to migrate user {name}\n{err}",
-                failed=True,
-            )
+        user = PW(self._module).usershow(name)
+        # TODO(github.com/skhal/lab/issues/400): migrate groups
+        PW(self._module, rootdir).useradd(user)
         return dict(msg=f"user {name} migrated", changed=False)
 
 
@@ -130,10 +176,7 @@ def main():
         ),
         supports_check_mode=True,
     )
-    try:
-        run(module)
-    except Exception as ex:
-        module.fail_json(msg="failed to migrate users", exception=ex)
+    run(module)
 
 
 if __name__ == "__main__":
