@@ -155,6 +155,8 @@ class PW:
                 str(user.uid),
                 "-g",
                 str(user.gid),
+                "-G",
+                ",".join(str(gid) for gid in user.secondary_gids),
                 "-c",
                 user.gecos,
                 "-d",
