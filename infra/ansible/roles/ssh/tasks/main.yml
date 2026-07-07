@@ -21,8 +21,8 @@
     - name: "Update {{ _conf_file }} - listen on cloned interfaces"
       ansible.builtin.lineinfile:
         path: "{{ _conf_file }}"
-        line: "ListenAddress={{ item.cidr | ansible.utils.ipaddr('address') }}"
-      loop: "{{ netif_clones }}"
+        line: "ListenAddress={{ item }}"
+      loop: "{{ ssh_listen_addresses }}"
       notify: "restart_sshd"
 
     - name: "Update {{ _conf_file }} - allow op user" # noqa name[template]
