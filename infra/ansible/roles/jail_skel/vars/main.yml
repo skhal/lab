@@ -14,5 +14,7 @@ jail_skel_default_packages:
   - FreeBSD-bsdconfig
   - FreeBSD-set-minimal-jail
   - FreeBSD-ssh
+  - doas
   - pkg
+  - python3
   # keep-sorted end
