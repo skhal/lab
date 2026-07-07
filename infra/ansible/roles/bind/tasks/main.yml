@@ -1,0 +1,96 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+- name: "Install DNS server"
+  block:
+    - name: "Install DNS server {{ bind_package }}"
+      community.general.pkgng:
+        name: "{{ bind_package }}"
+
+- name: "Enable service"
+  notify: "bind_start"
+  vars:
+    _rc_file: /usr/local/etc/rc.conf.d/named
+  block:
+    - name: "Create {{ _rc_file | dirname }}"
+      ansible.builtin.file:
+        path: "{{ _rc_file | dirname }}"
+        state: directory
+        owner: root
+        group: wheel
+        mode: u=rwx,g=rx,o=rx
+
+    - name: "Enable DNS server in {{ _rc_file }}"
+      community.general.sysrc:
+        path: "{{ _rc_file }}"
+        name: named_enable
+        value: true
+
+- name: "Configure service"
+  notify: "bind_restart"
+  vars:
+    _prefix: /usr/local/etc/namedb
+  block:
+    - name: "Add ACL"
+      ansible.builtin.lineinfile:
+        path: "{{ _prefix }}/named.conf"
+        firstmatch: true
+        insertbefore: "^options {"
+        line: |
+          acl {{ bind_acl.name }} {
+          {% for subnet in bind_acl.subnets %}
+            {{ subnet }};
+          {% endfor %}
+          };
+
+    - name: "Set options"
+      ansible.builtin.lineinfile:
+        path: "{{ _prefix }}/named.conf"
+        regexp: "^(\\s+)listen-on(\\s+){ 127\\.0\\.0\\.1; };$"
+        backrefs: true
+        line: |
+          \1listen-on\2{ {{ bind_listen_on | join('; ') }}; };
+          \1allow-query\2{ 127.0.0.1; {{ bind_acl.name }}; };
+          \1allow-transfer\2{ "none"; };
+          \1forwarders\2{ {{ bind_forwarders | join('; ') }}; };
+
+    - name: "Include Lab zone"
+      ansible.builtin.lineinfile:
+        path: "{{ _prefix }}/named.conf"
+        line: >-
+          include "{{ _prefix }}/zones.conf.d/lab.net.conf";
+
+- name: "Configure Lab zone"
+  notify: "bind_restart"
+  vars:
+    _prefix: /usr/local/etc/namedb
+  block:
+    - name: "Copy Lab zone configuration"
+      ansible.builtin.copy:
+        src: usr/local/etc/namedb/zones.conf.d/lab.net.conf
+        dest: "{{ _prefix }}/zones.conf.d/"
+        owner: root
+        group: wheel
+        mode: u=rw,g=r,o=r
+        directory_mode: u=rwx,g=rx,o=rx
+
+    - name: "Copy forward map"
+      ansible.builtin.copy:
+        src: usr/local/etc/namedb/primary/lab.net.db
+        dest: "{{ _prefix }}/primary/"
+        owner: root
+        group: wheel
+        mode: u=rw,g=r,o=r
+        directory_mode: u=rwx,g=rx,o=rx
+
+    - name: "Copy reverse map"
+      ansible.builtin.copy:
+        src: usr/local/etc/namedb/primary/0.0.10.in-addr.arpa
+        dest: "{{ _prefix }}/primary/"
+        owner: root
+        group: wheel
+        mode: u=rw,g=r,o=r
+        directory_mode: u=rwx,g=rx,o=rx

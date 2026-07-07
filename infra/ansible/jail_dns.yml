@@ -41,3 +41,9 @@
 
     - role: user
       tags: user
+
+    - role: pkg
+      tags: pkg
+
+    - role: bind
+      tags: bind

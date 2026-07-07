@@ -1,0 +1,21 @@
+; Copyright 2026 Samvel Khalatyan. All rights reserved.
+;
+; Use of this source code is governed by a BSD-style
+; license that can be found in the LICENSE file.
+
+$TTL  1h
+@       IN      SOA     lab.net. root.lab.net. (
+                        2026070701 ; serial (yyyymmddnn)
+                        1h         ; refresh
+                        15m        ; update retry
+                        1w         ; expiry
+                        1d         ; minimum
+)
+
+; Name server
+      IN  NS  dns.lab.net.
+      IN  A   10.0.0.2
+
+; Servers
+1     IN  PTR nuc.lab.net.
+2     IN  PTR dns.lab.net.

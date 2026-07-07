@@ -7,10 +7,11 @@
 - name: "Use latest branch"
   ansible.builtin.copy:
     src: usr/local/etc/pkg/repos/FreeBSD.conf
-    dest: /usr/local/etc/pkg/repos/FreeBSD.conf
+    dest: /usr/local/etc/pkg/repos/
     owner: root
     group: wheel
     mode: u=rw,g=r,o=r
+    directory_mode: u=rwx,g=rx,o=rx
   notify: "upgrade_packages"
 
 - name: "Add pkg aliases"

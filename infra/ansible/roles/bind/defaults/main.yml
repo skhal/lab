@@ -1,0 +1,22 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+# bind_package is the package name with bind DNS server.
+bind_package: bind920
+
+# bind_listen_on lists IPv4 addresses to listen on.
+bind_listen_on:
+  -
+
+# bind_forwarders lists DNS resolvers to forward unresolved queries to.
+bind_forwarders:
+  -
+
+# bind_acl defines an acl block. It is expected to have the following structure:
+#
+#   name    string  ACL name.
+#   subnets list    a list of subnetworks in CIDR format.
+bind_acl: {}
