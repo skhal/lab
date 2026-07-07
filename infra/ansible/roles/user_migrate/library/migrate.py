@@ -199,6 +199,7 @@ class PW:
                 user.home,
                 "-s",
                 user.shell,
+                "-m",
             ],
         )
         if rc != os.EX_OK:
