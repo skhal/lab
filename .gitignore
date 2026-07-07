@@ -73,3 +73,4 @@ bazel-*
 *.wasm
 wasm_exec.js
 *.gz
+__pycache__
