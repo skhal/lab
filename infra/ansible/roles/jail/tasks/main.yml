@@ -138,6 +138,11 @@
         mode: u=rw,g=r,o=r
         create: true
 
+    - name: "Disable DNS lookup the remote host name"
+      ansible.builtin.lineinfile:
+        path: "{{ jail_path }}/etc/ssh/sshd_config"
+        line: "UseDNS no"
+
 - name: "Enable jail {{ jail_name }}"
   community.general.sysrc:
     name: jail_list
