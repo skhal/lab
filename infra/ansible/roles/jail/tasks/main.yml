@@ -4,6 +4,13 @@
 # license that can be found in the LICENSE file.
 
 ---
+# noqa command-instead-of-module
+- name: "Stop jail {{ jail_name }}"
+  ansible.builtin.command:
+    cmd: service jail stop {{ jail_name }}
+  register: jail_service_stop_task
+  changed_when: jail_service_stop_task is succeeded
+
 - name: "Get skeleton snapsthot"
   block:
     - name: "ZFS list snapshots for {{ jail_skel_zfs_dataset }}"
@@ -154,6 +161,6 @@
 # noqa command-instead-of-module
 - name: "Restart jail {{ jail_name }}"
   ansible.builtin.command:
-    cmd: service jail restart dns
+    cmd: service jail restart {{ jail_name }}
   register: jail_service_restart_result
   changed_when: jail_service_restart_result is succeeded
