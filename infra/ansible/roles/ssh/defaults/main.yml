@@ -7,9 +7,7 @@
 # ssh_allow_users lists user names to allow for ssh. It translates to
 # sshd_config.AllowUsers configuration parameter.
 ssh_allow_users: []
-
 # ssh_listen_addresses lists IPv4 addresses for SSH server to listen on.
 ssh_listen_addresses: []
-
 # ssh_server_config points at sshd_config file.
 ssh_server_config: /etc/ssh/sshd_config

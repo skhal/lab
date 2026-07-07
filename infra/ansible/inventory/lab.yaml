@@ -7,3 +7,6 @@
 servers:
   hosts:
     nuc.lab.net:
+jails:
+  hosts:
+    dns.lab.net:

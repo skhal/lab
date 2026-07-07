@@ -23,3 +23,21 @@
   roles:
     - role: jail
       tags: jail
+
+- name: Configure DNS
+  hosts: dns.lab.net
+
+  gather_facts: false
+
+  become: true
+  become_method: community.general.doas
+
+  roles:
+    - role: ssh
+      tags: ssh
+
+    - role: syslog
+      tags: syslog
+
+    - role: user
+      tags: user
