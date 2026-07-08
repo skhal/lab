@@ -47,3 +47,6 @@
 
     - role: bind
       tags: bind
+
+    - role: local_unbound
+      tags: local_unbound

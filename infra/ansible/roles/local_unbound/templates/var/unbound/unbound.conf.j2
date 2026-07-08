@@ -1,0 +1,33 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+
+server:
+	# keep-sorted start
+	access-control: 127.0.0.0/8 allow
+	do-ip6: no
+	interface: 127.0.0.1
+	pidfile: /var/run/local_unbound.pid
+	prefetch: yes
+	# keep-sorted end
+
+# local_unbound uses local-unbound-control to check status:
+# https://github.com/freebsd/freebsd-src/blob/750d429a228fb102d6e5d45bdc116489acbfff00/libexec/rc/rc.d/local_unbound#L111
+remote-control:
+	control-enable: yes
+	control-interface: 127.0.0.1
+	control-use-cert: no
+
+{% for zone in local_unbound_stub_zones %}
+stub-zone:
+	name: "{{ zone.name }}"
+	stub-addr: "{{ zone.addr }}"
+{% endfor %}
+
+{% for zone in local_unbound_forward_zones %}
+forward-zone:
+	name: "{{ zone.name }}"
+	forward-addr: "{{ zone.addr }}"
+{% endfor %}

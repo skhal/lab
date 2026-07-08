@@ -10,6 +10,14 @@ bind_listen_on:
   addr: 10.0.0.2
 bind_zones:
   - lab.net
+local_unbound_forward_zones:
+  - name: "."
+    addr: 192.168.10.1
+local_unbound_stub_zones:
+  - name: "lab.net"
+    addr: 10.0.0.2@5353
+  - name: "0.0.10.in-addr.arpa."
+    addr: 10.0.0.2@5353
 pkg_install:
   - neovim
   - FreeBSD-libexecinfo # for /usr/lib/libexecinfo.so.1

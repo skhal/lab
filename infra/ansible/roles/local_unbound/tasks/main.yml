@@ -1,0 +1,31 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+- name: "Configure service"
+  ansible.builtin.template:
+    src: var/unbound/unbound.conf.j2
+    dest: /var/unbound/unbound.conf
+    owner: root
+    group: wheel
+    mode: u=rw,g=r,o=r
+    validate: local-unbound-checkconf -f %s
+  notify: local_unbound_restart
+
+- name: "Enable service"
+  community.general.sysrc:
+    path: /etc/rc.conf.d/local_unbound
+    name: local_unbound_enable
+    value: true
+  notify: local_unbound_start
+
+- name: "Configure resolver"
+  ansible.builtin.copy:
+    dest: /etc/resolv.conf
+    content: |
+      nameserver 127.0.0.1
+    owner: root
+    group: wheel
+    mode: u=rw,g=r,o=r
