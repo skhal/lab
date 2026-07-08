@@ -5,15 +5,11 @@
 
 ---
 # keep-sorted start
-bind_acl:
-  name: jails
-  subnets:
-    - 10.0.0.0/24
-bind_forwarders:
-  - 192.168.1.1
 bind_listen_on:
-  - 127.0.0.1
-  - 10.0.0.2
+  port: 5353
+  addr: 10.0.0.2
+bind_zones:
+  - lab.net
 pkg_install:
   - neovim
   - FreeBSD-libexecinfo # for /usr/lib/libexecinfo.so.1

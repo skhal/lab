@@ -29,68 +29,20 @@
         name: named_enable
         value: true
 
-- name: "Configure service"
+- name: "Update configuration"
   notify: "bind_restart"
-  vars:
-    _prefix: /usr/local/etc/namedb
   block:
-    - name: "Add ACL"
-      ansible.builtin.lineinfile:
-        path: "{{ _prefix }}/named.conf"
-        firstmatch: true
-        insertbefore: "^options {"
-        line: |
-          acl {{ bind_acl.name }} {
-          {% for subnet in bind_acl.subnets %}
-            {{ subnet }};
-          {% endfor %}
-          };
+    - name: "Copy zone files"
+      ansible.builtin.include_tasks: "copy_zone.yml"
+      loop: "{{ bind_zones }}"
+      loop_control:
+        loop_var: _zone
 
-    - name: "Set options"
-      ansible.builtin.lineinfile:
-        path: "{{ _prefix }}/named.conf"
-        regexp: "^(\\s+)listen-on(\\s+){ 127\\.0\\.0\\.1; };$"
-        backrefs: true
-        line: |
-          \1listen-on\2{ {{ bind_listen_on | join('; ') }}; };
-          \1allow-query\2{ 127.0.0.1; {{ bind_acl.name }}; };
-          \1allow-transfer\2{ "none"; };
-          \1forwarders\2{ {{ bind_forwarders | join('; ') }}; };
-
-    - name: "Include Lab zone"
-      ansible.builtin.lineinfile:
-        path: "{{ _prefix }}/named.conf"
-        line: >-
-          include "{{ _prefix }}/zones.conf.d/lab.net.conf";
-
-- name: "Configure Lab zone"
-  notify: "bind_restart"
-  vars:
-    _prefix: /usr/local/etc/namedb
-  block:
-    - name: "Copy Lab zone configuration"
-      ansible.builtin.copy:
-        src: usr/local/etc/namedb/zones.conf.d/lab.net.conf
-        dest: "{{ _prefix }}/zones.conf.d/"
-        owner: root
-        group: wheel
+    - name: "Configure service"
+      ansible.builtin.template:
+        src: usr/local/etc/namedb/named.conf.j2
+        dest: /usr/local/etc/namedb/named.conf
+        owner: bind
+        group: bind
         mode: u=rw,g=r,o=r
-        directory_mode: u=rwx,g=rx,o=rx
-
-    - name: "Copy forward map"
-      ansible.builtin.copy:
-        src: usr/local/etc/namedb/primary/lab.net.db
-        dest: "{{ _prefix }}/primary/"
-        owner: root
-        group: wheel
-        mode: u=rw,g=r,o=r
-        directory_mode: u=rwx,g=rx,o=rx
-
-    - name: "Copy reverse map"
-      ansible.builtin.copy:
-        src: usr/local/etc/namedb/primary/0.0.10.in-addr.arpa
-        dest: "{{ _prefix }}/primary/"
-        owner: root
-        group: wheel
-        mode: u=rw,g=r,o=r
-        directory_mode: u=rwx,g=rx,o=rx
+        validate: named-checkconf %s

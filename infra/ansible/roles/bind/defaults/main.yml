@@ -4,19 +4,16 @@
 # license that can be found in the LICENSE file.
 
 ---
+# keep-sorted start
+# bind_listen_on restricts binding parameters to listen on. It must have the
+# following structure:
+#
+#   port  integer?  port number to listen on (defaults to 53 - see bind doc)
+#   addr  string    IPv4 address to listen on
+bind_listen_on:
 # bind_package is the package name with bind DNS server.
 bind_package: bind920
-
-# bind_listen_on lists IPv4 addresses to listen on.
-bind_listen_on:
+# bind_zones lists zone names to configure.
+bind_zones:
   -
-
-# bind_forwarders lists DNS resolvers to forward unresolved queries to.
-bind_forwarders:
-  -
-
-# bind_acl defines an acl block. It is expected to have the following structure:
-#
-#   name    string  ACL name.
-#   subnets list    a list of subnetworks in CIDR format.
-bind_acl: {}
+# keep-sorted end

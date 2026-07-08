@@ -1,0 +1,27 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+- name: "Configure Lab zone"
+  vars:
+    _prefix: /usr/local/etc/namedb
+  block:
+    - name: "Copy config for zone {{ _zone }}"
+      ansible.builtin.copy:
+        src: usr/local/etc/namedb/zones.conf.d/{{ _zone }}.conf
+        dest: "{{ _prefix }}/zones.conf.d/"
+        owner: bind
+        group: bind
+        mode: u=rw,g=r,o=r
+        directory_mode: u=rwx,g=rx,o=rx
+
+    - name: "Copy map for zone {{ _zone }}"
+      ansible.builtin.copy:
+        src: usr/local/etc/namedb/primary/{{ _zone }}/
+        dest: "{{ _prefix }}/primary/{{ _zone }}/"
+        owner: bind
+        group: bind
+        mode: u=rw,g=r,o=r
+        directory_mode: u=rwx,g=rx,o=rx
