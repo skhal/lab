@@ -54,10 +54,9 @@ rc_update:
 routing_defaultrouter: 192.168.10.1
 ssh_allow_users:
   - op
-ssh_listen_addresses: |
-  {% for clone in netif_clones %}
-  - {{ clone.cidr | ansible.utils.ipaddr('address') }}
-  {% endfor %}
+ssh_listen_addresses:
+  - 192.168.10.101
+  - 10.0.0.1
 user_list:
   # keep-sorted start
   - name: op
