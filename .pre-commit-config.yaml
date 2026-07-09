@@ -285,6 +285,10 @@ repos:
     args:
     - format
     types: [toml]
+    exclude: |
+      (?x)^(
+        .*\.lock
+      )$
   - id: toml-lint
     name: "TOML format"
     description: "format TOML files"
@@ -293,6 +297,10 @@ repos:
     args:
     - lint
     types: [toml]
+    exclude: |
+      (?x)^(
+        .*\.lock
+      )$
 
   # YAML
   - id: yaml-fmt
