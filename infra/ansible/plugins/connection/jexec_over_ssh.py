@@ -148,16 +148,10 @@ class Connection(SSHConnection):
         self._remote_host = None
 
     @property
-    def jail_name(self):
+    def jail(self):
         if not self._jail:
             self._jail = self._init_jail()
-        return self._jail.name
-
-    @property
-    def jail_path(self):
-        if not self._jail:
-            self._jail = self._init_jail()
-        return self._jail.path
+        return self._jail
 
     @property
     def remote_host(self):
@@ -194,12 +188,12 @@ class Connection(SSHConnection):
         """
         self._display.vvv(
             f"{self.transport}: original command: {cmd}",
-            host=f"{self.remote_host} {self.jail_name}",
+            host=f"{self.remote_host} {self.jail.name}",
         )
         jexec_cmd = [
             _JEXEC_CMD,
             "-l",  # run in clean environment
-            self.jail_name,
+            self.jail.name,
             cmd,
         ]
         return self._exec_command(jexec_cmd, in_data, sudoable)
@@ -212,7 +206,7 @@ class Connection(SSHConnection):
             cmd = self.become.build_become_command(cmd, self._shell)
         self._display.vvv(
             f"{self.transport}: {cmd}",
-            host=f"{self.remote_host} {self.jail_name}",
+            host=f"{self.remote_host} {self.jail.name}",
         )
         return super().exec_command(cmd, in_data=in_data, sudoable=sudoable)
 
@@ -228,7 +222,7 @@ class Connection(SSHConnection):
                 "-f",
                 "-p",  # preserve attributes
                 tmp_file,
-                os.path.join(self.jail_path, out_path),
+                os.path.join(self.jail.path, out_path),
             ]
             return self._exec_command(cp_cmd)
 
@@ -240,7 +234,7 @@ class Connection(SSHConnection):
                 _CP_CMD,
                 "-f",
                 "-p",  # preserve attributes
-                os.path.join(self.jail_path, in_path),
+                os.path.join(self.jail.path, in_path),
                 tmp_file,
             ]
             rc, out, err = self._exec_command(cp_cmd)
