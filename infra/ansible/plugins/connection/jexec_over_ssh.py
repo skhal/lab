@@ -52,14 +52,14 @@ EXAMPLES = r"""
     - name: Ping the jail
       ansible.builtin.ping:
 
-# The same but using Ansible CLI:
-# ansible foo.example.com \
-#   -b \
-#   --become-method=community.general.doas \
-#   -c jexec_over_ssh \
-#   -e ansible_jexec_over_ssh_jail_name=foo \
-#   -e ansible_ssh_host=bar.example.com \
-#   -m ping
+# Same but using Ansible CLI:
+#   ansible foo.example.com \
+#       -b \
+#       --become-method=community.general.doas \
+#       -c jexec_over_ssh \
+#       -e ansible_jexec_over_ssh_jail_name=foo \
+#       -e ansible_ssh_host=bar.example.com \
+#       -m ping
 """
 
 _DOC_OPTIONS_KEY = "options"
@@ -173,16 +173,17 @@ class Connection(SSHConnection):
         rc, out, _ = super().exec_command(" ".join(cmd))
         if rc != os.EX_OK:
             raise JailNotFoundError(jname)
-        return self._parse_jls_output(to_text(out.strip()), jname)
-
-    def _parse_jls_output(self, s: str, name: str) -> Jail:
-        jail_list = json.loads(s, object_hook=as_jail_list)
-        jails = {j.name: j for j in jail_list.get("jail", [])}
-        if name not in jails:
-            raise JailNotFoundError(name)
-        jail = jails[name]
+        jail = self._parse_jls_output(to_text(out.strip()), jname)
         self._display.vvv(f"{self.transport}: validated jail {jail}")
         return jail
+
+    @staticmethod
+    def _parse_jls_output(out: str, jail_name: str) -> Jail:
+        jail_list = json.loads(out, object_hook=as_jail_list)
+        jails = {j.name: j for j in jail_list.get("jail", [])}
+        if jail_name not in jails:
+            raise JailNotFoundError(jail_name)
+        return jails[jail_name]
 
     @override
     def exec_command(
