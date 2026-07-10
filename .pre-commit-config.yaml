@@ -249,6 +249,11 @@ repos:
     entry: black
     language: system
     types_or: [python]
+  - id: py-isort
+    name: "Python sort includes"
+    entry: isort
+    language: system
+    types_or: [python]
 
   # Shell
   - id: sh-fmt

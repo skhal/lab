@@ -39,6 +39,7 @@ pkg
 protobuf
 protobuf-go
 py312-black
+py312-isort
 py312-poetry
 py312-pre-commit
 py312-ty

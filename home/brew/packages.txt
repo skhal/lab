@@ -21,6 +21,7 @@ git
 go
 graphviz
 groff
+isort
 jq
 llvm@21
 lua-language-server
