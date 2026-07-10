@@ -218,30 +218,29 @@ class Connection(SSHConnection):
             rc, out, err = super().put_file(in_path, tmp_file)
             if rc != os.EX_OK:
                 return rc, out, err
-            cp_cmd = [
-                _CP_CMD,
-                "-f",
-                "-p",  # preserve attributes
-                tmp_file,
-                os.path.join(self.jail.path, out_path),
-            ]
-            return self._exec_command(cp_cmd)
+            return self._remote_copy(tmp_file, os.path.join(self.jail.path, out_path))
 
     @override
     def fetch_file(self, in_path: str, out_path: str) -> tuple[int, bytes, bytes]:
         """Fetch a remote in_path file to the local out_path file."""
         with self._remote_mktemp() as tmp_file:
-            cp_cmd = [
-                _CP_CMD,
-                "-f",
-                "-p",  # preserve attributes
-                os.path.join(self.jail.path, in_path),
-                tmp_file,
-            ]
-            rc, out, err = self._exec_command(cp_cmd)
+            rc, out, err = self._remote_copy(
+                os.path.join(self.jail.path, in_path), tmp_file
+            )
             if rc != os.EX_OK:
                 return rc, out, err
             return super().fetch_file(tmp_file, out_path)
+
+    def _remote_copy(self, src: str, dst: str) -> tuple[int, bytes, bytes]:
+        """Copy src file to dst file on the remote host."""
+        cp_cmd = [
+            _CP_CMD,
+            "-f",
+            "-p",  # preserve attributes
+            src,
+            dst,
+        ]
+        return self._exec_command(cp_cmd)
 
     @contextmanager
     def _remote_mktemp(self):
