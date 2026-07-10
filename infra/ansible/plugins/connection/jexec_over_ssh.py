@@ -100,7 +100,7 @@ class JailNotFoundError(AnsibleError):
         super().__init__(f"jail {name} not found")
 
 
-def as_jail_list(d: dict):
+def as_jail_list(d: dict) -> dict | Jail:
     """Remove wrapper json header and parse jails.
 
     jls(8) JSON output is:
@@ -148,13 +148,13 @@ class Connection(SSHConnection):
         self._remote_host = None
 
     @property
-    def jail(self):
+    def jail(self) -> Jail:
         if not self._jail:
             self._jail = self._init_jail()
         return self._jail
 
     @property
-    def remote_host(self):
+    def remote_host(self) -> str:
         if not self._remote_host:
             self._remote_host = (
                 self.get_option("host") or self._play_context.remote_addr
@@ -162,6 +162,7 @@ class Connection(SSHConnection):
         return self._remote_host
 
     def _init_jail(self) -> Jail:
+        """Pull jail properties from the remote host using jls(8)."""
         jname = self.get_option(Connection._OPT_JAIL_NAME)
         cmd = [_JLS_CMD, "--libxo=json", "-j", jname, "jid", "name", "path"]
         rc, out, _ = super().exec_command(" ".join(cmd))
@@ -181,7 +182,7 @@ class Connection(SSHConnection):
 
     @override
     def exec_command(
-        self, cmd, in_data=None, sudoable=True
+        self, cmd: str, in_data=None, sudoable=True
     ) -> tuple[int, bytes, bytes]:
         """Execute a remote command cmd with optional stdin in_data and
         escalated privileges when sudoable is set to True.
