@@ -30,42 +30,59 @@ options:
         required: true
         vars:
             - name: ansible_jexec_over_ssh_jail_name
-    jexec_escalator:
+    jail_user:
+        description:
+            - Jail user to run commands as using jexec(8) -U flag.
+        type: str
+        vars:
+            - name: ansible_user
+            - name: ansible_jexec_over_ssh_jail_user
+    escalator:
         description:
             - Method used to escalate jexec(8) privileges.
         type: str
         choices: [doas, sudo]
         vars:
-            - name: ansible_jexec_over_ssh_jexec_escalator
+            - name: ansible_jexec_over_ssh_escalator
 author: Samvel Khalatyan
 """
 
 EXAMPLES = r"""
-# SSH to bar.example.com and jexec to the jail foo, assuming the jail is
-# registered in the inventory under foo.example.com hostname.
+# Setup: a hostname foo.example.com runs a jail bar with hostname
+# bar.example.com.
+
+# Run ping module inside the jail using `doas jexec -U {{ ansible_user }}`
 - name: Example
-  hosts: foo.example.com
+  hosts: bar.example.com
   connection: jexec_over_ssh
   vars:
-    # ssh to bar.example.ecom
-    ansible_ssh_host: bar.example.com
-    # jexec to foo jail
-    ansible_jexec_over_ssh_jail_name: foo
-  gather_facts: false
-  # elevate privileges to run jexec.
-  become: true
-  become_method: community.general.doas
+    ansible_ssh_host: foo.example.com
+    ansible_jexec_over_ssh_jail_name: bar
+    ansible_jexec_over_ssh_escalator: doas
+  tasks:
+    - name: Ping the jail
+      ansible.builtin.ping:
+
+# Run ping module inside the jail with operator-user using
+# `doas jexec -U operator`
+- name: Example
+  hosts: bar.example.com
+  connection: jexec_over_ssh
+  vars:
+    ansible_ssh_host: foo.example.com
+    ansible_jexec_over_ssh_jail_name: bar
+    ansible_jexec_over_ssh_jail_user: operator
+    ansible_jexec_over_ssh_escalator: doas
   tasks:
     - name: Ping the jail
       ansible.builtin.ping:
 
 # Same but using Ansible CLI:
 #   ansible foo.example.com \
-#       -b \
-#       --become-method=community.general.doas \
 #       -c jexec_over_ssh \
-#       -e ansible_jexec_over_ssh_jail_name=foo \
-#       -e ansible_ssh_host=bar.example.com \
+#       -e ansible_ssh_host=foo.example.com \
+#       -e ansible_jexec_over_ssh_jail_name=bar \
+#       -e ansible_jexec_over_ssh_escalator=doas \
 #       -m ping
 """
 
@@ -172,8 +189,9 @@ class Connection(SSHConnection):
     """Remote BSD jail connection."""
 
     # keep-sorted start
+    _OPT_ESCALATOR = "escalator"
     _OPT_JAIL_NAME = "jail_name"
-    _OPT_JEXEC_ESCALATOR = "jexec_escalator"
+    _OPT_JAIL_USER = "jail_user"
     # keep-sorted end
 
     transport = "jexec_over_ssh"  # plugin identifier
@@ -184,6 +202,7 @@ class Connection(SSHConnection):
         self._jail = None
         self._remote_host = None
         self._escalator = None
+        self._jexec_args = None
 
     @property
     def escalator(self) -> Escalator:
@@ -192,7 +211,8 @@ class Connection(SSHConnection):
         return self._escalator
 
     def _init_escalator(self) -> Escalator:
-        match (escalator := self.get_option(Connection._OPT_JEXEC_ESCALATOR)):
+        escalator = self.get_option(Connection._OPT_ESCALATOR)
+        match escalator:
             case "doas":
                 return DoasEscalator()
             case "sudo":
@@ -201,6 +221,21 @@ class Connection(SSHConnection):
                 return Escalator()
             case _:
                 raise AnsibleError(f"unsupported escalator {escalator}")
+
+    @property
+    def jexec_args(self) -> list[str]:
+        if not self._jexec_args:
+            self._jexec_args = self._init_jexec_args()
+        return self._jexec_args
+
+    def _init_jexec_args(self) -> list[str]:
+        args = [
+            "-l",  # run in clean environment
+        ]
+        user = self.get_option(Connection._OPT_JAIL_USER)
+        if user and user != "root":
+            args.extend(["-U", user])
+        return args
 
     @property
     def jail(self) -> Jail:
@@ -247,7 +282,7 @@ class Connection(SSHConnection):
         )
         jexec_cmd = [
             _JEXEC_CMD,
-            "-l",  # run in clean environment
+            *self.jexec_args,
             self.jail.name,
             cmd,
         ]
@@ -258,10 +293,8 @@ class Connection(SSHConnection):
         self, command: list[str], in_data=None, sudoable=True
     ) -> tuple[int, bytes, bytes]:
         cmd = " ".join(command)
-        if self.become:
-            cmd = self.become.build_become_command(cmd, self._shell)
         self._display.vvv(
-            f"{self.transport}: {cmd}",
+            f"{self.transport}: command: {cmd}",
             host=f"{self.remote_host} {self.jail.name}",
         )
         return super().exec_command(cmd, in_data=in_data, sudoable=sudoable)
