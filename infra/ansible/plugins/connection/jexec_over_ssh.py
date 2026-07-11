@@ -199,10 +199,10 @@ class Connection(SSHConnection):
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
-        self._jail = None
-        self._remote_host = None
         self._escalator = None
         self._jexec_args = None
+        self._jail = None
+        self._remote_host = None
 
     @property
     def escalator(self) -> Escalator:
@@ -243,14 +243,6 @@ class Connection(SSHConnection):
             self._jail = self._init_jail()
         return self._jail
 
-    @property
-    def remote_host(self) -> str:
-        if not self._remote_host:
-            self._remote_host = (
-                self.get_option("host") or self._play_context.remote_addr
-            )
-        return self._remote_host
-
     def _init_jail(self) -> Jail:
         """Pull jail properties from the remote host using jls(8)."""
         jname = self.get_option(Connection._OPT_JAIL_NAME)
@@ -268,6 +260,14 @@ class Connection(SSHConnection):
         if jail_name not in jails:
             raise JailNotFoundError(jail_name)
         return jails[jail_name]
+
+    @property
+    def remote_host(self) -> str:
+        if not self._remote_host:
+            self._remote_host = (
+                self.get_option("host") or self._play_context.remote_addr
+            )
+        return self._remote_host
 
     @override
     def exec_command(
