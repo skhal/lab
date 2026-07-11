@@ -4,12 +4,17 @@
 # license that can be found in the LICENSE file.
 
 ---
+- name: "Install package"
+  community.general.pkgng:
+    name: FreeBSD-local-unbound
+    state: present
+
 - name: "Configure service"
   ansible.builtin.template:
     src: var/unbound/unbound.conf.j2
     dest: /var/unbound/unbound.conf
-    owner: root
-    group: wheel
+    owner: unbound
+    group: unbound
     mode: u=rw,g=r,o=r
     validate: local-unbound-checkconf -f %s
   notify: local_unbound_restart
