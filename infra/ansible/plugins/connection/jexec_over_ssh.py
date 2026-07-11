@@ -318,7 +318,7 @@ class Connection(SSHConnection):
     def _remote_mktemp(self):
         """Creates a temporary file on the remote host. It removes the file upon
         exit from the context."""
-        cmd = [_MKTEMP_CMD, "--quiet"]
+        cmd = [_MKTEMP_CMD, "--quiet", "-t", f"ansible.{self.transport}"]
         rc, out, _ = super().exec_command(" ".join(cmd))
         if rc != os.EX_OK:
             raise AnsibleError(f"failed to create temporary file on {self.remote_host}")
