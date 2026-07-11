@@ -4,7 +4,7 @@
 # license that can be found in the LICENSE file.
 
 ---
-- name: Configure NUC
+- name: Create DNS jail
   hosts: nuc.lab.net
 
   gather_facts: false
@@ -24,8 +24,14 @@
     - role: jail
       tags: jail
 
-- name: Configure DNS
+- name: Bootstrap DNS jail
   hosts: dns.lab.net
+
+  connection: jexec_over_ssh
+  vars:
+    ansible_ssh_host: nuc.lab.net
+    ansible_jexec_over_ssh_jail_name: dns
+    ansible_jexec_over_ssh_escalator: doas
 
   gather_facts: false
 
@@ -45,6 +51,25 @@
     - role: pkg
       tags: pkg
 
+# Configure DNS server ina separate play to ensure that changes to the resolver
+# do not affect handlers run by previous roles, e.g. pkg handlers upgrade
+# packages but fails if bind and local_unbound roles mess up with DNS settings.
+# The separate plays guarantee that the roles run independently.
+- name: Configure DNS server
+  hosts: dns.lab.net
+
+  connection: jexec_over_ssh
+  vars:
+    ansible_ssh_host: nuc.lab.net
+    ansible_jexec_over_ssh_jail_name: dns
+    ansible_jexec_over_ssh_escalator: doas
+
+  gather_facts: false
+
+  become: true
+  become_method: community.general.doas
+
+  roles:
     - role: bind
       tags: bind
 
