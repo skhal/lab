@@ -30,6 +30,13 @@ options:
         required: true
         vars:
             - name: ansible_jexec_over_ssh_jail_name
+    jexec_escalator:
+        description:
+            - Method used to escalate jexec(8) privileges.
+        type: str
+        choices: [doas, sudo]
+        vars:
+            - name: ansible_jexec_over_ssh_jexec_escalator
 author: Samvel Khalatyan
 """
 
@@ -80,10 +87,12 @@ globals().update(DOCUMENTATION=_merge_doc_options(ssh.DOCUMENTATION, DOCUMENTATI
 
 # keep-sorted start
 _CP_CMD = "/bin/cp"
+_DOAS_CMD = "/usr/local/bin/doas"
 _JEXEC_CMD = "/usr/sbin/jexec"
 _JLS_CMD = "/usr/sbin/jls"
 _MKTEMP_CMD = "/usr/bin/mktemp"
 _RM_CMD = "/bin/rm"
+_SUDO_CMD = "/usr/local/bin/sudo"
 # keep-sorted end
 
 
@@ -134,10 +143,38 @@ def as_jail_list(d: dict) -> dict | Jail:
     return Jail(**{k: d[k] for k in d.keys() & keys})
 
 
+class Escalator:
+    def escalate(self, cmd: list[str]) -> list[str]:
+        return cmd
+
+
+class DoasEscalator(Escalator):
+    @override
+    def escalate(self, cmd: list[str]) -> list[str]:
+        return [
+            _DOAS_CMD,
+            "-n",  # non-interactive
+            *cmd,
+        ]
+
+
+class SudoEscalator(Escalator):
+    @override
+    def escalate(self, cmd: list[str]) -> list[str]:
+        return [
+            _SUDO_CMD,
+            "-n",  # non-interactive
+            *cmd,
+        ]
+
+
 class Connection(SSHConnection):
     """Remote BSD jail connection."""
 
+    # keep-sorted start
     _OPT_JAIL_NAME = "jail_name"
+    _OPT_JEXEC_ESCALATOR = "jexec_escalator"
+    # keep-sorted end
 
     transport = "jexec_over_ssh"  # plugin identifier
     has_pipelining = True  # use persistent connection
@@ -146,6 +183,24 @@ class Connection(SSHConnection):
         super().__init__(*args, **kwargs)
         self._jail = None
         self._remote_host = None
+        self._escalator = None
+
+    @property
+    def escalator(self) -> Escalator:
+        if not self._escalator:
+            self._escalator = self._init_escalator()
+        return self._escalator
+
+    def _init_escalator(self) -> Escalator:
+        match (escalator := self.get_option(Connection._OPT_JEXEC_ESCALATOR)):
+            case "doas":
+                return DoasEscalator()
+            case "sudo":
+                return SudoEscalator()
+            case None:
+                return Escalator()
+            case _:
+                raise AnsibleError(f"unsupported escalator {escalator}")
 
     @property
     def jail(self) -> Jail:
@@ -197,6 +252,7 @@ class Connection(SSHConnection):
             self.jail.name,
             cmd,
         ]
+        jexec_cmd = self.escalator.escalate(jexec_cmd)
         return self._exec_command(jexec_cmd, in_data, sudoable)
 
     def _exec_command(
