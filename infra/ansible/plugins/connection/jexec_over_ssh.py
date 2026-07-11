@@ -224,7 +224,6 @@ class Connection(SSHConnection):
         if rc != os.EX_OK:
             raise JailNotFoundError(jname)
         jail = self._parse_jls_output(to_text(out.strip()), jname)
-        self._display.vvv(f"{self.transport}: validated jail {jail}")
         return jail
 
     @staticmethod
@@ -308,7 +307,6 @@ class Connection(SSHConnection):
         cp_cmd = [
             _CP_CMD,
             "-f",
-            "-p",  # preserve attributes
             src,
             dst,
         ]
