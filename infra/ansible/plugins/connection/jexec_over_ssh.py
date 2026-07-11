@@ -270,19 +270,35 @@ class Connection(SSHConnection):
     @override
     def put_file(self, in_path: str, out_path: str) -> tuple[int, bytes, bytes]:
         """Transfer a local in_path file to the remote out_path file."""
+        self._display.vvv(
+            f"{self.transport}: put {in_path} to {out_path}",
+            host=f"{self.remote_host} {self.jail.name}",
+        )
         with self._remote_mktemp() as tmp_file:
             rc, out, err = super().put_file(in_path, tmp_file)
             if rc != os.EX_OK:
                 return rc, out, err
-            return self._remote_copy(tmp_file, os.path.join(self.jail.path, out_path))
+            dst = self._to_jail_path(out_path)
+            return self._remote_copy(tmp_file, dst)
+
+    def _to_jail_path(self, path: str) -> str:
+        # os.path.join() drops arguments before out_path if the latter one
+        # is an absolute path. Strip of leading slash from out_path to join
+        # it to the jail path.
+        if os.path.isabs(path):
+            path = os.path.splitroot(path)[2]
+        return os.path.join(self.jail.path, path)
 
     @override
     def fetch_file(self, in_path: str, out_path: str) -> tuple[int, bytes, bytes]:
         """Fetch a remote in_path file to the local out_path file."""
+        self._display.vvv(
+            f"{self.transport}: fetch {in_path} to {out_path}",
+            host=f"{self.remote_host} {self.jail.name}",
+        )
         with self._remote_mktemp() as tmp_file:
-            rc, out, err = self._remote_copy(
-                os.path.join(self.jail.path, in_path), tmp_file
-            )
+            src = self._to_jail_path(in_path)
+            rc, out, err = self._remote_copy(src, tmp_file)
             if rc != os.EX_OK:
                 return rc, out, err
             return super().fetch_file(tmp_file, out_path)
