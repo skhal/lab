@@ -86,13 +86,13 @@ def _merge_doc_options(src: str, dst: str) -> str:
 globals().update(DOCUMENTATION=_merge_doc_options(ssh.DOCUMENTATION, DOCUMENTATION))
 
 # keep-sorted start
-_CP_CMD = "/bin/cp"
-_DOAS_CMD = "/usr/local/bin/doas"
-_JEXEC_CMD = "/usr/sbin/jexec"
-_JLS_CMD = "/usr/sbin/jls"
-_MKTEMP_CMD = "/usr/bin/mktemp"
-_RM_CMD = "/bin/rm"
-_SUDO_CMD = "/usr/local/bin/sudo"
+_CP_CMD = "cp"
+_DOAS_CMD = "doas"
+_JEXEC_CMD = "jexec"
+_JLS_CMD = "jls"
+_MKTEMP_CMD = "mktemp"
+_RM_CMD = "rm"
+_SUDO_CMD = "sudo"
 # keep-sorted end
 
 
