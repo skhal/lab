@@ -3,15 +3,20 @@
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 
-
 server:
 	# keep-sorted start
 	access-control: 127.0.0.0/8 allow
 	do-ip6: no
 	interface: 127.0.0.1
+	logfile: /var/unbound/unbound.log
 	pidfile: /var/run/local_unbound.pid
 	prefetch: yes
 	# keep-sorted end
+{% for zone in local_unbound_stub_zones %}
+{% if zone.type is defined %}
+	local-zone: "{{ zone.name }}" {{ zone.type }}
+{% endif %}
+{% endfor %}
 
 # local_unbound uses local-unbound-control to check status:
 # https://github.com/freebsd/freebsd-src/blob/750d429a228fb102d6e5d45bdc116489acbfff00/libexec/rc/rc.d/local_unbound#L111
@@ -21,12 +26,14 @@ remote-control:
 	control-use-cert: no
 
 {% for zone in local_unbound_stub_zones %}
+
 stub-zone:
 	name: "{{ zone.name }}"
 	stub-addr: "{{ zone.addr }}"
 {% endfor %}
 
-{% for zone in local_unbound_forward_zones %}
+{%- for zone in local_unbound_forward_zones %}
+
 forward-zone:
 	name: "{{ zone.name }}"
 	forward-addr: "{{ zone.addr }}"

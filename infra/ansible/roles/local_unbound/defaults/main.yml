@@ -14,11 +14,13 @@
 # ref list: https://github.com/trinib/AdGuard-WireGuard-Unbound-DNScrypt/blob/00139af587bf2ff35b9614768b4f5967cd7c5401/unbound.conf#L163-L209
 local_unbound_forward_zones:
   -
-# local_unbound_stub_zones create stub zones (see unbound.conf(5)). Each zone
+# local_unbound_stub_zones create stub zones (see local-unbound.conf(5)). Each zone
 # has the following structure:
 #
 #   name  string  domain name
 #   addr  string  zone address with optional port, e.g. 1.2.3.4@53
+#   type  string? set type of the local zone (see local-zone in
+#                 local-unbound.conf(5))
 local_unbound_stub_zones:
   -
 # keep-sorted end

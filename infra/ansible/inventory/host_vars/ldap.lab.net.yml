@@ -11,8 +11,9 @@ local_unbound_forward_zones:
 local_unbound_stub_zones:
   - name: "lab.net"
     addr: 10.0.0.2@5353
-  - name: "0.0.10.in-addr.arpa."
+  - name: "10.in-addr.arpa."
     addr: 10.0.0.2@5353
+    type: always_transparent
 pkg_install:
   - neovim
 ssh_allow_users:
