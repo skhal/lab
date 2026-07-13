@@ -5,7 +5,7 @@
 
 $TTL  1h
 @       IN      SOA     lab.net. root.lab.net. (
-                        2026070701 ; serial (yyyymmddnn)
+                        2026071201 ; serial (yyyymmddnn)
                         1h         ; refresh
                         15m        ; update retry
                         1w         ; expiry
@@ -19,3 +19,4 @@ $TTL  1h
 ; Servers
 1     IN  PTR nuc.lab.net.
 2     IN  PTR dns.lab.net.
+3     IN  PTR ldap.lab.net.
