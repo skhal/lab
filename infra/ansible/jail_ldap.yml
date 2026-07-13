@@ -50,3 +50,21 @@
 
     - role: pkg
       tags: pkg
+
+- name: Configure DNS server
+  hosts: ldap.lab.net
+
+  connection: jexec_over_ssh
+  vars:
+    ansible_ssh_host: nuc.lab.net
+    ansible_jexec_over_ssh_jail_name: ldap
+    ansible_jexec_over_ssh_escalator: doas
+
+  gather_facts: false
+
+  become: true
+  become_method: community.general.doas
+
+  roles:
+    - role: local_unbound
+      tags: local_unbound
