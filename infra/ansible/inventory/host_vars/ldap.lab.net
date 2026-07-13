@@ -1,0 +1,31 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+# keep-sorted start
+local_unbound_forward_zones:
+  - name: "."
+    addr: 192.168.10.1
+local_unbound_stub_zones:
+  - name: "lab.net"
+    addr: 10.0.0.2@5353
+  - name: "0.0.10.in-addr.arpa."
+    addr: 10.0.0.2@5353
+pkg_install:
+  - neovim
+ssh_allow_users:
+  - op
+ssh_listen_addresses:
+  - 10.0.0.3
+user_list:
+  # keep-sorted start
+  - name: op
+    shell: /bin/tcsh
+  - name: root
+    group: wheel
+    home: /root
+    shell: /bin/tcsh
+  # keep-sorted end
+# keep-sorted end

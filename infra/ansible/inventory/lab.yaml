@@ -10,3 +10,4 @@ servers:
 jails:
   hosts:
     dns.lab.net:
+    ldap.lab.net:
