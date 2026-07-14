@@ -1,0 +1,99 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+- name: Install Open LDAP
+  community.general.pkgng:
+    name: openldap26-server
+    state: present
+
+- name: Patch configuration
+  ansible.posix.patch:
+    src: usr/local/etc/openldap/slapd.ldif.diff
+    dest: /usr/local/etc/openldap/slapd.ldif
+    backup: true
+    ignore_whitespace: true
+
+- name: Import configuration
+  block:
+    - name: Create database tree
+      ansible.builtin.file:
+        path: "{{ _path }}"
+        state: directory
+        owner: ldap
+        group: ldap
+        mode: u=rwx
+      loop:
+        - /usr/local/etc/openldap/slapd.d
+        - /var/db/openldap-data/lab.net
+      loop_control:
+        loop_var: _path
+
+    - name: Import configuration database
+      ansible.builtin.command:
+        cmd: >-
+          /usr/local/sbin/slapadd
+            -n0
+            -F /usr/local/etc/openldap/slapd.d/
+            -l /usr/local/etc/openldap/slapd.ldif
+      register: openldap_slapadd_task
+      changed_when: openldap_slapadd_task is succeeded
+
+    - name: Fix database ownership
+      ansible.builtin.file:
+        path: "{{ _path }}"
+        state: directory
+        recurse: true
+        owner: ldap
+        group: ldap
+        mode: u=rwx
+      loop:
+        - /var/db/openldap-data
+        - /usr/local/etc/openldap/slapd.d
+      loop_control:
+        loop_var: _path
+
+- name: Configure service
+  notify: "openldap_start"
+  vars:
+    _rc_file: /usr/local/etc/rc.conf.d/slapd
+  block:
+    - name: Create rc.conf.d folder
+      ansible.builtin.file:
+        path: /usr/local/etc/rc.conf.d
+        state: directory
+        owner: root
+        group: wheel
+        mode: u=rwx,g=rx,o=rx
+
+    # Force slapd rc-script to fix the owner and permissions:
+    # https://github.com/freebsd/freebsd-ports/blob/c2991243dbb2dfc9f932d1560af12061ed998cf2/net/openldap26-server/files/slapd.in#L153
+    - name: Set socket
+      community.general.sysrc:
+        name: slapd_sockets
+        value: /var/run/openldap/ldapi
+        path: "{{ _rc_file }}"
+
+    - name: Set flags
+      community.general.sysrc:
+        name: slapd_flags
+        # noqa jinja[spacing]
+        value: >-
+          -h 'ldapi://%2Fvar%2Frun%2Fopenldap%2Fldapi
+          {%- if openldap_addr is defined %} ldap://{{ openldap_addr }}{% endif -%}
+          ' -s 256
+        path: "{{ _rc_file }}"
+
+    - name: Set CN config
+      community.general.sysrc:
+        name: slapd_cn_config
+        value: true
+        path: "{{ _rc_file }}"
+
+    - name: Enable slapd
+      community.general.sysrc:
+        name: slapd_enable
+        value: true
+        path: "{{ _rc_file }}"

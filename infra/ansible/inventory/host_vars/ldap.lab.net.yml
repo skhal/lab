@@ -14,6 +14,7 @@ local_unbound_stub_zones:
   - name: "10.in-addr.arpa."
     addr: 10.0.0.2@5353
     type: always_transparent
+openldap_addr: 10.0.0.3
 pkg_install:
   - neovim
 ssh_allow_users:
