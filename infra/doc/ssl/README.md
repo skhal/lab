@@ -28,6 +28,15 @@ Use `certctl rehash` to install new certificates.
 # chmod -v 700 /usr/local/share/ssl/private
 ```
 
+Use the following command to see where OpenSSL stores the certificates:
+
+```console
+% openssl version -a
+...
+OPENSSLDIR: "/etc/ssl"
+...
+```
+
 ## Create certificates
 
 Generate a CA certificate:
