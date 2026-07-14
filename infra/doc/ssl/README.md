@@ -15,15 +15,24 @@ The instructions below create a certificate autohority (CA) and use it to sign
 a certificate for LDAP service. It uses different hosts to create and use
 certificates.
 
-## Create certificates
+Keep in mind that trusted certificates:
 
-Create a CA certificate:
+- must reside under `/usr/local/share/certs/` (see `TRUSTPATH` in certctl(8)).
+- installed certificates live under `/etc/ssl/certs/`
+
+Use `certctl rehash` to install new certificates.
 
 ```
 # mkdir -vp /usr/local/share/certs
 # mkdir -vp /usr/local/share/ssl/{certs,private}
 # chmod -v 700 /usr/local/share/ssl/private
+```
 
+## Create certificates
+
+Generate a CA certificate:
+
+```
 # cd /usr/local/share/ssl/private
 
 -- the certificate is valid for 5y (1825 days)
