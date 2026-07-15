@@ -5,6 +5,7 @@
 
 ---
 # keep-sorted start
+ansible_jexec_over_ssh_jail_name: dns
 bind_listen_on:
   port: 5353
   addr: 10.0.0.2
