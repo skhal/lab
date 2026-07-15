@@ -1,0 +1,12 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+- name: CA rehash certificates
+  listen: openssl_ca_rehash_certs
+  ansible.builtin.command:
+    cmd: certctl rehash
+  register: openssl_ca_rehash_certs_task
+  changed_when: openssl_ca_rehash_certs_task.rc == 0

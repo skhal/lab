@@ -68,3 +68,21 @@
   roles:
     - role: local_unbound
       tags: local_unbound
+
+- name: Setup Central Authority
+  hosts: ssl.lab.net
+
+  connection: jexec_over_ssh
+  vars:
+    ansible_ssh_host: nuc.lab.net
+    ansible_jexec_over_ssh_jail_name: ssl
+    ansible_jexec_over_ssh_escalator: doas
+
+  gather_facts: false
+
+  become: true
+  become_method: community.general.doas
+
+  roles:
+    - role: openssl_ca
+      tags: openssl_ca
