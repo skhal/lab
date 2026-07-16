@@ -69,9 +69,6 @@
     - role: openssl_ca
       tags: openssl_ca
 
-    - role: openssl_gen
-      tags: openssl_gen
-
 - name: Configure LDAP server
   hosts: ldap.lab.net
 
@@ -83,3 +80,9 @@
   roles:
     - role: openldap
       tags: openldap
+
+    # generate certificate and let ldap:ldap own it. Run this after openldap
+    # role, where openldap-package installation creates ldap:ldap user and
+    # group.
+    - role: openssl_gen
+      tags: openssl_gen
