@@ -45,6 +45,18 @@
     - role: pkg
       tags: pkg
 
+- name: Generate certificate
+  hosts: dns.lab.net
+
+  gather_facts: false
+
+  become: true
+  become_method: community.general.doas
+
+  roles:
+    - role: openssl_gen
+      tags: openssl_gen
+
 # Configure DNS server ina separate play to ensure that changes to the resolver
 # do not affect handlers run by previous roles, e.g. pkg handlers upgrade
 # packages but fails if bind and local_unbound roles mess up with DNS settings.

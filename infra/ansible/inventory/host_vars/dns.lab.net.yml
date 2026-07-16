@@ -20,6 +20,9 @@ local_unbound_stub_zones:
   - name: "10.in-addr.arpa."
     addr: 10.0.0.2@5353
     type: always_transparent
+openssl_gen_crt: "/usr/local/etc/namedb/ssl/bind.crt"
+openssl_gen_group: bind
+openssl_gen_owner: bind
 pkg_install:
   - neovim
   - FreeBSD-libexecinfo # for /usr/lib/libexecinfo.so.1
