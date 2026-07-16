@@ -4,7 +4,7 @@
 # license that can be found in the LICENSE file.
 
 ---
-- name: Create a certificate
+- name: Sign a certificate
   vars:
     _crt_file: /usr/local/share/certs/ca.crt
     _key_file: /usr/local/share/certs/private/ca.key
@@ -19,6 +19,6 @@
         ownca_privatekey_passphrase: "{{ openssl_ca_passphrase }}"
         ownca_not_after: +45d # valid for 45 days
         ownca_not_before: -1d # valid since yesterday
-      delegate_to: "{{ openssl_ca_sign_host }}"
+      delegate_to: "{{ openssl_ca_host }}"
       run_once: true
       register: openssl_ca_sign_task

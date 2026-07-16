@@ -90,7 +90,6 @@
         name: openssl_ca
         tasks_from: sign_csr
       vars:
-        openssl_ca_sign_host: ssl.lab.net
         openssl_ca_sign_crt_base64: "{{ openssl_gen_crt_task.content if openssl_gen_crt_stat_task.stat.exists else undef() }}"
         openssl_ca_sign_csr: "{{ openssl_gen_csr_task.csr }}"
 

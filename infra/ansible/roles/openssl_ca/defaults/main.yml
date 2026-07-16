@@ -19,8 +19,6 @@ openssl_ca_passphrase: ""
 openssl_ca_sign_crt_base64: "{{ undef(hint='base64 encoded certificate') }}"
 # openssl_ca_sign_csr is the certificate sining request (CSR)
 openssl_ca_sign_csr: ""
-# openssl_ca_sign_host is the hostname of the CA to sign CSRs.
-openssl_ca_sign_host: ""
 # openssl_ca_sign_register is the name of the registered variable.
 openssl_ca_sign_register: ""
 # keep-sorted end
