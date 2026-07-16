@@ -57,9 +57,6 @@
     - role: openssl_ca
       tags: openssl_ca
 
-    - role: openssl_gen
-      tags: openssl_gen
-
 # Configure DNS server ina separate play to ensure that changes to the resolver
 # do not affect handlers run by previous roles, e.g. pkg handlers upgrade
 # packages but fails if bind and local_unbound roles mess up with DNS settings.
@@ -75,6 +72,11 @@
   roles:
     - role: bind
       tags: bind
+
+    # bind installs the package and adds bind:bind user. This user owns
+    # the certificate.
+    - role: openssl_gen
+      tags: openssl_gen
 
     - role: local_unbound
       tags: local_unbound
