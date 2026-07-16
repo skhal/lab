@@ -1,0 +1,104 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+- name: Install package
+  community.general.pkgng:
+    name:
+      - FreeBSD-openssl
+      - py312-cryptography
+    state: present
+
+- name: "Generate certificate"
+  vars:
+    _key_file: >-
+      {{
+        openssl_gen_key
+          if openssl_gen_key
+          else (
+            [
+              ( openssl_gen_crt | dirname),
+              'private',
+              (
+                [
+                  (openssl_gen_crt | basename | splitext | first),
+                  'key'
+                ] | join('.')
+              )
+            ] | path_join
+          )
+      }}
+  tags:
+    - generate-cert
+    - never
+  block:
+    - name: Prepare folders
+      block:
+        - name: Create folders
+          ansible.builtin.file:
+            name: "{{ _path }}"
+            state: directory
+            owner: "{{ openssl_gen_owner }}"
+            group: "{{ openssl_gen_group }}"
+            mode: u=rwx,g=rx,o=rx
+          loop:
+            - "{{ openssl_gen_crt | dirname }}"
+          loop_control:
+            loop_var: _path
+
+        - name: Create folders for private keys
+          ansible.builtin.file:
+            name: "{{ _path }}"
+            state: directory
+            owner: "{{ openssl_gen_owner }}"
+            group: "{{ openssl_gen_group }}"
+            mode: u=rwx,g=,o=
+          loop:
+            - "{{ _key_file | dirname }}"
+          loop_control:
+            loop_var: _path
+
+    - name: Create a private key
+      community.crypto.openssl_privatekey:
+        path: "{{ _key_file }}"
+        owner: "{{ openssl_gen_owner }}"
+        group: "{{ openssl_gen_group }}"
+        mode: u=rwx,g=,o=
+
+    - name: Create signing request
+      community.crypto.openssl_csr_pipe:
+        privatekey_path: "{{ _key_file }}"
+      register: openssl_gen_csr_task
+
+    - name: Load certificate if exists
+      block:
+        - name: Check if certificate exists
+          ansible.builtin.stat:
+            path: "{{ openssl_gen_crt }}"
+          register: openssl_gen_crt_stat_task
+
+        - name: Load existing certificate
+          ansible.builtin.slurp:
+            src: "{{ openssl_gen_crt }}"
+          when: openssl_gen_crt_stat_task.stat.exists
+          register: openssl_gen_crt_task
+
+    - name: Sign certificate signing request
+      ansible.builtin.include_role:
+        name: openssl_ca
+        tasks_from: sign_csr
+      vars:
+        openssl_ca_sign_host: ssl.lab.net
+        openssl_ca_sign_crt_base64: "{{ openssl_gen_crt_task.content if openssl_gen_crt_stat_task.stat.exists else undef() }}"
+        openssl_ca_sign_csr: "{{ openssl_gen_csr_task.csr }}"
+
+    - name: Write certificate
+      ansible.builtin.copy:
+        dest: "{{ openssl_gen_crt }}"
+        content: "{{ openssl_ca_sign_task.certificate }}"
+        owner: "{{ openssl_gen_owner | default(omit) }}"
+        group: "{{ openssl_gen_group | default(omit) }}"
+        mode: u=rw,g=r,o=r
+      when: openssl_ca_sign_task is changed # noqa no-handler

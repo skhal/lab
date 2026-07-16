@@ -1,0 +1,18 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+# keep-sorted start
+# openssl_gen_crt is the certificate file to generate including path.
+openssl_gen_crt: ""
+# openssl_gen_group is the group ownership for the certificate.
+openssl_gen_group: "wheel"
+# openssl_gen_crt is the certificate's private key file to generate including
+# path. Default is /path/private/<cert>.key for the certificate at
+# /path/<cert>.crt set in openssl_gen_crt.
+openssl_gen_key: ""
+# openssl_gen_owner is the user owner for the certificate.
+openssl_gen_owner: "root"
+# keep-sorted end
