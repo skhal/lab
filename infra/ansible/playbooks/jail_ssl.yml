@@ -70,9 +70,6 @@
       ansible.builtin.include_role:
         name: openssl_ca
         tasks_from: generate_ca
-      tags:
-        - generate-ca
-        - never
 
 - name: Fetch CA
   hosts: nuc.lab.net
