@@ -57,6 +57,18 @@
     - role: local_unbound
       tags: local_unbound
 
+- name: Generate certificate
+  hosts: ldap.lab.net
+
+  gather_facts: false
+
+  become: true
+  become_method: community.general.doas
+
+  roles:
+    - role: openssl_gen
+      tags: openssl_gen
+
 - name: Configure LDAP server
   hosts: ldap.lab.net
 
