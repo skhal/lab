@@ -4,6 +4,16 @@
 # license that can be found in the LICENSE file.
 
 ---
+- name: Create folders
+  vars:
+    _crt_dir: "{{ openssl_ca_crt_file | dirname }}"
+  ansible.builtin.file:
+    name: "{{ _crt_dir }}"
+    state: directory
+    owner: root
+    group: wheel
+    mode: u=rwx,g=rx,o=rx
+
 - name: Load CA certificate
   ansible.builtin.slurp:
     src: "{{ openssl_ca_crt_file }}"
