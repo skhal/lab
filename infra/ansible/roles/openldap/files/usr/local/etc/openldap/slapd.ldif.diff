@@ -6,8 +6,8 @@
  #olcSecurity: ssf=1 update_ssf=112 simple_bind=64
 +olcSecurity: ssf=128
 +olcLocalSSF: 128
-+olcTLSCertificateFile: /usr/local/share/ssl/certs/ldap.crt
-+olcTLSCertificateKeyFile: /usr/local/share/ssl/private/ldap.key
++olcTLSCertificateFile: /usr/local/etc/openldap/ssl/ldap.crt
++olcTLSCertificateKeyFile: /usr/local/etc/openldap/ssl/private/ldap.key
 +olcTLSCACertificateFile: /usr/local/share/certs/ca.crt
 +olcTLSProtocolMin: 3.1
 +olcTLSVerifyClient: never

@@ -45,7 +45,7 @@
     - role: pkg
       tags: pkg
 
-- name: Generate certificate
+- name: Configure certificate
   hosts: dns.lab.net
 
   gather_facts: false
@@ -54,6 +54,9 @@
   become_method: community.general.doas
 
   roles:
+    - role: openssl_ca
+      tags: openssl_ca
+
     - role: openssl_gen
       tags: openssl_gen
 
