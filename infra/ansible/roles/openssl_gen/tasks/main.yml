@@ -30,9 +30,6 @@
             ] | path_join
           )
       }}
-  tags:
-    - generate-cert
-    - never
   block:
     - name: Prepare folders
       block:
