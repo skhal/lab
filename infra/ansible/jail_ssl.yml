@@ -65,6 +65,22 @@
   become: true
   become_method: community.general.doas
 
+  tasks:
+    - name: Generate CA
+      ansible.builtin.include_role:
+        name: openssl_ca
+        tasks_from: generate_ca
+      tags:
+        - generate-ca
+        - never
+
+- name: Fetch CA
+  hosts: nuc.lab.net
+
+  gather_facts: false
+
+  become: true
+  become_method: community.general.doas
+
   roles:
     - role: openssl_ca
-      tags: openssl_ca
