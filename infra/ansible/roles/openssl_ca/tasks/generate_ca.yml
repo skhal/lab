@@ -12,62 +12,57 @@
       - py312-cryptography
     state: present
 
-- name: Create a certificate
-  vars:
-    _crt_file: /usr/local/share/certs/ca.crt
-    _key_file: /usr/local/share/certs/private/ca.key
+- name: Prepare folders
   block:
-    - name: Prepare folders
-      block:
-        - name: Create folders
-          ansible.builtin.file:
-            name: "{{ _path }}"
-            state: directory
-            owner: root
-            group: wheel
-            mode: u=rwx,g=rx,o=rx
-          loop:
-            - "{{ _crt_file | dirname }}"
-          loop_control:
-            loop_var: _path
+    - name: Create folders
+      ansible.builtin.file:
+        name: "{{ _path }}"
+        state: directory
+        owner: root
+        group: wheel
+        mode: u=rwx,g=rx,o=rx
+      loop:
+        - "{{ openssl_ca_crt_file | dirname }}"
+      loop_control:
+        loop_var: _path
 
-        - name: Create folders for private keys
-          ansible.builtin.file:
-            name: "{{ _path }}"
-            state: directory
-            owner: root
-            group: wheel
-            mode: u=rwx
-          loop:
-            - "{{ _key_file | dirname }}"
-          loop_control:
-            loop_var: _path
-        - name: Create CA private key
-          community.crypto.openssl_privatekey:
-            path: "{{ _key_file }}"
-            passphrase: "{{ openssl_ca_passphrase }}"
-            cipher: auto
+    - name: Create folders for private keys
+      ansible.builtin.file:
+        name: "{{ _path }}"
+        state: directory
+        owner: root
+        group: wheel
+        mode: u=rwx
+      loop:
+        - "{{ openssl_ca_key_file | dirname }}"
+      loop_control:
+        loop_var: _path
+    - name: Create CA private key
+      community.crypto.openssl_privatekey:
+        path: "{{ openssl_ca_key_file }}"
+        passphrase: "{{ openssl_ca_passphrase }}"
+        cipher: auto
 
-    - name: Create CA signing request
-      community.crypto.openssl_csr_pipe:
-        privatekey_path: "{{ _key_file }}"
-        privatekey_passphrase: "{{ openssl_ca_passphrase }}"
-        organization_name: "{{ openssl_ca_organization | default(omit) }}"
-        common_name: "{{ openssl_ca_common_name }}"
-        use_common_name_for_san: false
-        basic_constraints:
-          - "CA:TRUE"
-        basic_constraints_critical: true
-        key_usage:
-          - keyCertSign
-        key_usage_critical: true
-      register: openssl_ca_csr_task
+- name: Create CA signing request
+  community.crypto.openssl_csr_pipe:
+    privatekey_path: "{{ openssl_ca_key_file }}"
+    privatekey_passphrase: "{{ openssl_ca_passphrase }}"
+    organization_name: "{{ openssl_ca_organization | default(omit) }}"
+    common_name: "{{ openssl_ca_common_name }}"
+    use_common_name_for_san: false
+    basic_constraints:
+      - "CA:TRUE"
+    basic_constraints_critical: true
+    key_usage:
+      - keyCertSign
+    key_usage_critical: true
+  register: openssl_ca_csr_task
 
-    - name: Sign CA signing request
-      community.crypto.x509_certificate:
-        path: "{{ _crt_file }}"
-        csr_content: "{{ openssl_ca_csr_task.csr }}"
-        privatekey_path: "{{ _key_file }}"
-        privatekey_passphrase: "{{ openssl_ca_passphrase }}"
-        provider: selfsigned
-      notify: "openssl_ca_rehash_certs"
+- name: Sign CA signing request
+  community.crypto.x509_certificate:
+    path: "{{ openssl_ca_crt_file }}"
+    csr_content: "{{ openssl_ca_csr_task.csr }}"
+    privatekey_path: "{{ openssl_ca_key_file }}"
+    privatekey_passphrase: "{{ openssl_ca_passphrase }}"
+    provider: selfsigned
+  notify: "openssl_ca_rehash_certs"

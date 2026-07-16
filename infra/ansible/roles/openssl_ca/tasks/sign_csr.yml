@@ -4,21 +4,16 @@
 # license that can be found in the LICENSE file.
 
 ---
-- name: Sign a certificate
-  vars:
-    _crt_file: /usr/local/share/certs/ca.crt
-    _key_file: /usr/local/share/certs/private/ca.key
-  block:
-    - name: Sign certificate signing request
-      community.crypto.x509_certificate_pipe:
-        content: "{{ (openssl_ca_sign_crt_base64 | b64decode) if openssl_ca_sign_crt_base64 is defined else omit }}"
-        csr_content: "{{ openssl_ca_sign_csr }}"
-        provider: ownca
-        ownca_path: "{{ _crt_file }}"
-        ownca_privatekey_path: "{{ _key_file }}"
-        ownca_privatekey_passphrase: "{{ openssl_ca_passphrase }}"
-        ownca_not_after: +45d # valid for 45 days
-        ownca_not_before: -1d # valid since yesterday
-      delegate_to: "{{ openssl_ca_host }}"
-      run_once: true
-      register: openssl_ca_sign_task
+- name: Sign CSR
+  community.crypto.x509_certificate_pipe:
+    content: "{{ (openssl_ca_sign_crt_base64 | b64decode) if openssl_ca_sign_crt_base64 is defined else omit }}"
+    csr_content: "{{ openssl_ca_sign_csr }}"
+    provider: ownca
+    ownca_path: "{{ openssl_ca_crt_file }}"
+    ownca_privatekey_path: "{{ openssl_ca_key_file }}"
+    ownca_privatekey_passphrase: "{{ openssl_ca_passphrase }}"
+    ownca_not_after: +45d # valid for 45 days
+    ownca_not_before: -1d # valid since yesterday
+  delegate_to: "{{ openssl_ca_host }}"
+  run_once: true
+  register: openssl_ca_sign_task
