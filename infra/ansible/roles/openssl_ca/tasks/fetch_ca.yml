@@ -1,0 +1,24 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+- name: Fetch CA certificate
+  vars:
+    _crt_file: /usr/local/share/certs/ca.crt
+  block:
+    - name: Load CA certificate
+      ansible.builtin.slurp:
+        src: "{{ _crt_file }}"
+      register: openssl_ca_crt_task
+      delegate_to: "{{ openssl_ca_host }}"
+
+    - name: Write CA certificate
+      ansible.builtin.copy:
+        dest: "{{ _crt_file }}"
+        content: "{{ openssl_ca_crt_task.content | b64decode }}"
+        owner: root
+        group: wheel
+        mode: u=rw,g=r,o=r
+      notify: openssl_ca_rehash_certs

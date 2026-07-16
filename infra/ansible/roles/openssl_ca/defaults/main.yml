@@ -24,3 +24,9 @@ openssl_ca_sign_host: ""
 # openssl_ca_sign_register is the name of the registered variable.
 openssl_ca_sign_register: ""
 # keep-sorted end
+
+# fetch_ca.yml variables
+# keep-sorted start
+# openssl_ca_host is the CA hostname.
+openssl_ca_host: ""
+# keep-sorted end

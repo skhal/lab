@@ -4,15 +4,13 @@
 # license that can be found in the LICENSE file.
 
 ---
-- name: Install package
+- name: Install packages
   community.general.pkgng:
     name:
+      - FreeBSD-certctl
       - FreeBSD-openssl
       - py312-cryptography
     state: present
 
-- name: Create a certificate
-  ansible.builtin.include_tasks: "generate_ca.yml"
-  tags:
-    - generate-ca
-    - never
+- name: Fetch CA certificate
+  ansible.builtin.include_tasks: "fetch_ca.yml"

@@ -4,6 +4,14 @@
 # license that can be found in the LICENSE file.
 
 ---
+- name: Install packages
+  community.general.pkgng:
+    name:
+      - FreeBSD-certctl
+      - FreeBSD-openssl
+      - py312-cryptography
+    state: present
+
 - name: Create a certificate
   vars:
     _crt_file: /usr/local/share/certs/ca.crt
