@@ -5,6 +5,8 @@
 
 ---
 # keep-sorted start
+# openssl_gen_common_name certificate's common name.
+openssl_gen_common_name: ""
 # openssl_gen_crt is the certificate file to generate including path.
 openssl_gen_crt: ""
 # openssl_gen_group is the group ownership for the certificate.

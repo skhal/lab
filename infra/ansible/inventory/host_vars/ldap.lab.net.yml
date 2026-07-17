@@ -19,6 +19,7 @@ local_unbound_stub_zones:
     type: always_transparent
 openldap_server_addr: 10.0.0.3
 openssl_gen_crt: "/usr/local/etc/openldap/ssl/ldap.crt"
+openssl_gen_common_name: ldap.lab.net
 openssl_gen_group: ldap
 openssl_gen_owner: ldap
 pkg_install:
