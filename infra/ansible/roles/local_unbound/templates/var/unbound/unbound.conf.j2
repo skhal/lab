@@ -30,6 +30,9 @@ remote-control:
 stub-zone:
 	name: "{{ zone.name }}"
 	stub-addr: "{{ zone.addr }}"
+  {% if zone.tls_upstream | bool %}
+	stub-tls-upstream: yes
+  {% endif %}
 {% endfor %}
 
 {%- for zone in local_unbound_forward_zones %}

@@ -6,6 +6,14 @@
 // simple mistakes, you can break connectivity for affected parties,
 // or cause huge amounts of useless Internet traffic.
 
+{% if bind_tls is defined %}
+tls {{ bind_tls.name }} {
+	cert-file "{{ bind_tls.cert }}";
+	key-file "{{ bind_tls.key }}";
+	protocols { {{ (bind_tls.protocols | join(';')) if bind_tls.protocols is defined else 'TLSv1.3' }}; };
+};
+{% endif %}
+
 options {
 	// All file and path names are relative to the chroot directory,
 	// if any, and should be fully qualified.
@@ -17,7 +25,9 @@ options {
 // If named is being used only as a local resolver, this is a safe default.
 // For named to be accessible to the network, comment this option, specify
 // the proper IP address, or delete this option.
-	listen-on{% if bind_listen_on.port is defined %} port {{ bind_listen_on.port }}{% endif %} { {{ bind_listen_on.addr }}; };
+	listen-on
+  {%- if bind_listen_on.port is defined %} port {{ bind_listen_on.port }}{% endif %}
+  {%- if bind_listen_on.tls is defined %} tls {{ bind_listen_on.tls }}{% endif %} { {{ bind_listen_on.addr }}; };
 	allow-query	{ localnets; };
 	allow-transfer	{ "none"; };
 

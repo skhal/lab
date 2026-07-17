@@ -7,12 +7,18 @@
 # keep-sorted start
 # bind_listen_on restricts binding parameters to listen on. It must have the
 # following structure:
-#
 #   port  integer?  port number to listen on (defaults to 53 - see bind doc)
 #   addr  string    IPv4 address to listen on
+#   tls   string?   tls block name
 bind_listen_on:
 # bind_package is the package name with bind DNS server.
 bind_package: bind920
+# bind_tls configures DNS over TLS. It must have the following structure:
+#   name      string  tls block name
+#   cert      string  path to certificate file
+#   key       string  path to private key file
+#   protocols list    a list of supported protocols, e.g. TLSv1.3
+bind_tls:
 # bind_zones lists zone names to configure.
 bind_zones:
   -

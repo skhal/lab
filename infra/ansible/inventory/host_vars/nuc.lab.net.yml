@@ -20,9 +20,11 @@ local_unbound_forward_zones:
     addr: 192.168.10.1
 local_unbound_stub_zones:
   - name: "lab.net"
-    addr: 10.0.0.2@5353
+    addr: 10.0.0.2@853
+    tls_upstream: true
   - name: "10.in-addr.arpa."
-    addr: 10.0.0.2@5353
+    addr: 10.0.0.2@853
+    tls_upstream: true
     type: always_transparent
 netif_clones:
   # keep-sorted start
