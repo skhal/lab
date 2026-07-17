@@ -25,7 +25,7 @@
 - name: "Reload pf"
   listen: "reload_pf_conf"
   ansible.builtin.shell:
-    cmd: ((sleep 1; nohup service pf reload ) & )
+    cmd: "((sleep 1; nohup pfctl -f /etc/pf.conf) & )"
   async: 10
   poll: 0
   register: pf_reload_conf_task
