@@ -10,24 +10,29 @@
 # a folder with ansible.cfg file.
 set -e
 
-# is_ansible returns true if the file is in Ansible project, else false.
-is_ansible() {
-  local p=${1:?'is_ansible: missing file'}
+# ansible_project detects Ansible project and returns path to it, else empty
+# string.
+ansible_project() {
+  local p=${1:?'ansible_project: missing file'}
   for _ in $(seq 1 5); do
     if [ ${p} == "." ]; then
-      return 1
+      break
     fi
     p=$(dirname ${p})
     if [ -e ${p}/ansible.cfg ]; then
-      return 0
+      echo "${p}"
     fi
   done
 }
 
 yaml_files=
 yaml_ansible_files=
+ansible_project_dir=
 for f; do
-  if $(is_ansible ${f}); then
+  # assuming all files belong to the same project
+  project_dir=$(ansible_project "${f}")
+  if [ -n "${project_dir}" ]; then
+    ansible_project_dir="${project_dir}"
     yaml_ansible_files="${yaml_ansible_files} ${f}"
   else
     yaml_files="${yaml_files} ${f}"
@@ -36,7 +41,7 @@ done
 
 rc=0
 if [ -n "${yaml_ansible_files}" ]; then
-  if ! ansible-lint -f brief -qq --fix=all ${yaml_ansible_files}; then
+  if ! ansible-lint --project-dir "${ansible_project_dir}" -f brief -qq --fix=all ${yaml_ansible_files}; then
     rc=1
   fi
 fi
