@@ -38,8 +38,8 @@
             -n0
             -F /usr/local/etc/openldap/slapd.d/
             -l /usr/local/etc/openldap/slapd.ldif
-      register: openldap_slapadd_task
-      changed_when: openldap_slapadd_task is succeeded
+      register: openldap_server_slapadd_task
+      changed_when: openldap_server_slapadd_task is succeeded
 
     - name: Fix database ownership
       ansible.builtin.file:
@@ -56,7 +56,7 @@
         loop_var: _path
 
 - name: Configure service
-  notify: "openldap_start"
+  notify: "openldap_server_start"
   vars:
     _rc_file: /usr/local/etc/rc.conf.d/slapd
   block:
@@ -82,7 +82,7 @@
         # noqa jinja[spacing]
         value: >-
           -h 'ldapi://%2Fvar%2Frun%2Fopenldap%2Fldapi
-          {%- if openldap_addr is defined %} ldap://{{ openldap_addr }}{% endif -%}
+          {%- if openldap_server_addr %} ldap://{{ openldap_server_addr }}{% endif -%}
           ' -s 256
         path: "{{ _rc_file }}"
 

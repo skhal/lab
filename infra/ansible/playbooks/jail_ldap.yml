@@ -12,6 +12,8 @@
   become: true
   become_method: community.general.doas
 
+  tags: create
+
   vars:
     # keep-sorted start
     jail_bridge: bridge1
@@ -22,7 +24,6 @@
 
   roles:
     - role: jail
-      tags: jail
 
 - name: Bootstrap LDAP jail
   hosts: ldap.lab.net
@@ -32,18 +33,13 @@
   become: true
   become_method: community.general.doas
 
+  tags: bootstrap
+
   roles:
     - role: ssh
-      tags: ssh
-
     - role: syslog
-      tags: syslog
-
     - role: user
-      tags: user
-
     - role: pkg
-      tags: pkg
 
 - name: Configure DNS server
   hosts: ldap.lab.net
@@ -53,9 +49,10 @@
   become: true
   become_method: community.general.doas
 
+  tags: dns
+
   roles:
     - role: local_unbound
-      tags: local_unbound
 
 - name: Configure certificates
   hosts: ldap.lab.net
@@ -65,9 +62,10 @@
   become: true
   become_method: community.general.doas
 
+  tags: cert
+
   roles:
     - role: openssl_ca
-      tags: openssl_ca
 
 - name: Configure LDAP server
   hosts: ldap.lab.net
@@ -77,12 +75,11 @@
   become: true
   become_method: community.general.doas
 
-  roles:
-    - role: openldap
-      tags: openldap
+  tags: ldap
 
+  roles:
+    - role: openldap_server
     # generate certificate and let ldap:ldap own it. Run this after openldap
     # role, where openldap-package installation creates ldap:ldap user and
     # group.
     - role: openssl_gen
-      tags: openssl_gen

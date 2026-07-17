@@ -17,7 +17,7 @@ local_unbound_stub_zones:
     addr: 10.0.0.2@853
     tls_upstream: true
     type: always_transparent
-openldap_addr: 10.0.0.3
+openldap_server_addr: 10.0.0.3
 openssl_gen_crt: "/usr/local/etc/openldap/ssl/ldap.crt"
 openssl_gen_group: ldap
 openssl_gen_owner: ldap

@@ -4,8 +4,5 @@
 # license that can be found in the LICENSE file.
 
 ---
-- name: "Start slapd"
-  listen: "openldap_start"
-  ansible.builtin.service:
-    name: slapd
-    state: started
+# openldap_server_addr is the ip-address to listen to.
+openldap_server_addr: ""
