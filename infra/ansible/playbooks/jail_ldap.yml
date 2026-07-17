@@ -84,3 +84,19 @@
     # group.
     - role: openssl_gen
     - role: openldap_client
+
+- name: Fill LDAP entries
+  hosts: ldap.lab.net
+
+  gather_facts: false
+
+  become: true
+  become_method: community.general.doas
+
+  tags: ldapadd
+
+  tasks:
+    - name: Add entries
+      ansible.builtin.include_role:
+        name: openldap_server
+        tasks_from: add_entries

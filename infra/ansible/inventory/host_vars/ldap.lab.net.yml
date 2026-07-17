@@ -18,8 +18,27 @@ local_unbound_stub_zones:
     tls_upstream: true
     type: always_transparent
 openldap_server_addr: 10.0.0.3
-openssl_gen_crt: "/usr/local/etc/openldap/ssl/ldap.crt"
+openldap_server_entries:
+  - name: root node
+    dn: dc=lab,dc=net
+    dc: lab
+    objectClass:
+      - dcObject
+      - organization
+    description: Research & Development lab
+    o: Research Lab
+  - name: people tree
+    dn: ou=people,dc=lab,dc=net
+    ou: people
+    objectClass: organizationalUnit
+    description: people in the lab
+  - name: groups tree
+    dn: ou=groups,dc=lab,dc=net
+    ou: groups
+    objectClass: organizationalUnit
+    description: groups in the lab
 openssl_gen_common_name: ldap.lab.net
+openssl_gen_crt: "/usr/local/etc/openldap/ssl/ldap.crt"
 openssl_gen_group: ldap
 openssl_gen_owner: ldap
 pkg_install:

@@ -1,0 +1,21 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+- name: Install packages
+  vars:
+    _pkg:
+      - py312-python-ldap
+  block:
+    - name: Install {{ _pkg | join(',') }}
+      community.general.pkgng:
+        name: "{{ _pkg }}"
+        state: present
+
+- name: Add entries
+  ansible.builtin.include_tasks: _add_entry.yml
+  loop: "{{ openldap_server_entries }}"
+  loop_control:
+    loop_var: _entry

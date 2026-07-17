@@ -1,0 +1,22 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+- name: Add {{ _entry.name }}
+  community.general.ldap_entry:
+    server_uri: "ldap://ldap.lab.net"
+    bind_dn: "cn=op,dc=lab,dc=net"
+    bind_pw: "{{ openldap_server_bind_pw }}"
+    start_tls: true
+    validate_certs: true
+    dn: "{{ _entry.dn }}"
+    objectClass: "{{ _entry.objectClass }}"
+    attributes:
+      # keep-sorted start
+      dc: "{{ _entry.dc | default(omit) }}"
+      description: "{{ _entry.description | default(omit) }}"
+      o: "{{ _entry.o | default(omit) }}"
+      ou: "{{ _entry.ou | default(omit) }}"
+      # keep-sorted end
