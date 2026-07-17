@@ -1,0 +1,40 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+# keep-sorted start
+ansible_jexec_over_ssh_jail_name: ldap
+local_unbound_forward_zones:
+  - name: "."
+    addr: 192.168.10.1
+local_unbound_stub_zones:
+  - name: "lab.net"
+    addr: 10.0.0.2@853
+    tls_upstream: true
+  - name: "10.in-addr.arpa."
+    addr: 10.0.0.2@853
+    tls_upstream: true
+    type: always_transparent
+openldap_server_addr: 10.0.0.3
+openssl_gen_common_name: ldap.lab.net
+openssl_gen_crt: "/usr/local/etc/openldap/ssl/ldap.crt"
+openssl_gen_group: ldap
+openssl_gen_owner: ldap
+pkg_install:
+  - neovim
+ssh_allow_users:
+  - op
+ssh_listen_addresses:
+  - 10.0.0.3
+user_list:
+  # keep-sorted start
+  - name: op
+    shell: /bin/tcsh
+  - name: root
+    group: wheel
+    home: /root
+    shell: /bin/tcsh
+  # keep-sorted end
+# keep-sorted end
