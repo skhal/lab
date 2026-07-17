@@ -12,30 +12,17 @@
   become: true
   become_method: community.general.doas
 
+  tags: bootstrap
+
   roles:
     - role: rc
-      tags: rc
-
     - role: syslog
-      tags: syslog
-
     - role: user
-      tags: user
-
     - role: pkg
-      tags: pkg
-
     - role: ntp
-      tags: ntp
-
     - role: hostname
-      tags: hostname
-
     - role: periodic
-      tags: periodic
-
     - role: zfs
-      tags: zfs
 
 - name: Configure network
   hosts: nuc.lab.net
@@ -45,23 +32,13 @@
   become: true
   become_method: community.general.doas
 
+  tags: network
+
   roles:
     - role: routing
-      tags: routing
-
     - role: netif
-      tags: netif
 
-    - role: pflog
-      tags: pflog
-
-    - role: pf
-      tags: pf
-
-    - role: ssh
-      tags: ssh
-
-- name: Configure DNS
+- name: Configure firewall
   hosts: nuc.lab.net
 
   gather_facts: false
@@ -69,6 +46,22 @@
   become: true
   become_method: community.general.doas
 
+  tags: pf
+
   roles:
+    - role: pflog
+    - role: pf
+
+- name: Configure Services
+  hosts: nuc.lab.net
+
+  gather_facts: false
+
+  become: true
+  become_method: community.general.doas
+
+  tags: services
+
+  roles:
+    - role: ssh
     - role: local_unbound
-      tags: local_unbound
