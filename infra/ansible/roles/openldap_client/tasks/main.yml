@@ -1,0 +1,16 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+- name: Install packages
+  community.general.pkgng:
+    name: openldap26-client
+
+- name: Patch configuration
+  ansible.posix.patch:
+    src: usr/local/etc/openldap/ldap.conf.diff
+    dest: /usr/local/etc/openldap/ldap.conf
+    backup: true
+    ignore_whitespace: true
