@@ -37,6 +37,49 @@ openldap_server_entries:
     ou: groups
     objectClass: organizationalUnit
     description: groups in the lab
+  - name: op group
+    dn: cn=op,ou=groups,dc=lab,dc=net
+    cn: op
+    objectClass:
+      - top
+      - posixGroup
+    gidNumber: 1001
+    memberUid: op
+  - name: op user
+    dn: uid=op,ou=people,dc=lab,dc=net
+    cn: op
+    objectClass:
+      - top
+      - account
+      - posixAccount
+    uid: op
+    uidNumber: 1001
+    gidNumber: 1001
+    homeDirectory: /home/op
+    loginShell: /bin/tcsh
+    gecos: Operator
+    description: Operator
+  - name: skhalatyan group
+    dn: cn=skhalatyan,ou=groups,dc=lab,dc=net
+    cn: skhalatyan
+    objectClass:
+      - top
+      - posixGroup
+    gidNumber: 10001
+    memberUid: skhalatyan
+  - name: skhalatyan user
+    dn: uid=skhalatyan,ou=people,dc=lab,dc=net
+    cn: skhalatyan
+    objectClass:
+      - top
+      - account
+      - posixAccount
+    uid: skhalatyan
+    uidNumber: 10001
+    gidNumber: 10001
+    homeDirectory: /home/skhalatyan
+    loginShell: /bin/tcsh
+    description: Samvel Khalatyan account
 openssl_gen_common_name: ldap.lab.net
 openssl_gen_crt: "/usr/local/etc/openldap/ssl/ldap.crt"
 openssl_gen_group: ldap

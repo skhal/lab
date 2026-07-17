@@ -15,8 +15,16 @@
     objectClass: "{{ _entry.objectClass }}"
     attributes:
       # keep-sorted start
+      cn: "{{ _entry.cn | default(omit) }}"
       dc: "{{ _entry.dc | default(omit) }}"
       description: "{{ _entry.description | default(omit) }}"
+      gecos: "{{ _entry.gecos | default(omit) }}"
+      gidNumber: "{{ _entry.gidNumber | default(omit) }}"
+      homeDirectory: "{{ _entry.homeDirectory | default(omit) }}"
+      loginShell: "{{ _entry.loginShell | default(omit) }}"
+      memberUid: "{{ _entry.memberUid | default(omit) }}"
       o: "{{ _entry.o | default(omit) }}"
       ou: "{{ _entry.ou | default(omit) }}"
+      uid: "{{ _entry.uid | default(omit) }}"
+      uidNumber: "{{ _entry.uidNumber | default(omit) }}"
       # keep-sorted end
