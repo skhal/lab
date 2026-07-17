@@ -17,12 +17,33 @@
   vars:
     _cfg_file: /usr/local/etc/openldap/slapd.ldif
   block:
+    - name: Create temp file
+      ansible.builtin.tempfile:
+        state: file
+        suffix: .diff
+        prefix: ansible.slapd.ldif.
+      register: openldap_server_tempfile_task
+      failed_when: openldap_server_tempfile_task.path is not defined
+
+    - name: Create patch
+      ansible.builtin.template:
+        src: usr/local/etc/openldap/slapd.ldif.diff.j2
+        dest: "{{ openldap_server_tempfile_task.path }}"
+        mode: u=rw,g=r,o=r
+
     - name: Patch configuration
       ansible.posix.patch:
-        src: usr/local/etc/openldap/slapd.ldif.diff
+        src: "{{ openldap_server_tempfile_task.path }}"
+        remote_src: true
         dest: "{{ _cfg_file }}"
         backup: true
         ignore_whitespace: true
+
+    - name: Clean patch
+      ansible.builtin.file:
+        path: "{{ openldap_server_tempfile_task.path }}"
+        state: absent
+      when: openldap_server_tempfile_task.path is defined
 
 - name: Create configuration database
   vars:
