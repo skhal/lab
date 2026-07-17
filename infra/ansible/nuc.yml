@@ -4,7 +4,7 @@
 # license that can be found in the LICENSE file.
 
 ---
-- name: Configure NUC
+- name: Bootstrap NUC
   hosts: nuc.lab.net
 
   gather_facts: false
@@ -16,6 +16,36 @@
     - role: rc
       tags: rc
 
+    - role: syslog
+      tags: syslog
+
+    - role: user
+      tags: user
+
+    - role: pkg
+      tags: pkg
+
+    - role: ntp
+      tags: ntp
+
+    - role: hostname
+      tags: hostname
+
+    - role: periodic
+      tags: periodic
+
+    - role: zfs
+      tags: zfs
+
+- name: Configure network
+  hosts: nuc.lab.net
+
+  gather_facts: false
+
+  become: true
+  become_method: community.general.doas
+
+  roles:
     - role: routing
       tags: routing
 
@@ -28,32 +58,17 @@
     - role: pf
       tags: pf
 
-    - role: syslog
-      tags: syslog
-
-    - role: ntp
-      tags: ntp
-
-    - role: hostname
-      tags: hostname
-
-    - role: periodic
-      tags: periodic
-
-    - role: user
-      tags: user
-
-    - role: zfs
-      tags: zfs
-
     - role: ssh
       tags: ssh
 
-    - role: pkg
-      tags: pkg
+- name: Configure DNS
+  hosts: nuc.lab.net
 
+  gather_facts: false
+
+  become: true
+  become_method: community.general.doas
+
+  roles:
     - role: local_unbound
       tags: local_unbound
-
-    - role: jail_skel
-      tags: jail_skel
