@@ -35,10 +35,16 @@ to prompt for NUC root-password):
 $ ansible-playbook -K ./nuc_bootstrap.yaml
 ```
 
-Configure NUC without root privileges:
+Configure NUC:
 
 ```console
 $ ansible-playbook ./nuc.yaml
+```
+
+Manage jails:
+
+```console
+$ ansible-playbook --vault-password-file ~/.ansible/vault-pass ./nuc_jails.yaml
 ```
 
 ## Test
