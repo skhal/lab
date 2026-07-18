@@ -6,6 +6,7 @@
 ---
 - name: "Restart routing"
   listen: "restart_routing"
+  become: true
   ansible.builtin.service:
     name: routing
     state: restarted

@@ -6,6 +6,7 @@
 ---
 - name: "Restart network"
   listen: "restart_network"
+  become: true
   ansible.builtin.service:
     name: netif
     state: restarted

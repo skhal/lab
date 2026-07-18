@@ -14,6 +14,7 @@
       path: /etc/rc.conf.d/syslogd
 
 - name: "Enable console logs"
+  become: true
   ansible.builtin.lineinfile:
     path: /etc/syslog.conf
     regexp: "^#(console.info.*)$"

@@ -5,11 +5,13 @@
 
 ---
 - name: "Install package"
+  become: true
   community.general.pkgng:
     name: FreeBSD-local-unbound
     state: present
 
 - name: "Configure service"
+  become: true
   ansible.builtin.template:
     src: var/unbound/unbound.conf.j2
     dest: /var/unbound/unbound.conf
@@ -20,6 +22,7 @@
   notify: local_unbound_restart
 
 - name: "Enable service"
+  become: true
   community.general.sysrc:
     path: /etc/rc.conf.d/local_unbound
     name: local_unbound_enable
@@ -27,6 +30,7 @@
   notify: local_unbound_start
 
 - name: "Configure resolver"
+  become: true
   ansible.builtin.copy:
     dest: /etc/resolv.conf
     content: |

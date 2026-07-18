@@ -10,6 +10,7 @@
   block:
     # noqa name[template]
     - name: "Update {{ _rc_file }} - clone {{ _iface.name }}"
+      become: true
       community.general.sysrc:
         path: "{{ _rc_file }}"
         name: cloned_interfaces
@@ -18,6 +19,7 @@
       notify: "restart_network"
 
     - name: "Update {{ _rc_file }} - configure {{ _iface.name }}" # noqa name[template]
+      become: true
       community.general.sysrc:
         path: "{{ _rc_file }}"
         name: "ifconfig_{{ _iface.name }}"

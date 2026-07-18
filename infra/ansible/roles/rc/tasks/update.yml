@@ -6,6 +6,7 @@
 ---
 # noqa name[template]
 - name: "Update {{ _rc_var.path }} - set {{ _rc_var.name }}"
+  become: true
   community.general.sysrc:
     name: "{{ _rc_var.name }}"
     value: "{{ _rc_var.value }}"

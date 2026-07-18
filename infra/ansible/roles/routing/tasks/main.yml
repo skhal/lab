@@ -15,6 +15,7 @@
       notify: "restart_routing"
 
 - name: "Enable gateway in /etc/rc.conf.d/routing"
+  become: true
   community.general.sysrc:
     name: gateway_enable
     value: true

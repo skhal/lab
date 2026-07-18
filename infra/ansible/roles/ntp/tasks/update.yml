@@ -6,6 +6,7 @@
 ---
 # noqa name[template]
 - name: "Update {{ _update.file }} - {{ _update.name }}"
+  become: true
   ansible.builtin.lineinfile:
     path: "{{ _update.file }}"
     line: "{{ _update.line }}"

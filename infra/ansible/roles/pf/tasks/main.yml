@@ -27,6 +27,7 @@
       register: pf_stat_pf_conf_task
 
     - name: "Create /etc/pf.conf"
+      become: true
       ansible.builtin.file:
         path: "{{ _conf_file }}"
         state: touch
@@ -37,6 +38,7 @@
       notify: "start_pf"
 
 - name: "Enable pf"
+  become: true
   community.general.sysrc:
     path: /etc/rc.conf.d/pf
     name: pf_enable
@@ -56,6 +58,7 @@
 - name: "Check status"
   block:
     - name: "PF status"
+      become: true
       ansible.builtin.raw: /sbin/pfctl -s Running
       register: pf_status_task
       changed_when: false
@@ -69,6 +72,7 @@
         success_msg: "Firewall is enabled"
 
 - name: "Configure pf"
+  become: true
   ansible.builtin.copy:
     src: etc/pf.conf
     dest: /etc/pf.conf

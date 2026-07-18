@@ -6,6 +6,7 @@
 ---
 - name: "Start pflog"
   listen: "start_pflog"
+  become: true
   ansible.builtin.service:
     name: pflog
     state: started

@@ -6,12 +6,14 @@
 ---
 - name: "Start local_unbound"
   listen: local_unbound_start
+  become: true
   ansible.builtin.service:
     name: local_unbound
     state: started
 
 - name: "Restart local_unbound"
   listen: local_unbound_restart
+  become: true
   ansible.builtin.service:
     name: local_unbound
     state: restarted

@@ -5,6 +5,7 @@
 
 ---
 - name: "Update /etc/periodic.conf - send daily logs to /var/log/daily.log"
+  become: true
   community.general.sysrc:
     path: /etc/periodic.conf
     name: daily_output

@@ -5,6 +5,7 @@
 
 ---
 - name: "Migrate rc-var {{ sysrc_migrate.name }}"
+  become: true
   block:
     - name: "Update /etc/rc.conf - remove {{ sysrc_migrate.name }}"
       community.general.sysrc:

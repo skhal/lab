@@ -5,6 +5,7 @@
 
 ---
 - name: "Use latest branch"
+  become: true
   ansible.builtin.copy:
     src: usr/local/etc/pkg/repos/FreeBSD.conf
     dest: /usr/local/etc/pkg/repos/
@@ -21,6 +22,7 @@
     loop_var: _alias
 
 - name: "Install packages {{ pkg_install }}"
+  become: true
   community.general.pkgng:
     name: "{{ pkg_install }}"
     state: latest

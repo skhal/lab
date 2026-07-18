@@ -5,6 +5,7 @@
 
 ---
 - name: "Enable pflog"
+  become: true
   community.general.sysrc:
     path: /etc/rc.conf.d/pflog
     name: pflog_enable

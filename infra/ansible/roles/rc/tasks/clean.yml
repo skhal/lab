@@ -5,6 +5,7 @@
 
 ---
 - name: "Update /etc/rc.conf - remove {{ _rc_var }}"
+  become: true
   community.general.sysrc:
     name: "{{ _rc_var }}"
     state: absent

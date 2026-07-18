@@ -6,6 +6,7 @@
 ---
 # noqa name[template]
 - name: "User {{ _copy.user }} - copy {{ _copy.src | basename }}"
+  become: true
   ansible.builtin.copy:
     src: "{{ _copy.src }}"
     dest: "{{ _copy.dst }}"

@@ -16,6 +16,7 @@
 # noqa command-instead-of-module command-instead-of-shell
 - name: "Start pf"
   listen: "start_pf"
+  become: true
   ansible.builtin.shell:
     cmd: service pf start
   async: 10
@@ -24,6 +25,7 @@
 # reload_pf_conf reloads non-empty /etc/pf.conf and must be done asynchronously.
 - name: "Reload pf"
   listen: "reload_pf_conf"
+  become: true
   ansible.builtin.shell:
     cmd: "((sleep 1; nohup pfctl -f /etc/pf.conf) & )"
   async: 10

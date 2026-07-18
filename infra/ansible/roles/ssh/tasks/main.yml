@@ -19,6 +19,7 @@
   block:
     # noqa name[template]
     - name: "Update {{ _conf_file }} - listen on cloned interfaces"
+      become: true
       ansible.builtin.lineinfile:
         path: "{{ _conf_file }}"
         line: "ListenAddress={{ item }}"
@@ -26,6 +27,7 @@
       notify: "restart_sshd"
 
     - name: "Update {{ _conf_file }} - allow op user" # noqa name[template]
+      become: true
       ansible.builtin.lineinfile:
         path: "{{ _conf_file }}"
         line: "AllowUsers={{ ssh_allow_users | join(' ') }}"

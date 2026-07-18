@@ -6,7 +6,6 @@
 ---
 - name: Bootstrap NUC
   hosts: nuc.lab.net
-  become: true
   tags: bootstrap
   roles:
     - role: rc
@@ -20,7 +19,6 @@
 
 - name: Configure network
   hosts: nuc.lab.net
-  become: true
   tags: network
   roles:
     - role: routing
@@ -28,7 +26,6 @@
 
 - name: Configure firewall
   hosts: nuc.lab.net
-  become: true
   tags: pf
   roles:
     - role: pflog
@@ -36,7 +33,6 @@
 
 - name: Configure Services
   hosts: nuc.lab.net
-  become: true
   tags: services
   roles:
     - role: ssh

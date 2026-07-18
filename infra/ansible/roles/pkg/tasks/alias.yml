@@ -6,6 +6,7 @@
 ---
 # noqa name[template]
 - name: "Update {{ pkg_conf_path }} - add alias {{ _alias.name }}"
+  become: true
   ansible.builtin.lineinfile:
     path: "{{ pkg_conf_path }}"
     insertafter: "^ALIAS {"

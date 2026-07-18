@@ -5,6 +5,7 @@
 
 ---
 - name: "Upgrade packages"
+  become: true
   community.general.pkgng:
     name: "*"
     state: latest
