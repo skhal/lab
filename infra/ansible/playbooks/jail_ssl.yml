@@ -6,6 +6,7 @@
 ---
 - name: Create SSL jail
   hosts: nuc.lab.net
+  tags: create
   vars:
     # keep-sorted start
     jail_bridge: bridge1
@@ -15,31 +16,25 @@
     # keep-sorted end
   roles:
     - role: jail
-      tags: jail
 
 - name: Bootstrap SSL jail
   hosts: ssl.lab.net
+  tags: bootstrap
   roles:
     - role: ssh
-      tags: ssh
-
     - role: syslog
-      tags: syslog
-
     - role: user
-      tags: user
-
     - role: pkg
-      tags: pkg
 
 - name: Configure DNS server
   hosts: ssl.lab.net
+  tags: dns
   roles:
     - role: local_unbound
-      tags: local_unbound
 
 - name: Setup Central Authority
   hosts: ssl.lab.net
+  tags: ca
   tasks:
     - name: Generate CA
       ansible.builtin.include_role:
@@ -48,5 +43,6 @@
 
 - name: Fetch CA
   hosts: nuc.lab.net
+  tags: ca
   roles:
     - role: openssl_ca
