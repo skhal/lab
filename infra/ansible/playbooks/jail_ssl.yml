@@ -6,12 +6,7 @@
 ---
 - name: Create SSL jail
   hosts: nuc.lab.net
-
-  gather_facts: false
-
   become: true
-  become_method: community.general.doas
-
   vars:
     # keep-sorted start
     jail_bridge: bridge1
@@ -19,19 +14,13 @@
     jail_defaultrouter: 10.0.0.1
     jail_name: ssl
     # keep-sorted end
-
   roles:
     - role: jail
       tags: jail
 
 - name: Bootstrap SSL jail
   hosts: ssl.lab.net
-
-  gather_facts: false
-
   become: true
-  become_method: community.general.doas
-
   roles:
     - role: ssh
       tags: ssh
@@ -47,24 +36,14 @@
 
 - name: Configure DNS server
   hosts: ssl.lab.net
-
-  gather_facts: false
-
   become: true
-  become_method: community.general.doas
-
   roles:
     - role: local_unbound
       tags: local_unbound
 
 - name: Setup Central Authority
   hosts: ssl.lab.net
-
-  gather_facts: false
-
   become: true
-  become_method: community.general.doas
-
   tasks:
     - name: Generate CA
       ansible.builtin.include_role:
@@ -73,11 +52,6 @@
 
 - name: Fetch CA
   hosts: nuc.lab.net
-
-  gather_facts: false
-
   become: true
-  become_method: community.general.doas
-
   roles:
     - role: openssl_ca

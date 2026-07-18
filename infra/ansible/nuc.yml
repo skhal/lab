@@ -6,14 +6,8 @@
 ---
 - name: Bootstrap NUC
   hosts: nuc.lab.net
-
-  gather_facts: false
-
   become: true
-  become_method: community.general.doas
-
   tags: bootstrap
-
   roles:
     - role: rc
     - role: syslog
@@ -26,42 +20,24 @@
 
 - name: Configure network
   hosts: nuc.lab.net
-
-  gather_facts: false
-
   become: true
-  become_method: community.general.doas
-
   tags: network
-
   roles:
     - role: routing
     - role: netif
 
 - name: Configure firewall
   hosts: nuc.lab.net
-
-  gather_facts: false
-
   become: true
-  become_method: community.general.doas
-
   tags: pf
-
   roles:
     - role: pflog
     - role: pf
 
 - name: Configure Services
   hosts: nuc.lab.net
-
-  gather_facts: false
-
   become: true
-  become_method: community.general.doas
-
   tags: services
-
   roles:
     - role: ssh
     - role: local_unbound

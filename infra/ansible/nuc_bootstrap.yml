@@ -5,12 +5,7 @@
 
 ---
 - name: Bootstrap for Ansible
-
   hosts: nuc.lab.net
-  gather_facts: false
-
-  become: true
   become_method: ansible.builtin.su
-
   roles:
     - role: bootstrap

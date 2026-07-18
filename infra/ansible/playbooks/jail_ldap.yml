@@ -6,14 +6,8 @@
 ---
 - name: Create LDAP jail
   hosts: nuc.lab.net
-
-  gather_facts: false
-
   become: true
-  become_method: community.general.doas
-
   tags: create
-
   vars:
     # keep-sorted start
     jail_bridge: bridge1
@@ -21,20 +15,13 @@
     jail_defaultrouter: 10.0.0.1
     jail_name: ldap
     # keep-sorted end
-
   roles:
     - role: jail
 
 - name: Bootstrap LDAP jail
   hosts: ldap.lab.net
-
-  gather_facts: false
-
   become: true
-  become_method: community.general.doas
-
   tags: bootstrap
-
   roles:
     - role: ssh
     - role: syslog
@@ -43,40 +30,22 @@
 
 - name: Configure DNS server
   hosts: ldap.lab.net
-
-  gather_facts: false
-
   become: true
-  become_method: community.general.doas
-
   tags: dns
-
   roles:
     - role: local_unbound
 
 - name: Configure certificates
   hosts: ldap.lab.net
-
-  gather_facts: false
-
   become: true
-  become_method: community.general.doas
-
   tags: cert
-
   roles:
     - role: openssl_ca
 
 - name: Configure LDAP server
   hosts: ldap.lab.net
-
-  gather_facts: false
-
   become: true
-  become_method: community.general.doas
-
   tags: ldap
-
   roles:
     - role: openldap_server
     # generate certificate and let ldap:ldap own it. Run this after openldap
@@ -87,14 +56,8 @@
 
 - name: Fill LDAP entries
   hosts: ldap.lab.net
-
-  gather_facts: false
-
   become: true
-  become_method: community.general.doas
-
   tags: ldapadd
-
   tasks:
     - name: Add entries
       ansible.builtin.include_role:
