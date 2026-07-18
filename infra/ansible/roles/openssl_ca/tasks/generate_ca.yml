@@ -5,6 +5,7 @@
 
 ---
 - name: Install packages
+  become: true
   community.general.pkgng:
     name:
       - FreeBSD-certctl
@@ -23,6 +24,7 @@
     - name: Prepare folders
       block:
         - name: Create folders
+          become: true
           ansible.builtin.file:
             name: "{{ _path }}"
             state: directory
@@ -35,6 +37,7 @@
             loop_var: _path
 
         - name: Create folders for private keys
+          become: true
           ansible.builtin.file:
             name: "{{ _path }}"
             state: directory
@@ -45,13 +48,16 @@
             - "{{ openssl_ca_key_file | dirname }}"
           loop_control:
             loop_var: _path
+
         - name: Create CA private key
+          become: true
           community.crypto.openssl_privatekey:
             path: "{{ openssl_ca_key_file }}"
             passphrase: "{{ openssl_ca_passphrase }}"
             cipher: auto
 
     - name: Create CA signing request
+      become: true # to access private key
       community.crypto.openssl_csr_pipe:
         privatekey_path: "{{ openssl_ca_key_file }}"
         privatekey_passphrase: "{{ openssl_ca_passphrase }}"
@@ -67,6 +73,7 @@
       register: openssl_ca_csr_task
 
     - name: Sign CA signing request
+      become: true
       community.crypto.x509_certificate:
         path: "{{ openssl_ca_crt_file }}"
         csr_content: "{{ openssl_ca_csr_task.csr }}"

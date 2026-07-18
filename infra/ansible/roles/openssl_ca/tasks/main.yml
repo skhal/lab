@@ -5,6 +5,7 @@
 
 ---
 - name: Install packages
+  become: true
   community.general.pkgng:
     name:
       - FreeBSD-certctl

@@ -5,6 +5,7 @@
 
 ---
 - name: "Migrate users"
+  become: true
   migrate:
     name: "{{ item }}"
     rootdir: "{{ user_migrate_rootdir }}"

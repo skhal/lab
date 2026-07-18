@@ -5,6 +5,7 @@
 
 ---
 - name: "Start jail"
+  become: true
   ansible.builtin.service:
     name: jail
     state: started
@@ -15,6 +16,7 @@
     _snapshot: "{{ jail_skel_zfs_dataset }}@{{ '%Y-%m-%d-%T' | strftime }}"
   block:
     - name: "Snapshot dataset {{ _snapshot }}"
+      become: true
       community.general.zfs:
         name: "{{ _snapshot }}"
         state: present

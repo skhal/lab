@@ -6,12 +6,14 @@
 ---
 - name: "Start bind"
   listen: "bind_start"
+  become: true
   ansible.builtin.service:
     name: named
     state: started
 
 - name: "Restart bind"
   listen: "bind_restart"
+  become: true
   ansible.builtin.service:
     name: named
     state: restarted

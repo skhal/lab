@@ -6,6 +6,7 @@
 ---
 # noqa command-instead-of-module
 - name: "Stop jail {{ jail_name }}"
+  become: true
   ansible.builtin.command:
     cmd: service jail stop {{ jail_name }}
   register: jail_service_stop_task
@@ -50,6 +51,7 @@
       block:
         # noqa name[template]
         - name: "ZFS copy {{ jail_zfs_dataset }} from {{ jail_skel_zfs_dataset }}"
+          become: true
           ansible.builtin.shell:
             cmd: >-
               set -o pipefail;
@@ -60,6 +62,7 @@
           changed_when: jail_zfs_copy is succeeded
 
         - name: "ZFS update properties {{ jail_zfs_dataset }}"
+          become: true
           community.general.zfs:
             name: "{{ jail_zfs_dataset }}"
             state: present
@@ -102,18 +105,30 @@
               }}
 
 - name: "Configure jail {{ jail_name }}"
+  vars:
+    _conf_path: /etc/jail.conf.d/{{ jail_name }}.conf
   block:
-    # noqa name[template]
-    - name: "Create jail config /etc/jail.conf.d/{{ jail_name }}.conf"
+    - name: Create {{ _conf_path | dirname }}
+      become: true
+      ansible.builtin.file:
+        path: "{{ _conf_path | dirname }}"
+        state: directory
+        owner: root
+        group: wheel
+        mode: u=rwx,g=rx,o=rx
+
+    - name: "Create jail config {{ _conf_path }}"
+      become: true
       ansible.builtin.template:
         src: etc/jail.conf.d/jail.conf
-        dest: /etc/jail.conf.d/{{ jail_name }}.conf
+        dest: "{{ _conf_path }}"
         owner: root
         group: wheel
         mode: u=rw,g=r,o=r
         validate: /usr/sbin/jail -f %s -e ' '
 
     - name: "Set default router in {{ jail_path }}/etc/rc.conf.d/routing" # noqa name[template]
+      become: true
       community.general.sysrc:
         name: defaultrouter
         value: "{{ jail_defaultrouter }}"
@@ -125,18 +140,21 @@
       block:
         # noqa name[template]
         - name: "Update {{ rc_file }} - name vnet interface"
+          become: true
           community.general.sysrc:
             name: ifconfig_e0b_{{ jail_name }}_name
             value: "vnet0"
             path: "{{ rc_file }}"
 
         - name: "Update {{ rc_file }} - configure vnet interface" # noqa name[template]
+          become: true
           community.general.sysrc:
             name: ifconfig_vnet0
             value: "inet {{ jail_cidr }}"
             path: "{{ rc_file }}"
 
     - name: "Configure resolver in {{ jail_path }}/etc/resolv.conf" # noqa name[template]
+      become: true
       ansible.builtin.lineinfile:
         path: "{{ jail_path }}/etc/resolv.conf"
         line: "nameserver {{ routing_defaultrouter }}"
@@ -146,11 +164,13 @@
         create: true
 
     - name: "Disable DNS lookup the remote host name"
+      become: true
       ansible.builtin.lineinfile:
         path: "{{ jail_path }}/etc/ssh/sshd_config"
         line: "UseDNS no"
 
 - name: "Enable jail {{ jail_name }}"
+  become: true
   community.general.sysrc:
     name: jail_list
     value: "{{ jail_name }}"
@@ -160,6 +180,7 @@
 
 # noqa command-instead-of-module
 - name: "Restart jail {{ jail_name }}"
+  become: true
   ansible.builtin.command:
     cmd: service jail restart {{ jail_name }}
   register: jail_service_restart_result

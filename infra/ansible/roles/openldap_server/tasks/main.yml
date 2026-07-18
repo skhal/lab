@@ -9,6 +9,7 @@
     _pkg: openldap26-server
   block:
     - name: Install {{ _pkg | join(',') }}
+      become: true
       community.general.pkgng:
         name: "{{ _pkg }}"
         state: present
@@ -32,6 +33,7 @@
         mode: u=rw,g=r,o=r
 
     - name: Patch configuration
+      become: true
       ansible.posix.patch:
         src: "{{ openldap_server_tempfile_task.path }}"
         remote_src: true
@@ -60,6 +62,7 @@
       notify: "openldap_server_start"
       block:
         - name: Create database tree
+          become: true
           ansible.builtin.file:
             path: "{{ _path }}"
             state: directory
@@ -73,6 +76,7 @@
             loop_var: _path
 
         - name: Import configuration database
+          become: true
           ansible.builtin.command:
             cmd: >-
               /usr/local/sbin/slapadd
@@ -83,6 +87,7 @@
           changed_when: openldap_server_slapadd_task is succeeded
 
         - name: Fix database ownership
+          become: true
           ansible.builtin.file:
             path: "{{ _path }}"
             state: directory
@@ -102,6 +107,7 @@
     _rc_file: /usr/local/etc/rc.conf.d/slapd
   block:
     - name: Create rc.conf.d folder
+      become: true
       ansible.builtin.file:
         path: "{{ _rc_file | dirname }}"
         state: directory
@@ -112,12 +118,14 @@
     # Force slapd rc-script to fix the owner and permissions:
     # https://github.com/freebsd/freebsd-ports/blob/c2991243dbb2dfc9f932d1560af12061ed998cf2/net/openldap26-server/files/slapd.in#L153
     - name: Set socket
+      become: true
       community.general.sysrc:
         name: slapd_sockets
         value: /var/run/openldap/ldapi
         path: "{{ _rc_file }}"
 
     - name: Set flags
+      become: true
       community.general.sysrc:
         name: slapd_flags
         # noqa jinja[spacing]
@@ -128,12 +136,14 @@
         path: "{{ _rc_file }}"
 
     - name: Set CN config
+      become: true
       community.general.sysrc:
         name: slapd_cn_config
         value: true
         path: "{{ _rc_file }}"
 
     - name: Enable slapd
+      become: true
       community.general.sysrc:
         name: slapd_enable
         value: true

@@ -7,6 +7,7 @@
 - name: "Install DNS server"
   block:
     - name: "Install DNS server {{ bind_package }}"
+      become: true
       community.general.pkgng:
         name: "{{ bind_package }}"
 
@@ -16,6 +17,7 @@
     _rc_file: /usr/local/etc/rc.conf.d/named
   block:
     - name: "Create {{ _rc_file | dirname }}"
+      become: true
       ansible.builtin.file:
         path: "{{ _rc_file | dirname }}"
         state: directory
@@ -24,6 +26,7 @@
         mode: u=rwx,g=rx,o=rx
 
     - name: "Enable DNS server in {{ _rc_file }}"
+      become: true
       community.general.sysrc:
         path: "{{ _rc_file }}"
         name: named_enable
@@ -39,6 +42,7 @@
         loop_var: _zone
 
     - name: "Configure service"
+      become: true
       ansible.builtin.template:
         src: usr/local/etc/namedb/named.conf.j2
         dest: /usr/local/etc/namedb/named.conf

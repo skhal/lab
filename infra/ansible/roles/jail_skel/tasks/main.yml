@@ -8,6 +8,7 @@
   notify: "jail_skel_snapshot"
   block:
     - name: "Create parent datasets {{ jail_skel_zfs_dataset | dirname }}"
+      become: true
       community.general.zfs:
         name: "{{ jail_skel_zfs_dataset | dirname }}"
         state: present
@@ -23,6 +24,7 @@
           | count > 1
 
     - name: "Create dataset {{ jail_skel_zfs_dataset }}"
+      become: true
       community.general.zfs:
         name: "{{ jail_skel_zfs_dataset }}"
         state: present
@@ -66,6 +68,7 @@
     _rc_file: /etc/rc.conf.d/jail
   block:
     - name: "Create /etc/jail.conf"
+      become: true
       vars:
         prefix: "{{ jail_skel_path }}"
       ansible.builtin.template:
@@ -77,6 +80,7 @@
         validate: /usr/sbin/jail -f %s -e ' '
 
     - name: "Update {{ _rc_file }} - enable jail service" # noqa name[template]
+      become: true
       community.general.sysrc:
         name: jail_enable
         value: true
@@ -84,6 +88,7 @@
       notify: "start_jail"
 
     - name: "Update {{ _rc_file }} - stop jails in reverse order" # noqa name[template]
+      become: true
       community.general.sysrc:
         name: jail_reverse_stop
         value: true
@@ -97,6 +102,7 @@
         _keys_path: "{{ jail_skel_path }}/usr/share"
       block:
         - name: "Create keys folder {{ _keys_path }}"
+          become: true
           ansible.builtin.file:
             path: "{{ _keys_path }}"
             state: directory
@@ -105,6 +111,7 @@
             mode: u=rwx,g=rx,o=rx
 
         - name: "Copy keys from /usr/share/keys"
+          become: true
           ansible.builtin.copy:
             src: /usr/share/keys
             dest: "{{ _keys_path }}/"
@@ -118,6 +125,7 @@
         _db_path: "{{ jail_skel_path }}/var/db/pkg/repos"
       block:
         - name: "Create pkg db at {{ _db_path }}"
+          become: true
           ansible.builtin.file:
             path: "{{ _db_path }}"
             state: directory
@@ -126,6 +134,7 @@
             mode: u=rwx,g=rx,o=rx
 
         - name: "Mount metadata cache at {{ _db_path }}"
+          become: true
           ansible.posix.mount:
             path: "{{ _db_path }}"
             src: tmpfs
@@ -133,12 +142,14 @@
             state: present
 
         - name: "Install packages to {{ jail_skel_path }}"
+          become: true
           community.general.pkgng:
             rootdir: "{{ jail_skel_path }}"
             name: "{{ jail_skel_default_packages | union(jail_skel_packages) }}"
             state: present
       always:
         - name: "Unmount metadata cache at {{ _db_path }}"
+          become: true
           ansible.posix.mount:
             path: "{{ _db_path }}"
             state: unmounted
@@ -158,6 +169,7 @@
     - name: "Installed userland"
       block:
         - name: "Get installed userland at {{ jail_skel_path }}"
+          become: true
           ansible.builtin.command:
             cmd: chroot {{ jail_skel_path }} freebsd-version -u
           register: jail_skel_get_os_version_task
@@ -178,6 +190,7 @@
         user_migrate_rootdir: "{{ jail_skel_path }}"
 
 - name: "Enable sshd"
+  become: true
   community.general.sysrc:
     name: sshd_enable
     value: true

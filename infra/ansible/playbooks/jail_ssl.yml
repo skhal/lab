@@ -6,7 +6,6 @@
 ---
 - name: Create SSL jail
   hosts: nuc.lab.net
-  become: true
   vars:
     # keep-sorted start
     jail_bridge: bridge1
@@ -20,7 +19,6 @@
 
 - name: Bootstrap SSL jail
   hosts: ssl.lab.net
-  become: true
   roles:
     - role: ssh
       tags: ssh
@@ -36,14 +34,12 @@
 
 - name: Configure DNS server
   hosts: ssl.lab.net
-  become: true
   roles:
     - role: local_unbound
       tags: local_unbound
 
 - name: Setup Central Authority
   hosts: ssl.lab.net
-  become: true
   tasks:
     - name: Generate CA
       ansible.builtin.include_role:
@@ -52,6 +48,5 @@
 
 - name: Fetch CA
   hosts: nuc.lab.net
-  become: true
   roles:
     - role: openssl_ca

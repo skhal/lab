@@ -6,7 +6,7 @@
 ---
 - name: Create DNS jail
   hosts: nuc.lab.net
-  become: true
+  tags: create
   vars:
     # keep-sorted start
     jail_bridge: bridge1
@@ -16,46 +16,32 @@
     # keep-sorted end
   roles:
     - role: jail
-      tags: jail
 
 - name: Bootstrap DNS jail
   hosts: dns.lab.net
-  become: true
+  tags: bootstrap
   roles:
     - role: ssh
-      tags: ssh
-
     - role: syslog
-      tags: syslog
-
     - role: user
-      tags: user
-
     - role: pkg
-      tags: pkg
 
 - name: Configure certificate
   hosts: dns.lab.net
-  become: true
+  tags: cert
   roles:
     - role: openssl_ca
-      tags: openssl_ca
 
-# Configure DNS server ina separate play to ensure that changes to the resolver
+# Configure DNS server in a separate play to ensure that changes to the resolver
 # do not affect handlers run by previous roles, e.g. pkg handlers upgrade
 # packages but fails if bind and local_unbound roles mess up with DNS settings.
 # The separate plays guarantee that the roles run independently.
 - name: Configure DNS server
   hosts: dns.lab.net
-  become: true
+  tags: dns
   roles:
     - role: bind
-      tags: bind
-
     # bind installs the package and adds bind:bind user. This user owns
     # the certificate.
     - role: openssl_gen
-      tags: openssl_gen
-
     - role: local_unbound
-      tags: local_unbound

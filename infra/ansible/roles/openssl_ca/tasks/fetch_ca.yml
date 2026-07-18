@@ -5,6 +5,7 @@
 
 ---
 - name: Create folders
+  become: true
   vars:
     _crt_dir: "{{ openssl_ca_crt_file | dirname }}"
   ansible.builtin.file:
@@ -21,6 +22,7 @@
   delegate_to: "{{ openssl_ca_host }}"
 
 - name: Write CA certificate
+  become: true
   ansible.builtin.copy:
     dest: "{{ openssl_ca_crt_file }}"
     content: "{{ openssl_ca_crt_task.content | b64decode }}"

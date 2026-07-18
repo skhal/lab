@@ -6,7 +6,6 @@
 ---
 - name: Create LDAP jail
   hosts: nuc.lab.net
-  become: true
   tags: create
   vars:
     # keep-sorted start
@@ -20,7 +19,6 @@
 
 - name: Bootstrap LDAP jail
   hosts: ldap.lab.net
-  become: true
   tags: bootstrap
   roles:
     - role: ssh
@@ -30,21 +28,18 @@
 
 - name: Configure DNS server
   hosts: ldap.lab.net
-  become: true
   tags: dns
   roles:
     - role: local_unbound
 
 - name: Configure certificates
   hosts: ldap.lab.net
-  become: true
   tags: cert
   roles:
     - role: openssl_ca
 
 - name: Configure LDAP server
   hosts: ldap.lab.net
-  become: true
   tags: ldap
   roles:
     - role: openldap_server
@@ -56,7 +51,6 @@
 
 - name: Fill LDAP entries
   hosts: ldap.lab.net
-  become: true
   tags: ldapadd
   tasks:
     - name: Add entries

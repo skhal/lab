@@ -5,6 +5,7 @@
 
 ---
 - name: Add {{ _entry.name }}
+  become: true # to start TLS
   community.general.ldap_entry:
     server_uri: "ldap://ldap.lab.net"
     bind_dn: "cn=op,dc=lab,dc=net"

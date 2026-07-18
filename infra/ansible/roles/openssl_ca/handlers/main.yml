@@ -6,6 +6,7 @@
 ---
 - name: CA rehash certificates
   listen: openssl_ca_rehash_certs
+  become: true
   ansible.builtin.command:
     cmd: certctl rehash
   register: openssl_ca_rehash_certs_task

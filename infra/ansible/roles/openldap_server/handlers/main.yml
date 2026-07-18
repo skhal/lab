@@ -6,6 +6,7 @@
 ---
 - name: "Start slapd"
   listen: "openldap_server_start"
+  become: true
   ansible.builtin.service:
     name: slapd
     state: started
