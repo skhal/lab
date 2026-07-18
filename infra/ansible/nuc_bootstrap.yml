@@ -6,6 +6,8 @@
 ---
 - name: Bootstrap for Ansible
   hosts: nuc.lab.net
+  # The server is bare-bone with fresh OS install. Use included method to
+  # escalate privileges su(1).
   become_method: ansible.builtin.su
   roles:
     - role: bootstrap

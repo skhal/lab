@@ -10,6 +10,7 @@
       {{ bootstrap_packages | select('match', 'python') }}
     _pkg_not_python: >-
       {{ bootstrap_packages | reject('match', 'python') }}
+  become: true
   block:
     # It is assumed the remote node does not have Python available yet and
     # can't use ansible.builtin.{command,shell}.
@@ -20,11 +21,9 @@
       changed_when:
         - bootstrap_install_python_task is succeeded
         - '"already installed" not in bootstrap_install_python_task.stdout'
-      become: true
 
     # Python is installed at this point, can use Ansible modules to install
     # other packages.
     - name: "Install {{ _pkg_not_python | join(',') }}"
       community.general.pkgng:
         name: "{{ _pkg_not_python }}"
-      become: true
