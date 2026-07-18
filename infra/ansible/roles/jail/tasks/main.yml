@@ -4,14 +4,6 @@
 # license that can be found in the LICENSE file.
 
 ---
-# noqa command-instead-of-module
-- name: "Stop jail {{ jail_name }}"
-  become: true
-  ansible.builtin.command:
-    cmd: service jail stop {{ jail_name }}
-  register: jail_service_stop_task
-  changed_when: jail_service_stop_task is succeeded
-
 - name: "Pick skeleton last snapsthot"
   block:
     - name: "Get snapshots of {{ jail_skel_zfs_dataset }}"
@@ -179,10 +171,25 @@
     state: value_present
     path: /etc/rc.conf.d/jail
 
-# noqa command-instead-of-module
-- name: "Restart jail {{ jail_name }}"
-  become: true
-  ansible.builtin.command:
-    cmd: service jail restart {{ jail_name }}
-  register: jail_service_restart_result
-  changed_when: jail_service_restart_result is succeeded
+# can't use handlers because Ansible does not support passing parameters to
+# handlers, i.e. can't pass the jail name to start. Don't create "smart" logic
+# that would propagate the list of jails to start because all variables are
+# global and other tasks may change the list before the handler runs breaking
+# encapsulation.
+- name: Run jail
+  block:
+    - name: Check if the jail runs
+      ansible.builtin.command:
+        cmd: jls -j {{ jail_name }} -c
+      register: jail_jls_task
+      failed_when: false
+      changed_when: false
+
+    # noqa command-instead-of-module
+    - name: "Run jail {{ jail_name }}"
+      become: true
+      ansible.builtin.command:
+        cmd: service jail start {{ jail_name }}
+      when: jail_jls_task.rc != 0
+      register: jail_service_restart_result
+      changed_when: jail_service_restart_result is succeeded
