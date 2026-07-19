@@ -4,24 +4,14 @@
 # license that can be found in the LICENSE file.
 
 ---
-# noqa name[template]
-- name: >-
-    Setup timezone to {{ timezone_name }}
-    {% if timezone_chroot != "" %}in {{ timezone_chroot }}{% endif %}
+- name: Setup timezone to {{ timezone_name }}
   ansible.builtin.command:
-    cmd: >-
-      {% if timezone_chroot != "" %}chroot {{ timezone_chroot }}{% endif %}
-      tzsetup -s {{ timezone_name }}
-  register: timezone_set_job
-  changed_when: timezone_set_job.rc == 0
+    cmd: tzsetup -s {{ timezone_name }}
+  register: timezone_setup_task
+  changed_when: timezone_setup_task.rc == 0
 
-# noqa name[template]
-- name: >-
-    Install timezone in {{ timezone_chroot }}
-    {% if timezone_chroot != "" %}in {{ timezone_chroot }}{% endif %}
+- name: Install timezone
   ansible.builtin.command:
-    cmd: >-
-      {% if timezone_chroot != "" %}chroot {{ timezone_chroot }}{% endif %}
-      tzsetup -r
-  register: timezone_install_job
-  changed_when: timezone_install_job.rc == 0
+    cmd: tzsetup -r
+  register: timezone_install_task
+  changed_when: timezone_install_task.rc == 0
