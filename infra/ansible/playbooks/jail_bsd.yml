@@ -47,3 +47,4 @@
   roles:
     - role: openldap_client
     - role: nss
+    - role: pam
