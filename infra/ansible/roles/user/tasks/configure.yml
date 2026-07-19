@@ -8,21 +8,15 @@
   block:
     - name: "User {{ _user.name }} - get info"
       ansible.builtin.command:
-        cmd: >-
-          {% if user_chroot != "" %}chroot {{ user_chroot }}{% endif %}
-          pw showuser {{ _user.name }}
+        cmd: pw showuser {{ _user.name }}
       register: user_get_info_task
       changed_when: false
 
     # noqa name[template]
-    - name: >-
-        User {{ _user.name }} - set shell to {{ _user.shell }}
-        {% if user_chroot != "" %} in {{ user_chroot }}{% endif %}
+    - name: User {{ _user.name }} - set shell to {{ _user.shell }}
       become: true
       ansible.builtin.command:
-        cmd: >-
-          {% if user_chroot != "" %}chroot {{ user_chroot }}{% endif %}
-          chsh -s {{ _user.shell }} {{ _user.name }}
+        cmd: chsh -s {{ _user.shell }} {{ _user.name }}
       register: user_chsh
       changed_when: user_chsh.rc == 0
       when:
@@ -30,16 +24,13 @@
         - _user.shell not in user_get_info_task.stdout
 
 # noqa name[template]
-- name: >-
-    User {{ _user.name }} - copy skeleton
-    {% if user_chroot != "" %} in {{ user_chroot }}{% endif %}
+- name: User {{ _user.name }} - copy skeleton
   ansible.builtin.include_tasks: "copy.yml"
   vars:
     _copy:
       user: "{{ _user.name }}"
       src: "{{ item_file }}"
       dst: >-
-        {% if user_chroot != "" %}{{ user_chroot }}{% endif -%}
         {{ _user.home }}/{{
           item_file
             | basename

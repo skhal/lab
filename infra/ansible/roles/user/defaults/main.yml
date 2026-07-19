@@ -15,6 +15,3 @@ user_list:
 
 # user_default_shell is the default shell to set for users.
 user_default_shell: /bin/sh
-
-# user_chroot runs user changes in chrooted environment.
-user_chroot: ""
