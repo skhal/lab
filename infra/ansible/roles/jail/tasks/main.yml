@@ -73,7 +73,12 @@
 
     - name: "Get jail mountpoint"
       vars:
-        facts: "{{ [jail_zfs_facts_new, jail_zfs_facts_task] | selectattr('ansible_facts', 'defined') | first }}"
+        facts: >-
+          {{
+            [jail_zfs_facts_new, jail_zfs_facts_task]
+              | selectattr('ansible_facts', 'defined')
+              | first
+          }}
       block:
         - name: "Jail must be mounted"
           ansible.builtin.assert:
