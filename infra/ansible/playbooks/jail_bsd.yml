@@ -40,3 +40,9 @@
   tags: cert
   roles:
     - role: openssl_ca
+
+- name: Configure SSO
+  hosts: bsd.lab.net
+  tags: sso
+  roles:
+    - role: openldap_client
