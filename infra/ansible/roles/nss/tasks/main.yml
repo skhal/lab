@@ -9,7 +9,7 @@
   community.general.pkgng:
     name: nss_ldap
 
-- name: Configure NSS
+- name: Configure Name-Service Switch (NSS)
   vars:
     _nss_ldap_file: /usr/local/etc/nss_ldap.conf
     _nsswitch_file: /etc/nsswitch.conf
