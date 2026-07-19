@@ -169,9 +169,8 @@
     - name: "Installed userland"
       block:
         - name: "Get installed userland at {{ jail_skel_path }}"
-          become: true
           ansible.builtin.command:
-            cmd: chroot {{ jail_skel_path }} freebsd-version -u
+            cmd: env ROOT={{ jail_skel_path }} freebsd-version -u
           register: jail_skel_get_os_version_task
           changed_when: false
 
