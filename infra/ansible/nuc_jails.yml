@@ -18,3 +18,6 @@
 
 - name: Import LDAP jail
   ansible.builtin.import_playbook: "playbooks/jail_ldap.yml"
+
+- name: Import BSD jail
+  ansible.builtin.import_playbook: "playbooks/jail_bsd.yml"

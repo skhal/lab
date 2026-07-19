@@ -1,0 +1,39 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+- name: Create BSD jail
+  hosts: nuc.lab.net
+  tags: create
+  vars:
+    # keep-sorted start
+    jail_bridge: bridge1
+    jail_cidr: 10.0.0.101/24
+    jail_defaultrouter: 10.0.0.1
+    jail_name: bsd
+    # keep-sorted end
+  roles:
+    - role: jail
+
+- name: Bootstrap BSD jail
+  hosts: bsd.lab.net
+  tags: bootstrap
+  roles:
+    - role: ssh
+    - role: syslog
+    - role: user
+    - role: pkg
+
+- name: Configure DNS server
+  hosts: bsd.lab.net
+  tags: dns
+  roles:
+    - role: local_unbound
+
+- name: Configure certificates
+  hosts: bsd.lab.net
+  tags: cert
+  roles:
+    - role: openssl_ca

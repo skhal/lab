@@ -12,3 +12,4 @@ jails:
     dns.lab.net:
     ldap.lab.net:
     ssl.lab.net:
+    bsd.lab.net:
