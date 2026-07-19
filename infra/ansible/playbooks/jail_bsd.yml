@@ -46,3 +46,4 @@
   tags: sso
   roles:
     - role: openldap_client
+    - role: sso

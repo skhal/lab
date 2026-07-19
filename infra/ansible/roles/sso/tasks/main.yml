@@ -1,0 +1,31 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+- name: Install packages
+  become: true
+  community.general.pkgng:
+    name: nss_ldap
+
+- name: Configure NSS
+  vars:
+    _nss_ldap_file: /usr/local/etc/nss_ldap.conf
+    _nsswitch_file: /etc/nsswitch.conf
+  block:
+    - name: Patch {{ _nss_ldap_file }}
+      become: true
+      ansible.posix.patch:
+        src: usr/local/etc/nss_ldap.conf.diff
+        dest: "{{ _nss_ldap_file }}"
+        backup: true
+        ignore_whitespace: true
+
+    - name: Patch {{ _nsswitch_file }}
+      become: true
+      ansible.posix.patch:
+        src: etc/nsswitch.conf.diff
+        dest: "{{ _nsswitch_file }}"
+        backup: true
+        ignore_whitespace: true
