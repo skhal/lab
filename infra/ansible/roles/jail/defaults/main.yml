@@ -4,14 +4,15 @@
 # license that can be found in the LICENSE file.
 
 ---
+# keep-sorted start
 # jail_bridge is the jails bridge.
 jail_bridge: ""
-
 # jail_cidr is the IP with network marsk.
 jail_cidr: ""
-
 # jail_defaultrouter sets the IP for default route.
 jail_defaultrouter: ""
-
+# jail_depend is a list of jail names that this jail depends on (see jail(8)).
+jail_depend: []
 # jail_name is the jail name.
 jail_name: ""
+# keep-sorted end

@@ -12,6 +12,8 @@
     jail_bridge: bridge1
     jail_cidr: 10.0.0.3/24
     jail_defaultrouter: 10.0.0.1
+    jail_depend:
+      - dns
     jail_name: ldap
     # keep-sorted end
   roles:
