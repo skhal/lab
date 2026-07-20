@@ -13,6 +13,11 @@ jail_cidr: ""
 jail_defaultrouter: ""
 # jail_depend is a list of jail names that this jail depends on (see jail(8)).
 jail_depend: []
+# jail_mounts lists mount points to add to the jail (see mount in jail(8)).
+# Each mount has the following structure:
+#   path  string  absolute path to mount, e.g. "/home/op"
+#   perm  string? mount permissions, e.g. "rw" (default: rw)
+jail_mounts: []
 # jail_name is the jail name.
 jail_name: ""
 # keep-sorted end
