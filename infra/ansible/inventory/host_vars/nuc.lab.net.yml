@@ -26,18 +26,13 @@ local_unbound_stub_zones:
     addr: 10.0.0.2@853
     tls_upstream: true
     type: always_transparent
-netif_clones:
-  # keep-sorted start
+netif_bridges:
   - name: bridge0
-    cidr: 192.168.10.101/24
-    addm:
-      - igc0
-    desc: jail:ext
-  - name: bridge1
     cidr: 10.0.0.1/24
     desc: jail:int
-  # keep-sorted end
-netif_ethernet_if: igc0
+netif_ifaces:
+  - name: igc0
+    cidr: 192.168.10.101/24
 pflog_enable: true
 pkg_install:
   - neovim

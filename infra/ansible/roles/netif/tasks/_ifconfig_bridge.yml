@@ -9,24 +9,24 @@
     _rc_file: /etc/rc.conf.d/network
   block:
     # noqa name[template]
-    - name: "Update {{ _rc_file }} - clone {{ _iface.name }}"
+    - name: "Update {{ _rc_file }} - clone {{ _bridge.name }}"
       become: true
       community.general.sysrc:
         path: "{{ _rc_file }}"
         name: cloned_interfaces
         state: value_present
-        value: "{{ _iface.name }}"
+        value: "{{ _bridge.name }}"
       notify: "restart_network"
 
-    - name: "Update {{ _rc_file }} - configure {{ _iface.name }}" # noqa name[template]
+    - name: "Update {{ _rc_file }} - configure {{ _bridge.name }}" # noqa name[template]
       become: true
       community.general.sysrc:
         path: "{{ _rc_file }}"
-        name: "ifconfig_{{ _iface.name }}"
+        name: "ifconfig_{{ _bridge.name }}"
         # noqa jinja[spacing]
         value: >-
-          inet {{ _iface.cidr }}
-          {%- for m in _iface.get('addm', []) %} addm {{ m }}{% endfor %}
+          inet {{ _bridge.cidr }}
+          {% for m in _bridge.get('addm', []) %}addm {{ m }}{% endfor %}
           up
-          {%- if 'desc' in _iface %} descr {{ _iface.desc }}{% endif %}
+          {% if 'desc' in _bridge %}descr {{ _bridge.desc }}{% endif %}
       notify: "restart_network"

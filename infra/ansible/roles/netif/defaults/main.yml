@@ -4,15 +4,18 @@
 # license that can be found in the LICENSE file.
 
 ---
-# netif_ethernet_if is the ethernet interface on the server.
-netif_ethernet_if: ""
-
-# netif_clones is the list of interfaces to configure. Each iface has the
-# following structure:
-#
+# keep-sorted start
+# netif_bridges is the list of bridge interfaces to configure. Each iface has
+# the following structure:
 #   name  string  iface name
 #   cidr  string  iface IP address with sub-net mask in CIDR format
-#   addm  string  (optional) members interfaces to add (e.g. bridge)
-#   desc  string  (optional) iface description
-netif_clones:
-  -
+#   addm  string? members interfaces to add (e.g. bridge)
+#   desc  string? iface description
+netif_bridges: []
+# netif_ifaces lists insterfaces to configure. Each iface has the following
+# structure:
+#   name  string  iface name
+#   cidr  string  iface IP address with sub-net mask in CIDR format
+#   desc  string? iface description
+netif_ifaces: []
+# keep-sorted end

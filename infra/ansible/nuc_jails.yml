@@ -6,6 +6,7 @@
 ---
 - name: Bootstrap Jails
   hosts: nuc.lab.net
+  tags: skel
   roles:
     - role: jail_skel
       tags: jail_skel

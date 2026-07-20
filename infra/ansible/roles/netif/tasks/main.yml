@@ -4,18 +4,25 @@
 # license that can be found in the LICENSE file.
 
 ---
-- name: "Migrate ifconfig_{{ netif_ethernet_if }}"
-  ansible.builtin.include_role:
-    name: sysrc
-  vars:
-    sysrc_migrate:
-      name: "ifconfig_{{ netif_ethernet_if }}"
-      value: up
-      path: /etc/rc.conf.d/network
-      notify: "restart_network"
-
 - name: Configure interfaces
-  ansible.builtin.include_tasks: "ifconfig.yml"
-  loop: "{{ netif_clones }}"
+  become: true
+  notify: "restart_network"
+  vars:
+    _rc_file: /etc/rc.conf.d/network
+  community.general.sysrc:
+    path: "{{ _rc_file }}"
+    name: "ifconfig_{{ _iface.name }}"
+    value: >-
+      inet {{ _iface.cidr }} up
+      {% if 'desc' in _iface %}descr {{ _iface.desc }}{% endif %}
+  loop: "{{ netif_ifaces }}"
   loop_control:
+    label: "{{ item.name }}"
     loop_var: _iface
+
+- name: Configure bridges
+  ansible.builtin.include_tasks: "_ifconfig_bridge.yml"
+  loop: "{{ netif_bridges }}"
+  loop_control:
+    label: "{{ item.name }}"
+    loop_var: _bridge
