@@ -32,3 +32,17 @@
         path: "{{ _conf_file }}"
         line: "AllowUsers={{ ssh_allow_users | join(' ') }}"
       notify: "restart_sshd"
+      when: ssh_allow_users | length > 0
+
+    - name: "Allow groups {{ ssh_allow_groups | join(',') }}"
+      become: true
+      ansible.builtin.lineinfile:
+        path: "{{ _conf_file }}"
+        line: |-
+          Match Group {{ _group }}
+            AllowUsers *
+      when: ssh_allow_groups | length > 0
+      loop: "{{ ssh_allow_groups }}"
+      loop_control:
+        loop_var: _group
+      notify: "restart_sshd"

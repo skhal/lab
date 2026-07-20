@@ -19,6 +19,8 @@ local_unbound_stub_zones:
     type: always_transparent
 pkg_install:
   - neovim
+ssh_allow_groups:
+  - ssh
 ssh_allow_users:
   - op
 ssh_listen_addresses:

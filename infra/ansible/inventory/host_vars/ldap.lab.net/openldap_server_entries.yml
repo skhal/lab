@@ -66,3 +66,13 @@ openldap_server_entries:
     homeDirectory: /home/skhalatyan
     loginShell: /bin/tcsh
     description: Samvel Khalatyan account
+  - name: ssh group
+    dn: cn=ssh,ou=groups,dc=lab,dc=net
+    cn: ssh
+    objectClass:
+      - top
+      - posixGroup
+    gidNumber: 1002
+    memberUid:
+      - op
+      - skhalatyan
