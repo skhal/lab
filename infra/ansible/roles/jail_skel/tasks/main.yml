@@ -139,7 +139,7 @@
             path: "{{ _db_path }}"
             src: tmpfs
             fstype: tmpfs
-            state: present
+            state: ephemeral
 
         - name: "Install packages to {{ jail_skel_path }}"
           become: true
