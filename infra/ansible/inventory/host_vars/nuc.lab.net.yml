@@ -77,4 +77,9 @@ user_list:
     home: /root
     shell: /bin/tcsh
   # keep-sorted end
+# sync with users in ldap
+zfs_mkhomedir_users:
+  - name: skhalatyan
+    uid: 10001
+    gid: 10001
 # keep-sorted end

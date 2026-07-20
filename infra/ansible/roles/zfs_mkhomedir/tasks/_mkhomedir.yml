@@ -1,0 +1,85 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+- name: Create user home dataset
+  vars:
+    _dset: zroot/home/{{ _user.name }}
+  block:
+    - name: Is dataset exist {{ _dset }}
+      community.general.zfs_facts:
+        name: "{{ _dset }}"
+        type: filesystem
+        properties: "name,mounted,mountpoint"
+      ignore_errors: true
+      register: zfs_mkhomedir_dset_task
+
+    - name: Create dataset
+      when: zfs_mkhomedir_dset_task is failed
+      block:
+        - name: Create dataset {{ _dset }}
+          become: true
+          community.general.zfs:
+            name: "{{ _dset }}"
+            state: present
+
+        - name: Get dataset info {{ _dset }}
+          community.general.zfs_facts:
+            name: "{{ _dset }}"
+            type: filesystem
+            properties: "name,mounted,mountpoint"
+          register: zfs_mkhomedir_new_dset_task
+
+    - name: Get mountpoint of {{ _dset }}
+      vars:
+        _facts: >-
+          {{
+            [zfs_mkhomedir_new_dset_task, zfs_mkhomedir_dset_task]
+              | selectattr('ansible_facts', 'defined')
+              | first
+          }}
+      ansible.builtin.set_fact:
+        zfs_mkhomedir_path: >-
+          {{
+            _facts.ansible_facts.ansible_zfs_datasets
+              | selectattr('name', 'equalto', _dset)
+              | map(attribute='mountpoint')
+              | first
+              | default(omit)
+          }}
+
+    - name: Get skeleton files
+      ansible.builtin.find:
+        paths: /usr/share/skel
+        patterns: dot.*
+      register: zfs_mkhomedir_skel_files_task
+
+    - name: Copy skeleton
+      become: true
+      ansible.builtin.copy:
+        src: "{{ _file.path }}"
+        remote_src: true
+        dest: >-
+          {{
+            [
+              zfs_mkhomedir_path,
+              (_file.path | basename | regex_replace('^dot', ''))
+            ] | path_join
+          }}
+        force: false # do not overwrite if exists
+        owner: "{{ _user.uid }}"
+        group: "{{ _user.gid }}"
+        mode: preserve
+      loop: "{{ zfs_mkhomedir_skel_files_task.files }}"
+      loop_control:
+        loop_var: _file
+
+    - name: Fix owner
+      become: true
+      ansible.builtin.file:
+        path: "{{ zfs_mkhomedir_path }}"
+        owner: "{{ _user.uid }}"
+        group: "{{ _user.gid }}"
+        mode: u=rwx,g=rx,o=rx

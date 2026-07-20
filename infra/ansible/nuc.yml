@@ -10,12 +10,18 @@
   roles:
     - role: rc
     - role: syslog
-    - role: user
     - role: pkg
     - role: ntp
     - role: hostname
     - role: periodic
     - role: zfs
+
+- name: Configure Users
+  hosts: nuc.lab.net
+  tags: users
+  roles:
+    - role: user
+    - role: zfs_mkhomedir
 
 - name: Configure network
   hosts: nuc.lab.net
