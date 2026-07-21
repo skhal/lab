@@ -43,14 +43,14 @@
 
 - name: Configure nscd
   become: true
-  notify: nss_start_nscd
+  notify: pam_ldap_start_nscd
   community.general.sysrc:
     path: /etc/rc.conf.d/nscd
     name: nscd_enable
     value: true
 
 - name: Configure nslcd
-  notify: nss_start_nslcd
+  notify: pam_ldap_start_nslcd
   vars:
     _rc_file: /usr/local/etc/rc.conf.d/nslcd
   block:

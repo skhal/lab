@@ -48,5 +48,4 @@
   tags: sso
   roles:
     - role: openldap_client
-    - role: nss
-    - role: pam
+    - role: pam_ldap
