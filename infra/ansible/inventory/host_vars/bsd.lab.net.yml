@@ -17,8 +17,6 @@ local_unbound_stub_zones:
     addr: 10.0.0.2@853
     tls_upstream: true
     type: always_transparent
-pkg_install:
-  - neovim
 ssh_allow_groups:
   - ssh
 ssh_listen_addresses:

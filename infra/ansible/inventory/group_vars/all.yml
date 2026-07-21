@@ -17,6 +17,11 @@ ansible_async_dir: /var/tmp/.ansible_async
 ansible_python_interpreter: /usr/local/bin/python3
 ansible_user: op
 openssl_ca_host: ssl.lab.net
+pkg_install:
+  # keep-sorted start
+  - doas
+  - neovim
+  # keep-sorted end
 ssh_allow_users:
   - op
 timezone_name: America/Chicago

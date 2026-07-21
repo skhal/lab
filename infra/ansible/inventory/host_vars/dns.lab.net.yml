@@ -33,8 +33,14 @@ openssl_gen_crt: "/usr/local/etc/namedb/ssl/bind.crt"
 openssl_gen_group: bind
 openssl_gen_owner: bind
 pkg_install:
-  - neovim
+  # TODO(github.com/skhal/lab/issues/432): move libexecinfo to
+  # corresponding role.
+  # Include pkg_install from group_vars/all.yml
+  # keep-sorted start
   - FreeBSD-libexecinfo # for /usr/lib/libexecinfo.so.1
+  - doas
+  - neovim
+  # keep-sorted end
 ssh_listen_addresses:
   - 10.0.0.2
 # keep-sorted end

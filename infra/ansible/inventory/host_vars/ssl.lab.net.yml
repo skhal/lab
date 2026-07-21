@@ -19,8 +19,6 @@ local_unbound_stub_zones:
     type: always_transparent
 openssl_ca_common_name: ca.ssl.lab.net
 openssl_ca_organization: Lab
-pkg_install:
-  - neovim
 ssh_listen_addresses:
   - 10.0.0.4
 # keep-sorted end
