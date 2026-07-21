@@ -1,0 +1,16 @@
+--- /etc/pam.d/system.sample	2026-07-21 02:27:33.024688000 +0000
++++ /etc/pam.d/system	2026-07-21 02:28:57.623057000 +0000
+@@ -6,11 +6,13 @@
+ # auth
+ #auth		sufficient	pam_krb5.so		no_warn try_first_pass
+ #auth		sufficient	pam_ssh.so		no_warn try_first_pass
++auth		sufficient	pam_ldap.so		no_warn try_first_pass
+ auth		required	pam_unix.so		no_warn try_first_pass nullok
+ 
+ # account
+ #account	required	pam_krb5.so
+ account		required	pam_login_access.so
++account		required	pam_ldap.so		no_warn ignore_authinfo_unavail ignore_unknown_user
+ account		required	pam_unix.so
+ 
+ # session

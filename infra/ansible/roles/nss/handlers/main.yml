@@ -1,0 +1,19 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+- name: Start nscd
+  become: true
+  listen: nss_start_nscd
+  ansible.builtin.service:
+    name: nscd
+    state: started
+
+- name: Start nslcd
+  become: true
+  listen: nss_start_nslcd
+  ansible.builtin.service:
+    name: nslcd
+    state: started

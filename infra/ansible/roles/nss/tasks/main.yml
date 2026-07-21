@@ -7,18 +7,29 @@
 - name: Install packages
   become: true
   community.general.pkgng:
-    name: nss_ldap
+    name: nss-pam-ldapd
 
 - name: Configure Name-Service Switch (NSS)
   vars:
-    _nss_ldap_file: /usr/local/etc/nss_ldap.conf
+    # keep-sorted start
+    _nslcd_conf_file: /usr/local/etc/nslcd.conf
     _nsswitch_file: /etc/nsswitch.conf
+    _pam_sys_file: /etc/pam.d/system
+    # keep-sorted end
   block:
-    - name: Patch {{ _nss_ldap_file }}
+    - name: Patch {{ _nslcd_conf_file }}
       become: true
       ansible.posix.patch:
-        src: usr/local/etc/nss_ldap.conf.diff
-        dest: "{{ _nss_ldap_file }}"
+        src: usr/local/etc/nslcd.conf.diff
+        dest: "{{ _nslcd_conf_file }}"
+        backup: true
+        ignore_whitespace: true
+
+    - name: Patch {{ _pam_sys_file }}
+      become: true
+      ansible.posix.patch:
+        src: etc/pam.d/system.diff
+        dest: "{{ _pam_sys_file }}"
         backup: true
         ignore_whitespace: true
 
@@ -29,3 +40,32 @@
         dest: "{{ _nsswitch_file }}"
         backup: true
         ignore_whitespace: true
+
+- name: Configure nscd
+  become: true
+  notify: nss_start_nscd
+  community.general.sysrc:
+    path: /etc/rc.conf.d/nscd
+    name: nscd_enable
+    value: true
+
+- name: Configure nslcd
+  notify: nss_start_nslcd
+  vars:
+    _rc_file: /usr/local/etc/rc.conf.d/nslcd
+  block:
+    - name: Create {{ _rc_file | dirname }}
+      become: true
+      ansible.builtin.file:
+        path: "{{ _rc_file | dirname }}"
+        state: directory
+        owner: root
+        group: wheel
+        mode: u=rwx,g=rx,o=rx
+
+    - name: Enable nslcd
+      become: true
+      community.general.sysrc:
+        path: /usr/local/etc/rc.conf.d/nslcd
+        name: nslcd_enable
+        value: true
