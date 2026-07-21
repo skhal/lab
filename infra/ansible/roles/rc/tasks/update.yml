@@ -4,8 +4,7 @@
 # license that can be found in the LICENSE file.
 
 ---
-# noqa name[template]
-- name: "Update {{ _rc_var.path }} - set {{ _rc_var.name }}"
+- name: "Update {{ _rc_var.name }}"
   become: true
   community.general.sysrc:
     name: "{{ _rc_var.name }}"
