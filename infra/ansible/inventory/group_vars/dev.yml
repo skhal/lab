@@ -1,0 +1,24 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+# Include pkg_install from group_vars/all.yml
+pkg_install:
+  # keep-sorted start
+  - doas
+  - git
+  - go126
+  - lua-language-server
+  - neovim
+  - protobuf
+  - protobuf-go
+  - py312-black
+  - py312-isort
+  - py312-poetry
+  - tmux
+  - tree
+  - typescript-go
+  - unzip
+  # keep-sorted end
