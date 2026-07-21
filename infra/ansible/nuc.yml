@@ -15,6 +15,7 @@
     - role: hostname
     - role: periodic
     - role: zfs
+    - role: timezone
 
 - name: Configure Users
   hosts: nuc.lab.net

@@ -30,6 +30,7 @@
     - role: syslog
     - role: user
     - role: pkg
+    - role: timezone
 
 - name: Configure DNS server
   hosts: bsd.lab.net

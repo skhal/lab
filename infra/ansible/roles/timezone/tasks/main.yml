@@ -5,12 +5,14 @@
 
 ---
 - name: Setup timezone to {{ timezone_name }}
+  become: true
   ansible.builtin.command:
     cmd: tzsetup -s {{ timezone_name }}
   register: timezone_setup_task
   changed_when: timezone_setup_task.rc == 0
 
 - name: Install timezone
+  become: true
   ansible.builtin.command:
     cmd: tzsetup -r
   register: timezone_install_task

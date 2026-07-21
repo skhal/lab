@@ -9,7 +9,6 @@
   tags: skel
   roles:
     - role: jail_skel
-      tags: jail_skel
 
 - name: Import SSL jail
   ansible.builtin.import_playbook: "playbooks/jail_ssl.yml"

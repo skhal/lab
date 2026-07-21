@@ -39,6 +39,7 @@ ssh_allow_users:
   - op
 ssh_listen_addresses:
   - 10.0.0.2
+timezone_name: America/Chicago
 user_list:
   # keep-sorted start
   - name: op
