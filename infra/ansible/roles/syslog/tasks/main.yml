@@ -13,11 +13,27 @@
       value: "-ss"
       path: /etc/rc.conf.d/syslogd
 
-- name: "Enable console logs"
-  become: true
-  ansible.builtin.lineinfile:
-    path: /etc/syslog.conf
-    regexp: "^#(console.info.*)$"
-    line: "\\1"
-    backrefs: true
-  notify: "restart_syslogd"
+- name: Configure console logs
+  vars:
+    _log_file: /var/log/console.log
+  block:
+    - name: "Enable console logs"
+      become: true
+      ansible.builtin.lineinfile:
+        path: /etc/syslog.conf
+        regexp: "^#(console.info.*)$"
+        line: "\\1"
+        backrefs: true
+      notify: "restart_syslogd"
+
+    - name: Create {{ _log_file }}
+      become: true
+      # ansible.builtin.file has state=touch that createas a file else updates
+      # modification time. This task only creates the file if one does not
+      # exist.
+      ansible.builtin.copy:
+        content: ""
+        dest: "{{ _log_file }}"
+        owner: root
+        group: wheel
+        mode: u=rw,g=r,o=r
