@@ -8,7 +8,7 @@
   vars:
     _pkg: openldap26-server
   block:
-    - name: Install {{ _pkg | join(',') }}
+    - name: Install {{ _pkg }}
       become: true
       community.general.pkgng:
         name: "{{ _pkg }}"
