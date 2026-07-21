@@ -17,12 +17,12 @@
       {% if 'desc' in _iface %}descr {{ _iface.desc }}{% endif %}
   loop: "{{ netif_ifaces }}"
   loop_control:
-    label: "{{ item.name }}"
+    label: "{{ _iface.name }}"
     loop_var: _iface
 
 - name: Configure bridges
   ansible.builtin.include_tasks: "_ifconfig_bridge.yml"
   loop: "{{ netif_bridges }}"
   loop_control:
-    label: "{{ item.name }}"
+    label: "{{ _bridge.name }}"
     loop_var: _bridge
