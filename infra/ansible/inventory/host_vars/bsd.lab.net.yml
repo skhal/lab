@@ -21,18 +21,6 @@ pkg_install:
   - neovim
 ssh_allow_groups:
   - ssh
-ssh_allow_users:
-  - op
 ssh_listen_addresses:
   - 10.0.0.101
-timezone_name: America/Chicago
-user_list:
-  # keep-sorted start
-  - name: op
-    shell: /bin/tcsh
-  - name: root
-    group: wheel
-    home: /root
-    shell: /bin/tcsh
-  # keep-sorted end
 # keep-sorted end

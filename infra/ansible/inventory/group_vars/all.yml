@@ -17,4 +17,16 @@ ansible_async_dir: /var/tmp/.ansible_async
 ansible_python_interpreter: /usr/local/bin/python3
 ansible_user: op
 openssl_ca_host: ssl.lab.net
+ssh_allow_users:
+  - op
+timezone_name: America/Chicago
+user_list:
+  # keep-sorted start
+  - name: op
+    shell: /bin/tcsh
+  - name: root
+    group: wheel
+    home: /root
+    shell: /bin/tcsh
+  # keep-sorted end
 # keep-sorted end

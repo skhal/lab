@@ -58,21 +58,9 @@ rc_update:
     value: true
   # keep-sorted end
 routing_defaultrouter: 192.168.10.1
-ssh_allow_users:
-  - op
 ssh_listen_addresses:
   - 192.168.10.101
   - 10.0.0.1
-timezone_name: America/Chicago
-user_list:
-  # keep-sorted start
-  - name: op
-    shell: /bin/tcsh
-  - name: root
-    group: wheel
-    home: /root
-    shell: /bin/tcsh
-  # keep-sorted end
 # sync with users in ldap
 zfs_mkhomedir_users:
   - name: skhalatyan

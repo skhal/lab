@@ -35,18 +35,6 @@ openssl_gen_owner: bind
 pkg_install:
   - neovim
   - FreeBSD-libexecinfo # for /usr/lib/libexecinfo.so.1
-ssh_allow_users:
-  - op
 ssh_listen_addresses:
   - 10.0.0.2
-timezone_name: America/Chicago
-user_list:
-  # keep-sorted start
-  - name: op
-    shell: /bin/tcsh
-  - name: root
-    group: wheel
-    home: /root
-    shell: /bin/tcsh
-  # keep-sorted end
 # keep-sorted end
