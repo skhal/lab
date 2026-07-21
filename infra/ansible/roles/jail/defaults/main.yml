@@ -5,6 +5,8 @@
 
 ---
 # keep-sorted start
+# jail_allow_chflags adds allow.chflags to the jail configuration when enabled.
+jail_allow_chflags: false
 # jail_bridge is the jails bridge.
 jail_bridge: ""
 # jail_cidr is the IP with network marsk.

@@ -9,6 +9,7 @@
   tags: create
   vars:
     # keep-sorted start
+    jail_allow_chflags: true
     jail_bridge: bridge0
     jail_cidr: 10.0.0.101/24
     jail_defaultrouter: 10.0.0.1
