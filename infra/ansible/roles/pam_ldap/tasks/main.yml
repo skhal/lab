@@ -14,6 +14,7 @@
     # keep-sorted start
     _nslcd_conf_file: /usr/local/etc/nslcd.conf
     _nsswitch_file: /etc/nsswitch.conf
+    _pam_sshd_file: /etc/pam.d/sshd
     _pam_sys_file: /etc/pam.d/system
     # keep-sorted end
   block:
@@ -30,6 +31,14 @@
       ansible.posix.patch:
         src: etc/pam.d/system.diff
         dest: "{{ _pam_sys_file }}"
+        backup: true
+        ignore_whitespace: true
+
+    - name: Patch {{ _pam_sshd_file }}
+      become: true
+      ansible.posix.patch:
+        src: etc/pam.d/sshd.diff
+        dest: "{{ _pam_sshd_file }}"
         backup: true
         ignore_whitespace: true
 

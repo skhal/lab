@@ -1,0 +1,17 @@
+--- /etc/pam.d/sshd.sample	2026-07-21 13:44:26.901565000 +0000
++++ /etc/pam.d/sshd	2026-07-21 13:46:04.114140000 +0000
+@@ -6,12 +6,14 @@
+ # auth
+ #auth		sufficient	pam_krb5.so		no_warn try_first_pass
+ #auth		sufficient	pam_ssh.so		no_warn try_first_pass
++auth		sufficient	pam_ldap.so		no_warn try_first_pass
+ auth		required	pam_unix.so		no_warn try_first_pass
+ 
+ # account
+ account		required	pam_nologin.so
+ #account	required	pam_krb5.so
+ account		required	pam_login_access.so
++account		required	pam_ldap.so		no_warn ignore_authinfo_unavail ignore_unknown_user
+ account		required	pam_unix.so
+ 
+ # session
