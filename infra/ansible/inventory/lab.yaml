@@ -9,7 +9,19 @@ servers:
     nuc.lab.net:
 jails:
   hosts:
+    # keep-sorted start
+    bsd.lab.net:
     dns.lab.net:
     ldap.lab.net:
     ssl.lab.net:
+    # keep-sorted end
+infra:
+  hosts:
+    # keep-sorted start
+    dns.lab.net:
+    ldap.lab.net:
+    ssl.lab.net:
+    # keep-sorted end
+dev:
+  hosts:
     bsd.lab.net:
