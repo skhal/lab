@@ -12,14 +12,11 @@ PACKAGES = brew
 go npm rust: ${PACKAGES} .NOTMAIN
 .endif
 
-INSTALL_PATHS = tcshrc.dc nvim vim vimrc.d ${PACKAGES} tags.d go npm rust
-SOURCES = tcshrc vimrc tmux.conf gitconfig
+INSTALL_PATHS = tcshrc.d nvim ${PACKAGES} ctags.d go npm rust
+SOURCES = tcshrc tmux.conf gitconfig
 INSTALL_TARGETS = ${SOURCES:S,^,${HOME}/.,}
 
 install: ${INSTALL_TARGETS} ${INSTALL_PATHS} .PHONY
-
-# install vimrc before adding packs
-vim: ${HOME}/.vimrc vimrc.d
 
 # Target is `${HOME}/.foo`, the source is `foo`.
 SOURCE = ${.TARGET:T:S/^.//}
