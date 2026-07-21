@@ -7,6 +7,7 @@
 # Include pkg_install from group_vars/all.yml
 pkg_install:
   # keep-sorted start
+  - FreeBSD-bmake
   - doas
   - git
   - go126
