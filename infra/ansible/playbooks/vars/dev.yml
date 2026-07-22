@@ -4,15 +4,18 @@
 # license that can be found in the LICENSE file.
 
 ---
-# Include pkg_install from group_vars/all.yml
 pkg_install:
   # keep-sorted start
-  - FreeBSD-bmake
-  - doas
+  - FreeBSD-audit-dev # incall bsm/audit.h for go-delve
+  - FreeBSD-bmake # install make(1)
+  - FreeBSD-clibs-dev # install C libraries for Go cgo.
+  - FreeBSD-runtime-dev # install libutil.h for go-delve
+  - FreeBSD-toolchain # install default C compiler to enable Go cgo.
+  - FreeBSD-utilities-dev # install libprocstat.h for go-delve
   - git
   - go126
+  - llvm21
   - lua-language-server
-  - neovim
   - protobuf
   - protobuf-go
   - py312-black

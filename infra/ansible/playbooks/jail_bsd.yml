@@ -51,3 +51,11 @@
   roles:
     - role: openldap_client
     - role: pam_ldap
+
+- name: Setup development environment
+  hosts: bsd.lab.net
+  tags: devenv
+  vars_files:
+    - vars/dev.yml
+  roles:
+    - role: pkg
