@@ -5,9 +5,13 @@
 #
 # Flavor: FreeBSD
 
-GO_CMD = ${/usr/bin/which -a go:L:sh:M*:[1]}
+GO_CMD = ${/usr/bin/which -a go || true:L:sh:M*:[1]}
 .if !exists(${GO_CMD})
-.error "can't find go: ${GO_CMD}"
+# Standard go installation is not available.
+GO_CMD = ${ls -1 /usr/local/go*/bin/go || true:L:sh:M*:[1]}
+.if !exists(${GO_CMD})
+.error "can't find go"
+.endif
 .endif
 
 GO_BIN_PATH = ${HOME}/go/bin
