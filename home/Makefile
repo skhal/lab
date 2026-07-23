@@ -16,7 +16,10 @@ INSTALL_PATHS = tcshrc.d nvim ${PACKAGES} ctags.d go npm rust
 SOURCES = tcshrc tmux.conf gitconfig
 INSTALL_TARGETS = ${SOURCES:S,^,${HOME}/.,}
 
-install: ${INSTALL_TARGETS} ${INSTALL_PATHS} .PHONY
+GIT_DIR = ${git rev-parse --git-dir:L:sh:M*}
+GIT_PRE_COMMIT = "${GIT_DIR}/hooks/pre-commit"
+
+install: ${INSTALL_TARGETS} ${INSTALL_PATHS} ${GIT_PRE_COMMIT} .PHONY
 
 # Target is `${HOME}/.foo`, the source is `foo`.
 SOURCE = ${.TARGET:T:S/^.//}
@@ -31,6 +34,12 @@ INSTALL_TARGET: .NOTMAIN .USE
 .for target in ${INSTALL_TARGETS}
 ${target}: ${SOURCE} INSTALL_TARGET
 .endfor
+
+${GIT_PRE_COMMIT}: .NOTMAIN .PHONY
+	@if ! grep -i 'file generated.*pre-commit' -qs ${.TARGET}; then \
+		echo ".. install pre-commit"; \
+		pre-commit install; \
+	 fi
 
 .for target in ${INSTALL_PATHS}
 ${target}: .PHONY
