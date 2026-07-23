@@ -18,6 +18,7 @@ pkg_install:
   - go126
   - llvm21
   - lua-language-server
+  - lua54-luacheck # pre-commit Lua lint
   - npm
   - protobuf
   - protobuf-go
@@ -27,6 +28,7 @@ pkg_install:
   - py312-pre-commit
   - rust
   - stylua # Lua formatter
+  - superhtml # HTML formatter
   - tmux
   - tree
   - typescript-go

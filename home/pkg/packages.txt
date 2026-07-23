@@ -16,12 +16,10 @@ fzf
 graphviz
 groff
 jq
-lua54-luacheck
 py312-ty
 python
 ripgrep
 rsync
-superhtml
 universal-ctags
 webfonts
 # keep-sorted end
