@@ -6,7 +6,6 @@
 # List of FreeBSD packages to install. Keep one package per line.
 
 # keep-sorted start
-bash
 buf
 catch2
 ccache
@@ -18,7 +17,6 @@ graphviz
 groff
 jq
 lua54-luacheck
-py312-pre-commit
 py312-ty
 python
 ripgrep
