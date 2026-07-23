@@ -16,6 +16,7 @@ pkg_install:
   - go126
   - llvm21
   - lua-language-server
+  - npm
   - protobuf
   - protobuf-go
   - py312-black

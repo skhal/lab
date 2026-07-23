@@ -19,7 +19,6 @@ graphviz
 groff
 jq
 lua54-luacheck
-npm
 py312-pre-commit
 py312-ty
 python
