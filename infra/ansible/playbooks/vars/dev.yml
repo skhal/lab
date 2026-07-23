@@ -14,6 +14,8 @@ pkg_install:
   - FreeBSD-toolchain # install default C compiler to enable Go cgo.
   - FreeBSD-utilities-dev # install libprocstat.h for go-delve
   - bash # for pre-commit & co
+  - buf # Protobuf lint, fmt, LSP
+  - deno # JSON formatter # JSON formatter # JSON formatter # JSON formatter
   - git
   - go126
   - llvm21
@@ -22,10 +24,11 @@ pkg_install:
   - npm
   - protobuf
   - protobuf-go
-  - py312-black # python formatter
-  - py312-isort # python import sorter
-  - py312-poetry # python environment and packaging
+  - py312-black # Python formatter
+  - py312-isort # Python import sorter
+  - py312-poetry # Python environment and packaging
   - py312-pre-commit
+  - py312-ty # Python LSP
   - rust
   - stylua # Lua formatter
   - superhtml # HTML formatter

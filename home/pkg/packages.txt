@@ -6,17 +6,14 @@
 # List of FreeBSD packages to install. Keep one package per line.
 
 # keep-sorted start
-buf
 catch2
 ccache
 cmake
-deno
 fswatch-mon
 fzf
 graphviz
 groff
 jq
-py312-ty
 python
 ripgrep
 rsync
