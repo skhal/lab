@@ -28,7 +28,7 @@ PACKAGES = ${grep -v '^\#' ${PACKAGES_FILE} | tr ' ' ',':L:sh:M*}
 SOURCES = ${find . -maxdepth 1 -type f -perm +111:L:sh:S,./,,}
 
 M_package = C|,.*$$||
-M_flags = C|^[^,]*,||
+M_flags = C|^[^,]*||:C|,||
 M_unpack = C|,| |g
 # Target is the last component of the package, `name`. A package may have an optional
 # version suffix:
