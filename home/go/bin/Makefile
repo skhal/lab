@@ -5,6 +5,11 @@
 #
 # Flavor: FreeBSD
 
+GO_CMD = ${/usr/bin/which -a go:L:sh:M*:[1]}
+.if !exists(${GO_CMD})
+.error "can't find go: ${GO_CMD}"
+.endif
+
 GO_BIN_PATH = ${HOME}/go/bin
 GO_INSTALL_OPTS = -ldflags "-s -w -linkmode external -extldflags -static"
 .if ${.MAKE.OS} == Darwin
@@ -53,6 +58,6 @@ target=${package:${M_target}}
 ${target}: ${GO_BIN_PATH} ${PACKAGES_FILE}
 	@if ! test -e ${.TARGET}; then \
 		echo ".. install ${.TARGET:T}"; \
-		go install ${GO_INSTALL_OPTS} ${package:${M_flags}:${M_unpack}} ${package:${M_package}}; \
+		${GO_CMD} install ${GO_INSTALL_OPTS} ${package:${M_flags}:${M_unpack}} ${package:${M_package}}; \
 	 fi
 .endfor
