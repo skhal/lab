@@ -19,11 +19,14 @@ pkg_install:
   - npm
   - protobuf
   - protobuf-go
-  - py312-black
-  - py312-isort
-  - py312-poetry
+  - py312-black # python formatter
+  - py312-isort # python import sorter
+  - py312-poetry # python environment and packaging
+  - rust
+  - stylua # Lua formatter
   - tmux
   - tree
   - typescript-go
+  - typos # spell checker
   - unzip
   # keep-sorted end

@@ -24,7 +24,6 @@ py312-ty
 python
 ripgrep
 rsync
-rust
 superhtml
 universal-ctags
 webfonts
