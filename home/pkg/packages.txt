@@ -6,7 +6,6 @@
 # List of FreeBSD packages to install. Keep one package per line.
 
 # keep-sorted start
-FreeBSD-libexecinfo-dev
 bash
 buf
 catch2

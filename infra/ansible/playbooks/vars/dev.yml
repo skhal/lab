@@ -9,6 +9,7 @@ pkg_install:
   - FreeBSD-audit-dev # incall bsm/audit.h for go-delve
   - FreeBSD-bmake # install make(1)
   - FreeBSD-clibs-dev # install C libraries for Go cgo.
+  - FreeBSD-libexecinfo-dev # install execinfo for Rust cargo protols
   - FreeBSD-runtime-dev # install libutil.h for go-delve
   - FreeBSD-toolchain # install default C compiler to enable Go cgo.
   - FreeBSD-utilities-dev # install libprocstat.h for go-delve
