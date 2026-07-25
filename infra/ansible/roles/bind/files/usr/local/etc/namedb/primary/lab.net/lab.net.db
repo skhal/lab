@@ -5,7 +5,7 @@
 
 $TTL  1h
 @       IN      SOA     dns.lab.net. root.dns.lab.net. (
-                        2026072501 ; serial (yyyymmddnn)
+                        2026072502 ; serial (yyyymmddnn)
                         1h         ; refresh
                         15m        ; update retry
                         1w         ; expiry
@@ -20,5 +20,6 @@ $TTL  1h
 nuc     IN A 10.0.0.1
 dns     IN A 10.0.0.2
 ldap    IN A 10.0.0.3
-pkg     IN A 10.0.0.4
+ssl     IN A 10.0.0.4
+pkg     IN A 10.0.0.5
 bsd     IN A 10.0.0.101

@@ -10,7 +10,7 @@
   vars:
     # keep-sorted start
     jail_bridge: bridge0
-    jail_cidr: 10.0.0.4/24
+    jail_cidr: 10.0.0.5/24
     jail_defaultrouter: 10.0.0.1
     jail_name: pkg
     # keep-sorted end
