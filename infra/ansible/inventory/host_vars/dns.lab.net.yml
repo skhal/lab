@@ -18,17 +18,6 @@ bind_tls:
     - TLSv1.3
 bind_zones:
   - lab.net
-local_unbound_forward_zones:
-  - name: "."
-    addr: 192.168.10.1
-local_unbound_stub_zones:
-  - name: "lab.net"
-    addr: 10.0.0.2@853
-    tls_upstream: true
-  - name: "10.in-addr.arpa."
-    addr: 10.0.0.2@853
-    tls_upstream: true
-    type: always_transparent
 openssl_gen_crt: "/usr/local/etc/namedb/ssl/bind.crt"
 openssl_gen_group: bind
 openssl_gen_owner: bind

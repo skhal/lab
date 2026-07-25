@@ -15,17 +15,6 @@ jail_skel_packages:
   - neovim
   # keep-sorted end
 jail_skel_zfs_dataset: zroot/usr/jail/15.1
-local_unbound_forward_zones:
-  - name: "."
-    addr: 192.168.10.1
-local_unbound_stub_zones:
-  - name: "lab.net"
-    addr: 10.0.0.2@853
-    tls_upstream: true
-  - name: "10.in-addr.arpa."
-    addr: 10.0.0.2@853
-    tls_upstream: true
-    type: always_transparent
 netif_bridges:
   - name: bridge0
     cidr: 10.0.0.1/24
