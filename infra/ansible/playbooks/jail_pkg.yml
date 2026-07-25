@@ -32,3 +32,9 @@
   tags: cert
   roles:
     - role: openssl_ca
+
+- name: Configure PKG
+  hosts: pkg.lab.net
+  tags: pkg
+  roles:
+    - role: local_pkg

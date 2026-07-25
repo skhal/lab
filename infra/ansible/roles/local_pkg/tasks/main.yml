@@ -1,0 +1,66 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+- name: Install nginx
+  become: true
+  community.general.pkgng:
+    name: nginx
+    state: present
+
+- name: Configure service
+  vars:
+    _rc_file: /usr/local/etc/rc.conf.d/nginx
+  block:
+    - name: Create {{ _rc_file | dirname }}
+      become: true
+      ansible.builtin.file:
+        path: "{{ _rc_file | dirname }}"
+        state: directory
+        owner: root
+        group: wheel
+        mode: u=rwx,g=rx,o=rx
+
+    - name: Enable nginx
+      become: true
+      notify: local_pkg_start_nginx
+      community.general.sysrc:
+        path: "{{ _rc_file }}"
+        name: nginx_enable
+        value: true
+
+- name: Configure nginx
+  vars:
+    _conf_file: /usr/local/etc/nginx/nginx.conf
+  block:
+    - name: Create temp file
+      ansible.builtin.tempfile:
+        state: file
+        suffix: .diff
+        prefix: ansible.nginx.conf.
+      register: local_pkg_tempfile_task
+      failed_when: local_pkg_tempfile_task.path is not defined
+
+    - name: Create patch
+      ansible.builtin.template:
+        src: usr/local/etc/nginx/nginx.conf.diff.j2
+        dest: "{{ local_pkg_tempfile_task.path }}"
+        mode: u=rw,g=r,o=r
+
+    - name: Patch nginx configuration
+      notify: local_pkg_restart_nginx
+      become: true
+      ansible.posix.patch:
+        src: "{{ local_pkg_tempfile_task.path }}"
+        remote_src: true
+        dest: "{{ _conf_file }}"
+        backup: true
+        ignore_whitespace: true
+
+    - name: Clean patch
+      ansible.builtin.file:
+        path: "{{ local_pkg_tempfile_task.path }}"
+        state: absent
+      when: local_pkg_tempfile_task.path is defined

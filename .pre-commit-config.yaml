@@ -16,6 +16,7 @@ repos:
       (?x)^(
          .*/testdata/.*
         |.*\.diff
+        |.*\.diff\.j2
         |.*\.patch
       )$
   - id: trailing-whitespace
@@ -23,6 +24,7 @@ repos:
       (?x)^(
          .*/testdata/.*
         |.*\.diff
+        |.*\.diff\.j2
         |.*\.patch
         |infra/net\.lab.*
       )$
@@ -335,6 +337,7 @@ repos:
         |.*_string\.go
         |.*/(test)?data/.*
         |.*\.diff
+        |.*\.diff\.j2
         |.*\.patch
         |.*\.pb\.go
         |go\.(mod|sum)
@@ -355,6 +358,7 @@ repos:
     exclude: |
       (?x)^(
          .*\.diff
+        |.*\.diff\.j2
         |.*\.patch
       )$
   - id: keep-sorted
@@ -377,5 +381,6 @@ repos:
     exclude: |
       (?x)^(
          .*\.diff
+        |.*\.diff\.j2
         |infra/net\.lab.*\.conf
       )$

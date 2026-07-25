@@ -1,0 +1,19 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+- name: Start nginx
+  become: true
+  listen: local_pkg_start_nginx
+  ansible.builtin.service:
+    name: nginx
+    state: started
+
+- name: Restart nginx
+  become: true
+  listen: local_pkg_restart_nginx
+  ansible.builtin.service:
+    name: nginx
+    state: restarted

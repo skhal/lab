@@ -4,9 +4,5 @@
 # license that can be found in the LICENSE file.
 
 ---
-# keep-sorted start
-ansible_jexec_over_ssh_jail_name: pkg
-local_pkg_listen_on: 10.0.0.5
-ssh_listen_addresses:
-  - 10.0.0.5
-# keep-sorted end
+# local_pkg_listen_on is the IP4 address to listen on.
+local_pkg_listen_on: ""
