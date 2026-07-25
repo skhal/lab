@@ -13,6 +13,7 @@ jails:
     bsd.lab.net:
     dns.lab.net:
     ldap.lab.net:
+    pkg.lab.net:
     ssl.lab.net:
     # keep-sorted end
 infra:
@@ -20,6 +21,7 @@ infra:
     # keep-sorted start
     dns.lab.net:
     ldap.lab.net:
+    pkg.lab.net:
     ssl.lab.net:
     # keep-sorted end
 dev:

@@ -16,6 +16,9 @@
 - name: Import DNS jail
   ansible.builtin.import_playbook: "playbooks/jail_dns.yml"
 
+- name: Import PKG jail
+  ansible.builtin.import_playbook: "playbooks/jail_pkg.yml"
+
 - name: Import LDAP jail
   ansible.builtin.import_playbook: "playbooks/jail_ldap.yml"
 
