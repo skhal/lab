@@ -50,6 +50,7 @@
     # role, where openldap-package installation creates ldap:ldap user and
     # group.
     - role: openssl_gen
+      tags: ldap_cert
     - role: openldap_client
 
 - name: Fill LDAP entries
