@@ -11,7 +11,7 @@ openssl_gen_common_name: ""
 openssl_gen_crt: ""
 # openssl_gen_group is the group ownership for the certificate.
 openssl_gen_group: "wheel"
-# openssl_gen_crt is the certificate's private key file to generate including
+# openssl_gen_key is the certificate's private key file to generate including
 # path. Default is /path/private/<cert>.key for the certificate at
 # /path/<cert>.crt set in openssl_gen_crt.
 openssl_gen_key: ""
