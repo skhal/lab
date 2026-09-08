@@ -30,6 +30,7 @@ local_unbound_stub_zones:
 openssl_ca_host: ssl.lab.net
 pkg_install:
   # keep-sorted start
+  - bind-tools
   - doas
   - neovim
   # keep-sorted end
