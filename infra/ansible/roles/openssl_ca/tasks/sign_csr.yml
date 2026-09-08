@@ -7,9 +7,14 @@
 - name: Sign CSR
   become: true # to access private key
   community.crypto.x509_certificate_pipe:
-    content: "{{ (openssl_ca_sign_crt_base64 | b64decode) if openssl_ca_sign_crt_base64 is defined else omit }}"
-    csr_content: "{{ openssl_ca_sign_csr }}"
     provider: ownca
+    content: >-
+      {{
+        (openssl_ca_sign_crt_base64 | b64decode)
+          if openssl_ca_sign_crt_base64 is defined
+          else omit
+      }}
+    csr_content: "{{ openssl_ca_sign_csr }}"
     ownca_path: "{{ openssl_ca_crt_file }}"
     ownca_privatekey_path: "{{ openssl_ca_key_file }}"
     ownca_privatekey_passphrase: "{{ openssl_ca_passphrase }}"
