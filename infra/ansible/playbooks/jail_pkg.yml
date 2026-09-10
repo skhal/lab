@@ -30,7 +30,7 @@
     - role: timezone
 
 - name: Configure DNS server
-  hosts: ldap.lab.net
+  hosts: pkg.lab.net
   tags: dns
   roles:
     - role: local_unbound
