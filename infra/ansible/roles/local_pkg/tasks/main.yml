@@ -45,3 +45,28 @@
         group: wheel
         mode: u=rw,g=r,o=r
         validate: nginx -t -c %s
+
+- name: Configure newsyslog
+  vars:
+    _files:
+      - /var/log/nginx/access.log
+      - /var/log/nginx/error.log
+    _conf_file: /usr/local/etc/newsyslog.conf.d/nginx.conf
+  block:
+    - name: Create {{ _conf_file | dirname }}
+      become: true
+      ansible.builtin.file:
+        path: "{{ _conf_file | dirname }}"
+        state: directory
+        owner: root
+        group: wheel
+        mode: u=rwx,g=rx,o=rx
+
+    - name: Configure rotations
+      become: true
+      ansible.builtin.copy:
+        src: usr/local/etc/newsyslog.conf.d/nginx.conf
+        dest: "{{ _conf_file }}"
+        owner: root
+        group: wheel
+        mode: u=rw,g=r,o=r
