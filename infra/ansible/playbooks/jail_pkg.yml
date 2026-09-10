@@ -12,6 +12,8 @@
     jail_bridge: bridge0
     jail_cidr: 10.0.0.5/24
     jail_defaultrouter: 10.0.0.1
+    jail_depend:
+      - dns
     jail_name: pkg
     # keep-sorted end
   roles:
@@ -26,6 +28,12 @@
     - role: user
     - role: pkg
     - role: timezone
+
+- name: Configure DNS server
+  hosts: ldap.lab.net
+  tags: dns
+  roles:
+    - role: local_unbound
 
 - name: Configure certificate
   hosts: pkg.lab.net
