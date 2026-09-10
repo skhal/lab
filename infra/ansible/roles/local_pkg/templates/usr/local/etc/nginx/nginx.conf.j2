@@ -1,0 +1,47 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+worker_processes  1;
+
+events {
+    worker_connections  1024;
+}
+
+http {
+    # Use absolute path includes to make Nginx configuration validator work
+    # with Ansible, which runs validation `nginx -t -c %s` on a temporary file
+    # and nginx(1) tries to pick up mime.types from the same location instead
+    # of prefix even if `-p /usr/local/etc/nginx` is used without effect.
+    #
+    include       /usr/local/etc/nginx/mime.types;
+    default_type  application/octet-stream;
+
+    error_log   syslog:server=unix:/var/run/log,nohostname;
+    access_log  syslog:server=unix:/var/run/log,nohostname;
+
+    sendfile    on;
+
+    keepalive_timeout  65;
+
+    server {
+        listen        {{ local_pkg_listen_on }}:80;
+        server_name   localhost;
+
+        allow 10.0.0.0/24;
+        deny  all;
+
+        location / {
+            root   /usr/local/www/nginx;
+            index  index.html index.htm;
+        }
+
+        # redirect server error pages to the static page /50x.html
+        #
+        error_page   500 502 503 504  /50x.html;
+        location = /50x.html {
+            root   /usr/local/www/nginx-dist;
+        }
+    }
+}
