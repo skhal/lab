@@ -86,6 +86,10 @@ var (
 )
 
 func newInserter(file string) (*inserter, error) {
+	if ext := filepath.Ext(file); ext == ".j2" {
+		// jinja2 template: strip off jinja2 extension to detect file type.
+		file, _ = strings.CutSuffix(file, ext)
+	}
 	switch filepath.Ext(file) {
 	// keep-sorted start
 	case "", ".sh": // no extension: default to shell
