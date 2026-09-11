@@ -22,7 +22,15 @@ http {
 
   keepalive_timeout  65;
 
-  # Content cache for pkg.FreeBSD.org
+  # Content cache for pkg.FreeBSD.org.
+  #
+  # Base and Kernel modules have low update cadence:
+  #  - inactive cached items live longer for base and kmods (see inactive=)
+  #  - cached items stay valid longer for base and kmods (see proxy_cache_valid)
+  proxy_cache_path /var/cache/pkg.freebsd.base levels=1:2 use_temp_path=off
+                   keys_zone=freebsd-base:10m inactive=30d;
+  proxy_cache_path /var/cache/pkg.freebsd.kmods levels=1:2 use_temp_path=off
+                   keys_zone=freebsd-kmods:10m inactive=30d;
   proxy_cache_path /var/cache/pkg.freebsd.ports levels=1:2 use_temp_path=off
                    keys_zone=freebsd-ports:10m inactive=14d;
 
@@ -35,6 +43,36 @@ http {
 
     # Use notice-level to capture rewrites
     error_log /var/log/nginx/error.log notice;
+
+    location /freebsd/base/ {
+      rewrite ^/freebsd/base/(.*)$ /$1 break;
+      rewrite_log on;
+
+      proxy_cache freebsd-base;
+      proxy_cache_revalidate on;     # conditional GET for outdated content.
+      proxy_cache_lock on;           # concurrent MISS'es lock, first fetches.
+      proxy_cache_lock_timeout 30s;  # first fetch must complete in 30 seconds.
+      proxy_cache_valid 14d;         # cache validity for 200, 301, 302.
+
+      proxy_pass  https://pkg.FreeBSD.org;
+
+      add_header	X-Cache-Status $upstream_cache_status;
+    }
+
+    location /freebsd/kmods/ {
+      rewrite ^/freebsd/kmods/(.*)$ /$1 break;
+      rewrite_log on;
+
+      proxy_cache freebsd-kmods;
+      proxy_cache_revalidate on;     # conditional GET for outdated content.
+      proxy_cache_lock on;           # concurrent MISS'es lock, first fetches.
+      proxy_cache_lock_timeout 30s;  # first fetch must complete in 30 seconds.
+      proxy_cache_valid 14d;         # cache validity for 200, 301, 302.
+
+      proxy_pass  https://pkg.FreeBSD.org;
+
+      add_header	X-Cache-Status $upstream_cache_status;
+    }
 
     location /freebsd/ports/ {
       rewrite ^/freebsd/ports/(.*)$ /$1 break;

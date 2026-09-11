@@ -4,8 +4,8 @@
 # license that can be found in the LICENSE file.
 
 # Source: /etc/pkg/FreeBSD.conf
-freebsd-ports: {
-  url: "http://{{ local_pkg_hostname }}/freebsd/ports/${ABI}/latest",
+freebsd-kmods: {
+  url: "http://{{ local_pkg_hostname }}/freebsd/kmods/${ABI}/kmods_quarterly_1",
   mirror_type: "srv",
   signature_type: "fingerprints",
   fingerprints: "/usr/share/keys/pkg",

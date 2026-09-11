@@ -4,11 +4,11 @@
 # license that can be found in the LICENSE file.
 
 # Source: /etc/pkg/FreeBSD.conf
-freebsd-ports: {
-  url: "http://{{ local_pkg_hostname }}/freebsd/ports/${ABI}/latest",
+freebsd-base: {
+  url: "http://{{ local_pkg_hostname }}/freebsd/base/${ABI}/base_release_1",
   mirror_type: "srv",
   signature_type: "fingerprints",
-  fingerprints: "/usr/share/keys/pkg",
+  fingerprints: "/usr/share/keys/pkgbase-15",
   enabled: yes,
   # Set priority that is higher than default repositories.
   priority: 1
