@@ -35,9 +35,12 @@ http {
     location / {
       proxy_cache freebsd-ports;
 
-      add_header	X-Cache-Status $upstream_cache_status;
+      proxy_cache_revalidate on;  # conditional GET only if contents are stale
+      proxy_cache_lock on;  # multiple MISS'es: first fetch, others wait
 
       proxy_pass  https://pkg.FreeBSD.org;
+
+      add_header	X-Cache-Status $upstream_cache_status;
     }
   }
 }
