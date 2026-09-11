@@ -33,13 +33,18 @@ http {
     allow 10.0.0.0/24;  # local network
     deny  all;
 
-    location / {
-      proxy_cache freebsd-ports;
+    # Use notice-level to capture rewrites
+    error_log /var/log/nginx/error.log notice;
 
-      proxy_cache_revalidate on;  # conditional GET only if contents are stale.
-      proxy_cache_lock on;  # multiple MISS'es: first fetch, others wait.
-      proxy_cache_lock_timeout 30s;  # expect lock to complete in 30 seconds.
-      proxy_cache_valid 7d;  # caching time for 200, 301, 302.
+    location /freebsd/ports/ {
+      rewrite ^/freebsd/ports/(.*)$ /$1 break;
+      rewrite_log on;
+
+      proxy_cache freebsd-ports;
+      proxy_cache_revalidate on;     # conditional GET for outdated content.
+      proxy_cache_lock on;           # concurrent MISS'es lock, first fetches.
+      proxy_cache_lock_timeout 30s;  # first fetch must complete in 30 seconds.
+      proxy_cache_valid 7d;          # cache validity for 200, 301, 302.
 
       proxy_pass  https://pkg.FreeBSD.org;
 
