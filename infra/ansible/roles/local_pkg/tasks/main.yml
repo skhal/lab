@@ -48,9 +48,6 @@
 
 - name: Configure newsyslog
   vars:
-    _files:
-      - /var/log/nginx/access.log
-      - /var/log/nginx/error.log
     _conf_file: /usr/local/etc/newsyslog.conf.d/nginx.conf
   block:
     - name: Create {{ _conf_file | dirname }}
@@ -62,7 +59,7 @@
         group: wheel
         mode: u=rwx,g=rx,o=rx
 
-    - name: Configure rotations
+    - name: Rotate logs
       become: true
       ansible.builtin.copy:
         src: usr/local/etc/newsyslog.conf.d/nginx.conf
@@ -70,3 +67,16 @@
         owner: root
         group: wheel
         mode: u=rw,g=r,o=r
+
+- name: Setup cache
+  vars:
+    _cache_path: /var/cache/pkg.freebsd.ports
+  block:
+    - name: Create {{ _cache_path }}
+      become: true
+      ansible.builtin.file:
+        path: "{{ _cache_path }}"
+        state: directory
+        owner: www
+        group: www
+        mode: u=rwx,g=rx,o=rx

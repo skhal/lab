@@ -6,42 +6,38 @@
 worker_processes  1;
 
 events {
-    worker_connections  1024;
+  worker_connections  1024;
 }
 
 http {
-    # Use absolute path includes to make Nginx configuration validator work
-    # with Ansible, which runs validation `nginx -t -c %s` on a temporary file
-    # and nginx(1) tries to pick up mime.types from the same location instead
-    # of prefix even if `-p /usr/local/etc/nginx` is used without effect.
-    #
-    include       /usr/local/etc/nginx/mime.types;
-    default_type  application/octet-stream;
+  # Use absolute path includes to make Nginx configuration validator work
+  # with Ansible, which runs validation `nginx -t -c %s` on a temporary file
+  # and nginx(1) tries to pick up mime.types from the same location instead
+  # of prefix even if `-p /usr/local/etc/nginx` is used without effect.
+  #
+  include       /usr/local/etc/nginx/mime.types;
+  default_type  application/octet-stream;
 
-    error_log   syslog:server=unix:/var/run/log,nohostname;
-    access_log  syslog:server=unix:/var/run/log,nohostname;
+  sendfile    on;
 
-    sendfile    on;
+  keepalive_timeout  65;
 
-    keepalive_timeout  65;
+  # Content cache for pkg.FreeBSD.org
+  proxy_cache_path /var/cache/pkg.freebsd.ports keys_zone=freebsd-ports:10m;
 
-    server {
-        listen        {{ local_pkg_listen_on }}:80;
-        server_name   localhost;
+  server {
+    listen        {{ local_pkg_listen_on }}:80;
+    server_name   {{ inventory_hostname }};
 
-        allow 10.0.0.0/24;
-        deny  all;
+    allow 10.0.0.0/24;  # local network
+    deny  all;
 
-        location / {
-            root   /usr/local/www/nginx;
-            index  index.html index.htm;
-        }
+    location / {
+      proxy_cache freebsd-ports;
 
-        # redirect server error pages to the static page /50x.html
-        #
-        error_page   500 502 503 504  /50x.html;
-        location = /50x.html {
-            root   /usr/local/www/nginx-dist;
-        }
+      add_header	X-Cache-Status $upstream_cache_status;
+
+      proxy_pass  https://pkg.FreeBSD.org;
     }
+  }
 }
