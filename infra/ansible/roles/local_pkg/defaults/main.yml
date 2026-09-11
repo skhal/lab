@@ -6,3 +6,6 @@
 ---
 # local_pkg_listen_on is the IP4 address to listen on.
 local_pkg_listen_on: ""
+
+# local_pkg_hostname is the hostname of the pkg(8) server.
+local_pkg_hostname: ""

@@ -1,0 +1,15 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+# Source: /etc/pkg/FreeBSD.conf
+freebsd-ports: {
+  url: "http://{{ local_pkg_hostname }}/freebsd/ports/${ABI}/quarterly",
+  mirror_type: "srv",
+  signature_type: "fingerprints",
+  fingerprints: "/usr/share/keys/pkg",
+  enabled: yes,
+  # Set priority that is higher than default repositories.
+  priority: 1
+}

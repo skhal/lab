@@ -1,0 +1,27 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+- name: Configure pkg repositories
+  vars:
+    _conf_file: /usr/local/etc/pkg/repos/freebsd-ports.conf
+  block:
+    - name: Create {{ _conf_file | dirname }}
+      become: true
+      ansible.builtin.file:
+        path: "{{ _conf_file | dirname }}"
+        state: directory
+        owner: root
+        group: wheel
+        mode: u=rwx,g=rx,o=rx
+
+    - name: Write {{ _conf_file }}
+      become: true
+      ansible.builtin.template:
+        src: "{{ _conf_file | trim('/') }}.j2"
+        dest: "{{ _conf_file }}"
+        owner: root
+        group: wheel
+        mode: u=rw,g=r,o=r

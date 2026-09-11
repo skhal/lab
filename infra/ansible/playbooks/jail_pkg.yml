@@ -46,3 +46,12 @@
   tags: pkg
   roles:
     - role: local_pkg
+
+- name: Configure PKG repos
+  hosts: pkg.lab.net
+  tags: pkg-repos
+  tasks:
+    - name: Add repos
+      ansible.builtin.include_role:
+        name: local_pkg
+        tasks_from: configure_repos
