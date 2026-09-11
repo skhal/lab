@@ -23,8 +23,8 @@ http {
   keepalive_timeout  65;
 
   # Content cache for pkg.FreeBSD.org
-  proxy_cache_path /var/cache/pkg.freebsd.ports levels=1:2
-                   keys_zone=freebsd-ports:10m use_temp_path=off;
+  proxy_cache_path /var/cache/pkg.freebsd.ports levels=1:2 use_temp_path=off
+                   keys_zone=freebsd-ports:10m inactive=14d;
 
   server {
     listen        {{ local_pkg_listen_on }}:80;
