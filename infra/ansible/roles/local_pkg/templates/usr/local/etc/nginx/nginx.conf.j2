@@ -36,9 +36,10 @@ http {
     location / {
       proxy_cache freebsd-ports;
 
-      proxy_cache_revalidate on;  # conditional GET only if contents are stale
-      proxy_cache_lock on;  # multiple MISS'es: first fetch, others wait
-      proxy_cache_valid 7d;  # caching time for 200, 301, 302
+      proxy_cache_revalidate on;  # conditional GET only if contents are stale.
+      proxy_cache_lock on;  # multiple MISS'es: first fetch, others wait.
+      proxy_cache_lock_timeout 30s;  # expect lock to complete in 30 seconds.
+      proxy_cache_valid 7d;  # caching time for 200, 301, 302.
 
       proxy_pass  https://pkg.FreeBSD.org;
 
