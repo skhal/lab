@@ -5,7 +5,7 @@
 
 # Source: /etc/pkg/FreeBSD.conf
 freebsd-ports: {
-  url: "http://{{ local_pkg_hostname }}/freebsd/ports/${ABI}/latest",
+  url: "pkg+http://{{ local_pkg_hostname }}/freebsd/ports/${ABI}/latest",
   mirror_type: "srv",
   signature_type: "fingerprints",
   fingerprints: "/usr/share/keys/pkg",

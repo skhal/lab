@@ -5,7 +5,7 @@
 
 # Source: /etc/pkg/FreeBSD.conf
 freebsd-base: {
-  url: "http://{{ local_pkg_hostname }}/freebsd/base/${ABI}/base_release_1",
+  url: "pkg+http://{{ local_pkg_hostname }}/freebsd/base/${ABI}/base_release_1",
   mirror_type: "srv",
   signature_type: "fingerprints",
   fingerprints: "/usr/share/keys/pkgbase-15",
