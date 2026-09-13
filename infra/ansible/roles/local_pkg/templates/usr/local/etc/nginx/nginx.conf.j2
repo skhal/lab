@@ -35,7 +35,7 @@ http {
                    keys_zone=freebsd-ports:10m inactive=14d;
 
   server {
-    listen        {{ local_pkg_listen_on }}:80;
+    listen        {{ local_pkg_listen_on }}:443 ssl;
     server_name   {{ inventory_hostname }};
 
     allow 10.0.0.0/24;  # local network
@@ -43,6 +43,9 @@ http {
 
     # Use notice-level to capture rewrites
     error_log /var/log/nginx/error.log notice;
+
+    ssl_certificate     /usr/local/etc/nginx/ssl/pkg.crt;
+    ssl_certificate_key /usr/local/etc/nginx/ssl/private/pkg.key;
 
     location /freebsd/base/ {
       rewrite ^/freebsd/base/(.*)$ /$1 break;

@@ -7,6 +7,10 @@
 # keep-sorted start
 ansible_jexec_over_ssh_jail_name: pkg
 local_pkg_listen_on: 10.0.0.5
+openssl_gen_common_name: pkg.lab.net
+openssl_gen_crt: "/usr/local/etc/nginx/ssl/pkg.crt"
+openssl_gen_group: www
+openssl_gen_owner: www
 ssh_listen_addresses:
   - 10.0.0.5
 # keep-sorted end

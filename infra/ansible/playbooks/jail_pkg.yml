@@ -46,6 +46,8 @@
   hosts: pkg.lab.net
   tags: pkg
   roles:
+    - role: openssl_gen
+      tags: pkg-gen-cert
     - role: local_pkg
 
 - name: Configure PKG repos
