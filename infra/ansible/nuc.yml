@@ -17,6 +17,15 @@
     - role: zfs
     - role: timezone
 
+- name: Configure PKG repos
+  hosts: nuc.lab.net
+  tags: pkg-repos
+  tasks:
+    - name: Add repos
+      ansible.builtin.include_role:
+        name: local_pkg
+        tasks_from: configure_repos
+
 - name: Configure Users
   hosts: nuc.lab.net
   tags: users

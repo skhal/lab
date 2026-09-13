@@ -23,6 +23,15 @@
   roles:
     - role: jail
 
+- name: Configure PKG repos
+  hosts: bsd.lab.net
+  tags: pkg-repos
+  tasks:
+    - name: Add repos
+      ansible.builtin.include_role:
+        name: local_pkg
+        tasks_from: configure_repos
+
 - name: Bootstrap BSD jail
   hosts: bsd.lab.net
   tags: bootstrap
