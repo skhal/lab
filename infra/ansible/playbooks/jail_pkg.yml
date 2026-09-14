@@ -58,3 +58,9 @@
       ansible.builtin.include_role:
         name: local_pkg
         tasks_from: configure_repos
+
+- name: Configure poudriere
+  hosts: pkg.lab.net
+  tags: poudriere
+  roles:
+    - role: poudriere

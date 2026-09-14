@@ -1,0 +1,38 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+- name: Install poudriere
+  become: true
+  community.general.pkgng:
+    name:
+      # keep-sorted start
+      - FreeBSD-jail
+      - git
+      - poudriere
+      # keep-sorted end
+    state: present
+
+- name: Configure poudriere
+  vars:
+    _conf_file: /usr/local/etc/poudriere.conf
+    _distfile_cache_path: /usr/ports/distfiles
+  block:
+    - name: Create distfiles cache
+      become: true
+      ansible.builtin.file:
+        path: "{{ _distfile_cache_path }}"
+        state: directory
+        owner: root
+        group: wheel
+        mode: u=rwx,g=rx,o=rx
+
+    - name: Patch configuration
+      become: true
+      ansible.posix.patch:
+        src: "{{ _conf_file | trim('/') }}.diff"
+        dest: "{{ _conf_file }}"
+        backup: true
+        ignore_whitespace: true
