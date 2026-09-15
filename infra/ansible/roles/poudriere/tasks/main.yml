@@ -29,15 +29,25 @@
         group: wheel
         mode: u=rwx,g=rx,o=rx
 
-    - name: Patch configuration
-      become: true
-      ansible.posix.patch:
-        src: "{{ _conf_file | trim('/') }}.diff"
-        dest: "{{ _conf_file }}"
-        backup: true
-        ignore_whitespace: true
-
     - name: Generate RSA keys
       ansible.builtin.include_role:
         name: openssl_gen
         tasks_from: rsa
+
+    - name: Configure
+      become: true
+      vars:
+        _pkg_repo_signing_key: >-
+          {{
+            (
+              openssl_gen_rsa.path | dirname,
+              'private',
+              openssl_gen_rsa.path | basename | splitext | first
+            ) | path_join
+          }}.key
+      ansible.builtin.template:
+        src: "{{ _conf_file | trim('/') }}.j2"
+        dest: "{{ _conf_file }}"
+        owner: root
+        group: wheel
+        mode: u=rw,g=r,o=r
