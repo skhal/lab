@@ -10,14 +10,24 @@
   vars:
     # keep-sorted start
     jail_allow_chflags: true
+    jail_allow_mlock: true
+    jail_allow_mount: true
+    jail_allow_mount_devfs: true
+    jail_allow_mount_linprocfs: true
+    jail_allow_mount_nullfs: true
+    jail_allow_mount_procfs: true
+    jail_allow_mount_tmpfs: true
     jail_bridge: bridge0
+    jail_children_max: 10
     jail_cidr: 10.0.0.5/24
     jail_defaultrouter: 10.0.0.1
     jail_depend:
       - dns
+    jail_enforce_statfs: 1
     jail_name: pkg
     # keep-sorted end
   roles:
+    - role: linux
     - role: jail
 
 - name: Bootstrap PKG jail

@@ -9,9 +9,11 @@
   community.general.pkgng:
     name:
       # keep-sorted start
-      - FreeBSD-jail
+      - FreeBSD-clibs-dev
+      - FreeBSD-jail # for /usr/sbin/{jail,jls}
+      - FreeBSD-runtime # for /sbin/sysctl
       - git
-      - poudriere
+      - poudriere-devel # works better with jails than poudriere
       # keep-sorted end
     state: present
 

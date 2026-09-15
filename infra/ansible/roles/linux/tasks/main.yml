@@ -1,0 +1,15 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+- name: Enable service
+  become: true
+  notify: start_linux
+  vars:
+    _rc_file: /etc/rc.conf.d/linux
+  community.general.sysrc:
+    path: "{{ _rc_file }}"
+    name: linux_enable
+    value: true

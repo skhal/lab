@@ -4,22 +4,62 @@
 # license that can be found in the LICENSE file.
 
 ---
-# keep-sorted start
+# keep-sorted start newline_separated=yes
 # jail_allow_chflags adds allow.chflags to the jail configuration when enabled.
 jail_allow_chflags: false
+
+# jail_allow_mlock adds allow.mlock to the jail configuration when enabled.
+jail_allow_mlock: false
+
+# jail_allow_mount adds allow.mount to the jail configuration when enabled.
+jail_allow_mount: false
+
+# jail_allow_mount_devfs adds allow.mount.devfs to the jail configuration when
+# enabled.
+jail_allow_mount_devfs: false
+
+# jail_allow_mount_linprocfs adds allow.mount.linprocfs to the jail
+# configuration when enabled.
+jail_allow_mount_linprocfs: false
+
+# jail_allow_mount_nullfs adds allow.mount.nullfs to the jail configuration
+# when enabled.
+jail_allow_mount_nullfs: false
+
+# jail_allow_mount_procfs adds allow.mount.procfs to the jail configuration
+# when enabled.
+jail_allow_mount_procfs: false
+
+# jail_allow_mount_tmpfs adds allow.mount.tmpfs to the jail configuration when
+# enabled.
+jail_allow_mount_tmpfs: false
+
 # jail_bridge is the jails bridge.
 jail_bridge: ""
+
+# jail_children_max sets the number of child jails allowed in the jail when
+# set.
+jail_children_max: "{{ undef(hint='number of allowed child jails') }}"
+
 # jail_cidr is the IP with network marsk.
 jail_cidr: ""
+
 # jail_defaultrouter sets the IP for default route.
 jail_defaultrouter: ""
+
 # jail_depend is a list of jail names that this jail depends on (see jail(8)).
 jail_depend: []
+
+# jail_enforce_statfs controls access to mount points inside the jail (see
+# jail(8)).
+jail_enforce_statfs: "{{ undef(hint='mount point access in the jail') }}"
+
 # jail_mounts lists mount points to add to the jail (see mount in jail(8)).
 # Each mount has the following structure:
 #   path  string  absolute path to mount, e.g. "/home/op"
 #   perm  string? mount permissions, e.g. "rw" (default: rw)
 jail_mounts: []
+
 # jail_name is the jail name.
 jail_name: ""
 # keep-sorted end
