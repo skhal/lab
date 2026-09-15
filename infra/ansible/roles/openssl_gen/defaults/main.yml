@@ -17,4 +17,12 @@ openssl_gen_group: "wheel"
 openssl_gen_key: ""
 # openssl_gen_owner is the user owner for the certificate.
 openssl_gen_owner: "root"
+# openssl_gen_rsa defines RSA key to generate. It expects the following
+# structure:
+#   - path  string  file name with path to store public key. The private key
+#                   will reside at the same path under private/ sub-folder,
+#                   with the same name and .key extension.
+#   - owner         user to own the keys
+#   - group         group to own the keys
+openssl_gen_rsa: "{{ undef(hint='RSA public certificate info') }}"
 # keep-sorted end

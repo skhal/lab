@@ -1,0 +1,54 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+- name: Generate keys
+  vars:
+    _public_key: "{{ openssl_gen_rsa.path }}"
+    _private_key: >-
+      {{
+        (
+          _public_key | dirname,
+          'private',
+          _public_key | basename | splitext | first
+        ) | path_join
+      }}.key
+    _owner: "{{ openssl_gen_rsa.owner }}"
+    _group: "{{ openssl_gen_rsa.group }}"
+  block:
+    - name: Create public key path
+      become: true
+      ansible.builtin.file:
+        path: "{{ _public_key | dirname }}"
+        state: directory
+        owner: "{{ _owner | default(omit) }}"
+        group: "{{ _group | default(omit) }}"
+        mode: u=rwx,g=rx,o=rx
+
+    - name: Create private key path
+      become: true
+      ansible.builtin.file:
+        path: "{{ _private_key | dirname }}"
+        state: directory
+        owner: "{{ _owner | default(omit) }}"
+        group: "{{ _group | default(omit) }}"
+        mode: u=rwx,g=,o=
+
+    - name: Generate private key
+      become: true
+      community.crypto.openssl_privatekey:
+        path: "{{ _private_key }}"
+        owner: "{{ _owner | default(omit) }}"
+        group: "{{ _group | default(omit) }}"
+        mode: u=rw,g=,o=
+
+    - name: Generate public key
+      become: true
+      community.crypto.openssl_publickey:
+        path: "{{ _public_key }}"
+        privatekey_path: "{{ _private_key }}"
+        owner: "{{ _owner | default(omit) }}"
+        group: "{{ _group | default(omit) }}"
+        mode: u=rw,g=r,o=r
