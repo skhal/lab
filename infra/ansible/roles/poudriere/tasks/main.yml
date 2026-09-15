@@ -36,3 +36,8 @@
         dest: "{{ _conf_file }}"
         backup: true
         ignore_whitespace: true
+
+    - name: Generate RSA keys
+      ansible.builtin.include_role:
+        name: openssl_gen
+        tasks_from: rsa
