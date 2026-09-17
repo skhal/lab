@@ -1,0 +1,35 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+- name: Fetch public key
+  vars:
+    _src_host: "{{ openssl_gen_rsa_fetch.source | split(':', 1) | first }}"
+    _src_path: "{{ openssl_gen_rsa_fetch.source | split(':', 1) | last }}"
+    _dst_path: "{{ openssl_gen_rsa_fetch.target }}"
+  block:
+    - name: Create path for public key
+      become: true
+      ansible.builtin.file:
+        path: "{{ _dst_path | dirname }}"
+        state: directory
+        owner: root
+        group: wheel
+        mode: u=rwx,g=rx,o=rx
+
+    - name: Load public key
+      ansible.builtin.slurp:
+        src: "{{ _src_path }}"
+      register: openssl_gen_public_key_task
+      delegate_to: "{{ _src_host }}"
+
+    - name: Write public key
+      become: true
+      ansible.builtin.copy:
+        dest: "{{ _dst_path }}"
+        content: "{{ openssl_gen_public_key_task.content | b64decode }}"
+        owner: root
+        group: wheel
+        mode: u=rw,g=r,o=r

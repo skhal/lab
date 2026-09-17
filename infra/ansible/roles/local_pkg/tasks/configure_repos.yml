@@ -8,9 +8,12 @@
   vars:
     _conf_path: /usr/local/etc/pkg/repos
     _conf_files:
-      - freebsd-ports.conf
-      - freebsd-kmods.conf
+      # keep-sorted start
       - freebsd-base.conf
+      - freebsd-kmods.conf
+      - freebsd-ports.conf
+      - lab-ports.conf
+      # keep-sorted end
   block:
     - name: Create {{ _conf_path }}
       become: true

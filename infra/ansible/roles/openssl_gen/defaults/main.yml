@@ -25,4 +25,9 @@ openssl_gen_owner: "root"
 #   - owner         user to own the keys
 #   - group         group to own the keys
 openssl_gen_rsa: "{{ undef(hint='RSA public certificate info') }}"
+# openssl_gen_rsa_fetch defines RSA public key to fetch. It expects the
+# following structure:
+#   - source  string  path to the remote public key in the form host:/path
+#   - target  string  path to the public key to save
+openssl_gen_rsa_fetch: "{{ undef(hint='RSA public key source and targets') }}"
 # keep-sorted end

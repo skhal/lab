@@ -68,6 +68,10 @@
       ansible.builtin.include_role:
         name: local_pkg
         tasks_from: configure_repos
+    - name: Fetch repo public keys
+      ansible.builtin.include_role:
+        name: openssl_gen
+        tasks_from: rsa_fetch
 
 - name: Configure poudriere
   hosts: pkg.lab.net

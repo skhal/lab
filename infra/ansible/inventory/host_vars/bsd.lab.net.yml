@@ -6,6 +6,9 @@
 ---
 # keep-sorted start
 ansible_jexec_over_ssh_jail_name: bsd
+openssl_gen_rsa_fetch:
+  source: pkg.lab.net:/usr/local/etc/poudriere/ssl/pkg.pub
+  target: /usr/local/etc/pkg/ssl/lab-ports.pub
 ssh_allow_groups:
   - ssh
 ssh_listen_addresses:

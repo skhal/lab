@@ -1,0 +1,15 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+# Source: /etc/pkg/FreeBSD.conf
+lab-ports: {
+  url: "pkg+https://{{ local_pkg_hostname }}/lab/ports/${ABI}/latest",
+  mirror_type: "srv",
+  signature_type: "pubkey",
+  pubkey: "/usr/local/etc/pkg/ssl/lab-ports.pub",
+  enabled: yes,
+  # Set priority that is higher than default repositories.
+  priority: 10
+}

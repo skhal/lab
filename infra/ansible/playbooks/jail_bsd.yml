@@ -16,6 +16,7 @@
     jail_depend:
       - dns
       - ldap
+      - pkg
     jail_mounts:
       - path: /home/skhalatyan
     jail_name: bsd
@@ -31,6 +32,10 @@
       ansible.builtin.include_role:
         name: local_pkg
         tasks_from: configure_repos
+    - name: Fetch repo public key
+      ansible.builtin.include_role:
+        name: openssl_gen
+        tasks_from: rsa_fetch
 
 - name: Bootstrap BSD jail
   hosts: bsd.lab.net

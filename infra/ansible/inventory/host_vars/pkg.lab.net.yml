@@ -15,6 +15,9 @@ openssl_gen_rsa:
   path: /usr/local/etc/poudriere/ssl/pkg.pub
   owner: root
   group: wheel
+openssl_gen_rsa_fetch:
+  source: pkg.lab.net:/usr/local/etc/poudriere/ssl/pkg.pub
+  target: /usr/local/etc/pkg/ssl/lab-ports.pub
 ssh_listen_addresses:
   - 10.0.0.5
 # keep-sorted end

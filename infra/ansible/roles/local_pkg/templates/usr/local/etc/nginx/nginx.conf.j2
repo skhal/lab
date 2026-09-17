@@ -91,5 +91,10 @@ http {
 
       add_header	X-Cache-Status $upstream_cache_status;
     }
+
+    location ~ ^/lab/ports/FreeBSD:([[:digit:]]+):amd64/latest/(.+)$ {
+      autoindex on;
+      alias /usr/local/poudriere/data/packages/$1amd64-default/$2;
+    }
   }
 }
