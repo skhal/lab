@@ -1,0 +1,55 @@
+// Copyright 2026 Samvel Khalatyan. All rights reserved.
+//
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
+edition = "2024";
+
+package infra.cmd.certval;
+
+import "google/protobuf/go_features.proto";
+
+option features.(.pb.go).api_level = API_OPAQUE;
+option go_package = "github.com/skhal/lab/infra/cmd/certval/pb";
+
+// Config lists certificates to validate and Slack configuration to send
+// notifications to.
+//
+// Next ID: 3
+message Config {
+  // slack holds Slack configuration parameters such as webhook, etc.
+  Slack slack = 1;
+
+  // certificate lists certificates to validate.
+  repeated Certificate certificate = 2;
+}
+
+// Slack holds notification parameters such as application webhook, etc.
+//
+// Next ID: 2
+message Slack {
+  // webook is the webhook to Slack application
+  string webhook = 1;
+}
+
+// Certificate describes a single certificate to validate.
+//
+// Next ID: 4
+message Certificate {
+  // name is the certificate name for logging purposes.
+  string name = 1;
+
+  // path is the absolute path to the certification location on the file system.
+  string path = 2;
+
+  // Notify contains notification parameters.
+  //
+  // Next ID: 2
+  message Notify {
+    // expire_days is the minimum number of days from now until certificate's
+    // NotAfter below which the certificate is considered expiring.
+    int32 expire_days = 1;
+  }
+  // notify configures optional notification settings for the certificate.
+  Notify notify = 3;
+}
