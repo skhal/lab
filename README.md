@@ -25,6 +25,7 @@ Lab is the place to tinker with ideas, learn by doing, and don't be shy of makin
 | `go/`                | [![Go CI](https://github.com/skhal/lab/actions/workflows/go_ci.yml/badge.svg)](https://github.com/skhal/lab/actions/workflows/go_ci.yml)                  | Go libraries                                |
 | `iq/`                | [![Interview Questions CI](https://github.com/skhal/lab/actions/workflows/iq_ci.yml/badge.svg)](https://github.com/skhal/lab/actions/workflows/iq_ci.yml) | Interview Questions                         |
 | [`infra/`](./infra/) |                                                                                                                                                           | Infrastructure configuration & doc          |
+| [`ports/`](./ports/) |                                                                                                                                                           | Lab ports for FreeBSD                       |
 | [`x/`](./x/)         | [![X CI](https://github.com/skhal/lab/actions/workflows/x_ci.yml/badge.svg)](https://github.com/skhal/lab/actions/workflows/x_ci.yml)                     | experimental area                           |
 
 ## C++ development
