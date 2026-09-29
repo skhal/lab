@@ -73,3 +73,37 @@ Build the port:
 ```
 # poudriere bulk -j 15amd64 -O lab -C category/example
 ```
+
+## Port a Go application
+
+Ref: [FreeBSD-ports/Mk/Uses/go.mk](https://github.com/freebsd/freebsd-ports/blob/0d401addc581c17e55036498065bedf462dcfb60/Mk/Uses/go.mk)
+
+Follow standard documentation on porting Go applications to FreeBSD:
+
+- https://docs.freebsd.org/en/books/porters-handbook/special/#using-go
+- https://docs.freebsd.org/en/books/porters-handbook/uses/#uses-go
+
+Generate `GH_TUPLE` make(1) variable for the Makefile using
+https://github.com/dmgk/modules2tuple:
+
+```
+$ cd /path/to/lab
+
+$ go mod vendor
+
+$ modules2tuple ./vendor/modules.txt
+```
+
+Do not check-in generated `vendor/` folder. Poudriere will create it with
+packages pulled from `GH_TUPLE`.
+
+Keep in mind that Go will fail to build code with generated `vendor/` without
+`vendor/modules.txt` because it runs in `-mod=vendor` mode.
+
+Instead, store `modules.txt` in the port and inject it in the poudriere's
+worktree in the Makefile:
+
+```
+post-extract:
+	@${CP} ${FILESDIR}/modules.txt ${WRKSRC}/vendor
+```
