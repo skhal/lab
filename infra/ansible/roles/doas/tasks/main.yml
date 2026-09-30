@@ -10,13 +10,39 @@
     name: doas
     state: present
 
-- name: Configure doas
+- name: Configure
   vars:
     _conf_file: /usr/local/etc/doas.conf
-  become: true
-  ansible.builtin.template:
-    src: "{{ _conf_file | trim('/') }}.j2"
-    dest: "{{ _conf_file }}"
-    owner: root
-    group: wheel
-    mode: u=rw,g=r,o=r
+    _pam_file: /usr/local/etc/pam.d/doas
+  block:
+    - name: Configure doas
+      become: true
+      ansible.builtin.template:
+        src: "{{ _conf_file | trim('/') }}.j2"
+        dest: "{{ _conf_file }}"
+        owner: root
+        group: wheel
+        mode: u=rw,g=r,o=r
+
+    - name: Configure PAM
+      vars:
+        _pam_d_path: "{{ _pam_file | dirname }}"
+      block:
+        - name: Create {{ _pam_d_path }}
+          become: true
+          ansible.builtin.file:
+            path: "{{ _pam_d_path }}"
+            state: directory
+            owner: root
+            group: wheel
+            mode: u=rwx,g=rx,o=rx
+
+        - name: Configure PAM with doas
+          become: true
+          ansible.builtin.copy:
+            src: "{{ _pam_file | trim('/') }}"
+            dest: "{{ _pam_file }}"
+            owner: root
+            group: wheel
+            mode: u=rw,g=r,o=r
+            directory_mode: u=rwx,g=rx,o=rx
