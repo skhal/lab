@@ -11,6 +11,8 @@ doas_conf:
     description: Permit members of the wheel group to perform actions as root without password.
   - rule: permit skhalatyan as root cmd poudriere
     description: Permit user skhalatyan to run poudriere.
+  - rule: permit setenv { PORTSDIR } skhalatyan as root  cmd make args makesum
+    description: Permit user skhalatyan to generate distinfo for ports.
 openssl_gen_rsa:
   path: /usr/local/etc/poudriere/ssl/pkg.pub
   owner: root
