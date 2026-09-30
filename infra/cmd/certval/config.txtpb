@@ -1,0 +1,18 @@
+# proto-file: github.com/skhal/lab/infra/cmd/certval/pb/config.proto
+# proto-message: infra.cmd.certval.Config
+
+# slack configures Slack application.
+slack {
+  # webhook is the application webhook from api.slack.com
+  webhook: "https://hooks.slack.com/services/example"
+}
+
+# certificate configures a single certificate. There can be
+# multiple certificate-blocks in the configuration.
+certificate {
+  # name identifies the certificate, used in the notifications.
+  name: "Certificate A"
+
+  # path locates the certificate on the file system.
+  path: "/path/to/example/certificate-a.crt"
+}
