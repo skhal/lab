@@ -30,8 +30,11 @@
   hosts: nuc.lab.net
   tags: users
   roles:
+    # keep-sorted start
+    - role: doas
     - role: user
     - role: zfs_mkhomedir
+    # keep-sorted end
 
 - name: Configure network
   hosts: nuc.lab.net

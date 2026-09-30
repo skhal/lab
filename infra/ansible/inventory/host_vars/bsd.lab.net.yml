@@ -6,6 +6,11 @@
 ---
 # keep-sorted start
 ansible_jexec_over_ssh_jail_name: bsd
+doas_conf:
+  - rule: permit nopass :wheel
+    description: Permit members of the wheel group to perform actions as root without password.
+  - rule: permit skhalatyan as root cmd poudriere
+    description: Permit user skhalatyan to run poudriere.
 openssl_gen_rsa_fetch:
   source: pkg.lab.net:/usr/local/etc/poudriere/ssl/pkg.pub
   target: /usr/local/etc/pkg/ssl/lab-ports.pub

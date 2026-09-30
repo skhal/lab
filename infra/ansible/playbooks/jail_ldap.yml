@@ -33,11 +33,14 @@
   hosts: ldap.lab.net
   tags: bootstrap
   roles:
+    # keep-sorted start
+    - role: doas
+    - role: pkg
     - role: ssh
     - role: syslog
-    - role: user
-    - role: pkg
     - role: timezone
+    - role: user
+    # keep-sorted end
 
 - name: Configure DNS server
   hosts: ldap.lab.net
