@@ -6,7 +6,7 @@
 # vim: tabstop=2
 
 PORTNAME=       lab-certval
-PORTVERSION=    260929
+PORTVERSION=    260930
 PORTREVISION=   1
 CATEGORIES=     sysutils
 
@@ -23,7 +23,7 @@ USES=           go:modules
 USE_GITHUB=     yes
 GH_ACCOUNT=     skhal
 GH_PROJECT=     lab
-GH_TAGNAME=     aaa93283
+GH_TAGNAME=     e1adb8cb
 GO_TARGET=      ./infra/cmd/certval:lab-certval
 GH_TUPLE=       \
                 BurntSushi:toml:a339e1f7089c:burntsushi_toml/vendor/github.com/BurntSushi/toml \
@@ -60,5 +60,8 @@ GH_TUPLE=       \
 
 post-extract:
 	@${CP} ${FILESDIR}/modules.txt ${WRKSRC}/vendor
+
+post-install:
+	${INSTALL_DATA} ${WRKSRC}/infra/cmd/certval/config.txtpb ${STAGEDIR}${PREFIX}/etc/lab-certval.txtpb.sample
 
 .include <bsd.port.mk>
