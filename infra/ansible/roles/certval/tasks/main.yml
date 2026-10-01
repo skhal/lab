@@ -1,0 +1,31 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+- name: Install certval
+  become: true
+  community.general.pkgng:
+    name: lab-certval
+    state: present
+
+- name: Configure certval
+  vars:
+    _conf_file: /usr/local/etc/certval.txtpb
+  become: true
+  ansible.builtin.template:
+    src: "{{ _conf_file | trim('/') }}.j2"
+    dest: "{{ _conf_file }}"
+    owner: root
+    group: wheel
+    mode: u=rw,g=,o=
+
+- name: Run daily
+  vars:
+    _conf_file: /usr/local/etc/certval.txtpb
+  become: true
+  ansible.builtin.cron:
+    name: "validate certificates"
+    special_time: daily
+    job: "/usr/local/bin/lab-certval -c {{ _conf_file }}"

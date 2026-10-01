@@ -1,0 +1,13 @@
+# proto-file: github.com/skhal/lab/infra/cmd/certval/pb/config.proto
+# proto-message: infra.cmd.certval.Config
+
+slack {
+  webhook: "{{ certval_slack_webhook }}"
+}
+
+{% for cert in certval_certificates %}
+certificate {
+  name: "{{ cert.name }}"
+  path: "{{ cert.path }}"
+}
+{% endfor %}

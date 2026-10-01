@@ -18,9 +18,15 @@ bind_tls:
     - TLSv1.3
 bind_zones:
   - lab.net
+certval_certificates:
+  - name: "DNS Certificate"
+    path: /usr/local/etc/namedb/ssl/bind.crt
 openssl_gen_crt: "/usr/local/etc/namedb/ssl/bind.crt"
 openssl_gen_group: bind
 openssl_gen_owner: bind
+openssl_gen_rsa_fetch:
+  source: pkg.lab.net:/usr/local/etc/poudriere/ssl/pkg.pub
+  target: /usr/local/etc/pkg/ssl/lab-ports.pub
 ssh_listen_addresses:
   - 10.0.0.2
 # keep-sorted end

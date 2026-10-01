@@ -26,6 +26,10 @@
       ansible.builtin.include_role:
         name: local_pkg
         tasks_from: configure_repos
+    - name: Fetch repo public key
+      ansible.builtin.include_role:
+        name: openssl_gen
+        tasks_from: rsa_fetch
 
 - name: Bootstrap DNS jail
   hosts: dns.lab.net
@@ -59,3 +63,9 @@
     # the certificate.
     - role: openssl_gen
     - role: local_unbound
+
+- name: Certificate validation
+  hosts: dns.lab.net
+  tags: certval
+  roles:
+    - role: certval

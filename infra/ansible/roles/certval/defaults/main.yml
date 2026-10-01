@@ -1,0 +1,18 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+# keep-sorted start newline_separated=yes
+# certval_certificates lists certificates to validate. Each certificate has
+# the following structure:
+#
+#   name  string  human readable certificate name.
+#   path  string  location of the certificate on the file system.
+certval_certificates: "{{ undef(hint='Certificates to validate') }}"
+
+# certval_slack_webhook is the webhook of the Slack application that is used
+# to send notificateions to.
+certval_slack_webhook: "{{ undef(hint='Slack app webhook') }}"
+# keep-sorted end
