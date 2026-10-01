@@ -6,8 +6,14 @@
 ---
 # keep-sorted start
 ansible_jexec_over_ssh_jail_name: ssl
+certval_certificates:
+  - name: "CA Certificate"
+    path: /usr/local/share/certs/ca.crt
 openssl_ca_common_name: ca.ssl.lab.net
 openssl_ca_organization: Lab
+openssl_gen_rsa_fetch:
+  source: pkg.lab.net:/usr/local/etc/poudriere/ssl/pkg.pub
+  target: /usr/local/etc/pkg/ssl/lab-ports.pub
 ssh_listen_addresses:
   - 10.0.0.4
 # keep-sorted end
