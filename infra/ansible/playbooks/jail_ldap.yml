@@ -28,6 +28,10 @@
       ansible.builtin.include_role:
         name: local_pkg
         tasks_from: configure_repos
+    - name: Fetch repo public key
+      ansible.builtin.include_role:
+        name: openssl_gen
+        tasks_from: rsa_fetch
 
 - name: Bootstrap LDAP jail
   hosts: ldap.lab.net
@@ -74,3 +78,9 @@
       ansible.builtin.include_role:
         name: openldap_server
         tasks_from: add_entries
+
+- name: Certificate validation
+  hosts: ldap.lab.net
+  tags: certval
+  roles:
+    - role: certval
