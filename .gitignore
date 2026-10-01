@@ -74,3 +74,6 @@ bazel-*
 wasm_exec.js
 *.gz
 __pycache__
+
+# Poudriere temporary folders
+ports/**/work/
