@@ -168,7 +168,7 @@ ABC12345
 
 type testNotifier struct{}
 
-func (tn *testNotifier) Error(err error) error { return err }
+func (tn *testNotifier) Notify(err error) error { return err }
 
 func createEncodedCertificate(t *testing.T, cert *x509.Certificate, key *rsa.PrivateKey) []byte {
 	t.Helper()

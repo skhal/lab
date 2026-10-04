@@ -38,8 +38,8 @@ type SlackData struct {
 	Text string `json:"text"`
 }
 
-// Error sends an error notification to Slack.
-func (sl *SlackNotifier) Error(err error) error {
+// Notify sends an error notification to Slack.
+func (sl *SlackNotifier) Notify(err error) error {
 	data := SlackData{
 		Text: err.Error(),
 	}

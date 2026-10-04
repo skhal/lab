@@ -19,7 +19,7 @@ import (
 const defaultExpireDays = 10
 
 type notifier interface {
-	Error(error) error
+	Notify(error) error
 }
 
 type readFileFunc func(string) ([]byte, error)
@@ -57,23 +57,23 @@ var (
 func (vr *Validator) Validate(cert *pb.Certificate) error {
 	b, err := vr.readFile(cert.GetPath())
 	if err != nil {
-		return vr.notifier.Error(NewCertificateError(cert, err))
+		return vr.notifier.Notify(NewCertificateError(cert, err))
 	}
 	block, _ := pem.Decode(b)
 	if block == nil {
-		return vr.notifier.Error(NewCertificateError(cert, ErrCertEncoding))
+		return vr.notifier.Notify(NewCertificateError(cert, ErrCertEncoding))
 	}
 	parsedCert, err := x509.ParseCertificate(block.Bytes)
 	if err != nil {
 		err = fmt.Errorf("%w: %s", ErrCertParse, err)
-		return vr.notifier.Error(NewCertificateError(cert, err))
+		return vr.notifier.Notify(NewCertificateError(cert, err))
 	}
 	return vr.validateNotAfter(cert, parsedCert)
 }
 
 func (vr *Validator) validateNotAfter(cert *pb.Certificate, parsedCert *x509.Certificate) error {
 	if parsedCert.NotAfter.Before(time.Now()) {
-		return vr.notifier.Error(NewCertificateError(cert, ErrCertExpired))
+		return vr.notifier.Notify(NewCertificateError(cert, ErrCertExpired))
 	}
 	var (
 		years      int // zero
@@ -92,7 +92,7 @@ func (vr *Validator) validateNotAfter(cert *pb.Certificate, parsedCert *x509.Cer
 			msg = fmt.Sprintf("expires in %.0f hours", h)
 		}
 		err := fmt.Errorf("%w: %s (expire days is %d)", ErrCertExpiring, msg, expireDays)
-		return vr.notifier.Error(NewCertificateError(cert, err))
+		return vr.notifier.Notify(NewCertificateError(cert, err))
 	}
 	return nil
 }

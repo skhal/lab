@@ -15,7 +15,7 @@ var (
 	testErrNotifier     = errors.New("test notifier error")
 )
 
-func TestDispatcher_Error(t *testing.T) {
+func TestDispatcher_Notify(t *testing.T) {
 	tests := []struct {
 		name             string
 		notifier         *testDispatcherNotifier
@@ -43,7 +43,7 @@ func TestDispatcher_Error(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			dispatch := NewDispatchNotifier(tc.notifier)
 
-			err := dispatch.Error(tc.notification)
+			err := dispatch.Notify(tc.notification)
 
 			if !errors.Is(err, tc.wantErr) {
 				t.Errorf("unexpected error '%v'; want '%v'", err, tc.wantErr)
@@ -60,7 +60,7 @@ type testDispatcherNotifier struct {
 	got          error
 }
 
-func (tdn *testDispatcherNotifier) Error(err error) error {
+func (tdn *testDispatcherNotifier) Notify(err error) error {
 	tdn.got = err
 	return tdn.emulateError
 }

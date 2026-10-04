@@ -19,12 +19,12 @@ func NewDispatchNotifier(n notifier, nn ...notifier) DispatchNotifier {
 	}
 }
 
-// Error dispatches the notification to all notifiers and propagates returned
+// Notify dispatches the notification to all notifiers and propagates returned
 // errors if any.
-func (dn DispatchNotifier) Error(err error) error {
+func (dn DispatchNotifier) Notify(err error) error {
 	var ee []error
 	for _, n := range dn.notifiers {
-		ee = append(ee, n.Error(err))
+		ee = append(ee, n.Notify(err))
 	}
 	return errors.Join(ee...)
 }

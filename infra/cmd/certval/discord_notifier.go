@@ -29,8 +29,8 @@ type DiscordData struct {
 	Content string `json:"content"`
 }
 
-// Error sends an error notification to Discord.
-func (dn *DiscordNotifier) Error(err error) error {
+// Notify sends an error notification to Discord.
+func (dn *DiscordNotifier) Notify(err error) error {
 	data := DiscordData{
 		Content: err.Error(),
 	}

@@ -14,7 +14,7 @@ import (
 	"github.com/skhal/lab/infra/cmd/certval/pb"
 )
 
-func TestSlackNotifier_Error(t *testing.T) {
+func TestSlackNotifier_Nofiy(t *testing.T) {
 	tests := []struct {
 		name    string
 		handler http.HandlerFunc
@@ -52,7 +52,7 @@ func TestSlackNotifier_Error(t *testing.T) {
 			}.Build()
 			notifier := NewSlackNotifier(slack)
 
-			err := notifier.Error(tc.err)
+			err := notifier.Notify(tc.err)
 
 			if !errors.Is(err, tc.wantErr) {
 				t.Errorf("unexpected error '%v'; want '%v'", err, tc.wantErr)

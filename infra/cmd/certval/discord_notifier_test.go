@@ -14,7 +14,7 @@ import (
 	"github.com/skhal/lab/infra/cmd/certval/pb"
 )
 
-func TestDiscordNotifier_Error(t *testing.T) {
+func TestDiscordNotifier_Notify(t *testing.T) {
 	tests := []struct {
 		name    string
 		handler http.HandlerFunc
@@ -52,7 +52,7 @@ func TestDiscordNotifier_Error(t *testing.T) {
 			}.Build()
 			notifier := NewDiscordNotifier(slack)
 
-			err := notifier.Error(tc.err)
+			err := notifier.Notify(tc.err)
 
 			if !errors.Is(err, tc.wantErr) {
 				t.Errorf("unexpected error '%v'; want '%v'", err, tc.wantErr)
