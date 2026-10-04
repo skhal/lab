@@ -12,7 +12,10 @@
 #   path  string  location of the certificate on the file system.
 certval_certificates: "{{ undef(hint='Certificates to validate') }}"
 
-# certval_slack_webhook is the webhook of the Slack application that is used
-# to send notificateions to.
+# certval_discord_webhook is Discord webhook to send notifications.
+certval_discord_webhook: "{{ undef(hint='Discord webhook') }}"
+
+# certval_slack_webhook is the webhook of the Slack application to send
+# notifications.
 certval_slack_webhook: "{{ undef(hint='Slack app webhook') }}"
 # keep-sorted end

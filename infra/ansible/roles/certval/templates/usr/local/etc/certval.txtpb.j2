@@ -5,6 +5,10 @@ slack {
   webhook: "{{ certval_slack_webhook }}"
 }
 
+discord {
+  webhook: "{{ certval_discord_webhook }}"
+}
+
 {% for cert in certval_certificates %}
 certificate {
   name: "{{ cert.name }}"
