@@ -29,10 +29,11 @@ const (
 // Config lists certificates to validate and Slack configuration to send
 // notifications to.
 //
-// Next ID: 3
+// Next ID: 4
 type Config struct {
 	state                  protoimpl.MessageState `protogen:"opaque.v1"`
 	xxx_hidden_Slack       *Slack                 `protobuf:"bytes,1,opt,name=slack"`
+	xxx_hidden_Discord     *Discord               `protobuf:"bytes,3,opt,name=discord"`
 	xxx_hidden_Certificate *[]*Certificate        `protobuf:"bytes,2,rep,name=certificate"`
 	unknownFields          protoimpl.UnknownFields
 	sizeCache              protoimpl.SizeCache
@@ -70,6 +71,13 @@ func (x *Config) GetSlack() *Slack {
 	return nil
 }
 
+func (x *Config) GetDiscord() *Discord {
+	if x != nil {
+		return x.xxx_hidden_Discord
+	}
+	return nil
+}
+
 func (x *Config) GetCertificate() []*Certificate {
 	if x != nil {
 		if x.xxx_hidden_Certificate != nil {
@@ -83,6 +91,10 @@ func (x *Config) SetSlack(v *Slack) {
 	x.xxx_hidden_Slack = v
 }
 
+func (x *Config) SetDiscord(v *Discord) {
+	x.xxx_hidden_Discord = v
+}
+
 func (x *Config) SetCertificate(v []*Certificate) {
 	x.xxx_hidden_Certificate = &v
 }
@@ -94,8 +106,19 @@ func (x *Config) HasSlack() bool {
 	return x.xxx_hidden_Slack != nil
 }
 
+func (x *Config) HasDiscord() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Discord != nil
+}
+
 func (x *Config) ClearSlack() {
 	x.xxx_hidden_Slack = nil
+}
+
+func (x *Config) ClearDiscord() {
+	x.xxx_hidden_Discord = nil
 }
 
 type Config_builder struct {
@@ -103,6 +126,8 @@ type Config_builder struct {
 
 	// slack holds Slack configuration parameters such as webhook, etc.
 	Slack *Slack
+	// discord configures Discord, i.e. webhook, etc.
+	Discord *Discord
 	// certificate lists certificates to validate.
 	Certificate []*Certificate
 }
@@ -112,6 +137,7 @@ func (b0 Config_builder) Build() *Config {
 	b, x := &b0, m0
 	_, _ = b, x
 	x.xxx_hidden_Slack = b.Slack
+	x.xxx_hidden_Discord = b.Discord
 	x.xxx_hidden_Certificate = &b.Certificate
 	return m0
 }
@@ -198,6 +224,88 @@ func (b0 Slack_builder) Build() *Slack {
 	return m0
 }
 
+// Discord contains configuration parameters to send notifications to Discord.
+//
+// Next ID: 2
+type Discord struct {
+	state                  protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Webhook     *string                `protobuf:"bytes,1,opt,name=webhook"`
+	XXX_raceDetectHookData protoimpl.RaceDetectHookData
+	XXX_presence           [1]uint32
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
+}
+
+func (x *Discord) Reset() {
+	*x = Discord{}
+	mi := &file_infra_cmd_certval_pb_config_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Discord) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Discord) ProtoMessage() {}
+
+func (x *Discord) ProtoReflect() protoreflect.Message {
+	mi := &file_infra_cmd_certval_pb_config_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+func (x *Discord) GetWebhook() string {
+	if x != nil {
+		if x.xxx_hidden_Webhook != nil {
+			return *x.xxx_hidden_Webhook
+		}
+		return ""
+	}
+	return ""
+}
+
+func (x *Discord) SetWebhook(v string) {
+	x.xxx_hidden_Webhook = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 1)
+}
+
+func (x *Discord) HasWebhook() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 0)
+}
+
+func (x *Discord) ClearWebhook() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 0)
+	x.xxx_hidden_Webhook = nil
+}
+
+type Discord_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// webhook is the Discord webhook for the notifications.
+	Webhook *string
+}
+
+func (b0 Discord_builder) Build() *Discord {
+	m0 := &Discord{}
+	b, x := &b0, m0
+	_, _ = b, x
+	if b.Webhook != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 1)
+		x.xxx_hidden_Webhook = b.Webhook
+	}
+	return m0
+}
+
 // Certificate describes a single certificate to validate.
 //
 // Next ID: 4
@@ -214,7 +322,7 @@ type Certificate struct {
 
 func (x *Certificate) Reset() {
 	*x = Certificate{}
-	mi := &file_infra_cmd_certval_pb_config_proto_msgTypes[2]
+	mi := &file_infra_cmd_certval_pb_config_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -226,7 +334,7 @@ func (x *Certificate) String() string {
 func (*Certificate) ProtoMessage() {}
 
 func (x *Certificate) ProtoReflect() protoreflect.Message {
-	mi := &file_infra_cmd_certval_pb_config_proto_msgTypes[2]
+	mi := &file_infra_cmd_certval_pb_config_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -354,7 +462,7 @@ type Certificate_Notify struct {
 
 func (x *Certificate_Notify) Reset() {
 	*x = Certificate_Notify{}
-	mi := &file_infra_cmd_certval_pb_config_proto_msgTypes[3]
+	mi := &file_infra_cmd_certval_pb_config_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -366,7 +474,7 @@ func (x *Certificate_Notify) String() string {
 func (*Certificate_Notify) ProtoMessage() {}
 
 func (x *Certificate_Notify) ProtoReflect() protoreflect.Message {
-	mi := &file_infra_cmd_certval_pb_config_proto_msgTypes[3]
+	mi := &file_infra_cmd_certval_pb_config_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -424,11 +532,14 @@ var File_infra_cmd_certval_pb_config_proto protoreflect.FileDescriptor
 
 const file_infra_cmd_certval_pb_config_proto_rawDesc = "" +
 	"\n" +
-	"!infra/cmd/certval/pb/config.proto\x12\x11infra.cmd.certval\x1a!google/protobuf/go_features.proto\"z\n" +
+	"!infra/cmd/certval/pb/config.proto\x12\x11infra.cmd.certval\x1a!google/protobuf/go_features.proto\"\xb0\x01\n" +
 	"\x06Config\x12.\n" +
-	"\x05slack\x18\x01 \x01(\v2\x18.infra.cmd.certval.SlackR\x05slack\x12@\n" +
+	"\x05slack\x18\x01 \x01(\v2\x18.infra.cmd.certval.SlackR\x05slack\x124\n" +
+	"\adiscord\x18\x03 \x01(\v2\x1a.infra.cmd.certval.DiscordR\adiscord\x12@\n" +
 	"\vcertificate\x18\x02 \x03(\v2\x1e.infra.cmd.certval.CertificateR\vcertificate\"!\n" +
 	"\x05Slack\x12\x18\n" +
+	"\awebhook\x18\x01 \x01(\tR\awebhook\"#\n" +
+	"\aDiscord\x12\x18\n" +
 	"\awebhook\x18\x01 \x01(\tR\awebhook\"\x9f\x01\n" +
 	"\vCertificate\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12\x12\n" +
@@ -438,22 +549,24 @@ const file_infra_cmd_certval_pb_config_proto_rawDesc = "" +
 	"\vexpire_days\x18\x01 \x01(\x05R\n" +
 	"expireDaysB3Z)github.com/skhal/lab/infra/cmd/certval/pb\x92\x03\x05\xd2>\x02\x10\x03b\beditionsp\xe9\a"
 
-var file_infra_cmd_certval_pb_config_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
+var file_infra_cmd_certval_pb_config_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
 var file_infra_cmd_certval_pb_config_proto_goTypes = []any{
 	(*Config)(nil),             // 0: infra.cmd.certval.Config
 	(*Slack)(nil),              // 1: infra.cmd.certval.Slack
-	(*Certificate)(nil),        // 2: infra.cmd.certval.Certificate
-	(*Certificate_Notify)(nil), // 3: infra.cmd.certval.Certificate.Notify
+	(*Discord)(nil),            // 2: infra.cmd.certval.Discord
+	(*Certificate)(nil),        // 3: infra.cmd.certval.Certificate
+	(*Certificate_Notify)(nil), // 4: infra.cmd.certval.Certificate.Notify
 }
 var file_infra_cmd_certval_pb_config_proto_depIdxs = []int32{
 	1, // 0: infra.cmd.certval.Config.slack:type_name -> infra.cmd.certval.Slack
-	2, // 1: infra.cmd.certval.Config.certificate:type_name -> infra.cmd.certval.Certificate
-	3, // 2: infra.cmd.certval.Certificate.notify:type_name -> infra.cmd.certval.Certificate.Notify
-	3, // [3:3] is the sub-list for method output_type
-	3, // [3:3] is the sub-list for method input_type
-	3, // [3:3] is the sub-list for extension type_name
-	3, // [3:3] is the sub-list for extension extendee
-	0, // [0:3] is the sub-list for field type_name
+	2, // 1: infra.cmd.certval.Config.discord:type_name -> infra.cmd.certval.Discord
+	3, // 2: infra.cmd.certval.Config.certificate:type_name -> infra.cmd.certval.Certificate
+	4, // 3: infra.cmd.certval.Certificate.notify:type_name -> infra.cmd.certval.Certificate.Notify
+	4, // [4:4] is the sub-list for method output_type
+	4, // [4:4] is the sub-list for method input_type
+	4, // [4:4] is the sub-list for extension type_name
+	4, // [4:4] is the sub-list for extension extendee
+	0, // [0:4] is the sub-list for field type_name
 }
 
 func init() { file_infra_cmd_certval_pb_config_proto_init() }
@@ -467,7 +580,7 @@ func file_infra_cmd_certval_pb_config_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_infra_cmd_certval_pb_config_proto_rawDesc), len(file_infra_cmd_certval_pb_config_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   4,
+			NumMessages:   5,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

@@ -19,7 +19,10 @@ import (
 	"github.com/skhal/lab/infra/cmd/certval/pb"
 )
 
-var errFlagConfigFile = errors.New("missing configuration file")
+var (
+	errFlagConfigFile      = errors.New("missing configuration file")
+	errConfigEmptyNotifier = errors.New("missing notifiers in the configuration file")
+)
 
 func main() {
 	if err := run(); err != nil {
@@ -51,7 +54,10 @@ func run() error {
 }
 
 func validateCertificates(cfg *pb.Config) error {
-	notifier := NewSlackNotifier(cfg.GetSlack())
+	notifier, err := createNotifier(cfg)
+	if err != nil {
+		return err
+	}
 	validator := NewValidator(os.ReadFile, notifier)
 	var ee []error
 	for _, cert := range cfg.GetCertificate() {
@@ -59,4 +65,18 @@ func validateCertificates(cfg *pb.Config) error {
 		ee = append(ee, err)
 	}
 	return errors.Join(ee...)
+}
+
+func createNotifier(cfg *pb.Config) (notifier, error) {
+	var nn []notifier
+	if cfg.HasSlack() {
+		nn = append(nn, NewSlackNotifier(cfg.GetSlack()))
+	}
+	if cfg.HasDiscord() {
+		nn = append(nn, NewDiscordNotifier(cfg.GetDiscord()))
+	}
+	if nn == nil {
+		return nil, errConfigEmptyNotifier
+	}
+	return NewDispatchNotifier(nn[0], nn[1:]...), nil
 }

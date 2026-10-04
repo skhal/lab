@@ -1,3 +1,8 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
 # proto-file: github.com/skhal/lab/infra/cmd/certval/pb/config.proto
 # proto-message: infra.cmd.certval.Config
 
@@ -5,6 +10,12 @@
 slack {
   # webhook is the application webhook from api.slack.com
   webhook: "https://hooks.slack.com/services/example"
+}
+
+# discord configures Discord webhook.
+discord {
+  # webhook is the webhook to send the notifications to.
+  webhook: "https://discord.com/api/webhooks/example"
 }
 
 # certificate configures a single certificate. There can be

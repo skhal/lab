@@ -15,10 +15,13 @@ option go_package = "github.com/skhal/lab/infra/cmd/certval/pb";
 // Config lists certificates to validate and Slack configuration to send
 // notifications to.
 //
-// Next ID: 3
+// Next ID: 4
 message Config {
   // slack holds Slack configuration parameters such as webhook, etc.
   Slack slack = 1;
+
+  // discord configures Discord, i.e. webhook, etc.
+  Discord discord = 3;
 
   // certificate lists certificates to validate.
   repeated Certificate certificate = 2;
@@ -29,6 +32,14 @@ message Config {
 // Next ID: 2
 message Slack {
   // webook is the webhook to Slack application
+  string webhook = 1;
+}
+
+// Discord contains configuration parameters to send notifications to Discord.
+//
+// Next ID: 2
+message Discord {
+  // webhook is the Discord webhook for the notifications.
   string webhook = 1;
 }
 

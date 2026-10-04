@@ -47,13 +47,13 @@ func (sl *SlackNotifier) Error(err error) error {
 	if e != nil {
 		return e
 	}
-	if e := sl.send(body); e != nil {
+	if e := send(body, sl.slack.GetWebhook()); e != nil {
 		return fmt.Errorf("%w: %s\nServer response: %s", ErrNotify, e, err)
 	}
 	return nil
 }
 
-func (sl *SlackNotifier) send(b []byte) error {
+func send(b []byte, url string) error {
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{
 			InsecureSkipVerify: true,
@@ -63,7 +63,7 @@ func (sl *SlackNotifier) send(b []byte) error {
 		Transport: tr,
 	}
 	buf := bytes.NewBuffer(b)
-	resp, err := client.Post(sl.slack.GetWebhook(), contentTypeJSON, buf)
+	resp, err := client.Post(url, contentTypeJSON, buf)
 	if err != nil {
 		return err
 	}
