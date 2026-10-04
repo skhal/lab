@@ -6,7 +6,7 @@
 # vim: tabstop=2
 
 PORTNAME=       lab-certval
-PORTVERSION=    260930
+PORTVERSION=    261004
 PORTREVISION=   1
 CATEGORIES=     sysutils
 
@@ -23,7 +23,7 @@ USES=           go:modules
 USE_GITHUB=     yes
 GH_ACCOUNT=     skhal
 GH_PROJECT=     lab
-GH_TAGNAME=     e1adb8cb
+GH_TAGNAME=     79f1410d
 GO_TARGET=      ./infra/cmd/certval:lab-certval
 GH_TUPLE=       \
                 BurntSushi:toml:a339e1f7089c:burntsushi_toml/vendor/github.com/BurntSushi/toml \
