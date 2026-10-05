@@ -4,22 +4,6 @@
 # license that can be found in the LICENSE file.
 
 ---
-- name: Create LDAP jail
-  hosts: nuc.lab.net
-  tags: create
-  vars:
-    # keep-sorted start
-    jail_allow_chflags: true
-    jail_bridge: bridge0
-    jail_cidr: 10.0.0.3/24
-    jail_defaultrouter: 10.0.0.1
-    jail_depend:
-      - dns
-    jail_name: ldap
-    # keep-sorted end
-  roles:
-    - role: jail
-
 - name: Configure PKG repos
   hosts: ldap.lab.net
   tags: pkg-repos

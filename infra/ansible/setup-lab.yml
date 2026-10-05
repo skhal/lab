@@ -19,6 +19,13 @@
 #   Every play has a tag with name matching the imported play name without .yml
 #   suffix.
 ---
+# bootstrap-nuc runs minimal configuration of the NUC with bare FreeBSD OS.
 - name: Bootstrap NUC
   tags: bootstrap-nuc
   ansible.builtin.import_playbook: playbooks/bootstrap-nuc.yml
+
+# create-jails creates jail skeleton and adds bare thick jails with FreeBSD
+# environment.
+- name: Create Jails
+  tags: create-jails
+  ansible.builtin.import_playbook: playbooks/create-jails.yml

@@ -4,20 +4,6 @@
 # license that can be found in the LICENSE file.
 
 ---
-- name: Create DNS jail
-  hosts: nuc.lab.net
-  tags: create
-  vars:
-    # keep-sorted start
-    jail_allow_chflags: true
-    jail_bridge: bridge0
-    jail_cidr: 10.0.0.2/24
-    jail_defaultrouter: 10.0.0.1
-    jail_name: dns
-    # keep-sorted end
-  roles:
-    - role: jail
-
 - name: Configure PKG repos
   hosts: dns.lab.net
   tags: pkg-repos

@@ -4,12 +4,6 @@
 # license that can be found in the LICENSE file.
 
 ---
-- name: Bootstrap Jails
-  hosts: nuc.lab.net
-  tags: skel
-  roles:
-    - role: jail_skel
-
 - name: Import SSL jail
   ansible.builtin.import_playbook: "playbooks/jail_ssl.yml"
 

@@ -1,0 +1,103 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+# NAME
+#   create-jails • create thick jails with FreeBSD environment.
+#
+# SYNOPSIS
+#   ansible-playbook ./playbooks/create-jails.yml
+#
+# DESCRIPTION
+#   create-jails creates a jail skeleton (aka template) and instantiate jails.
+---
+- name: Create jail skeleton
+  hosts: nuc.lab.net
+  tags: create-jail-skeleton
+  roles:
+    - role: jail_skel
+
+- name: Create jail SSL
+  hosts: nuc.lab.net
+  tags: create-jail-ssl
+  vars:
+    # keep-sorted start
+    jail_cidr: 10.0.0.4/24
+    jail_name: ssl
+    # keep-sorted end
+  roles:
+    - role: jail
+
+- name: Create jail DNS
+  hosts: nuc.lab.net
+  tags: create-jail-dns
+  vars:
+    # keep-sorted start
+    jail_cidr: 10.0.0.2/24
+    jail_name: dns
+    # keep-sorted end
+  roles:
+    - role: jail
+
+- name: Create jail LDAP
+  hosts: nuc.lab.net
+  tags: create-jail-ldap
+  vars:
+    # keep-sorted start
+    jail_cidr: 10.0.0.3/24
+    jail_depend:
+      - dns
+    jail_name: ldap
+    # keep-sorted end
+  roles:
+    - role: jail
+
+- name: Create jail PKG
+  hosts: nuc.lab.net
+  tags: create-jail-pkg
+  vars:
+    # keep-sorted start
+    jail_allow_mlock: true
+    jail_allow_mount: true
+    jail_allow_mount_devfs: true
+    jail_allow_mount_linprocfs: true
+    jail_allow_mount_nullfs: true
+    jail_allow_mount_procfs: true
+    jail_allow_mount_tmpfs: true
+    jail_children_max: 10
+    jail_cidr: 10.0.0.5/24
+    jail_depend:
+      - dns
+    jail_enforce_statfs: 1
+    jail_name: pkg
+    # keep-sorted end
+  roles:
+    - role: linux
+    - role: jail
+
+- name: Create jail BSD
+  hosts: nuc.lab.net
+  tags: create-jail-bsd
+  vars:
+    # keep-sorted start
+    jail_allow_mlock: true
+    jail_allow_mount: true
+    jail_allow_mount_devfs: true
+    jail_allow_mount_linprocfs: true
+    jail_allow_mount_nullfs: true
+    jail_allow_mount_procfs: true
+    jail_allow_mount_tmpfs: true
+    jail_children_max: 10
+    jail_cidr: 10.0.0.101/24
+    jail_depend:
+      - dns
+      - ldap
+      - pkg
+    jail_enforce_statfs: 1
+    jail_mounts:
+      - path: /home/skhalatyan
+    jail_name: bsd
+    # keep-sorted end
+  roles:
+    - role: jail
