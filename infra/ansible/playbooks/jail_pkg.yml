@@ -4,19 +4,6 @@
 # license that can be found in the LICENSE file.
 
 ---
-- name: Bootstrap PKG jail
-  hosts: pkg.lab.net
-  tags: bootstrap
-  roles:
-    # keep-sorted start
-    - role: doas
-    - role: pkg
-    - role: ssh
-    - role: syslog
-    - role: timezone
-    - role: user
-    # keep-sorted end
-
 - name: Configure DNS server
   hosts: pkg.lab.net
   tags: dns

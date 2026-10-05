@@ -17,19 +17,6 @@
         name: openssl_gen
         tasks_from: rsa_fetch
 
-- name: Bootstrap BSD jail
-  hosts: bsd.lab.net
-  tags: bootstrap
-  roles:
-    # keep-sorted start
-    - role: doas
-    - role: pkg
-    - role: ssh
-    - role: syslog
-    - role: timezone
-    - role: user
-    # keep-sorted end
-
 - name: Configure DNS server
   hosts: bsd.lab.net
   tags: dns

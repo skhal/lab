@@ -26,6 +26,11 @@
 
 # create-jails creates jail skeleton and adds bare thick jails with FreeBSD
 # environment.
-- name: Create Jails
+- name: Create jails
   tags: create-jails
   ansible.builtin.import_playbook: playbooks/create-jails.yml
+
+# bootstrap-jails runs minimal configuration of bare jails.
+- name: Bootstrap jails
+  tags: bootstrap-jails
+  ansible.builtin.import_playbook: playbooks/bootstrap-jails.yml

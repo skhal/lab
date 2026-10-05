@@ -34,14 +34,16 @@
   hosts: nuc.lab.net
   tags: bootstrap-services
   roles:
+    # keep-sorted start
+    - role: hostname
+    - role: ntp
+    - role: periodic
+    - role: pkg
     - role: rc
     - role: syslog
-    - role: pkg
-    - role: ntp
-    - role: hostname
-    - role: periodic
-    - role: zfs
     - role: timezone
+    - role: zfs
+    # keep-sorted end
 
 - name: Bootstrap users
   hosts: nuc.lab.net

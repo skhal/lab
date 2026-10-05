@@ -1,0 +1,44 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+# NAME
+#   bootstrap-jails • minimal configuration of bare jails.
+#
+# SYNOPSIS
+#   ansible-playbook ./playbooks/bootstrap-jails.yml
+#
+# DESCRIPTION
+#   bootstrap-jails runs minimal configuration of fresh FreeBSD jails.
+#
+#   It runs the following steps:
+#
+#   - break /etc/rc.conf into per-service configuration under /etc/rc.conf.d/.
+#   - setup user environment.
+#   - configure remote access.
+---
+- name: Configure services
+  hosts: jails
+  tags: bootstrap-services
+  roles:
+    # keep-sorted start
+    - role: pkg
+    - role: syslog
+    - role: timezone
+    # keep-sorted end
+
+- name: Bootstrap users
+  hosts: jails
+  tags: bootstrap-users
+  roles:
+    # keep-sorted start
+    - role: doas
+    - role: user
+    # keep-sorted end
+
+- name: Configure remote access
+  hosts: jails
+  tags: bootstrap-remote-access
+  roles:
+    - role: ssh
