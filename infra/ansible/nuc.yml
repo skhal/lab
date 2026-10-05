@@ -4,9 +4,18 @@
 # license that can be found in the LICENSE file.
 
 ---
-- name: Bootstrap NUC
+- name: Bootstrap for Ansible
   hosts: nuc.lab.net
   tags: bootstrap
+  # The server is bare-bone with fresh OS install. Use included method to
+  # escalate privileges su(1).
+  become_method: ansible.builtin.su
+  roles:
+    - role: bootstrap
+
+- name: Bootstrap OS
+  hosts: nuc.lab.net
+  tags: config
   roles:
     - role: rc
     - role: syslog
@@ -45,7 +54,7 @@
 
 - name: Configure firewall
   hosts: nuc.lab.net
-  tags: pf
+  tags: firewall
   roles:
     - role: pflog
     - role: pf
