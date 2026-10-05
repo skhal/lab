@@ -4,28 +4,6 @@
 # license that can be found in the LICENSE file.
 
 ---
-- name: Bootstrap for Ansible
-  hosts: nuc.lab.net
-  tags: bootstrap
-  # The server is bare-bone with fresh OS install. Use included method to
-  # escalate privileges su(1).
-  become_method: ansible.builtin.su
-  roles:
-    - role: bootstrap
-
-- name: Bootstrap OS
-  hosts: nuc.lab.net
-  tags: config
-  roles:
-    - role: rc
-    - role: syslog
-    - role: pkg
-    - role: ntp
-    - role: hostname
-    - role: periodic
-    - role: zfs
-    - role: timezone
-
 - name: Configure PKG repos
   hosts: nuc.lab.net
   tags: pkg-repos
@@ -35,33 +13,8 @@
         name: local_pkg
         tasks_from: configure_repos
 
-- name: Configure Users
-  hosts: nuc.lab.net
-  tags: users
-  roles:
-    # keep-sorted start
-    - role: doas
-    - role: user
-    - role: zfs_mkhomedir
-    # keep-sorted end
-
-- name: Configure network
-  hosts: nuc.lab.net
-  tags: network
-  roles:
-    - role: routing
-    - role: netif
-
-- name: Configure firewall
-  hosts: nuc.lab.net
-  tags: firewall
-  roles:
-    - role: pflog
-    - role: pf
-
 - name: Configure Services
   hosts: nuc.lab.net
   tags: services
   roles:
-    - role: ssh
     - role: local_unbound

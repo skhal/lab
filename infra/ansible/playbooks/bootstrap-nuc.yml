@@ -1,0 +1,74 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+# NAME
+#   bootstrap-nuc • minimal configuration of freshly installed FreeBSD on NUC.
+#
+# SYNOPSIS
+#   ansible-playbook ./playbooks/bootstrap-nuc.yml
+#
+# DESCRIPTION
+#   bootstrap-nuc performs minimal configuration of NUC with fresh installation
+#   of FreeBSD OS. It includes the following steps:
+#
+#     - install Python and doas(1) for Ansible to manage the host.
+#     - break /etc/rc.conf into per-service rc configurion under /etc/rc.conf.d.
+#     - configure user environment (group, shell, etc.).
+#     - setup network and firewall
+#     - configure remote access
+#
+#   Every step of the configuration is tagged with bootstrap- prefix.
+---
+# The server is bare-bone with fresh OS install. It includes su(1) to escalate
+# privileges.
+- name: Bootstrap for Ansible
+  hosts: nuc.lab.net
+  tags: bootstrap-ansible
+  become_method: ansible.builtin.su
+  roles:
+    - role: bootstrap
+
+- name: Configure services
+  hosts: nuc.lab.net
+  tags: bootstrap-services
+  roles:
+    - role: rc
+    - role: syslog
+    - role: pkg
+    - role: ntp
+    - role: hostname
+    - role: periodic
+    - role: zfs
+    - role: timezone
+
+- name: Bootstrap users
+  hosts: nuc.lab.net
+  tags: bootstrap-users
+  roles:
+    # keep-sorted start
+    - role: doas
+    - role: user
+    - role: zfs_mkhomedir
+    # keep-sorted end
+
+- name: Configure network
+  hosts: nuc.lab.net
+  tags: bootstrap-network
+  roles:
+    - role: routing
+    - role: netif
+
+- name: Configure firewall
+  hosts: nuc.lab.net
+  tags: bootstrap-firewall
+  roles:
+    - role: pflog
+    - role: pf
+
+- name: Configure remote access
+  hosts: nuc.lab.net
+  tags: bootstrap-remote-access
+  roles:
+    - role: ssh

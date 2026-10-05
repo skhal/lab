@@ -1,0 +1,24 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+# NAME
+#   setup-lab • master playbook to setup Lab cluster.
+#
+# SYNOPSIS
+#   ansible-playbook ./setup-lab.yml
+#
+# DESCRIPTION
+#   setup-lab configures Lab cluster, starting with the host node (a NUC
+#   machine), and then proceed to virtual machines setup.
+#
+#   It lists plays in the expected order of execution, i.e. the N-th play
+#   expects upstream plays, 0 to N-1, to be run before.
+#
+#   Every play has a tag with name matching the imported play name without .yml
+#   suffix.
+---
+- name: Bootstrap NUC
+  tags: bootstrap-nuc
+  ansible.builtin.import_playbook: playbooks/bootstrap-nuc.yml
