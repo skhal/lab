@@ -23,12 +23,6 @@
   roles:
     - role: local_unbound
 
-- name: Configure certificates
-  hosts: ldap.lab.net
-  tags: cert
-  roles:
-    - role: openssl_ca
-
 - name: Configure LDAP server
   hosts: ldap.lab.net
   tags: ldap

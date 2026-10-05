@@ -10,12 +10,6 @@
   roles:
     - role: local_unbound
 
-- name: Configure certificate
-  hosts: pkg.lab.net
-  tags: cert
-  roles:
-    - role: openssl_ca
-
 - name: Configure PKG
   hosts: pkg.lab.net
   tags: pkg

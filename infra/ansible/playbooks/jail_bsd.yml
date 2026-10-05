@@ -23,12 +23,6 @@
   roles:
     - role: local_unbound
 
-- name: Configure certificates
-  hosts: bsd.lab.net
-  tags: cert
-  roles:
-    - role: openssl_ca
-
 - name: Configure SSO
   hosts: bsd.lab.net
   tags: sso

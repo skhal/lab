@@ -23,21 +23,6 @@
   roles:
     - role: local_unbound
 
-- name: Setup Central Authority
-  hosts: ssl.lab.net
-  tags: ca
-  tasks:
-    - name: Generate CA
-      ansible.builtin.include_role:
-        name: openssl_ca
-        tasks_from: generate_ca
-
-- name: Fetch CA
-  hosts: nuc.lab.net
-  tags: ca
-  roles:
-    - role: openssl_ca
-
 - name: Certificate validation
   hosts: ssl.lab.net
   tags: certval

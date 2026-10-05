@@ -1,0 +1,30 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+# NAME
+#   create-ca • creates a Central Authority
+#
+# SYNOPSIS
+#   ansible-playbook ./playbooks/create-ca.yml
+#
+# DESCRIPTION
+#   create-ca generates a self-signed certificate for local Central Authority
+#   (CA) and distributes it to all nodes in the cluster.
+---
+- name: Create Central Authority
+  hosts: ssl.lab.net
+  tags: create-ca
+  tasks:
+    - name: Generate CA
+      ansible.builtin.include_role:
+        name: openssl_ca
+        tasks_from: generate_ca
+
+- name: Distribute CA certificate
+  # every node on the cluster except the CA host
+  hosts: all:!ssl.lab.net
+  tags: ca
+  roles:
+    - role: openssl_ca

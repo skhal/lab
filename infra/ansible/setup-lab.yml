@@ -34,3 +34,8 @@
 - name: Bootstrap jails
   tags: bootstrap-jails
   ansible.builtin.import_playbook: playbooks/bootstrap-jails.yml
+
+# create-ca creates a local Central Authority to sign certificates.
+- name: Create Certificate Authority
+  tags: create-ca
+  ansible.builtin.import_playbook: playbooks/create-ca.yml
