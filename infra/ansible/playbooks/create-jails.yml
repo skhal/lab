@@ -4,13 +4,14 @@
 # license that can be found in the LICENSE file.
 
 # NAME
-#   create-jails • create thick jails with FreeBSD environment.
+#   create-jails • create a jail skeleton and instantiate jails
 #
 # SYNOPSIS
 #   ansible-playbook ./playbooks/create-jails.yml
 #
 # DESCRIPTION
-#   create-jails creates a jail skeleton (aka template) and instantiate jails.
+#   create-jails creates a jail skeleton, i.e. a template jail, and instantiate
+#   jails (VMs).
 ---
 - name: Create jail skeleton
   hosts: nuc.lab.net

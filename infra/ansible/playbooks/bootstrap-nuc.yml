@@ -11,21 +11,12 @@
 #
 # DESCRIPTION
 #   bootstrap-nuc performs minimal configuration of NUC with fresh installation
-#   of FreeBSD OS. It includes the following steps:
-#
-#     - install Python and doas(1) for Ansible to manage the host.
-#     - break /etc/rc.conf into per-service rc configurion under /etc/rc.conf.d.
-#     - configure user environment (group, shell, etc.).
-#     - setup network and firewall
-#     - configure remote access
-#
-#   Every step of the configuration is tagged with bootstrap- prefix.
+#   of FreeBSD OS.
 ---
-# The server is bare-bone with fresh OS install. It includes su(1) to escalate
-# privileges.
 - name: Bootstrap for Ansible
   hosts: nuc.lab.net
   tags: bootstrap-ansible
+  # The system is minimal, use su(1) to escalate privileges.
   become_method: ansible.builtin.su
   roles:
     - role: bootstrap
