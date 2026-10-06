@@ -39,3 +39,9 @@
 - name: Create Certificate Authority
   tags: create-ca
   ansible.builtin.import_playbook: playbooks/create-ca.yml
+
+# configure-dns creates an authoritative DNS server and sets up local caching
+# DNS server on every host.
+- name: Configure DNS
+  tags: configure-dns
+  ansible.builtin.import_playbook: playbooks/configure-dns.yml

@@ -17,12 +17,6 @@
         name: openssl_gen
         tasks_from: rsa_fetch
 
-- name: Configure DNS server
-  hosts: bsd.lab.net
-  tags: dns
-  roles:
-    - role: local_unbound
-
 - name: Configure SSO
   hosts: bsd.lab.net
   tags: sso

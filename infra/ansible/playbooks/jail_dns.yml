@@ -17,20 +17,6 @@
         name: openssl_gen
         tasks_from: rsa_fetch
 
-# Configure DNS server in a separate play to ensure that changes to the resolver
-# do not affect handlers run by previous roles, e.g. pkg handlers upgrade
-# packages but fails if bind and local_unbound roles mess up with DNS settings.
-# The separate plays guarantee that the roles run independently.
-- name: Configure DNS server
-  hosts: dns.lab.net
-  tags: dns
-  roles:
-    - role: bind
-    # bind installs the package and adds bind:bind user. This user owns
-    # the certificate.
-    - role: openssl_gen
-    - role: local_unbound
-
 - name: Certificate validation
   hosts: dns.lab.net
   tags: certval

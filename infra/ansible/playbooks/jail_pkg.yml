@@ -4,12 +4,6 @@
 # license that can be found in the LICENSE file.
 
 ---
-- name: Configure DNS server
-  hosts: pkg.lab.net
-  tags: dns
-  roles:
-    - role: local_unbound
-
 - name: Configure PKG
   hosts: pkg.lab.net
   tags: pkg

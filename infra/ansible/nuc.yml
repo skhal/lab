@@ -12,9 +12,3 @@
       ansible.builtin.include_role:
         name: local_pkg
         tasks_from: configure_repos
-
-- name: Configure Services
-  hosts: nuc.lab.net
-  tags: services
-  roles:
-    - role: local_unbound

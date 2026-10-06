@@ -1,0 +1,38 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+# NAME
+#   configure-dns • setup authoritative and caching DNS servers
+#
+# SYNOPSIS
+#   ansible-playbook ./playbooks/configure-dns.yml
+#
+# DESCRIPTION
+#   configure-dns creates an authoritative DNS serve and configures local
+#   caching DNS server on every node in the cluster.
+#
+#   The caching server delegates DNS queries for lab.net to the authoritative
+#   DNS server.
+#
+#   The authoritative DNS server uses TLS with certificate, owned by bind:bind
+#   user. Keep in mind that the user is added to the system in bind-role during
+#   the installation of bind-package. Therefore, the order of roles is
+#   important:
+#
+#   1. bind: install bind package
+#   2. openssl_gen: generate a certificate and make bind:bind user own it.
+---
+- name: Create authoritative DNS server
+  hosts: dns.lab.net
+  tags: configure-dns-authoritative
+  roles:
+    - role: bind
+    - role: openssl_gen
+
+- name: Configure local caching DNS server
+  hosts: all
+  tags: configure-dns-caching
+  roles:
+    - role: local_unbound

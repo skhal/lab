@@ -17,12 +17,6 @@
         name: openssl_gen
         tasks_from: rsa_fetch
 
-- name: Configure DNS server
-  hosts: ldap.lab.net
-  tags: dns
-  roles:
-    - role: local_unbound
-
 - name: Configure LDAP server
   hosts: ldap.lab.net
   tags: ldap
