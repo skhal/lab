@@ -6,14 +6,21 @@
 ---
 - name: "Use latest branch"
   become: true
+  vars:
+    _conf_file: /usr/local/etc/pkg/repos/FreeBSD.conf
   ansible.builtin.copy:
-    src: usr/local/etc/pkg/repos/FreeBSD.conf
-    dest: /usr/local/etc/pkg/repos/
+    src: "{{ _conf_file | trim('/') }}"
+    dest: "{{ _conf_file }}"
     owner: root
     group: wheel
     mode: u=rw,g=r,o=r
     directory_mode: u=rwx,g=rx,o=rx
-  notify: "upgrade_packages"
+
+- name: Upgrade packages
+  become: true
+  community.general.pkgng:
+    name: "*"
+    state: latest
 
 - name: "Add pkg aliases"
   ansible.builtin.include_tasks: "alias.yml"
