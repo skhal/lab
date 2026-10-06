@@ -46,6 +46,19 @@
         mode: u=rw,g=r,o=r
         validate: nginx -t -c %s
 
+    - name: Copy configurations
+      become: true
+      notify: local_pkg_restart_nginx
+      vars:
+        _conf_d_path: /usr/local/etc/nginx/conf.d/
+      ansible.builtin.copy:
+        src: "{{ _conf_d_path | trim('/') }}/"
+        dest: "{{ _conf_d_path }}"
+        owner: root
+        group: wheel
+        mode: u=rw,g=r,o=r
+        directory_mode: u=rwx,g=rx,o=rx
+
 - name: Configure newsyslog
   vars:
     _conf_file: /usr/local/etc/newsyslog.conf.d/nginx.conf
