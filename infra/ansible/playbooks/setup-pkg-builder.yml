@@ -1,0 +1,19 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+# NAME
+#   setup-pkg-builder • install poudriere
+#
+# SYNOPSIS
+#   ansible-playbook ./playbooks/setup-pkg-builder.yml
+#
+# DESCRIPTION
+#   setup-pkg-builder configures poudriere, a pkg builder and ports tester.
+---
+- name: Configure poudriere
+  hosts: bsd.lab.net
+  tags: poudriere
+  roles:
+    - role: poudriere

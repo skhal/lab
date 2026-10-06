@@ -55,3 +55,7 @@
 - name: Configure LDAP
   tags: configure-ldap
   ansible.builtin.import_playbook: playbooks/configure-ldap.yml
+
+- name: Setup PKG builder and port tester
+  tags: setup-pkg-builder
+  ansible.builtin.import_playbook: playbooks/setup-pkg-builder.yml

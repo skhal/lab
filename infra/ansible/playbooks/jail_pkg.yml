@@ -12,9 +12,3 @@
       ansible.builtin.include_role:
         name: openssl_gen
         tasks_from: rsa_fetch
-
-- name: Configure poudriere
-  hosts: pkg.lab.net
-  tags: poudriere
-  roles:
-    - role: poudriere

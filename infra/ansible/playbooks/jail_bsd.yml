@@ -26,10 +26,3 @@
     - vars/dev.yml
   roles:
     - role: pkg
-
-# add poudriere(8) for ports development.
-- name: Configure poudriere
-  hosts: bsd.lab.net
-  tags: poudriere
-  roles:
-    - role: poudriere
