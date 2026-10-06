@@ -8,10 +8,6 @@
   hosts: ldap.lab.net
   tags: pkg-repos
   tasks:
-    - name: Add repos
-      ansible.builtin.include_role:
-        name: local_pkg
-        tasks_from: configure_repos
     - name: Fetch repo public key
       ansible.builtin.include_role:
         name: openssl_gen

@@ -4,22 +4,10 @@
 # license that can be found in the LICENSE file.
 
 ---
-- name: Configure PKG
-  hosts: pkg.lab.net
-  tags: pkg
-  roles:
-    - role: openssl_gen
-      tags: pkg-gen-cert
-    - role: local_pkg
-
 - name: Configure PKG repos
   hosts: pkg.lab.net
   tags: pkg-repos
   tasks:
-    - name: Add repos
-      ansible.builtin.include_role:
-        name: local_pkg
-        tasks_from: configure_repos
     - name: Fetch repo public keys
       ansible.builtin.include_role:
         name: openssl_gen

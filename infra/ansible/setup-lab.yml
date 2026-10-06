@@ -45,3 +45,8 @@
 - name: Configure DNS
   tags: configure-dns
   ansible.builtin.import_playbook: playbooks/configure-dns.yml
+
+# setup-pkg configures a local caching PKG server.
+- name: Setup PKG
+  tags: setup-pkg
+  ansible.builtin.import_playbook: playbooks/setup-pkg.yml

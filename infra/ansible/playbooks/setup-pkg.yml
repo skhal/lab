@@ -1,0 +1,32 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+# NAME
+#   setup-pkg • create a caching PKG server
+#
+# SYNOPSIS
+#   ansible-playbook ./playbooks/setup-pkg.yml
+#
+# DESCRIPTION
+#   setup-pkg creates a local caching PKG server.
+#
+#   It also configures pkg-repos(1) on all hosts with the caching PKG server
+#   to fetch packages for FreeBSD-ports, FreeBSD-kmods and FreeBSD-base.
+---
+- name: Create PKG caching server
+  hosts: pkg.lab.net
+  tags: setup-pkg-server
+  roles:
+    - role: openssl_gen
+    - role: local_pkg
+
+- name: Configure PKG repos
+  hosts: all
+  tags: setup-pkg-repos
+  tasks:
+    - name: Add repos
+      ansible.builtin.include_role:
+        name: local_pkg
+        tasks_from: configure_repos
