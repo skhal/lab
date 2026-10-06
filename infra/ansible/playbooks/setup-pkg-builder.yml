@@ -14,6 +14,5 @@
 ---
 - name: Configure poudriere
   hosts: bsd.lab.net
-  tags: poudriere
   roles:
     - role: poudriere
