@@ -4,17 +4,26 @@
 # license that can be found in the LICENSE file.
 
 ---
-- name: "Use latest branch"
+- name: Configure repositories
   become: true
   vars:
     _conf_file: /usr/local/etc/pkg/repos/FreeBSD.conf
-  ansible.builtin.copy:
-    src: "{{ _conf_file | trim('/') }}"
-    dest: "{{ _conf_file }}"
-    owner: root
-    group: wheel
-    mode: u=rw,g=r,o=r
-    directory_mode: u=rwx,g=rx,o=rx
+  block:
+    - name: Create folder {{ _conf_file | dirname }}
+      ansible.builtin.file:
+        path: "{{ _conf_file | dirname }}"
+        state: directory
+        owner: root
+        group: wheel
+        mode: u=rwx,g=rx,o=rx
+
+    - name: Use latest branch
+      ansible.builtin.copy:
+        src: "{{ _conf_file | trim('/') }}"
+        dest: "{{ _conf_file }}"
+        owner: root
+        group: wheel
+        mode: u=rw,g=r,o=r
 
 - name: Upgrade packages
   become: true
