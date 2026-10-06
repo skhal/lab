@@ -39,7 +39,7 @@ jail_bridge: ""
 
 # jail_children_max sets the number of child jails allowed in the jail when
 # set.
-jail_children_max: "{{ undef(hint='number of allowed child jails') }}"
+jail_children_max: ""
 
 # jail_cidr is the IP with network marsk.
 jail_cidr: ""
@@ -52,7 +52,7 @@ jail_depend: []
 
 # jail_enforce_statfs controls access to mount points inside the jail (see
 # jail(8)).
-jail_enforce_statfs: "{{ undef(hint='mount point access in the jail') }}"
+jail_enforce_statfs: ""
 
 # jail_mounts lists mount points to add to the jail (see mount in jail(8)).
 # Each mount has the following structure:
