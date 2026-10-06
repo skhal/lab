@@ -4,8 +4,8 @@
 # license that can be found in the LICENSE file.
 
 ---
-- name: "Configure ZFS"
-  notify: "jail_skel_snapshot"
+- name: Bootstrap ZFS
+  notify: jail_skel_snapshot
   block:
     - name: "Create parent datasets {{ jail_skel_zfs_dataset | dirname }}"
       become: true
@@ -62,24 +62,25 @@
               | default(omit)
           }}
 
-- name: "Configure jail service"
-  notify: "jail_skel_snapshot"
+- name: "Bootstrap jail service"
+  notify: jail_skel_snapshot
   vars:
+    _conf_file: /etc/jail.conf
     _rc_file: /etc/rc.conf.d/jail
   block:
-    - name: "Create /etc/jail.conf"
+    - name: "Create {{ _conf_file }}"
       become: true
       vars:
         prefix: "{{ jail_skel_path }}"
       ansible.builtin.template:
-        src: etc/jail.conf.j2
-        dest: /etc/jail.conf
+        src: "{{ _conf_file | trim('/') }}.j2"
+        dest: "{{ _conf_file }}"
         owner: root
         group: wheel
         mode: u=rw,g=r,o=r
         validate: /usr/sbin/jail -f %s -e ' '
 
-    - name: "Update {{ _rc_file }} - enable jail service" # noqa name[template]
+    - name: Enable jail service
       become: true
       community.general.sysrc:
         name: jail_enable
@@ -87,7 +88,7 @@
         path: "{{ _rc_file }}"
       notify: "start_jail"
 
-    - name: "Update {{ _rc_file }} - stop jails in reverse order" # noqa name[template]
+    - name: Stop jails in reverse order
       become: true
       community.general.sysrc:
         name: jail_reverse_stop
@@ -154,31 +155,7 @@
             path: "{{ _db_path }}"
             state: unmounted
 
-    - name: "Installed packages"
-      block:
-        - name: "List installed packages at {{ jail_skel_path }}"
-          ansible.builtin.command:
-            cmd: pkg -r {{ jail_skel_path }} leaf
-          register: jail_skel_list_packages_task
-          changed_when: false
-
-        - name: "Installed packages at {{ jail_skel_path }}"
-          ansible.builtin.debug:
-            var: jail_skel_list_packages_task.stdout_lines
-
-    - name: "Installed userland"
-      block:
-        - name: "Get installed userland at {{ jail_skel_path }}"
-          ansible.builtin.command:
-            cmd: env ROOT={{ jail_skel_path }} freebsd-version -u
-          register: jail_skel_get_os_version_task
-          changed_when: false
-
-        - name: "Installed userland at {{ jail_skel_path }}"
-          ansible.builtin.debug:
-            msg: "userland: {{ jail_skel_get_os_version_task.stdout }}"
-
-- name: "Configure users"
+- name: Bootstrap users
   notify: "jail_skel_snapshot"
   block:
     - name: "Migrate users"
@@ -188,7 +165,7 @@
         user_migrate_users: "{{ jail_skel_migrate_users }}"
         user_migrate_rootdir: "{{ jail_skel_path }}"
 
-- name: "Enable sshd"
+- name: Configure remote access
   become: true
   community.general.sysrc:
     name: sshd_enable
