@@ -7,12 +7,17 @@
 #   bootstrap-nuc • minimal configuration of freshly installed FreeBSD on NUC.
 #
 # SYNOPSIS
-#   ansible-playbook ./playbooks/bootstrap-nuc.yml
+#   ansible-playbook -K ./playbooks/bootstrap-nuc.yml
 #
 # DESCRIPTION
 #   bootstrap-nuc performs minimal configuration of NUC with fresh installation
 #   of FreeBSD OS.
+#
+#   Use --ask-become-pass (-K) flag to supply Ansible user password to escalate
+#   privileges for su(1).
 ---
+# bootstrap-ansible installs Python and doas(1) to run commands with escalated
+# privileges without --ask-become-pass.
 - name: Bootstrap for Ansible
   hosts: nuc.lab.net
   tags: bootstrap-ansible

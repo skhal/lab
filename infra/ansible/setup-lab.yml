@@ -7,7 +7,7 @@
 #   setup-lab • master playbook to setup Lab cluster.
 #
 # SYNOPSIS
-#   ansible-playbook ./setup-lab.yml
+#   ansible-playbook -K ./setup-lab.yml
 #
 # DESCRIPTION
 #   setup-lab configures Lab cluster, starting with the host node (a NUC
@@ -18,6 +18,9 @@
 #
 #   Every play has a tag with name matching the imported play name without .yml
 #   suffix.
+#
+#   See playbooks/bootstrap-nuc.yml for reasons to use --ask-become-pass (-K)
+#   Ansible flag.
 ---
 # bootstrap-nuc runs minimal configuration of the NUC with bare FreeBSD OS.
 - name: Bootstrap NUC
