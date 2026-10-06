@@ -17,7 +17,6 @@
   hosts: bsd.lab.net
   tags: sso
   roles:
-    - role: openldap_client
     - role: pam_ldap
 
 - name: Setup development environment

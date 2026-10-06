@@ -50,3 +50,8 @@
 - name: Setup PKG
   tags: setup-pkg
   ansible.builtin.import_playbook: playbooks/setup-pkg.yml
+
+# configure-ldap brings up an LDAP server.
+- name: Configure LDAP
+  tags: configure-ldap
+  ansible.builtin.import_playbook: playbooks/configure-ldap.yml

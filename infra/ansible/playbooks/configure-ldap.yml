@@ -1,0 +1,39 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+# NAME
+#   configure-ldap • setup OpenLDAP server
+#
+# SYNOPSIS
+#   ansible-playbook ./playbooks/configure-ldap.yml
+#
+# DESCRIPTION
+#   configure-ldap sets up an OpenLDAP server with TLS. It also configures
+#   clients with LDAP and integrates with pam role.
+---
+- name: Configure LDAP server
+  hosts: ldap.lab.net
+  tags: configure-ldap-server
+  roles:
+    - role: openldap_server
+    # generate certificate and let ldap:ldap own it. Run this after openldap
+    # role, where openldap-package installation creates ldap:ldap user and
+    # group.
+    - role: openssl_gen
+
+- name: Fill LDAP entries
+  hosts: ldap.lab.net
+  tags: configure-ldap-db
+  tasks:
+    - name: Add entries
+      ansible.builtin.include_role:
+        name: openldap_server
+        tasks_from: add_entries
+
+- name: Configure LDAP clients
+  hosts: all
+  tags: configure-ldap-client
+  roles:
+    - role: openldap_client
