@@ -20,6 +20,7 @@ openssl_gen_rsa_fetch:
   target: /usr/local/etc/pkg/ssl/lab-ports.pub
 openssl_gen_san:
   # keep-sorted start
+  - DNS:freebsd-base.pkg.lab.net
   - DNS:freebsd-kmods.pkg.lab.net
   - DNS:freebsd-ports.pkg.lab.net
   # keep-sorted end

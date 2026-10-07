@@ -27,11 +27,13 @@ ssl     IN A 10.0.0.4
 ; keep-sorted end
 
 ; keep-sorted start
+freebsd-base.pkg  IN CNAME pkg
 freebsd-kmods.pkg IN CNAME pkg
 freebsd-ports.pkg IN CNAME pkg
 ; keep-sorted end
 
 ; keep-sorted start
+_https._tcp.freebsd-base.pkg.lab.net.   IN SRV 10 100 443 freebsd-base.pkg.lab.net.
 _https._tcp.freebsd-kmods.pkg.lab.net.  IN SRV 10 100 443 freebsd-kmods.pkg.lab.net.
 _https._tcp.freebsd-ports.pkg.lab.net.  IN SRV 10 100 443 freebsd-ports.pkg.lab.net.
 ; keep-sorted end
