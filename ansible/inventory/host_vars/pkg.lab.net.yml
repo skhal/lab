@@ -18,6 +18,8 @@ openssl_gen_rsa:
 openssl_gen_rsa_fetch:
   source: pkg.lab.net:/usr/local/etc/poudriere/ssl/pkg.pub
   target: /usr/local/etc/pkg/ssl/lab-ports.pub
+openssl_gen_san:
+  - DNS:freebsd-ports.pkg.lab.net
 ssh_listen_addresses:
   - 10.0.0.5
 # keep-sorted end

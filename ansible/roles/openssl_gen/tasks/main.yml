@@ -73,6 +73,7 @@
       community.crypto.openssl_csr_pipe:
         privatekey_path: "{{ _key_file }}"
         common_name: "{{ openssl_gen_common_name }}"
+        subject_alt_name: "{{ openssl_gen_san | default(omit) }}"
         use_common_name_for_san: false
       register: openssl_gen_csr_task
 

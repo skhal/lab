@@ -30,4 +30,6 @@ openssl_gen_rsa: "{{ undef(hint='RSA public certificate info') }}"
 #   - source  string  path to the remote public key in the form host:/path
 #   - target  string  path to the public key to save
 openssl_gen_rsa_fetch: "{{ undef(hint='RSA public key source and targets') }}"
+# openssl_gen_san a list of subject alternative names.
+openssl_gen_san: []
 # keep-sorted end
