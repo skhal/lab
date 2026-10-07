@@ -102,5 +102,5 @@ This change requires coordination with additional changes:
   _https._tcp.freebsd-ports.pkg.lab.net. IN SRV 10 100 443 freebsd-ports.pkg.lab.net.
   ```
 
-- **Certificate**: generate a certificate for each host, e.g.
-  `freebsd-ports.pkg.lab.net`.
+- **Certificate**: add Subject Alternative Name (SAN) to pkg.lab.net TLS
+  certificate to serve sub-domains, e.g. `freebsd-ports.pkg.lab.net`.
