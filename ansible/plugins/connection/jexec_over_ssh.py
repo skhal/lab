@@ -14,6 +14,7 @@ from typing import Callable, Optional, override
 import yaml
 from ansible.errors import AnsibleError
 from ansible.module_utils.common.text.converters import to_text
+
 from ansible.plugins.connection import ssh
 from ansible.plugins.connection.ssh import Connection as SSHConnection
 

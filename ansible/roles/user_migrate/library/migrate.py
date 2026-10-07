@@ -66,8 +66,9 @@ user:
 """
 
 import os
-from dataclasses import dataclass, field, asdict
+from dataclasses import asdict, dataclass, field
 from typing import NewType, Tuple
+
 from ansible.module_utils.basic import AnsibleModule
 
 
