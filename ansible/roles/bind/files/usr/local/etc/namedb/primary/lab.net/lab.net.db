@@ -17,13 +17,21 @@ $TTL  1h
        IN  A   10.0.0.2
 
 ; Servers
-nuc     IN A 10.0.0.1
+; keep-sorted start numeric=yes
+bsd     IN A 10.0.0.101
 dns     IN A 10.0.0.2
 ldap    IN A 10.0.0.3
-ssl     IN A 10.0.0.4
+nuc     IN A 10.0.0.1
 pkg     IN A 10.0.0.5
-bsd     IN A 10.0.0.101
+ssl     IN A 10.0.0.4
+; keep-sorted end
 
+; keep-sorted start
+freebsd-kmods.pkg IN CNAME pkg
 freebsd-ports.pkg IN CNAME pkg
+; keep-sorted end
 
+; keep-sorted start
+_https._tcp.freebsd-kmods.pkg.lab.net.  IN SRV 10 100 443 freebsd-kmods.pkg.lab.net.
 _https._tcp.freebsd-ports.pkg.lab.net.  IN SRV 10 100 443 freebsd-ports.pkg.lab.net.
+; keep-sorted end

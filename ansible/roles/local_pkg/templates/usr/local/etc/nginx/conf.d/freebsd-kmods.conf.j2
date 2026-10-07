@@ -3,10 +3,20 @@
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 
-    location /freebsd/kmods/ {
-      rewrite ^/freebsd/kmods/(.*)$ /$1 break;
-      rewrite_log on;
+  proxy_cache_path /var/cache/pkg.freebsd.kmods levels=1:2 use_temp_path=off
+                   keys_zone=freebsd-kmods:10m inactive=30d;
 
+  server {
+    listen        {{ local_pkg_listen_on }}:443 ssl;
+    server_name   freebsd-kmods.{{ inventory_hostname }};
+
+    allow 10.0.0.0/24;  # local network
+    deny  all;
+
+    ssl_certificate     /usr/local/etc/nginx/ssl/pkg.crt;
+    ssl_certificate_key /usr/local/etc/nginx/ssl/private/pkg.key;
+
+    location / {
       proxy_cache freebsd-kmods;
       proxy_cache_revalidate on;     # conditional GET for outdated content.
       proxy_cache_lock on;           # concurrent MISS'es lock, first fetches.
@@ -17,3 +27,4 @@
 
       add_header	X-Cache-Status $upstream_cache_status;
     }
+  }
