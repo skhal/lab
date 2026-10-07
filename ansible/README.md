@@ -11,47 +11,26 @@
 
 # DESCRIPTION
 
-Use Ansible (https://docs.ansible.com) to configure Lab cluster from
-laptop over SSH.
+`ansible/` automates Lab cluster management with
+[Ansible](https://docs.ansible.com).
 
-Make sure that NUC has the following setup:
+Start with a fresh installation of FreeBSD on the server. Make sure to create
+a user for Ansible to manage the host:
 
-- User `op` is a member of `wheel` group.
-- Running SSH server with `op` SSH key installed to let Ansible run
-  commands without password prompts.
-
-Install Ansible on the laptop:
-
-```console
-# brew install ansible
+```
+user: op
+groups: op,wheel
 ```
 
-## Configure
+Run an SSH server and install `op` user SSH keys for password-less remote
+access.
 
-Bootstrap NUC with Ansible to install python and setup user environment (`-K`
-to prompt for NUC root-password):
+Setup cluster with Ansible (`-K` option is to prompt for the `root` password on
+the server, needed at the very first step to install doas(1) for further remote
+management):
 
-```console
-$ ansible-playbook -K ./nuc_bootstrap.yaml
 ```
+$ cd ansible/
 
-Configure NUC:
-
-```console
-$ ansible-playbook ./nuc.yaml
-```
-
-Manage jails:
-
-```console
-$ ansible-playbook --vault-password-file ~/.ansible/vault-pass ./nuc_jails.yaml
-```
-
-## Test
-
-Test configuration with:
-
-```console
-$ ansible-playbook nuc.yml --check --diff
-$ ansible-playbook nuc.yml --check --diff --tags dumpdev
+$ ansible-playbook -K ./setup-lab.yml
 ```
