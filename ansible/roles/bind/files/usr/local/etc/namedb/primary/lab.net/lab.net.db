@@ -24,5 +24,6 @@ ssl     IN A 10.0.0.4
 pkg     IN A 10.0.0.5
 bsd     IN A 10.0.0.101
 
-_http._tcp.pkg.lab.net.   IN SRV 10 100 80  pkg.lab.net.
-_https._tcp.pkg.lab.net.  IN SRV 10 100 443 pkg.lab.net.
+freebsd-ports.pkg IN CNAME pkg
+
+_https._tcp.freebsd-ports.pkg.lab.net.  IN SRV 10 100 443 freebsd-ports.pkg.lab.net.
