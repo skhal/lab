@@ -63,3 +63,8 @@
 - name: Setup PKG builder and port tester
   tags: setup-pkg-builder
   ansible.builtin.import_playbook: playbooks/setup-pkg-builder.yml
+
+# bootstrap-devent sets up development environment.
+- name: Bootstrap development environment
+  tags: bootstrap-devenv
+  ansible.builtin.import_playbook: playbooks/bootstrap-devenv.yml

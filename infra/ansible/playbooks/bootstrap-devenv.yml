@@ -1,0 +1,21 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+# NAME
+#   bootstrap-devenv • setup development environment
+#
+# SYNOPSIS
+#   ansible-playbook ./playbooks/bootstrap-devenv.yml
+#
+# DESCRIPTION
+#   bootstrap-devenv configures userland for development.
+---
+- name: Install packages
+  hosts: dev
+  tags: bootstrap-devenv-pkg
+  vars_files:
+    - vars/dev.yml
+  roles:
+    - role: pkg

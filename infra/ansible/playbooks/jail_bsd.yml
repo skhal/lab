@@ -12,11 +12,3 @@
       ansible.builtin.include_role:
         name: openssl_gen
         tasks_from: rsa_fetch
-
-- name: Setup development environment
-  hosts: bsd.lab.net
-  tags: devenv
-  vars_files:
-    - vars/dev.yml
-  roles:
-    - role: pkg
