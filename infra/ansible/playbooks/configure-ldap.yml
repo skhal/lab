@@ -32,8 +32,9 @@
         name: openldap_server
         tasks_from: add_entries
 
-- name: Configure LDAP clients
-  hosts: all
-  tags: configure-ldap-client
+- name: Configure PAM with LDAP Authentication
+  hosts: dev
+  tags: bootstrap-devenv-sso
   roles:
     - role: openldap_client
+    - role: pam_ldap

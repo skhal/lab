@@ -13,12 +13,6 @@
         name: openssl_gen
         tasks_from: rsa_fetch
 
-- name: Configure SSO
-  hosts: bsd.lab.net
-  tags: sso
-  roles:
-    - role: pam_ldap
-
 - name: Setup development environment
   hosts: bsd.lab.net
   tags: devenv
