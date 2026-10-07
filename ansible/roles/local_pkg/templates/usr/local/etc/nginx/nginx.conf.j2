@@ -22,21 +22,5 @@ http {
 
   keepalive_timeout  65;
 
-  include /usr/local/etc/nginx/conf.d/http/*.conf;
-
-  server {
-    listen        {{ local_pkg_listen_on }}:443 ssl;
-    server_name   {{ inventory_hostname }};
-
-    allow 10.0.0.0/24;  # local network
-    deny  all;
-
-    # Use notice-level to capture rewrites
-    error_log /var/log/nginx/error.log notice;
-
-    ssl_certificate     /usr/local/etc/nginx/ssl/pkg.crt;
-    ssl_certificate_key /usr/local/etc/nginx/ssl/private/pkg.key;
-
-    include /usr/local/etc/nginx/conf.d/http/server/*.conf;
-  }
+  include /usr/local/etc/nginx/conf.d/*.conf;
 }

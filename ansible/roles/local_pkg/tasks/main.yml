@@ -33,18 +33,15 @@
 
 - name: Configure nginx
   vars:
-    _conf_file: /usr/local/etc/nginx/nginx.conf
+    _conf_files:
+      - /usr/local/etc/nginx/nginx.conf
+      - /usr/local/etc/nginx/conf.d/freebsd-ports.conf
   block:
-    - name: Create {{ _conf_file }}
-      become: true
-      notify: local_pkg_restart_nginx
-      ansible.builtin.template:
-        src: usr/local/etc/nginx/nginx.conf.j2
-        dest: "{{ _conf_file }}"
-        owner: root
-        group: wheel
-        mode: u=rw,g=r,o=r
-        validate: nginx -t -c %s
+    - name: Create configs
+      loop: "{{ _conf_files }}"
+      loop_control:
+        loop_var: _conf_file
+      ansible.builtin.include_tasks: "_create_conf.yml"
 
     - name: Copy configurations
       become: true
