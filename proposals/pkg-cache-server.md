@@ -5,6 +5,8 @@
   license that can be found in the LICENSE file.
 -->
 
+STATUS: Implemented (Issue #463)
+
 ## Background
 
 Nginx is a caching PKG server. It is setup with a single virtual server to serve different port collections:
