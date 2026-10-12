@@ -6,10 +6,15 @@
 ---
 - name: Enable service
   become: true
-  notify: start_linux
   vars:
     _rc_file: /etc/rc.conf.d/linux
   community.general.sysrc:
     path: "{{ _rc_file }}"
     name: linux_enable
     value: true
+
+- name: Service linux is running
+  become: true
+  ansible.builtin.service:
+    name: linux
+    state: started
