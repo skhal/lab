@@ -70,3 +70,11 @@
   tags: bootstrap-remote-access
   roles:
     - role: ssh
+
+- name: Reboot
+  hosts: nuc.lab.net
+  tags: bootstrap-reboot
+  become: true
+  tasks:
+    - name: Reboot NUC
+      ansible.builtin.reboot:
