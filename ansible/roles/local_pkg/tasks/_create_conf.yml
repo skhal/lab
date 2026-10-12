@@ -4,6 +4,15 @@
 # license that can be found in the LICENSE file.
 
 ---
+- name: Create {{ _conf_file | dirname }}
+  become: true
+  ansible.builtin.file:
+    path: "{{ _conf_file | dirname }}"
+    state: directory
+    owner: root
+    group: wheel
+    mode: u=rwx,g=rx,o=rx
+
 - name: Create {{ _conf_file }}
   become: true
   notify: local_pkg_restart_nginx
