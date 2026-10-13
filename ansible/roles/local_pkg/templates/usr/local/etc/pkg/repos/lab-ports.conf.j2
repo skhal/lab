@@ -5,7 +5,7 @@
 
 # Source: /etc/pkg/FreeBSD.conf
 lab-ports: {
-  url: "pkg+https://{{ local_pkg_hostname }}/lab/ports/${ABI}/latest",
+  url: "pkg+https://lab-ports.{{ local_pkg_hostname }}/${ABI}/latest",
   mirror_type: "srv",
   signature_type: "pubkey",
   pubkey: "/usr/local/etc/pkg/ssl/lab-ports.pub",

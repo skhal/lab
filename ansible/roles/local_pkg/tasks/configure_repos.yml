@@ -12,7 +12,6 @@
       - freebsd-base.conf
       - freebsd-kmods.conf
       - freebsd-ports.conf
-      - lab-ports.conf
       # keep-sorted end
   block:
     - name: Create {{ _conf_path }}
