@@ -1,0 +1,12 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+- name: Update packages repo to {{ _dst_repo }}
+  become: true
+  ansible.builtin.script:
+    cmd: pkg-mv-repo.sh {{ _src_repo }} {{ _dst_repo }}
+  register: local_pkg_update_pkg_repo_task
+  changed_when: local_pkg_update_pkg_repo_task.stdout != ''
