@@ -62,12 +62,15 @@
     jail_cidr: 10.0.0.5/24
     jail_depend:
       - dns
+    jail_mounts:
+      - path: /usr/packages
+        perm: ro
     jail_name: pkg
     # keep-sorted end
   roles:
     - role: jail
 
-- name: Create jail PKG
+- name: Create jail PKG builder
   hosts: nuc.lab.net
   tags: create-jail-pkgbuild
   vars:
