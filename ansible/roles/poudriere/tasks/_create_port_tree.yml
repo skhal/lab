@@ -1,0 +1,49 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+- name: Create port tree {{ _port_tree.name }}
+  vars:
+    # Given a repo https://example.com/foo.git construct _dest to be:
+    #   <poudriere_basefs>/ports/foo
+    _dest: >-
+      {{
+        [
+          poudriere_basefs,
+          "ports",
+          (_port_tree.repo | basename | splitext | first)
+        ] | path_join
+      }}
+  block:
+    - name: Checkout port tree
+      become: true
+      ansible.builtin.git:
+        repo: "{{ _port_tree.repo }}"
+        dest: "{{ _dest }}"
+        # only ensure the repository is checked out
+        update: false
+      # noqa: latest[git]
+
+    - name: Check ports tree
+      ansible.builtin.shell:
+        cmd: |
+          poudriere ports -l -n \
+            | grep -q '^{{ _port_tree.name }}$'
+      ignore_errors: true
+      changed_when: false
+      register: poudriere_check_port_tree_task
+
+    - name: Import port tree in poudriere
+      when: poudriere_check_port_tree_task.rc == 1
+      become: true
+      ansible.builtin.shell:
+        cmd: |
+          poudriere ports \
+            -c \
+            -M {{ [_dest, (_port_tree.path | default(''))] | path_join }} \
+            -p {{ _port_tree.name }} \
+            -m null
+      register: poudriere_import_port_tree_task
+      changed_when: poudriere_import_port_tree_task is succeeded

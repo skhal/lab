@@ -1,0 +1,17 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+# keep-sorted start newline_separated=yes
+# poudriere_prefix is the location of POUDRIERE_DATA
+poudriere_basefs: /usr/local/poudriere
+
+# poudriere_port_trees lists port trees to git-clone and import into poudriere.
+# Each item has the following structure:
+#   name  string  the port tree name
+#   repo  string  the port tree repository URL, e.g. https://github.com/a/b.git
+#   path  string? the path inside the repository to the ports else none
+poudriere_port_trees: []
+# keep-sorted end

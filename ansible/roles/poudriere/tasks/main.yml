@@ -53,3 +53,9 @@
         owner: root
         group: wheel
         mode: u=rw,g=r,o=r
+
+- name: Create port trees
+  loop: "{{ poudriere_port_trees }}"
+  loop_control:
+    loop_var: _port_tree
+  ansible.builtin.include_tasks: _create_port_tree.yml
