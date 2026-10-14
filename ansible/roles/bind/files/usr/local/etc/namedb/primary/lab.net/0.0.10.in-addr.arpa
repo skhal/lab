@@ -17,9 +17,12 @@ $TTL  1h
       IN  A   10.0.0.2
 
 ; Servers
+; keep-sorted start numeric=yes
 1     IN  PTR nuc.lab.net.
 2     IN  PTR dns.lab.net.
 3     IN  PTR ldap.lab.net.
 4     IN  PTR ssl.lab.net.
 5     IN  PTR pkg.lab.net.
+6     IN  PTR pkgbuild.lab.net.
 101   IN  PTR bsd.lab.net.
+; keep-sorted end

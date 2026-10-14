@@ -14,6 +14,7 @@ jails:
     dns.lab.net:
     ldap.lab.net:
     pkg.lab.net:
+    pkgbuild.lab.net:
     ssl.lab.net:
     # keep-sorted end
 infra:
@@ -22,6 +23,7 @@ infra:
     dns.lab.net:
     ldap.lab.net:
     pkg.lab.net:
+    pkgbuild.lab.net:
     ssl.lab.net:
     # keep-sorted end
 dev:

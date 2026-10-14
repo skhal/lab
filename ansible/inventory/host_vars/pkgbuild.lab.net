@@ -1,0 +1,11 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+# keep-sorted start
+ansible_jexec_over_ssh_jail_name: pkgbuild
+ssh_listen_addresses:
+  - 10.0.0.6
+# keep-sorted end

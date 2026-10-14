@@ -17,13 +17,14 @@ $TTL  1h
        IN  A   10.0.0.2
 
 ; Servers
-; keep-sorted start numeric=yes
-bsd     IN A 10.0.0.101
-dns     IN A 10.0.0.2
-ldap    IN A 10.0.0.3
-nuc     IN A 10.0.0.1
-pkg     IN A 10.0.0.5
-ssl     IN A 10.0.0.4
+; keep-sorted start numeric=yes by_regex=IN\s+A\s+(\d+)\.(\d+)\.(\d+)\.(\d+)
+nuc       IN A 10.0.0.1
+dns       IN A 10.0.0.2
+ldap      IN A 10.0.0.3
+ssl       IN A 10.0.0.4
+pkg       IN A 10.0.0.5
+pkgbuild  IN A 10.0.0.6
+bsd       IN A 10.0.0.101
 ; keep-sorted end
 
 ; keep-sorted start
