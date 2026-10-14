@@ -59,10 +59,10 @@
   tags: configure-ldap
   ansible.builtin.import_playbook: playbooks/configure-ldap.yml
 
-# setup-pkg-builder configures poudriere(8).
-- name: Setup PKG builder and port tester
-  tags: setup-pkg-builder
-  ansible.builtin.import_playbook: playbooks/setup-pkg-builder.yml
+# bootstrap-pkg-builder configures packages builder.
+- name: Bootstrap PKG builder
+  tags: bootstrap-pkg-builder
+  ansible.builtin.import_playbook: playbooks/bootstrap-pkg-builder.yml
 
 # bootstrap-devent sets up development environment.
 - name: Bootstrap development environment

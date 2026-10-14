@@ -19,3 +19,8 @@
     - vars/dev.yml
   roles:
     - role: pkg
+
+- name: Configure poudriere
+  hosts: dev
+  roles:
+    - role: poudriere

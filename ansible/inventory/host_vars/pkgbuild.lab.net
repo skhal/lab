@@ -6,6 +6,10 @@
 ---
 # keep-sorted start
 ansible_jexec_over_ssh_jail_name: pkgbuild
+openssl_gen_rsa:
+  path: /usr/local/etc/poudriere/ssl/pkg.pub
+  owner: root
+  group: wheel
 ssh_listen_addresses:
   - 10.0.0.6
 # keep-sorted end

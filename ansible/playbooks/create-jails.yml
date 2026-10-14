@@ -84,6 +84,8 @@
     jail_depend:
       - dns
     jail_enforce_statfs: 1
+    jail_mounts:
+      - path: /usr/packages
     jail_name: pkgbuild
     # keep-sorted end
   roles:
