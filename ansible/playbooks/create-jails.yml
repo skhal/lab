@@ -64,6 +64,7 @@
       - dns
     jail_mounts:
       - path: /usr/packages
+        dest: /var/cache/pkg.lab-ports
         perm: ro
     jail_name: pkg
     # keep-sorted end
