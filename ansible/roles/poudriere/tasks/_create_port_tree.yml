@@ -37,7 +37,7 @@
       register: poudriere_check_port_tree_task
 
     - name: Import port tree in poudriere
-      when: poudriere_check_port_tree_task.rc == 1
+      when: poudriere_check_port_tree_task.rc != 0
       become: true
       ansible.builtin.shell:
         cmd: |
