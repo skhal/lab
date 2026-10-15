@@ -7,11 +7,12 @@
 - name: Add {{ _entry.name }}
   become: true # to start TLS
   community.general.ldap_entry:
-    server_uri: "ldap://ldap.lab.net"
-    bind_dn: "cn=op,dc=lab,dc=net"
+    server_uri: "{{ openldap_server_uri }}"
+    bind_dn: "{{ openldap_server_bind_dn }}"
     bind_pw: "{{ openldap_server_bind_pw }}"
     start_tls: true
     validate_certs: true
+    # --- record
     dn: "{{ _entry.dn }}"
     objectClass: "{{ _entry.objectClass }}"
     attributes:

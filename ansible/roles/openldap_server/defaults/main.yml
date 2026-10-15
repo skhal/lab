@@ -4,5 +4,20 @@
 # license that can be found in the LICENSE file.
 
 ---
+# keep-sorted start newline_separated=yes
 # openldap_server_addr is the ip-address to listen to.
-openldap_server_addr: ""
+openldap_server_addr: "{{ undef(hint='LDAP server IP address') }}"
+
+# openldap_server_bind_dn is the Distinguished Name for LDAP server
+# administrator.
+openldap_server_bind_dn: "{{ undef(hint='admin DN to bind to LDAP server') }}"
+
+# openldap_server_bind_pw is the password for LDAP server administrator.
+openldap_server_bind_pw: "{{ undef(hint='admin pass to bind to LDAP server') }}"
+
+# openldap_server_entries lists LDAP entries to add
+openldap_server_entries: []
+
+# openldap_server_uri defines the URI for LDAP server, e.g. ldap://example.com
+openldap_server_uri: "{{ undef(hint='LDAP server URI') }}"
+# keep-sorted end
