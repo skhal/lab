@@ -32,7 +32,7 @@
       ansible.builtin.shell:
         cmd: |
           set -o pipefail;
-          poudriere ports -l -n \
+          poudriere ports -l -n -q \
             | grep -q '^{{ _port_tree.name }}$'
       ignore_errors: true
       changed_when: false
