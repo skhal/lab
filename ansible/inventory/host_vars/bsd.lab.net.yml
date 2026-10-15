@@ -20,6 +20,9 @@ openssl_gen_rsa:
 openssl_gen_rsa_fetch:
   source: pkg.lab.net:/usr/local/etc/poudriere/ssl/pkg.pub
   target: /usr/local/etc/pkg/ssl/lab-ports.pub
+poudriere_jail:
+  name: 151amd64
+  version: 15.1-RELEASE
 ssh_allow_groups:
   - ssh
 ssh_listen_addresses:

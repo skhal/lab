@@ -8,6 +8,13 @@
 # poudriere_prefix is the location of POUDRIERE_DATA
 poudriere_basefs: /usr/local/poudriere
 
+# poudriere_jail configures jail to be used by poudriere-jail(8) to build
+# packages. It is expected to have the following structure:
+#   name    string  jail name, e.g. 151amd64 for OS version 15.1-RELEASE
+#   version string  FreeBSD version without patch
+#                   (see -v flag in poudriere-jail(8)).
+poudriere_jail: "{{ undef(hint='poudriere jail name and version') }}"
+
 # poudriere_port_trees lists port trees to git-clone and import into poudriere.
 # Each item has the following structure:
 #   name  string  the port tree name

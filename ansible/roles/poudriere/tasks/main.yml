@@ -59,3 +59,6 @@
   loop_control:
     loop_var: _port_tree
   ansible.builtin.include_tasks: _create_port_tree.yml
+
+- name: Create jail
+  ansible.builtin.include_tasks: _create_jail.yml

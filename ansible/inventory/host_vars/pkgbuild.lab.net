@@ -10,6 +10,9 @@ openssl_gen_rsa:
   path: /usr/local/etc/poudriere/ssl/pkg.pub
   owner: root
   group: wheel
+poudriere_jail:
+  name: 151amd64
+  version: 15.1-RELEASE
 poudriere_port_trees:
   - name: lab
     repo: https://github.com/skhal/lab.git

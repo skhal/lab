@@ -1,0 +1,29 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+- name: Create a build jail
+  block:
+    - name: Check jail exists
+      ansible.builtin.shell:
+        cmd: |
+          set -o pipefail;
+          poudriere jail -l -n -q \
+            | grep {{ poudriere_jail.name }}
+      ignore_errors: true
+      changed_when: false
+      register: poudriere_check_jail_exists_task
+
+    - name: Create jail
+      when: poudriere_check_jail_exists_task.rc != 0
+      become: true
+      ansible.builtin.shell:
+        cmd: |
+          poudriere jail \
+            -c \
+            -j {{ poudriere_jail.name }} \
+            -v {{ poudriere_jail.version }}
+      register: poudriere_create_jail_task
+      changed_when: poudriere_create_jail_task is succeeded
