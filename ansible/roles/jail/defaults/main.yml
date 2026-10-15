@@ -57,6 +57,7 @@ jail_enforce_statfs: ""
 # jail_mounts lists mount points to add to the jail (see mount in jail(8)).
 # Each mount has the following structure:
 #   path  string  absolute path to mount, e.g. "/home/op"
+#   dest  string? destination path to mount (default: `path`)
 #   perm  string? mount permissions, e.g. "rw" (default: rw)
 jail_mounts: []
 
