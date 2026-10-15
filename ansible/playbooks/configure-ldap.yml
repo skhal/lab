@@ -31,6 +31,10 @@
       ansible.builtin.include_role:
         name: openldap_server
         tasks_from: add_entries
+    - name: Set passwords
+      ansible.builtin.include_role:
+        name: openldap_server
+        tasks_from: set_passwords
 
 - name: Configure PAM with LDAP Authentication
   hosts: dev
