@@ -4,18 +4,6 @@
 # license that can be found in the LICENSE file.
 
 ---
-- name: Bootstrap ZFS
-  hosts: nuc.lab.net
-  tags: bootstrap-pkg-builder-zfs
-  vars:
-    _zfs_ds: zroot/usr/packages
-  tasks:
-    - name: Create a ZFS dataset
-      become: true
-      community.general.zfs:
-        name: "{{ _zfs_ds }}"
-        state: present
-
 - name: Bootstrap pkg builder
   hosts: pkgbuild.lab.net
   tags: bootstrap-pkg-builder-poudriere

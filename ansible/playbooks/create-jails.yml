@@ -19,6 +19,15 @@
   roles:
     - role: jail_skel
 
+- name: Create ZFS datasets
+  hosts: nuc.lab.net
+  tags: create-jail-zfs-datasets
+  tasks:
+    - name: Create datasets
+      ansible.builtin.include_role:
+        name: zfs
+        tasks_from: create_datasets
+
 - name: Create jail SSL
   hosts: nuc.lab.net
   tags: create-jail-ssl
@@ -63,9 +72,14 @@
     jail_depend:
       - dns
     jail_mounts:
+      # keep-sorted start
       - path: /usr/packages
         dest: /var/cache/pkg.lab-ports
         perm: ro
+      - path: /var/cache/pkg.freebsd-base
+      - path: /var/cache/pkg.freebsd-kmods
+      - path: /var/cache/pkg.freebsd-ports
+      # keep-sorted end
     jail_name: pkg
     # keep-sorted end
   roles:

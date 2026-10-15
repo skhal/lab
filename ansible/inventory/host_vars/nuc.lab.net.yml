@@ -51,6 +51,11 @@ routing_defaultrouter: 192.168.10.1
 ssh_listen_addresses:
   - 192.168.10.101
   - 10.0.0.1
+zfs_datasets:
+  - zroot/usr/packages
+  - zroot/var/cache/pkg.freebsd-base
+  - zroot/var/cache/pkg.freebsd-kmods
+  - zroot/var/cache/pkg.freebsd-ports
 # sync with users in ldap
 zfs_mkhomedir_users:
   - name: skhalatyan

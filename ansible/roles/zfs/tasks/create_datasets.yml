@@ -1,0 +1,11 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+- name: Create datasets
+  loop: "{{ zfs_datasets }}"
+  loop_control:
+    loop_var: _dataset
+  ansible.builtin.include_tasks: _create_dataset.yml

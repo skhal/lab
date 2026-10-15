@@ -4,5 +4,10 @@
 # license that can be found in the LICENSE file.
 
 ---
+# keep-sorted start newline_separated=yes
+# zfs_datasets lists datasets that must be present on the system.
+zfs_datasets: []
+
 # zfs_scrub_days defines how often to run zpool-scrub(8).
 zfs_scrub_days: 14
+# keep-sorted end
