@@ -55,10 +55,34 @@
         mode: u=rw,g=r,o=r
 
 - name: Create port trees
-  loop: "{{ poudriere_port_trees }}"
-  loop_control:
-    loop_var: _port_tree
-  ansible.builtin.include_tasks: _create_port_tree.yml
+  block:
+    - name: Create default ports tree
+      vars:
+        _port_tree: default
+      block:
+        - name: Check port tree {{ _port_tree }}
+          ansible.builtin.shell:
+            cmd: |
+              set -o pipefail;
+              poudriere ports -l -n \
+                | grep -q '^{{ _port_tree }}$'
+          ignore_errors: true
+          changed_when: false
+          register: poudriere_check_port_tree_task
+
+        - name: Create port tree {{ _port_tree }}
+          when: poudriere_check_port_tree_task.rc != 0
+          become: true
+          ansible.builtin.command:
+            cmd: poudriere ports -c
+          register: poudriere_create_port_tree_task
+          changed_when: poudriere_create_port_tree_task is succeeded
+
+    - name: Create overlay port trees
+      loop: "{{ poudriere_port_trees }}"
+      loop_control:
+        loop_var: _port_tree
+      ansible.builtin.include_tasks: _create_port_tree.yml
 
 - name: Create jail
   ansible.builtin.include_tasks: _create_jail.yml

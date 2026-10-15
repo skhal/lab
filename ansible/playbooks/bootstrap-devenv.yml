@@ -22,5 +22,6 @@
 
 - name: Configure poudriere
   hosts: dev
+  tags: bootstrap-devenv-pkg-build
   roles:
     - role: poudriere

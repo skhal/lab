@@ -6,7 +6,9 @@
 ---
 - name: Create port tree {{ _port_tree.name }}
   vars:
-    # Given a repo https://example.com/foo.git construct _dest to be:
+    # Given a repo:
+    #   https://example.com/foo.git
+    # construct _dest to be:
     #   <poudriere_basefs>/ports/foo
     _dest: >-
       {{
