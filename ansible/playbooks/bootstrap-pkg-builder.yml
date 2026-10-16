@@ -8,4 +8,5 @@
   hosts: pkgbuild.lab.net
   tags: bootstrap-pkg-builder-poudriere
   roles:
+    - role: openssl_gen
     - role: poudriere

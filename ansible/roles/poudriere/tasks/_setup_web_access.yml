@@ -1,0 +1,49 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+- name: Install nginx
+  become: true
+  community.general.pkgng:
+    name: nginx
+    state: present
+
+- name: Enable nginx
+  vars:
+    _rc_file: /usr/local/etc/rc.conf.d/nginx
+  block:
+    - name: Create {{ _rc_file | dirname }}
+      become: true
+      ansible.builtin.file:
+        path: "{{ _rc_file | dirname }}"
+        state: directory
+        owner: root
+        group: wheel
+        mode: u=rwx,g=rx,o=rx
+
+    - name: Enable nginx service
+      become: true
+      community.general.sysrc:
+        path: "{{ _rc_file }}"
+        name: nginx_enable
+        value: true
+
+    - name: Start nginx
+      become: true
+      ansible.builtin.service:
+        name: nginx
+        state: started
+
+- name: Configure nginx
+  become: true
+  notify: poudriere_restart_nginx
+  vars:
+    _conf_file: /usr/local/etc/nginx/nginx.conf
+  ansible.builtin.template:
+    src: "{{ _conf_file | trim('/') }}.j2"
+    dest: "{{ _conf_file }}"
+    owner: root
+    group: wheel
+    mode: u=rw,g=r,o=r

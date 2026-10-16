@@ -86,3 +86,7 @@
 
 - name: Create jail
   ansible.builtin.include_tasks: _create_jail.yml
+
+- name: Setup web access
+  when: poudriere_web_access
+  ansible.builtin.include_tasks: _setup_web_access.yml

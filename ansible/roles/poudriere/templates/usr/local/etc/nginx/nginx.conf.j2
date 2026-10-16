@@ -1,0 +1,45 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+worker_processes  1;
+
+events {
+  worker_connections  1024;
+}
+
+http {
+  # Use absolute path includes to make Nginx configuration validator work
+  # with Ansible, which runs validation `nginx -t -c %s` on a temporary file
+  # and nginx(1) tries to pick up mime.types from the same location instead
+  # of prefix even if `-p /usr/local/etc/nginx` is used without effect.
+  #
+  include       /usr/local/etc/nginx/mime.types;
+  default_type  application/octet-stream;
+
+  sendfile    on;
+
+  keepalive_timeout  65;
+
+  server {
+    listen        localhost:443 ssl;
+    server_name   {{ inventory_hostname }};
+
+    allow 127.0.0.1;
+    deny  all;
+
+    ssl_certificate     /usr/local/etc/nginx/ssl/pkg.crt;
+    ssl_certificate_key /usr/local/etc/nginx/ssl/private/pkg.key;
+
+    access_log	/var/log/nginx/poudriere.access.log;
+    error_log 	/var/log/nginx/poudriere.error.log warn;
+
+    root /usr/local/share/poudriere/html;
+
+    location /data {
+      alias     /usr/local/poudriere/data/logs/bulk;
+      autoindex on;
+    }
+  }
+}

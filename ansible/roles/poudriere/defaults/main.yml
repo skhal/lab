@@ -21,4 +21,8 @@ poudriere_jail: "{{ undef(hint='poudriere jail name and version') }}"
 #   repo  string  the port tree repository URL, e.g. https://github.com/a/b.git
 #   path  string? the path inside the repository to the ports else none
 poudriere_port_trees: []
+
+# poudriere_web_access configures https://localhost to poudriere builds when
+# set to true.
+poudriere_web_access: false
 # keep-sorted end
