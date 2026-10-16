@@ -36,14 +36,24 @@
         name: nginx
         state: started
 
-- name: Configure nginx
-  become: true
+- name: Configure Nginx
   notify: poudriere_restart_nginx
-  vars:
-    _conf_file: /usr/local/etc/nginx/nginx.conf
-  ansible.builtin.template:
-    src: "{{ _conf_file | trim('/') }}.j2"
-    dest: "{{ _conf_file }}"
-    owner: root
-    group: wheel
-    mode: u=rw,g=r,o=r
+  block:
+    - name: Configure Nginx
+      become: true
+      vars:
+        _conf_file: /usr/local/etc/nginx/nginx.conf
+      ansible.builtin.template:
+        src: "{{ _conf_file | trim('/') }}.j2"
+        dest: "{{ _conf_file }}"
+        owner: root
+        group: wheel
+        mode: u=rw,g=r,o=r
+
+    - name: Open logs in browser
+      become: true
+      ansible.builtin.lineinfile:
+        path: /usr/local/etc/nginx/mime.types
+        regexp: "^(\\s*text/plain\\s+txt);$"
+        backrefs: true
+        line: "\\1 log;"
