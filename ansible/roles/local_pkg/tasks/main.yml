@@ -68,16 +68,3 @@
         owner: root
         group: wheel
         mode: u=rw,g=r,o=r
-
-- name: Setup cache
-  vars:
-    _cache_path: /var/cache/pkg.freebsd.ports
-  block:
-    - name: Create {{ _cache_path }}
-      become: true
-      ansible.builtin.file:
-        path: "{{ _cache_path }}"
-        state: directory
-        owner: www
-        group: www
-        mode: u=rwx,g=rx,o=rx
