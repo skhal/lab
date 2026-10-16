@@ -1,0 +1,10 @@
+Bootstrap a pkg(8) repository.
+
+It is an empty package that can be used by poudriere(8) to bootstrap an empty
+repository:
+
+    poudriere bulk -j <jail> -O <overlay> ports-mgmt/bootstrap-pkg-repo
+
+An empty pkg(8) repository is ready at (use Nginx to serve it):
+
+    /usr/local/poudriere/data/packages/<version>
