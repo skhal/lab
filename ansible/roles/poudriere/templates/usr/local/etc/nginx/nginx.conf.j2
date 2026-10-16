@@ -29,8 +29,8 @@ http {
     allow 127.0.0.1;
     deny  all;
 
-    ssl_certificate     /usr/local/etc/nginx/ssl/pkg.crt;
-    ssl_certificate_key /usr/local/etc/nginx/ssl/private/pkg.key;
+    ssl_certificate     {{ poudriere_cert }};
+    ssl_certificate_key {{ poudriere_cert_key }};
 
     access_log	/var/log/nginx/poudriere.access.log;
     error_log 	/var/log/nginx/poudriere.error.log warn;

@@ -14,6 +14,8 @@ openssl_gen_rsa:
   path: /usr/local/etc/poudriere/ssl/pkg.pub
   owner: root
   group: wheel
+poudriere_cert: /usr/local/etc/nginx/ssl/poudriere.crt
+poudriere_cert_key: /usr/local/etc/nginx/ssl/private/poudriere.key
 poudriere_jail:
   name: 151amd64
   version: 15.1-RELEASE
