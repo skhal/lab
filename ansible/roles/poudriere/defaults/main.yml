@@ -8,6 +8,13 @@
 # poudriere_prefix is the location of POUDRIERE_DATA
 poudriere_basefs: /usr/local/poudriere
 
+# poudriere_bootstrap bootstraps a repository catalog using provided overlay
+# and a package. It has the following structure:
+#   overlay string  overlay ports tree name (must be available in
+#                   `poudriere-ports -l`)
+#   package string  package to build
+poudriere_bootstrap: ""
+
 # poudriere_cert is the path to TLS certificate for Nginx.
 poudriere_cert: "{{ undef(hint='nginx TLS certificate') }}"
 

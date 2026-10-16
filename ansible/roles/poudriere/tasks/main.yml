@@ -90,3 +90,15 @@
 - name: Setup web access
   when: poudriere_web_access
   ansible.builtin.include_tasks: _setup_web_access.yml
+
+- name: Bootstrap repository catalogue
+  when: poudriere_bootstrap is defined
+  become: true
+  ansible.builtin.shell:
+    cmd: |
+      poudriere bulk \
+        -j {{ poudriere_jail.name }} \
+        -O {{ poudriere_bootstrap.overlay }} \
+        {{ poudriere_bootstrap.package }}
+  register: poudriere_bootstrap_repo_catalogue_task
+  changed_when: poudriere_bootstrap_repo_catalogue_task is succeeded
