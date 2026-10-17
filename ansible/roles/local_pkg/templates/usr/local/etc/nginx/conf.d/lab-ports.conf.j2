@@ -1,0 +1,20 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+  server {
+    listen        {{ local_pkg_listen_on }}:443 ssl;
+    server_name   lab-ports.{{ inventory_hostname }};
+
+    allow 10.0.0.0/24;  # local network
+    deny  all;
+
+    ssl_certificate     /usr/local/etc/nginx/ssl/pkg.crt;
+    ssl_certificate_key /usr/local/etc/nginx/ssl/private/pkg.key;
+
+    location ~ ^/FreeBSD:([[:digit:]]+):amd64/latest/(.+)$ {
+      alias /var/cache/pkg.lab-ports/$1amd64-default/$2;
+      autoindex on;
+    }
+  }

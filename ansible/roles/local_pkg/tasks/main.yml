@@ -38,6 +38,7 @@
       - /usr/local/etc/nginx/conf.d/freebsd-base.conf
       - /usr/local/etc/nginx/conf.d/freebsd-kmods.conf
       - /usr/local/etc/nginx/conf.d/freebsd-ports.conf
+      - /usr/local/etc/nginx/conf.d/lab-ports.conf
       - /usr/local/etc/nginx/nginx.conf
       # keep-sorted end
   block:
