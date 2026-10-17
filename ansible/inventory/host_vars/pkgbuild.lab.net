@@ -22,6 +22,9 @@ poudriere_cert_key: /usr/local/etc/nginx/ssl/private/poudriere.key
 poudriere_jail:
   name: 151amd64
   version: 15.1-RELEASE
+poudriere_packages_link:
+  src: 151amd64-default
+  dst: 15amd64-default
 poudriere_port_trees:
   - name: lab
     repo: https://github.com/skhal/lab.git

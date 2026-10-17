@@ -5,6 +5,25 @@
 
 ---
 # keep-sorted start newline_separated=yes
+# poudriere_abi_link creates a symbol link for ABI under
+# /usr/local/poudriere/data/packages/.
+#
+# This is helpful when poudriere jail includes FreeBSD minor OS version in the
+# name, e.g. 151amd64 for a jail that runs FreeBSD 15.1.
+#
+# The caching pkg server must translate repository ${ABI} into a path. The ABI
+# only includes the major number of the version, e.g. `FreeBSD:15:amd64`.
+#
+# This link resolves the translation ambiguity of ABI `FreeBSD:15:amd64 to
+# jail name `151amd64` by creating an explicit link under
+# /usr/local/poudriere/data/packages/:
+#   15amd64 -> 151amd64
+#
+# The variable has the following structure:
+#   src string  link source basename
+#   dst string  link target basename
+poudriere_abi_link: "{{ undef(hint='link package APIs') }}"
+
 # poudriere_prefix is the location of POUDRIERE_DATA
 poudriere_basefs: /usr/local/poudriere
 
