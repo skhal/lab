@@ -88,7 +88,7 @@
   ansible.builtin.include_tasks: _create_jail.yml
 
 - name: Setup web access
-  when: poudriere_web_access
+  when: poudriere_web_access is defined
   ansible.builtin.include_tasks: _setup_web_access.yml
 
 - name: Bootstrap repository catalogue

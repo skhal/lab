@@ -26,7 +26,8 @@ poudriere_port_trees:
   - name: lab
     repo: https://github.com/skhal/lab.git
     path: ports
-poudriere_web_access: true
+poudriere_web_access:
+  addr: 10.0.0.6
 ssh_listen_addresses:
   - 10.0.0.6
 # keep-sorted end

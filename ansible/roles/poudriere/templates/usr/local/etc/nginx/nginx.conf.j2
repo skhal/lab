@@ -23,10 +23,10 @@ http {
   keepalive_timeout  65;
 
   server {
-    listen        localhost:443 ssl;
+    listen        {{ poudriere_web_access.addr }}:443 ssl;
     server_name   {{ inventory_hostname }};
 
-    allow 127.0.0.1;
+    allow 10.0.0.0/24;  # local network
     deny  all;
 
     ssl_certificate     {{ poudriere_cert }};

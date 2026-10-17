@@ -36,6 +36,7 @@ poudriere_jail: "{{ undef(hint='poudriere jail name and version') }}"
 poudriere_port_trees: []
 
 # poudriere_web_access configures https://localhost to poudriere builds when
-# set to true.
-poudriere_web_access: false
+# set. It must have the following structure:
+#   addr  string  listen IP address for Nginx server
+poudriere_web_access: "{{ undef(hint='configure poudriere web access') }}"
 # keep-sorted end
