@@ -48,10 +48,10 @@
   tags: create-dns
   ansible.builtin.import_playbook: playbooks/create-dns.yml
 
-# setup-pkg configures a local caching PKG server.
-- name: Setup PKG
-  tags: setup-pkg
-  ansible.builtin.import_playbook: playbooks/setup-pkg.yml
+# create-pkg-cache adds a caching PKG server.
+- name: Create PKG cache
+  tags: create-pkg-cache
+  ansible.builtin.import_playbook: playbooks/create-pkg-cache.yml
 
 # create-ldap creates an LDAP server.
 - name: Create LDAP
