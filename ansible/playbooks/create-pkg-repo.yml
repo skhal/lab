@@ -11,11 +11,20 @@
     - role: openssl_gen
     - role: poudriere
 
-- name: Configure PKG repos
+- name: Install PKG repository
   hosts: all
   tags: create-pkg-repo-install
   tasks:
-    - name: Fetch repo key
+    - name: Fetch public key
       ansible.builtin.include_role:
         name: openssl_gen
         tasks_from: rsa_fetch
+
+    - name: Install repository
+      vars:
+        local_pkg_repos:
+          - name: lab-ports
+            conf: lab-ports.conf
+      ansible.builtin.include_role:
+        name: local_pkg
+        tasks_from: configure_repos
