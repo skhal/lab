@@ -1,0 +1,33 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+# NAME
+#   create-dns • setup authoritative and caching DNS servers
+#
+# SYNOPSIS
+#   ansible-playbook ./playbooks/create-dns.yml
+#
+# DESCRIPTION
+#   create-dns sets up an authoritative name server with TLS.
+#
+#   Then, it adds a caching name server on every node in the cluster with
+#   redirects to the authoritative name server for `*.lab.net` zone.
+#
+#   User `bind:bind` owns TLS certificate. The user does not exist until `bind`
+#   role installs package `bind`. Run it before `openssl_gen` to generate a
+#   certificate.
+---
+- name: Create authoritative name server
+  hosts: dns.lab.net
+  tags: create-dns-auth
+  roles:
+    - role: bind
+    - role: openssl_gen
+
+- name: Configure caching name server
+  hosts: all
+  tags: create-dns-cache
+  roles:
+    - role: local_unbound

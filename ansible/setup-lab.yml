@@ -39,15 +39,14 @@
   ansible.builtin.import_playbook: playbooks/bootstrap-jails.yml
 
 # create-ca creates a local Central Authority to sign certificates.
-- name: Create Certificate Authority
+- name: Create Certificate Authority (CA)
   tags: create-ca
   ansible.builtin.import_playbook: playbooks/create-ca.yml
 
-# configure-dns creates an authoritative DNS server and sets up local caching
-# DNS server on every host.
-- name: Configure DNS
-  tags: configure-dns
-  ansible.builtin.import_playbook: playbooks/configure-dns.yml
+# create-dns creates an authoritative and caching servers.
+- name: Create Domain Name System (DNS)
+  tags: create-dns
+  ansible.builtin.import_playbook: playbooks/create-dns.yml
 
 # setup-pkg configures a local caching PKG server.
 - name: Setup PKG
