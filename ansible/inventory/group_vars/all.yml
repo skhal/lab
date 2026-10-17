@@ -32,6 +32,9 @@ local_unbound_stub_zones:
     tls_upstream: true
     type: always_transparent
 openssl_ca_host: ssl.lab.net
+openssl_gen_rsa_fetch:
+  source: pkgbuild.lab.net:/usr/local/etc/poudriere/ssl/pkg.pub
+  target: /usr/local/etc/pkg/ssl/lab-ports.pub
 pkg_install:
   # keep-sorted start
   - bind-tools

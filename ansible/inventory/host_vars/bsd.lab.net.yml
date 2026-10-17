@@ -17,9 +17,6 @@ openssl_gen_rsa:
   path: /usr/local/etc/poudriere/ssl/pkg.pub
   owner: root
   group: wheel
-openssl_gen_rsa_fetch:
-  source: pkg.lab.net:/usr/local/etc/poudriere/ssl/pkg.pub
-  target: /usr/local/etc/pkg/ssl/lab-ports.pub
 poudriere_jail:
   name: 151amd64
   version: 15.1-RELEASE

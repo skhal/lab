@@ -4,15 +4,6 @@
 # license that can be found in the LICENSE file.
 
 ---
-- name: Configure PKG repos
-  hosts: dns.lab.net
-  tags: pkg-repos
-  tasks:
-    - name: Fetch repo public key
-      ansible.builtin.include_role:
-        name: openssl_gen
-        tasks_from: rsa_fetch
-
 - name: Certificate validation
   hosts: dns.lab.net
   tags: certval

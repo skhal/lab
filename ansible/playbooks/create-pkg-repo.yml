@@ -10,3 +10,12 @@
   roles:
     - role: openssl_gen
     - role: poudriere
+
+- name: Configure PKG repos
+  hosts: all
+  tags: create-pkg-repo-install
+  tasks:
+    - name: Fetch repo key
+      ansible.builtin.include_role:
+        name: openssl_gen
+        tasks_from: rsa_fetch
