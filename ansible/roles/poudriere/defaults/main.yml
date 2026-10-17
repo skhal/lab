@@ -13,7 +13,7 @@ poudriere_basefs: /usr/local/poudriere
 #   overlay string  overlay ports tree name (must be available in
 #                   `poudriere-ports -l`)
 #   package string  package to build
-poudriere_bootstrap: ""
+poudriere_bootstrap: "{{ undef(hint='create packages catalog when set') }}"
 
 # poudriere_cert is the path to TLS certificate for Nginx.
 poudriere_cert: "{{ undef(hint='nginx TLS certificate') }}"
