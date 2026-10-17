@@ -24,6 +24,19 @@
 - name: Configure PKG repos
   hosts: all
   tags: create-pkg-cache-repos
+  vars:
+    local_pkg_repos:
+      # keep-sorted start
+      - name: freebsd-base
+        conf: freebsd-base.conf
+        orig: FreeBSD-base
+      - name: freebsd-kmods
+        conf: freebsd-kmods.conf
+        orig: FreeBSD-ports-kmods
+      - name: freebsd-ports
+        conf: freebsd-ports.conf
+        orig: FreeBSD-ports
+      # keep-sorted end
   tasks:
     - name: Add repos
       ansible.builtin.include_role:

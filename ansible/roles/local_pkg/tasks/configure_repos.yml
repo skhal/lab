@@ -7,18 +7,6 @@
 - name: Configure pkg repositories
   vars:
     _conf_path: /usr/local/etc/pkg/repos
-    _repos:
-      # keep-sorted start
-      - name: freebsd-base
-        conf: freebsd-base.conf
-        orig: FreeBSD-base
-      - name: freebsd-kmods
-        conf: freebsd-kmods.conf
-        orig: FreeBSD-ports-kmods
-      - name: freebsd-ports
-        conf: freebsd-ports.conf
-        orig: FreeBSD-ports
-      # keep-sorted end
   block:
     - name: Create {{ _conf_path }}
       become: true
@@ -29,15 +17,15 @@
         group: wheel
         mode: u=rwx,g=rx,o=rx
 
-    - name: Write configs
+    - name: Install configs
       ansible.builtin.include_tasks: _configure_repo.yml
-      loop: "{{ _repos }}"
+      loop: "{{ local_pkg_repos }}"
       vars:
         _conf_file: "{{ (_conf_path, item.conf) | path_join }}"
 
     - name: Update package annotations
       ansible.builtin.include_tasks: _update_pkg_repo.yml
-      loop: "{{ _repos }}"
+      loop: "{{ local_pkg_repos }}"
       when: item.orig is defined
       vars:
         _src_repo: "{{ item.orig }}"

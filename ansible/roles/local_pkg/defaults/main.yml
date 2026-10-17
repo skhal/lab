@@ -4,8 +4,20 @@
 # license that can be found in the LICENSE file.
 
 ---
+# keep-sorted start newline_separated=yes
+# local_pkg_hostname is the hostname of the pkg(8) server.
+local_pkg_hostname: ""
+
 # local_pkg_listen_on is the IP4 address to listen on.
 local_pkg_listen_on: ""
 
-# local_pkg_hostname is the hostname of the pkg(8) server.
-local_pkg_hostname: ""
+# local_pkg_repos lists repository configurations to install (see templates
+# in the role). Each item has the following structure:
+#   name  string  repository name
+#   conf  string  configuration name (basename)
+#   orig  string? the old repository name this one replaces. This field
+#                 triggers an update of `repository` annotation in installed
+#                 packages from <orig> value to <name> to prefer newly
+#                 installed repository in pkg-upgrade(8).
+local_pkg_repos: []
+# keep-sorted end
