@@ -58,10 +58,10 @@
   tags: create-ldap
   ansible.builtin.import_playbook: playbooks/create-ldap.yml
 
-# bootstrap-pkg-builder configures packages builder.
-- name: Bootstrap PKG builder
-  tags: bootstrap-pkg-builder
-  ansible.builtin.import_playbook: playbooks/bootstrap-pkg-builder.yml
+# create-pkg-repo creates Lab pkg(8) repository.
+- name: Carete PKG repository.
+  tags: create-pkg-repo
+  ansible.builtin.import_playbook: playbooks/create-pkg-repo.yml
 
 # bootstrap-devent sets up development environment.
 - name: Bootstrap development environment

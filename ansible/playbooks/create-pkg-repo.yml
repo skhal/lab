@@ -4,9 +4,9 @@
 # license that can be found in the LICENSE file.
 
 ---
-- name: Bootstrap pkg builder
+- name: Build PKG repository
   hosts: pkgbuild.lab.net
-  tags: bootstrap-pkg-builder-poudriere
+  tags: create-pkg-repo-build
   roles:
     - role: openssl_gen
     - role: poudriere
