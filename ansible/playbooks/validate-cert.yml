@@ -1,0 +1,27 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+# NAME
+#   validate-cert • validate certificates
+#
+# SYNOPSIS
+#   ansible-playbook ./playbooks/validate-cert.yml
+#
+# DESCRIPTION
+#   validate-cert configures certificate validation such as certificate
+#   expiration date check, etc.
+#
+#   It installs sysutils/certval from Lab ports. Built it manually before
+#   running this playbook.
+#
+# CAVEATS
+#   See https://github.com/skhal/lab/issues/479 for poudriere(8) build
+#   reliability issue.
+---
+- name: Certificate validation
+  hosts: ssl
+  tags: validate-cert
+  roles:
+    - role: certval

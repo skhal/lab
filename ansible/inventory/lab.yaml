@@ -29,3 +29,10 @@ infra:
 dev:
   hosts:
     bsd.lab.net:
+ssl:
+  hosts:
+    ssl.lab.net: # CA cert
+    dns.lab.net: # DNS cert
+    ldap.lab.net: # OpenLDAP cert
+    pkg.lab.net: # PKG server cert
+    pkgbuild.lab.net: # Poudriere web cert

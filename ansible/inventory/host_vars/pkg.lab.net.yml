@@ -6,6 +6,9 @@
 ---
 # keep-sorted start
 ansible_jexec_over_ssh_jail_name: pkg
+certval_certificates:
+  - name: "PKG Certificate"
+    path: /usr/local/etc/nginx/ssl/pkg.crt
 local_pkg_listen_on: 10.0.0.5
 openssl_gen_common_name: pkg.lab.net
 openssl_gen_crt: "/usr/local/etc/nginx/ssl/pkg.crt"
