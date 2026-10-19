@@ -22,5 +22,10 @@ http {
 
   keepalive_timeout  65;
 
+  log_format proxy-pass '$remote_addr - $upstream_cache_status '
+                        '$remote_user [$time_local] '
+                        '"$request" $status $body_bytes_sent '
+                        '"$http_referer" "$http_user_agent"';
+
   include /usr/local/etc/nginx/conf.d/*.conf;
 }

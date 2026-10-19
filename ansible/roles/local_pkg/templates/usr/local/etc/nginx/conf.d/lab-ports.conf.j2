@@ -13,6 +13,8 @@
     ssl_certificate     /usr/local/etc/nginx/ssl/pkg.crt;
     ssl_certificate_key /usr/local/etc/nginx/ssl/private/pkg.key;
 
+    access_log /var/log/nginx/lab-ports.access.log proxy-pass;
+
     location ~ ^/FreeBSD:([[:digit:]]+):amd64/latest/(.+)$ {
       alias /var/cache/pkg.lab-ports/$1amd64-default/$2;
       autoindex on;
