@@ -4,11 +4,16 @@
 # license that can be found in the LICENSE file.
 
 ---
-- name: Build PKG repository
+- name: Generate certificate
+  hosts: pkgbuild.lab.net
+  tags: create-pkg-repo-cert
+  roles:
+    - role: openssl_gen
+
+- name: Create PKG builder
   hosts: pkgbuild.lab.net
   tags: create-pkg-repo-build
   roles:
-    - role: openssl_gen
     - role: poudriere
 
 - name: Install PKG repository
