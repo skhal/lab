@@ -14,11 +14,16 @@
 #   (base, Kernel modules, ports) and configures the cluster to use it instead
 #   of FreeBSD repos.
 ---
+- name: Generate certificate
+  hosts: pkg.lab.net
+  tags: create-pkg-cache-cert
+  roles:
+    - role: openssl_gen
+
 - name: Create caching PKG server
   hosts: pkg.lab.net
   tags: create-pkg-cache-server
   roles:
-    - role: openssl_gen
     - role: local_pkg
 
 - name: Configure PKG repos
