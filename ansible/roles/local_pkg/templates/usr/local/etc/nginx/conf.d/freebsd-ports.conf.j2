@@ -18,21 +18,45 @@
 
     access_log /var/log/nginx/freebsd-ports.access.log proxy-pass;
 
-    location / {
-      proxy_cache freebsd-ports;
+    # keep-sorted start
+    proxy_cache               freebsd-ports;
+    proxy_cache_bypass        $http_x_cache_bypass;
+    proxy_cache_lock          on;  # concurrent MISS'es lock, first fetches.
+    proxy_cache_lock_timeout  30s; # first fetch must complete in 30 seconds.
+    proxy_cache_revalidate    on;  # conditional GET for outdated content.
+    proxy_cache_valid         200 206 7d; # cache validity
+    proxy_ssl_server_name     on;
+    # keep-sorted end
 
+    location / {
       # keep-sorted start
-      proxy_cache_bypass $http_x_cache_bypass;
-      proxy_cache_lock on;           # concurrent MISS'es lock, first fetches.
-      proxy_cache_lock_timeout 30s;  # first fetch must complete in 30 seconds.
-      proxy_cache_revalidate on;     # conditional GET for outdated content.
-      proxy_cache_valid 7d;          # cache validity for 200, 301, 302.
+      proxy_cache_key   $scheme$proxy_host$request_uri;
+      proxy_pass        https://pkg.FreeBSD.org;
+      proxy_set_header  If-Modified-Since $http_if_modified_since;
       # keep-sorted end
 
-      proxy_set_header If-Modified-Since $http_if_modified_since;
+      proxy_intercept_errors on;
+      error_page 301 302 307 = @redirect;
 
-      proxy_pass  https://pkg.FreeBSD.org;
+      add_header X-Cache "$upstream_cache_status freebsd-ports";
+    }
 
-      add_header	X-Cache-Status $upstream_cache_status;
+    location @redirect {
+      # keep-sorted start
+      set $orig_cache_key     $scheme$proxy_host$request_uri;
+      set $orig_cache_status  $upstream_cache_status;
+      set $redirect_location  $upstream_http_location;
+      # keep-sorted end
+
+      resolver localhost:53 ipv6=off;
+
+      # keep-sorted start
+      proxy_cache_key   $orig_cache_key;
+      proxy_pass        $redirect_location;
+      proxy_set_header  If-Modified-Since $http_if_modified_since;
+      # keep-sorted end
+
+      add_header X-Cache "$orig_cache_status freebsd-ports (before redirect)";
+      add_header X-Cache "$upstream_cache_status freebsd-ports (redirect)";
     }
   }

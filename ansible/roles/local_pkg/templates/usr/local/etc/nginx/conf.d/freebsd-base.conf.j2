@@ -19,13 +19,13 @@
     access_log /var/log/nginx/freebsd-base.access.log proxy-pass;
 
     # keep-sorted start
-    proxy_cache freebsd-base;
-    proxy_cache_bypass $http_x_cache_bypass;
-    proxy_cache_lock on;           # concurrent MISS'es lock, first fetches.
-    proxy_cache_lock_timeout 30s;  # first fetch must complete in 30 seconds.
-    proxy_cache_revalidate on;     # conditional GET for outdated content.
-    proxy_cache_valid 200 206 14d; # cache validity
-    proxy_ssl_server_name on;
+    proxy_cache               freebsd-base;
+    proxy_cache_bypass        $http_x_cache_bypass;
+    proxy_cache_lock          on;  # concurrent MISS'es lock, first fetches.
+    proxy_cache_lock_timeout  30s; # first fetch must complete in 30 seconds.
+    proxy_cache_revalidate    on;  # conditional GET for outdated content.
+    proxy_cache_valid         200 206 14d; # cache validity
+    proxy_ssl_server_name     on;
     # keep-sorted end
 
     location / {
@@ -43,16 +43,17 @@
 
     location @redirect {
       # keep-sorted start
-      set $orig_cache_key $scheme$proxy_host$request_uri;
-      set $orig_cache_status $upstream_cache_status;
-      set $redirect_location $upstream_http_location;
+      set $orig_cache_key     $scheme$proxy_host$request_uri;
+      set $orig_cache_status  $upstream_cache_status;
+      set $redirect_location  $upstream_http_location;
       # keep-sorted end
 
       resolver localhost:53 ipv6=off;
 
       # keep-sorted start
-      proxy_cache_key $orig_cache_key;
-      proxy_pass $redirect_location;
+      proxy_cache_key   $orig_cache_key;
+      proxy_pass        $redirect_location;
+      proxy_set_header  If-Modified-Since $http_if_modified_since;
       # keep-sorted end
 
       add_header X-Cache "$orig_cache_status freebsd-base (before redirect)";
