@@ -36,10 +36,9 @@
         name: openssl_gen
         tasks_from: rsa
 
-    - name: Configure
-      become: true
+    - name: Update {{ _conf_file }}
       vars:
-        _pkg_repo_signing_key: >-
+        _signing_key: >-
           {{
             (
               openssl_gen_rsa.path | dirname,
@@ -47,12 +46,29 @@
               openssl_gen_rsa.path | basename | splitext | first
             ) | path_join
           }}.key
-      ansible.builtin.template:
-        src: "{{ _conf_file | trim('/') }}.j2"
-        dest: "{{ _conf_file }}"
-        owner: root
-        group: wheel
-        mode: u=rw,g=r,o=r
+      block:
+        - name: Set signing key
+          become: true
+          ansible.builtin.lineinfile:
+            path: "{{ _conf_file }}"
+            regexp: "^#PKG_REPO_SIGNING_KEY="
+            line: "PKG_REPO_SIGNING_KEY={{ _signing_key }}"
+
+        - name: Enable ccache
+          become: true
+          ansible.builtin.lineinfile:
+            path: "{{ _conf_file }}"
+            regexp: "^#\\s*(CCACHE_DIR=.*)$"
+            backrefs: true
+            line: "\\1"
+
+        - name: Allow make jobs
+          become: true
+          ansible.builtin.lineinfile:
+            path: "{{ _conf_file }}"
+            regexp: "^#\\s*(ALLOW_MAKE_JOBS=.*)$"
+            backrefs: true
+            line: "\\1"
 
 - name: Create port trees
   block:
