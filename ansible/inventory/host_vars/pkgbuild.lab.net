@@ -24,7 +24,9 @@ poudriere_cert: /usr/local/etc/nginx/ssl/poudriere.crt
 poudriere_cert_key: /usr/local/etc/nginx/ssl/private/poudriere.key
 poudriere_jail:
   name: 151amd64
-  version: 15.1-RELEASE
+  pkgbase_repodir: base_release_1
+  pkgbase_uri: pkg+https://freebsd-base.pkg.lab.net
+  version: 15
 poudriere_packages_link:
   src: 151amd64-default
   dst: 15amd64-default

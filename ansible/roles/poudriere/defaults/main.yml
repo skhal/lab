@@ -42,9 +42,12 @@ poudriere_cert_key: "{{ undef(hint='nginx TLS certificate private key') }}"
 
 # poudriere_jail configures jail to be used by poudriere-jail(8) to build
 # packages. It is expected to have the following structure:
-#   name    string  jail name, e.g. 151amd64 for OS version 15.1-RELEASE
-#   version string  FreeBSD version without patch
-#                   (see -v flag in poudriere-jail(8)).
+#   name            string  jail name, e.g. 151amd64 for OS version 15.1-RELEASE
+#   pkgbase_repodir string  release sub-dir, e.g. base_release_1.
+#   pkgbase_uri     string  URI to pkgbase server,
+#                           e.g. pkg+https://pkg.freebsd.org
+#   version         string  FreeBSD major version for pkgbase method of install,
+#                           e.g. 15 (see -v flag in poudriere-jail(8)).
 poudriere_jail: "{{ undef(hint='poudriere jail name and version') }}"
 
 # poudriere_port_trees lists port trees to git-clone and import into poudriere.

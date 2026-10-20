@@ -24,6 +24,8 @@
           poudriere jail \
             -c \
             -j {{ poudriere_jail.name }} \
+            -m pkgbase={{ poudriere_jail.pkgbase_repodir }} \
+            -U {{ poudriere_jail.pkgbase_uri }} \
             -v {{ poudriere_jail.version }}
       register: poudriere_create_jail_task
       changed_when: poudriere_create_jail_task is succeeded
