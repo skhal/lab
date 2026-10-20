@@ -23,6 +23,13 @@
       vars:
         _conf_file: "{{ (_conf_path, item.conf) | path_join }}"
 
+    - name: Disable canonical repos
+      ansible.builtin.include_tasks: _disable_repo.yml
+      loop: "{{ local_pkg_repos }}"
+      when: item.orig is defined
+      vars:
+        _repo: "{{ item.orig }}"
+
     - name: Update package annotations
       ansible.builtin.include_tasks: _update_pkg_repo.yml
       loop: "{{ local_pkg_repos }}"
