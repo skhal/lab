@@ -20,10 +20,14 @@
 
     location / {
       proxy_cache freebsd-base;
-      proxy_cache_revalidate on;     # conditional GET for outdated content.
+
+      # keep-sorted start
+      proxy_cache_bypass $http_x_cache_bypass;
       proxy_cache_lock on;           # concurrent MISS'es lock, first fetches.
       proxy_cache_lock_timeout 30s;  # first fetch must complete in 30 seconds.
+      proxy_cache_revalidate on;     # conditional GET for outdated content.
       proxy_cache_valid 14d;         # cache validity for 200, 301, 302.
+      # keep-sorted end
 
       proxy_set_header If-Modified-Since $http_if_modified_since;
 
