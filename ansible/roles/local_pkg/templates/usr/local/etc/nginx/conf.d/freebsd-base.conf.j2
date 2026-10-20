@@ -36,7 +36,7 @@
       # keep-sorted end
 
       proxy_intercept_errors on;
-      error_page 302 = @redirect;
+      error_page 301 302 307 = @redirect;
 
       add_header X-Cache "$upstream_cache_status freebsd-base";
     }
