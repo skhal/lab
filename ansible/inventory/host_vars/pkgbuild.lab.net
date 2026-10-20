@@ -17,6 +17,9 @@ openssl_gen_rsa:
   path: /usr/local/etc/poudriere/ssl/pkg.pub
   owner: root
   group: wheel
+poudriere_abi_link:
+  src: 151amd64-default
+  dst: 15amd64-default
 poudriere_bootstrap:
   overlay: lab
   package: ports-mgmt/bootstrap-pkg-repo
@@ -27,9 +30,6 @@ poudriere_jail:
   pkgbase_repodir: base_release_1
   pkgbase_uri: pkg+https://freebsd-base.pkg.lab.net
   version: 15
-poudriere_packages_link:
-  src: 151amd64-default
-  dst: 15amd64-default
 poudriere_port_trees:
   - name: lab
     repo: https://github.com/skhal/lab.git

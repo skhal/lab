@@ -109,7 +109,8 @@
   vars:
     _prefix: "{{ (poudriere_basefs, 'data', 'packages') | path_join }}"
   ansible.builtin.file:
-    src: "{{ (_prefix, poudriere_abi_link.src) | path_join }}"
+    # the link is relative to the destination
+    src: "{{ poudriere_abi_link.src }}"
     dest: "{{ (_prefix, poudriere_abi_link.dst) | path_join }}"
     owner: root
     group: wheel
