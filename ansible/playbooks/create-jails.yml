@@ -97,7 +97,7 @@
     jail_allow_mount_nullfs: true
     jail_allow_mount_procfs: true
     jail_allow_mount_tmpfs: true
-    jail_children_max: 10
+    jail_children_max: 50
     jail_cidr: 10.0.0.6/24
     jail_depend:
       - dns
@@ -123,7 +123,7 @@
     jail_allow_mount_nullfs: true
     jail_allow_mount_procfs: true
     jail_allow_mount_tmpfs: true
-    jail_children_max: 10
+    jail_children_max: 50
     jail_cidr: 10.0.0.101/24
     jail_depend:
       - dns
