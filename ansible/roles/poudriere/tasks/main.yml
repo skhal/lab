@@ -72,6 +72,7 @@
 
         - name: Limit the number of workers
           become: true
+          when: poudriere_conf_parallel_jobs is defined
           ansible.builtin.lineinfile:
             path: "{{ _conf_file }}"
             regexp: "^#\\s*(PARALLEL_JOBS=.*)$"
