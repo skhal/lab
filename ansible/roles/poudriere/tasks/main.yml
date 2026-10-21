@@ -70,6 +70,13 @@
             backrefs: true
             line: "\\1"
 
+        - name: Limit the number of workers
+          become: true
+          ansible.builtin.lineinfile:
+            path: "{{ _conf_file }}"
+            regexp: "^#\\s*(PARALLEL_JOBS=.*)$"
+            line: "PARALLEL_JOBS={{ poudriere_conf_parallel_jobs }}"
+
 - name: Create port trees
   block:
     - name: Create default ports tree
