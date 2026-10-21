@@ -1,0 +1,21 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+- name: Build {{ _port }}
+  become: true
+  ansible.builtin.shell:
+    cmd: |
+      poudriere bulk \
+        -j {{ pkgbuild_jail }} \
+        {% if pkgbuild_overlay is defined %}
+          -O {{ pkgbuild_overlay }} \
+        {% endif %}
+        {{ _port }}
+  register: pkgbuild_build_port_task
+  failed_when: pkgbuild_build_port_task.rc != 0
+  vars:
+    _regex: "Built ports:.*{{ _port }}"
+  changed_when: pkgbuild_build_port_task.stdout | regex_search(_regex) is not none

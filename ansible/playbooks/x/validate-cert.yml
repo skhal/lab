@@ -20,8 +20,17 @@
 #   See https://github.com/skhal/lab/issues/479 for poudriere(8) build
 #   reliability issue.
 ---
+- name: Build certval
+  hosts: pkgbuild.lab.net
+  tags: validate-cert-build
+  vars:
+    pkgbuild_ports:
+      - sysutils/certval
+  roles:
+    - role: pkgbuild
+
 - name: Certificate validation
   hosts: ssl
-  tags: validate-cert
+  tags: validate-cert-install
   roles:
     - role: certval
