@@ -17,6 +17,13 @@ openssl_gen_rsa:
   path: /usr/local/etc/poudriere/ssl/pkg.pub
   owner: root
   group: wheel
+pkg_install:
+  # keep-sorted start
+  - FreeBSD-zfs
+  - bind-tools
+  - doas
+  - neovim
+  # keep-sorted end
 poudriere_conf_allow_make_jobs: true
 poudriere_jail:
   name: 151amd64

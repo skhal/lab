@@ -123,6 +123,7 @@
     jail_allow_mount_nullfs: true
     jail_allow_mount_procfs: true
     jail_allow_mount_tmpfs: true
+    jail_allow_mount_zfs: true
     jail_children_max: 50
     jail_cidr: 10.0.0.101/24
     jail_depend:
@@ -133,6 +134,8 @@
     jail_mounts:
       - path: /home/skhalatyan
     jail_name: bsd
+    jail_zfs_datasets:
+      - zroot/usr/poudriere
     # keep-sorted end
   roles:
     - role: jail

@@ -34,6 +34,10 @@ jail_allow_mount_procfs: false
 # enabled.
 jail_allow_mount_tmpfs: false
 
+# jail_allow_mount_zfs adds allow.mount.zfs to the jail configuration when
+# enabled.
+jail_allow_mount_zfs: false
+
 # jail_bridge is the jails bridge.
 jail_bridge: ""
 
@@ -63,4 +67,7 @@ jail_mounts: []
 
 # jail_name is the jail name.
 jail_name: ""
+
+# jail_zfs_datasets is a list of datasets to enjail.
+jail_zfs_datasets: []
 # keep-sorted end
