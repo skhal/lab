@@ -17,6 +17,7 @@ openssl_gen_rsa:
   path: /usr/local/etc/poudriere/ssl/pkg.pub
   owner: root
   group: wheel
+poudriere_conf_allow_make_jobs: true
 poudriere_jail:
   name: 151amd64
   pkgbase_repodir: base_release_1

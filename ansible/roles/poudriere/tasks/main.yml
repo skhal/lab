@@ -64,6 +64,7 @@
 
         - name: Allow make jobs
           become: true
+          when: poudriere_conf_allow_make_jobs is defined and poudriere_conf_allow_make_jobs
           ansible.builtin.lineinfile:
             path: "{{ _conf_file }}"
             regexp: "^#\\s*(ALLOW_MAKE_JOBS=.*)$"
