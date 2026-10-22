@@ -4,8 +4,9 @@
 # license that can be found in the LICENSE file.
 
 ---
-- name: Create dataset {{ _dataset }}
+- name: Create dataset {{ _dset.name }}
   become: true
   community.general.zfs:
-    name: "{{ _dataset }}"
+    name: "{{ _dset.name }}"
     state: present
+    extra_zfs_properties: "{{ _dset.props | default(omit) }}"

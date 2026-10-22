@@ -5,7 +5,18 @@
 
 ---
 # keep-sorted start newline_separated=yes
-# zfs_datasets lists datasets that must be present on the system.
+# zfs_datasets lists datasets that must be present on the system. Each dataset
+# has the following structure:
+#   name  string  dataset name
+#   prop* string  dataset property and its value. These are optional and there
+#                 can be a few properties supported by zfs-create(8).
+#
+# Example:
+#   zfs_datasets:
+#     - name: zroot/example/one
+#     - name: zroot/example/two
+#       jailed: 'on'
+#       canmount: 'off'
 zfs_datasets: []
 
 # zfs_scrub_days defines how often to run zpool-scrub(8).

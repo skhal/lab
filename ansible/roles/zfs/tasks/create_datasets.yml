@@ -6,6 +6,8 @@
 ---
 - name: Create datasets
   loop: "{{ zfs_datasets }}"
-  loop_control:
-    loop_var: _dataset
+  vars:
+    _dset:
+      name: "{{ item.name }}"
+      props: "{{ item | combine({'name': omit}) or omit }}"
   ansible.builtin.include_tasks: _create_dataset.yml
