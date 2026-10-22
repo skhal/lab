@@ -40,6 +40,10 @@ poudriere_cert: "{{ undef(hint='nginx TLS certificate') }}"
 # poudriere_cert_key is the path to TLS certificate private key for Nginx.
 poudriere_cert_key: "{{ undef(hint='nginx TLS certificate private key') }}"
 
+# poudriere_conf_allow_make_jobs_packages lists packages that are allowed to
+# run multi-job make inside a poudriere build jail.
+poudriere_conf_allow_make_jobs_packages: "{{ undef(hint='list of packages with multi-job make') }}"
+
 # poudriere_conf_parallel_jobs limits the number of parallel poudriere builder
 # jails.
 poudriere_conf_parallel_jobs: "{{ undef(hint='number of builders') }}"

@@ -79,6 +79,14 @@
             regexp: "^#\\s*(PARALLEL_JOBS=.*)$"
             line: "PARALLEL_JOBS={{ poudriere_conf_parallel_jobs }}"
 
+        - name: Allow parallel make
+          become: true
+          when: poudriere_conf_allow_make_jobs_packages is defined
+          ansible.builtin.lineinfile:
+            path: "{{ _conf_file }}"
+            regexp: "^#\\s*(ALLOW_MAKE_JOBS_PACKAGES=.*)$"
+            line: "ALLOW_MAKE_JOBS_PACKAGES=\"{{ poudriere_conf_allow_make_jobs_packages | join(' ') }}\""
+
 - name: Create port trees
   block:
     - name: Create default ports tree
