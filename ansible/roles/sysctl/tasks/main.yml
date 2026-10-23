@@ -1,0 +1,18 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+- name: Set systcl state
+  when: sysctl_state is defined
+  vars:
+    _conf_file: /etc/sysctl.conf
+  become: true
+  ansible.builtin.template:
+    src: "{{ _conf_file | trim('/') }}.j2"
+    dest: "{{ _conf_file }}"
+    backup: true
+    owner: root
+    group: wheel
+    mode: u=rw,g=r,o=r

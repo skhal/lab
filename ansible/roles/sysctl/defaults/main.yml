@@ -1,0 +1,12 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+# sysctl_state is a list of sysctl management information bases (MIBs) and
+# their values to add to /etc/sysctl.conf. Each item has the following
+# structure:
+#   name  string  the mib name (eg security.bsd.unprivileged_proc_debug)
+#   value string  the mib value (ex 1)
+sysctl_state: "{{ undef(hint='list of sysctl variables') }}"

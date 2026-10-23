@@ -51,6 +51,23 @@ routing_defaultrouter: 192.168.10.1
 ssh_listen_addresses:
   - 192.168.10.101
   - 10.0.0.1
+sysctl_state:
+  # keep-sorted start
+  - name: kern.randompid
+    value: 1
+  - name: security.bsd.see_jail_proc
+    value: 0
+  - name: security.bsd.see_other_gids
+    value: 0
+  - name: security.bsd.see_other_uids
+    value: 0
+  - name: security.bsd.unprivileged_proc_debug
+    value: 0
+  - name: security.bsd.unprivileged_read_msgbuf
+    value: 0
+  - name: vfs.zfs.vdev.min_auto_ashift
+    value: 12
+  # keep-sorted end
 zfs_datasets:
   - name: zroot/usr/packages
   - name: zroot/var/cache/pkg.freebsd-base

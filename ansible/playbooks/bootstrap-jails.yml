@@ -18,6 +18,12 @@
 #   - setup user environment.
 #   - configure remote access.
 ---
+- name: Configure sysctl
+  hosts: dev
+  tags: bootstrap-sysctl
+  roles:
+    - role: sysctl
+
 - name: Configure services
   hosts: jails
   tags: bootstrap-services

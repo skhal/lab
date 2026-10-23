@@ -26,6 +26,12 @@
   roles:
     - role: bootstrap
 
+- name: Configure sysctl
+  hosts: nuc.lab.net
+  tags: bootstrap-sysctl
+  roles:
+    - role: sysctl
+
 - name: Configure services
   hosts: nuc.lab.net
   tags: bootstrap-services
