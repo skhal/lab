@@ -1,0 +1,28 @@
+From 07a63a5d00b3b58d42c401946b99ba5f400fb85d Mon Sep 17 00:00:00 2001
+From: Samvel Khalatyan <sn.khalatyan@gmail.com>
+Date: Fri, 23 Oct 2026 14:15:32 -0500
+Subject: [PATCH] exclude man pages from jdk-lib
+
+---
+ toolchains/jdk_build_file.bzl | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/toolchains/jdk_build_file.bzl b/toolchains/jdk_build_file.bzl
+index c0ed160..e4fc673 100644
+--- a/toolchains/jdk_build_file.bzl
++++ b/toolchains/jdk_build_file.bzl
+@@ -68,8 +68,11 @@ filegroup(
+         ["lib/**", "release"],
+         allow_empty = True,
+         exclude = [
++            # keep-sorted start
++            "lib/**/man/**",
+             "lib/missioncontrol/**",
+             "lib/visualvm/**",
++            # keep-sorted end
+         ],
+     ),
+ )
+-- 
+2.56.0
+
