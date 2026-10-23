@@ -14,6 +14,7 @@ pkg_install:
   - FreeBSD-toolchain # install default C compiler to enable Go cgo.
   - FreeBSD-utilities-dev # install libprocstat.h for go-delve
   - bash # for pre-commit & co
+  - bazel9
   - buf # Protobuf lint, fmt, LSP
   - deno # JSON formatter # JSON formatter # JSON formatter # JSON formatter
   - git
