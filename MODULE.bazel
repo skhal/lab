@@ -6,7 +6,6 @@
 module(
     name = "lab",
     version = "head",
-    compatibility_level = 1,
 )
 
 # keep-sorted start
