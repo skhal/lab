@@ -5,6 +5,7 @@
 
 load("@rules_cc//cc/toolchains:cc_toolchain.bzl", "cc_toolchain")
 load(":cc_toolchain_config.bzl", "cc_toolchain_config")
+load(":cc_toolchain_config_freebsd.bzl", "cc_toolchain_config_freebsd")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -38,5 +39,36 @@ toolchain(
         "@platforms//os:linux",
     ],
     toolchain = ":linux_x86_64_toolchain",
+    toolchain_type = "@bazel_tools//tools/cpp:toolchain_type",
+)
+
+cc_toolchain_config_freebsd(
+    name = "freebsd_x86_64_toolchain_config",
+)
+
+cc_toolchain(
+    name = "freebsd_x86_64_toolchain",
+    all_files = ":empty",
+    compiler_files = ":empty",
+    dwp_files = ":empty",
+    linker_files = ":empty",
+    objcopy_files = ":empty",
+    strip_files = ":empty",
+    supports_param_files = False,
+    toolchain_config = ":freebsd_x86_64_toolchain_config",
+    toolchain_identifier = "freebsd_x86_64-toolchain",
+)
+
+toolchain(
+    name = "cc_toolchain_freebsd_x86_64",
+    exec_compatible_with = [
+        "@platforms//cpu:x86_64",
+        "@platforms//os:freebsd",
+    ],
+    target_compatible_with = [
+        "@platforms//cpu:x86_64",
+        "@platforms//os:freebsd",
+    ],
+    toolchain = ":freebsd_x86_64_toolchain",
     toolchain_type = "@bazel_tools//tools/cpp:toolchain_type",
 )
