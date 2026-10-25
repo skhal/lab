@@ -23,6 +23,15 @@ bazel_dep(name = "rules_java", version = "9.9.0")
 register_toolchains("//toolchain:cc_toolchain_freebsd_x86_64")
 
 single_version_override(
+    module_name = "abseil-cpp",
+    patch_strip = 1,
+    patches = [
+        "//third_party/patch/abseil-cpp/20260817.0:0001-cctz-fix-implicit-int-conversion-error-on-FreeBSD.patch",
+    ],
+    version = "20260817.0",
+)
+
+single_version_override(
     module_name = "rules_java",
     patch_strip = 1,
     patches = [

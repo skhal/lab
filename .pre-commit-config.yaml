@@ -383,4 +383,5 @@ repos:
          .*\.diff
         |.*\.diff\.j2
         |infra/net\.lab.*\.conf
+        |.*\.patch
       )$

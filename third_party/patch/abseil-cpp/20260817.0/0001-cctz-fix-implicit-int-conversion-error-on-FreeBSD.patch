@@ -1,0 +1,96 @@
+From 92b124873d09682c3ef52b97a5c5b2fac0832024 Mon Sep 17 00:00:00 2001
+From: Samvel Khalatyan <sn.khalatyan@gmail.com>
+Date: Sun, 25 Oct 2026 10:13:30 -0500
+Subject: [PATCH] cctz: fix implicit int conversion error on FreeBSD
+
+---
+ absl/copts/GENERATED_copts.bzl |  2 ++
+ absl/copts/copts.py            | 29 +++++++++++++++--------------
+ 2 files changed, 17 insertions(+), 14 deletions(-)
+
+diff --git a/absl/copts/GENERATED_copts.bzl b/absl/copts/GENERATED_copts.bzl
+index 8c1d7a05..feaaaeee 100644
+--- a/absl/copts/GENERATED_copts.bzl
++++ b/absl/copts/GENERATED_copts.bzl
+@@ -188,6 +188,7 @@ ABSL_LLVM_FLAGS = [
+     "-Wtautological-overlap-compare",
+     "-Wtautological-unsigned-zero-compare",
+     "-Wthread-safety",
++    "-Wno-thread-safety-analysis",
+     "-Wundef",
+     "-Wuninitialized",
+     "-Wunreachable-code",
+@@ -199,6 +200,7 @@ ABSL_LLVM_FLAGS = [
+     "-Wno-float-conversion",
+     "-Wno-implicit-float-conversion",
+     "-Wno-implicit-int-float-conversion",
++    "-Wno-implicit-int-conversion",
+     "-Wno-unknown-warning-option",
+     "-Wno-unused-command-line-argument",
+     "-DNOMINMAX",
+diff --git a/absl/copts/copts.py b/absl/copts/copts.py
+index c1d1f4a7..22d851e8 100644
+--- a/absl/copts/copts.py
++++ b/absl/copts/copts.py
+@@ -73,6 +73,7 @@ ABSL_LLVM_BASE_FLAGS = [
+     "-Wtautological-overlap-compare",
+     "-Wtautological-unsigned-zero-compare",
+     "-Wthread-safety",
++    "-Wno-thread-safety-analysis",
+     "-Wundef",
+     "-Wuninitialized",
+     "-Wunreachable-code",
+@@ -86,6 +87,7 @@ ABSL_LLVM_BASE_FLAGS = [
+     "-Wno-float-conversion",
+     "-Wno-implicit-float-conversion",
+     "-Wno-implicit-int-float-conversion",
++    "-Wno-implicit-int-conversion",
+     # Disable warnings on unknown warning flags (when warning flags are
+     # unknown on older compiler versions)
+     "-Wno-unknown-warning-option",
+@@ -148,19 +150,20 @@ MSVC_DEFINES = [
+ 
+ 
+ def GccStyleFilterAndCombine(default_flags, test_flags):
+-  """Merges default_flags and test_flags for GCC and LLVM.
++    """Merges default_flags and test_flags for GCC and LLVM.
++
++    Args:
++      default_flags: A list of default compiler flags
++      test_flags: A list of flags that are only used in tests
+ 
+-  Args:
+-    default_flags: A list of default compiler flags
+-    test_flags: A list of flags that are only used in tests
++    Returns:
++      A combined list of default_flags and test_flags, but with all flags of the
++      form '-Wwarning' removed if test_flags contains a flag of the form
++      '-Wno-warning'
++    """
++    remove = set(["-W" + f[5:] for f in test_flags if f[:5] == "-Wno-"])
++    return [f for f in default_flags if f not in remove] + test_flags
+ 
+-  Returns:
+-    A combined list of default_flags and test_flags, but with all flags of the
+-    form '-Wwarning' removed if test_flags contains a flag of the form
+-    '-Wno-warning'
+-  """
+-  remove = set(["-W" + f[5:] for f in test_flags if f[:5] == "-Wno-"])
+-  return [f for f in default_flags if f not in remove] + test_flags
+ 
+ COPT_VARS = {
+     "ABSL_GCC_FLAGS": ABSL_GCC_FLAGS,
+@@ -181,9 +184,7 @@ COPT_VARS = {
+             ABSL_LLVM_BASE_FLAGS, ABSL_LLVM_TEST_ADDITIONAL_FLAGS
+         )
+     ),
+-    "ABSL_MSVC_FLAGS": (
+-        MSVC_BIG_WARNING_FLAGS + MSVC_WARNING_FLAGS + MSVC_DEFINES
+-    ),
++    "ABSL_MSVC_FLAGS": (MSVC_BIG_WARNING_FLAGS + MSVC_WARNING_FLAGS + MSVC_DEFINES),
+     "ABSL_MSVC_TEST_FLAGS": (
+         MSVC_BIG_WARNING_FLAGS
+         + MSVC_WARNING_FLAGS
+-- 
+2.56.0
+
