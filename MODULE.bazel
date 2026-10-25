@@ -35,7 +35,7 @@ single_version_override(
     module_name = "rules_java",
     patch_strip = 1,
     patches = [
-        "//third_party/patch/rules_java-9.9.0:0001-exclude-man-pages-from-jdk-lib.patch",
+        "//third_party/patch/rules_java/9.9.0:0001-exclude-man-pages-from-jdk-lib.patch",
     ],
     version = "9.9.0",
 )
