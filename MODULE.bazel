@@ -36,6 +36,7 @@ single_version_override(
     patches = [
         "//third_party/patch/rules_java-9.9.0:0001-exclude-man-pages-from-jdk-lib.patch",
     ],
+    version = "9.9.0",
 )
 
 # Lab runs Bazel in a FreeBSD jail using Linux Binary Compatibility:
