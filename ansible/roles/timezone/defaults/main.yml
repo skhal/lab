@@ -4,5 +4,5 @@
 # license that can be found in the LICENSE file.
 
 ---
-# timezone_name is the name of the timezonek, e.g. America/Chicago.
+# timezone_name is the timezone to set (see /usr/share/zoneinfo).
 timezone_name: ""

@@ -4,12 +4,12 @@
 # license that can be found in the LICENSE file.
 
 ---
-- name: Setup timezone to {{ timezone_name }}
+- name: Set timezone to {{ timezone_name }}
   become: true
   ansible.builtin.command:
     cmd: tzsetup -s {{ timezone_name }}
-  register: timezone_setup_task
-  changed_when: timezone_setup_task.rc == 0
+  register: timezone_tzsetup_task
+  changed_when: timezone_tzsetup_task.rc == 0
 
 - name: Install timezone
   become: true
