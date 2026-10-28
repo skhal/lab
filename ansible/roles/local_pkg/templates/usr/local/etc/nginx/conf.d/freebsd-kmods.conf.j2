@@ -13,8 +13,8 @@
     allow 10.0.0.0/24;  # local network
     deny  all;
 
-    ssl_certificate     /usr/local/etc/nginx/ssl/pkg.crt;
-    ssl_certificate_key /usr/local/etc/nginx/ssl/private/pkg.key;
+    ssl_certificate     /usr/local/etc/nginx/ssl/pkg.freebsd-kmods.crt;
+    ssl_certificate_key /usr/local/etc/nginx/ssl/private/pkg.freebsd-kmods.key;
 
     access_log /var/log/nginx/freebsd-kmods.access.log proxy-pass;
 

@@ -1,0 +1,107 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+- name: "Generate certificate {{ _cert.name }}"
+  vars:
+    _common_name: "{{ _cert.common_name | default(inventory_hostname) }}"
+    _key_file: >-
+      {{
+        _cert.key
+          if _cert.key is defined
+          else (
+            [
+              ( _cert.path | dirname),
+              'private',
+              (
+                [
+                  (_cert.path | basename | splitext | first),
+                  'key'
+                ] | join('.')
+              )
+            ] | path_join
+          )
+      }}
+  block:
+    - name: Prepare folders
+      block:
+        - name: Create folders
+          become: true
+          ansible.builtin.file:
+            name: "{{ _path }}"
+            state: directory
+            owner: "{{ _cert.owner | default(omit) }}"
+            group: "{{ _cert.group | default(omit) }}"
+            mode: u=rwx,g=rx,o=rx
+          loop:
+            - "{{ _cert.path | dirname }}"
+          loop_control:
+            loop_var: _path
+
+        - name: Create folders for private keys
+          become: true
+          ansible.builtin.file:
+            name: "{{ _path }}"
+            state: directory
+            owner: "{{ _cert.owner | default(omit) }}"
+            group: "{{ _cert.group | default(omit) }}"
+            mode: u=rwx,g=,o=
+          loop:
+            - "{{ _key_file | dirname }}"
+          loop_control:
+            loop_var: _path
+
+    - name: Create a private key
+      become: true
+      community.crypto.openssl_privatekey:
+        path: "{{ _key_file }}"
+        owner: "{{ _cert.owner | default(omit) }}"
+        group: "{{ _cert.group | default(omit) }}"
+        mode: u=rwx,g=,o=
+
+    - name: Create signing request
+      become: true # to access private key
+      community.crypto.openssl_csr_pipe:
+        privatekey_path: "{{ _key_file }}"
+        common_name: "{{ _common_name }}"
+        subject_alt_name: "{{ _cert.san | default(omit) }}"
+        use_common_name_for_san: false
+      register: openssl_gen_csr_task
+
+    - name: Load certificate if exists
+      block:
+        - name: Check if certificate exists
+          ansible.builtin.stat:
+            path: "{{ _cert.path }}"
+          register: openssl_gen_crt_stat_task
+
+        - name: Load existing certificate
+          ansible.builtin.slurp:
+            src: "{{ _cert.path }}"
+          when: openssl_gen_crt_stat_task.stat.exists
+          register: openssl_gen_crt_task
+
+    - name: Sign certificate signing request
+      ansible.builtin.include_role:
+        name: openssl_ca
+        tasks_from: sign_csr
+      vars:
+        openssl_ca_sign_crt_base64: >-
+          {{
+            openssl_gen_crt_task.content
+              if openssl_gen_crt_stat_task.stat.exists
+              else undef()
+          }}
+        openssl_ca_sign_csr: "{{ openssl_gen_csr_task.csr }}"
+
+    - name: Write certificate
+      become: true
+      ansible.builtin.copy:
+        dest: "{{ _cert.path }}"
+        content: "{{ openssl_ca_sign_task.certificate }}"
+        owner: "{{ _cert.owner | default(omit) }}"
+        group: "{{ _cert.group | default(omit) }}"
+        mode: u=rw,g=r,o=r
+      when: openssl_ca_sign_task is changed # noqa no-handler

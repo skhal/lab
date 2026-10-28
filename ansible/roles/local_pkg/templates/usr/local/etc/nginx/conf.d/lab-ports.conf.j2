@@ -10,8 +10,8 @@
     allow 10.0.0.0/24;  # local network
     deny  all;
 
-    ssl_certificate     /usr/local/etc/nginx/ssl/pkg.crt;
-    ssl_certificate_key /usr/local/etc/nginx/ssl/private/pkg.key;
+    ssl_certificate     /usr/local/etc/nginx/ssl/pkg.lab-ports.crt;
+    ssl_certificate_key /usr/local/etc/nginx/ssl/private/pkg.lab-ports.key;
 
     access_log /var/log/nginx/lab-ports.access.log proxy-pass;
 

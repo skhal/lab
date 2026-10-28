@@ -12,10 +12,11 @@ certval_certificates:
 openldap_server_addr: 10.0.0.3
 openldap_server_bind_dn: cn=op,dc=lab,dc=net
 openldap_server_uri: ldap://ldap.lab.net
-openssl_gen_common_name: ldap.lab.net
-openssl_gen_crt: "/usr/local/etc/openldap/ssl/ldap.crt"
-openssl_gen_group: ldap
-openssl_gen_owner: ldap
+openssl_gen_certs:
+  - name: OpenLDAP Cert
+    path: "/usr/local/etc/openldap/ssl/ldap.crt"
+    owner: ldap
+    group: ldap
 ssh_listen_addresses:
   - 10.0.0.3
 # keep-sorted end
