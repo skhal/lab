@@ -4,25 +4,28 @@
 # license that can be found in the LICENSE file.
 
 ---
-- name: "Update rc-config"
-  ansible.builtin.include_role:
-    name: sysrc
+- name: RC config NTP
   vars:
-    sysrc_migrate: "{{ item }}"
-  loop:
-    - name: ntpd_enable
-      value: true
-      path: /etc/rc.conf.d/ntpd
-    - name: ntpd_sync_on_start
-      value: true
-      path: /etc/rc.conf.d/ntpd
+    _rc_vars:
+      ntpd_enable: true
+      ntpd_sync_on_start: true
+  loop: "{{ _rc_vars | dict2items }}"
+  loop_control:
+    loop_var: _rc_var
+  ansible.builtin.include_tasks: _update_rc.yml
 
-- name: "Update config"
-  ansible.builtin.include_tasks: "update.yml"
+- name: Update config
+  notify: "ntp_restart_server"
   loop:
-    - name: ignore wildrace interface
-      line: interface ignore wildcard
-    - name: listen on loopback
-      line: interface listen 127.0.0.1
-  vars:
-    _update: "{{ item | combine({'file': '/etc/ntp.conf'}) }}"
+    - interface ignore wildcard
+    - interface listen 127.0.0.1
+  become: true
+  ansible.builtin.lineinfile:
+    path: /etc/ntp.conf
+    line: "{{ item }}"
+
+- name: Start NTP server
+  become: true
+  ansible.builtin.service:
+    name: ntpd
+    state: started

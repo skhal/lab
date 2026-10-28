@@ -4,9 +4,9 @@
 # license that can be found in the LICENSE file.
 
 ---
-- name: Restart ntpd
+- name: Restart NTP server
+  listen: "ntp_restart_server"
   become: true
   ansible.builtin.service:
     name: ntpd
     state: restarted
-  listen: "restart_ntpd"
