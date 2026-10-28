@@ -35,6 +35,11 @@ openssl_ca_host: ssl.lab.net
 openssl_gen_rsa_fetch:
   source: pkgbuild.lab.net:/usr/local/etc/poudriere/ssl/pkg.pub
   target: /usr/local/etc/pkg/ssl/lab-ports.pub
+pkg_aliases:
+  # keep-sorted start
+  outdated: "version -vL="
+  vital: 'query -e \"%V=1\" %n'
+  # keep-sorted end
 pkg_install:
   # keep-sorted start
   - bind-tools

@@ -5,11 +5,11 @@
 
 ---
 - name: Configure repositories
-  become: true
   vars:
     _conf_file: /usr/local/etc/pkg/repos/FreeBSD.conf
   block:
     - name: Create folder {{ _conf_file | dirname }}
+      become: true
       ansible.builtin.file:
         path: "{{ _conf_file | dirname }}"
         state: directory
@@ -18,6 +18,7 @@
         mode: u=rwx,g=rx,o=rx
 
     - name: Use latest branch
+      become: true
       ansible.builtin.copy:
         src: "{{ _conf_file | trim('/') }}"
         dest: "{{ _conf_file }}"
@@ -25,21 +26,20 @@
         group: wheel
         mode: u=rw,g=r,o=r
 
-- name: Upgrade packages
-  become: true
-  community.general.pkgng:
-    name: "*"
-    state: latest
+- name: Configure aliases
+  when: pkg_aliases is defined
+  block:
+    - name: Add aliases
+      loop: "{{ pkg_aliases | dict2items }}"
+      become: true
+      ansible.builtin.lineinfile:
+        path: /usr/local/etc/pkg.conf
+        insertafter: "^ALIAS {"
+        line: '    {{ item.key }} = "{{ item.value }}";'
 
-- name: "Add pkg aliases"
-  ansible.builtin.include_tasks: "alias.yml"
-  loop: "{{ pkg_aliases }}"
-  loop_control:
-    loop_var: _alias
-
-- name: "Install packages {{ pkg_install }}"
+- name: "Install packages"
+  when: pkg_install is defined
   become: true
   community.general.pkgng:
     name: "{{ pkg_install }}"
     state: latest
-  when: pkg_install | length > 0

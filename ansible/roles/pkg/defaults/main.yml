@@ -4,20 +4,11 @@
 # license that can be found in the LICENSE file.
 
 ---
-# pkg_aliases is a list of pkg(8) aliases to add. Each alias has the
-# following structure:
-#
-#   name  string  alias name
-#   value string  alias command
-pkg_aliases:
-  - name: outdated
-    value: "version -vL="
-  - name: vital
-    value: 'query -e \"%V=1\" %n'
+# keep-sorted start newline_separated=true
+# pkg_aliases maps pkg-alias(8) to a pkg(8) command where keys are alias names
+# and values are aliased commands.
+pkg_aliases: "{{ undef(hint='pkg-alias commands') }}"
 
-# pkg_conf_path is the path to the pkg(8) configuration file.
-pkg_conf_path: /usr/local/etc/pkg.conf
-
-# pkg_install is a list of packages to install.
-pkg_install:
-  -
+# pkg_install lists packages to install.
+pkg_install: "{{ undef(hint='a list of packages to install') }}"
+# keep-sorted end
