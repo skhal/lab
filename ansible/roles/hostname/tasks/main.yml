@@ -4,11 +4,19 @@
 # license that can be found in the LICENSE file.
 
 ---
-- name: "Migrate hostname"
-  ansible.builtin.include_role:
-    name: sysrc
+- name: Configure hostname
   vars:
-    sysrc_migrate:
-      name: hostname
-      path: /etc/rc.conf.d/hostname
-      value: "{{ inventory_hostname }}"
+    _rc_file: /etc/rc.conf.d/hostname
+  block:
+    - name: Remove hostname from /etc/rc.conf
+      become: true
+      community.general.sysrc:
+        name: hostname
+        state: absent
+
+    - name: Set hostname in {{ _rc_file }}
+      become: true
+      community.general.sysrc:
+        name: hostname
+        value: "{{ inventory_hostname }}"
+        path: "{{ _rc_file }}"
