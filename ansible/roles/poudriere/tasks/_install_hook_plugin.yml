@@ -1,0 +1,33 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+- name: Install hook plugin {{ _plugin.name }}
+  become: true
+  vars:
+    _plugins_path: /usr/local/etc/poudriere.d/hooks/plugins/
+  ansible.builtin.copy:
+    src: >-
+      {{
+        [
+          _plugins_path | trim('/'),
+          _plugin.name
+        ] | path_join
+      }}
+    dest: "{{ _plugins_path }}"
+    owner: root
+    group: wheel
+    mode: u=rw,g=r,o=r
+    directory_mode: u=rwx,g=rx,o=rx
+
+- name: Set plugin variables
+  when: _plugin.env is defined
+  loop: "{{ _plugin.env | dict2items }}"
+  loop_control:
+    loop_var: _item_plugin_env
+  become: true
+  ansible.builtin.lineinfile:
+    path: /usr/local/etc/poudriere.conf
+    line: "export {{ _item_plugin_env.key }}={{ _item_plugin_env.value }}"

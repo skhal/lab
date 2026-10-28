@@ -87,6 +87,16 @@
             regexp: "^#\\s*(ALLOW_MAKE_JOBS_PACKAGES=.*)$"
             line: "ALLOW_MAKE_JOBS_PACKAGES=\"{{ poudriere_conf_allow_make_jobs_packages | join(' ') }}\""
 
+        - name: Allow package fetch
+          when: poudriere_conf_package_fetch is defined
+          block:
+            - name: Set package fetch url
+              become: true
+              ansible.builtin.lineinfile:
+                path: "{{ _conf_file }}"
+                regexp: "^#\\s*PACKAGE_FETCH_URL=.*$"
+                line: "PACKAGE_FETCH_URL={{ poudriere_conf_package_fetch.url }}"
+
         - name: Setup ZFS
           when: poudriere_conf_zfs is defined
           block:
@@ -106,6 +116,17 @@
                   ZROOTFS={{
                     poudriere_conf_zfs.dset | regex_replace('^' + poudriere_conf_zfs.pool, '')
                   }}
+
+- name: Install hook plugins
+  when: poudriere_hook_plugins is defined
+  loop: "{{ poudriere_hook_plugins | dict2items }}"
+  loop_control:
+    loop_var: _item_plugin
+  vars:
+    _plugin:
+      name: "{{ _item_plugin.key }}"
+      env: "{{ _item_plugin.value | default(omit) }}"
+  ansible.builtin.include_tasks: _install_hook_plugin.yml
 
 - name: Create port trees
   block:
