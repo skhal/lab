@@ -37,17 +37,17 @@
         tasks_from: rsa
 
     - name: Update {{ _conf_file }}
-      vars:
-        _signing_key: >-
-          {{
-            (
-              openssl_gen_rsa.path | dirname,
-              'private',
-              openssl_gen_rsa.path | basename | splitext | first
-            ) | path_join
-          }}.key
       block:
         - name: Set signing key
+          vars:
+            _signing_key: >-
+              {{
+                (
+                  openssl_gen_rsa.path | dirname,
+                  'private',
+                  openssl_gen_rsa.path | basename | splitext | first
+                ) | path_join
+              }}.key
           become: true
           ansible.builtin.lineinfile:
             path: "{{ _conf_file }}"
