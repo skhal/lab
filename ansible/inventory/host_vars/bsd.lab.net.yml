@@ -27,9 +27,7 @@ pkg_install:
 poudriere_conf_allow_make_jobs: true
 poudriere_conf_package_fetch:
   url: pkg+https://freebsd-ports.pkg.lab.net/\${ABI}
-poudriere_conf_zfs:
-  pool: zroot
-  dset: zroot/usr/poudriere/bsd.lab.net
+poudriere_conf_zfs_dset: zroot/usr/jail/bsd/poudriere
 poudriere_hook_plugins:
   ca_cert:
     CA_CERT: /usr/local/share/certs/ca.crt

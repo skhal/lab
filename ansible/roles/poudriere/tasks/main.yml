@@ -98,24 +98,24 @@
                 line: "PACKAGE_FETCH_URL={{ poudriere_conf_package_fetch.url }}"
 
         - name: Setup ZFS
-          when: poudriere_conf_zfs is defined
+          when: poudriere_conf_zfs_dset is defined
+          vars:
+            _zpool: "{{ poudriere_conf_zfs_dset | split('/') | first }}"
+            _zrootfs: "{{ (poudriere_conf_zfs_dset | split('/'))[1:] | path_join }}"
           block:
             - name: Set ZFS pool
               become: true
               ansible.builtin.lineinfile:
                 path: "{{ _conf_file }}"
                 regexp: "^(#\\s*)?ZPOOL=.*$"
-                line: "ZPOOL={{ poudriere_conf_zfs.pool }}"
+                line: "ZPOOL={{ _zpool }}"
 
             - name: Set ZFS dataset
               become: true
               ansible.builtin.lineinfile:
                 path: "{{ _conf_file }}"
                 regexp: "^(#\\s*)?ZROOTFS=.*$"
-                line: >
-                  ZROOTFS={{
-                    poudriere_conf_zfs.dset | regex_replace('^' + poudriere_conf_zfs.pool, '')
-                  }}
+                line: "ZROOTFS={{ _zrootfs }}"
 
 - name: Install hook plugins
   when: poudriere_hook_plugins is defined

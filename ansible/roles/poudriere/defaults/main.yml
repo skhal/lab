@@ -53,11 +53,9 @@ poudriere_conf_package_fetch: "{{ undef(hint='fetch pre-built packages') }}"
 # jails.
 poudriere_conf_parallel_jobs: "{{ undef(hint='number of builders') }}"
 
-# poudriere_conf_zfs configures poudriere with ZFS. It has the following
-# structure:
-#   pool  string  ZFS pool
-#   dset  string  ZFS dataset for /usr/local/poudriere
-poudriere_conf_zfs: "{{ undef(hint='ZFS pool and dataset') }}"
+# poudriere_conf_zfs_dset configures poudriere with ZFS. It is the name of
+# dataset to store /usr/local/poudriere data in.
+poudriere_conf_zfs_dset: "{{ undef(hint='ZFS dataset') }}"
 
 # poudriere_plugins maps hook plugin to plugin's environment. The keys identify
 # plugins to be installed. The environment is a map of variable name to its

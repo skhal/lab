@@ -107,7 +107,7 @@
         dest: /usr/local/poudriere/data/packages
     jail_name: pkgbuild
     jail_zfs_datasets:
-      - zroot/usr/poudriere/pkgbuild.lab.net
+      - zroot/usr/jail/pkgbuild/poudriere
     # keep-sorted end
   roles:
     - role: linux
@@ -137,7 +137,7 @@
       - path: /home/skhalatyan
     jail_name: bsd
     jail_zfs_datasets:
-      - zroot/usr/poudriere/bsd.lab.net
+      - zroot/usr/jail/bsd/poudriere
     # keep-sorted end
   roles:
     - role: jail
