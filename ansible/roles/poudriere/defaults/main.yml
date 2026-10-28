@@ -48,6 +48,12 @@ poudriere_conf_allow_make_jobs_packages: "{{ undef(hint='list of packages with m
 # jails.
 poudriere_conf_parallel_jobs: "{{ undef(hint='number of builders') }}"
 
+# poudriere_conf_zfs configures poudriere with ZFS. It has the following
+# structure:
+#   pool  string  ZFS pool
+#   dset  string  ZFS dataset for /usr/local/poudriere
+poudriere_conf_zfs: "{{ undef(hint='ZFS pool and dataset') }}"
+
 # poudriere_jail configures jail to be used by poudriere-jail(8) to build
 # packages. It is expected to have the following structure:
 #   name            string  jail name, e.g. 151amd64 for OS version 15.1-RELEASE
