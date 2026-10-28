@@ -22,10 +22,15 @@
 #   See playbooks/bootstrap-nuc.yml for reasons to use --ask-become-pass (-K)
 #   Ansible flag.
 ---
-# bootstrap-nuc runs minimal configuration of the NUC with bare FreeBSD OS.
+# bootstrap-nuc sets up bare OS for Ansible.
 - name: Bootstrap NUC
   tags: bootstrap-nuc
   ansible.builtin.import_playbook: playbooks/bootstrap-nuc.yml
+
+# init-nuc configures NUC basic services such as network, firewall, etc.
+- name: Initialize NUC
+  tags: init-nuc
+  ansible.builtin.import_playbook: playbooks/init-nuc.yml
 
 # create-jails creates jail skeleton and adds bare thick jails with FreeBSD
 # environment.

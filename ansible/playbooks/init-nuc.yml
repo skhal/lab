@@ -1,0 +1,73 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+# NAME
+#   init-nuc • minimal configuration of fresh OS
+#
+# SYNOPSIS
+#   ansible-playbook ./playbooks/init-nuc.yml
+#
+# DESCRIPTION
+#   init-nuc performs minimal configuration of NUC with a fresh installation
+#   of FreeBSD OS.
+---
+- name: Configure sysctl
+  hosts: nuc.lab.net
+  tags: init-nuc-sysctl
+  roles:
+    - role: sysctl
+
+- name: Configure services
+  hosts: nuc.lab.net
+  tags: init-nuc-services
+  roles:
+    # keep-sorted start
+    - role: hostname
+    - role: ntp
+    - role: periodic
+    - role: pkg
+    - role: rc
+    - role: syslog
+    - role: timezone
+    - role: zfs
+    # keep-sorted end
+
+- name: Bootstrap users
+  hosts: nuc.lab.net
+  tags: init-nuc-users
+  roles:
+    # keep-sorted start
+    - role: doas
+    - role: user
+    - role: zfs_mkhomedir
+    # keep-sorted end
+
+- name: Configure network
+  hosts: nuc.lab.net
+  tags: init-nuc-network
+  roles:
+    - role: routing
+    - role: netif
+
+- name: Configure firewall
+  hosts: nuc.lab.net
+  tags: init-nuc-firewall
+  roles:
+    - role: pflog
+    - role: pf
+
+- name: Configure remote access
+  hosts: nuc.lab.net
+  tags: init-nuc-access
+  roles:
+    - role: ssh
+
+- name: Reboot
+  hosts: nuc.lab.net
+  tags: init-nuc-reboot
+  become: true
+  tasks:
+    - name: Reboot NUC
+      ansible.builtin.reboot:
