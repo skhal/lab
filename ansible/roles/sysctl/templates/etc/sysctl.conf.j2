@@ -10,6 +10,6 @@
 #   host  {{ template_host }}
 #   path  {{ template_fullpath | regex_replace('^.*ansible/roles', 'roles') }}
 
-{% for mib in sysctl_state | sort(attribute='name') %}
-{{ mib.name }}={{ mib.value }}
+{% for name, value in sysctl_state | dictsort %}
+{{ name }}={{ value }}
 {% endfor %}

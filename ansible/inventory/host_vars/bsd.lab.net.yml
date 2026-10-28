@@ -41,6 +41,5 @@ ssh_allow_groups:
 ssh_listen_addresses:
   - 10.0.0.101
 sysctl_state:
-  - name: security.bsd.unprivileged_proc_debug
-    value: 1
+  security.bsd.unprivileged_proc_debug: 1
 # keep-sorted end
