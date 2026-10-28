@@ -4,36 +4,49 @@
 # license that can be found in the LICENSE file.
 
 ---
-- name: "Migrate syslog"
-  ansible.builtin.include_role:
-    name: sysrc
+- name: RC config
   vars:
-    sysrc_migrate:
-      name: syslogd_flags
-      value: "-ss"
-      path: /etc/rc.conf.d/syslogd
+    _rc_file: /etc/rc.conf.d/syslogd
+    _rc_var: syslogd_flags
+  block:
+    - name: Clean /etc/rc.conf
+      become: true
+      community.general.sysrc:
+        name: "{{ _rc_var }}"
+        state: absent
+
+    - name: Enable secure mode without network
+      become: true
+      community.general.sysrc:
+        name: "{{ _rc_var }}"
+        value: -ss
+        path: "{{ _rc_file }}"
 
 - name: Configure console logs
-  vars:
-    _log_file: /var/log/console.log
   block:
-    - name: "Enable console logs"
+    - name: Enable console logs
       become: true
       ansible.builtin.lineinfile:
         path: /etc/syslog.conf
         regexp: "^#(console.info.*)$"
         line: "\\1"
         backrefs: true
-      notify: "restart_syslogd"
+      notify: syslog_restart_service
 
-    - name: Create {{ _log_file }}
+    # ansible.builtin.file has state=touch that createas a file else updates
+    # modification time. This task only creates the file if one does not
+    # exist.
+    - name: Create log file
       become: true
-      # ansible.builtin.file has state=touch that createas a file else updates
-      # modification time. This task only creates the file if one does not
-      # exist.
       ansible.builtin.copy:
         content: ""
-        dest: "{{ _log_file }}"
+        dest: /var/log/console.log
         owner: root
         group: wheel
         mode: u=rw,g=r,o=r
+
+- name: Run service
+  become: true
+  ansible.builtin.service:
+    name: syslogd
+    state: started

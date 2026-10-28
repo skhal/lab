@@ -5,8 +5,8 @@
 
 ---
 - name: Restart syslogd
+  listen: syslog_restart_service
   become: true
   ansible.builtin.service:
     name: syslogd
     state: restarted
-  listen: "restart_syslogd"
