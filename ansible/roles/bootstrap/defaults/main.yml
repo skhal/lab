@@ -4,7 +4,10 @@
 # license that can be found in the LICENSE file.
 
 ---
-# bootstrap_packages lists packages to install on the system.
+# bootstrap_packages is the minimal set of packages that must be installed for
+# Ansible to manage the host:
+#   Python  to run Ansible modules.
+#   doas    to run commands in privileged mode.
 bootstrap_packages:
   # keep-sorted start
   - doas
