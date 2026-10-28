@@ -5,27 +5,6 @@
 
 ---
 # keep-sorted start
-ansible_jexec_over_ssh_jail_name: pkgbuild
-certval_certificates:
-  - name: "Poudriere Web Certificate"
-    path: "/usr/local/etc/nginx/ssl/poudriere.crt"
-openssl_gen_common_name: pkgbuild.lab.net
-openssl_gen_crt: "/usr/local/etc/nginx/ssl/poudriere.crt"
-openssl_gen_group: www
-openssl_gen_owner: www
-openssl_gen_rsa:
-  path: /usr/local/etc/poudriere/ssl/pkg.pub
-  owner: root
-  group: wheel
-pkg_install:
-  # keep-sorted start
-  - FreeBSD-zfs
-  - bind-tools
-  - doas
-  - neovim
-  # keep-sorted end
-pkgbuild_jail: 151amd64
-pkgbuild_overlay: lab
 poudriere_abi_link:
   src: 151amd64-default
   dst: 15amd64-default
@@ -52,6 +31,4 @@ poudriere_port_trees:
     path: ports
 poudriere_web_access:
   addr: 10.0.0.6
-ssh_listen_addresses:
-  - 10.0.0.6
 # keep-sorted end
