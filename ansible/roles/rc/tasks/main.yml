@@ -5,10 +5,11 @@
 
 ---
 - name: "Clean /etc/rc.conf"
-  ansible.builtin.include_tasks: "clean.yml"
   loop: "{{ rc_remove }}"
-  loop_control:
-    loop_var: _rc_var
+  become: true
+  community.general.sysrc:
+    name: "{{ item }}"
+    state: absent
 
 - name: "Migrate rc-vars"
   ansible.builtin.include_role:
