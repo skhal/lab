@@ -1,0 +1,23 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+- name: Disable nondefault
+  vars:
+    _rc_var: moused_nondefault_enable
+    _rc_file: /etc/rc.conf.d/moused
+  block:
+    - name: Clean /etc/rc.conf
+      become: true
+      community.general.sysrc:
+        name: "{{ _rc_var }}"
+        state: absent
+
+    - name: Disable nondefault
+      become: true
+      community.general.sysrc:
+        name: "{{ _rc_var }}"
+        value: false
+        path: "{{ _rc_file }}"

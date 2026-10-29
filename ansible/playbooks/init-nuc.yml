@@ -21,10 +21,11 @@
 
 - name: Configure services
   hosts: nuc.lab.net
-  tags: init-nuc-services
+  tags: init-nuc-rc
   roles:
     # keep-sorted start
     - role: hostname
+    - role: moused
     - role: ntp
     - role: periodic
     - role: pkg
