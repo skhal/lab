@@ -11,8 +11,16 @@
     name: "{{ item }}"
     state: absent
 
-- name: "Update rc-vars"
-  ansible.builtin.include_tasks: "update.yml"
-  loop: "{{ rc_update }}"
-  loop_control:
-    loop_var: _rc_var
+- name: "Configure RC info"
+  when: rc_info is defined
+  become: true
+  community.general.sysrc:
+    name: rc_info
+    value: "{{ rc_info }}"
+
+- name: "Configure RC debug"
+  when: rc_debug is defined
+  become: true
+  community.general.sysrc:
+    name: rc_debug
+    value: "{{ rc_debug }}"
