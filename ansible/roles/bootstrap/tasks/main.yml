@@ -21,7 +21,7 @@
 
     # Python is available. Use Ansible modules to install the rest of packages.
     - name: "Install {{ _pkg_not_python | join(',') }}"
-      when: _pkg_not_python
+      when: _pkg_not_python | length > 0
       become: true
       community.general.pkgng:
         name: "{{ _pkg_not_python }}"
