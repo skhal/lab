@@ -4,13 +4,6 @@
 # license that can be found in the LICENSE file.
 
 ---
-- name: "Clean /etc/rc.conf"
-  loop: "{{ rc_remove }}"
-  become: true
-  community.general.sysrc:
-    name: "{{ item }}"
-    state: absent
-
 - name: "Configure RC info"
   when: rc_info is defined
   become: true

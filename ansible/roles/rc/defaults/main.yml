@@ -10,8 +10,4 @@ rc_debug: "{{ undef(hint='enables debug log in rc-scripts when set to true') }}"
 
 # rc_info enables info logging in rc-scripts when set to true.
 rc_info: "{{ undef(hint='enables info log in rc-scripts when set to true') }}"
-
-# rc_remove is a list of rc-vars to remove from /etc/rc.conf, e.g. a variable
-# is set in /etc/rc.conf with default value from /etc/defaults/rc.conf.
-rc_remove: []
 # keep-sorted end

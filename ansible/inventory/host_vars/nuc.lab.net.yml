@@ -28,8 +28,6 @@ netif_ifaces:
 pflog_enable: true
 rc_debug: true
 rc_info: true
-rc_remove:
-  - dumpdev
 routing_defaultrouter: 192.168.10.1
 ssh_listen_addresses:
   - 192.168.10.101
