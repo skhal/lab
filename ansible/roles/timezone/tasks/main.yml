@@ -4,16 +4,27 @@
 # license that can be found in the LICENSE file.
 
 ---
-- name: Set timezone to {{ timezone_name }}
-  become: true
-  ansible.builtin.command:
-    cmd: tzsetup -s {{ timezone_name }}
-  register: timezone_tzsetup_task
-  changed_when: timezone_tzsetup_task.rc == 0
+- name: Current timezone
+  ansible.builtin.lineinfile:
+    path: /var/db/zoneinfo
+    line: "{{ timezone_name }}"
+    state: present
+  check_mode: true
+  register: timezone_check_zone_task
 
-- name: Install timezone
-  become: true
-  ansible.builtin.command:
-    cmd: tzsetup -r
-  register: timezone_install_task
-  changed_when: timezone_install_task.rc == 0
+- name: Set timezone
+  when: timezone_check_zone_task is changed # noqa no-handler
+  block:
+    - name: Set timezone to {{ timezone_name }}
+      become: true
+      ansible.builtin.command:
+        cmd: tzsetup -s {{ timezone_name }}
+      register: timezone_tzsetup_task
+      changed_when: timezone_tzsetup_task.rc == 0
+
+    - name: Install timezone
+      become: true
+      ansible.builtin.command:
+        cmd: tzsetup -r
+      register: timezone_install_task
+      changed_when: timezone_install_task.rc == 0
