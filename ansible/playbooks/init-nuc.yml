@@ -47,7 +47,6 @@
   roles:
     - role: zfs
     - role: zfs_scrub
-    - role: zfs_create
 
 - name: Bootstrap users
   hosts: nuc.lab.net
