@@ -29,6 +29,7 @@
     - role: ntp
     - role: periodic
     - role: pkg
+    - role: powerd
     - role: rc
     - role: syslog
     - role: timezone

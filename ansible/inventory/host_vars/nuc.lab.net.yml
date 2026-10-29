@@ -26,12 +26,6 @@ netif_ifaces:
   - name: igc0
     cidr: 192.168.10.101/24
 pflog_enable: true
-rc_migrate:
-  # keep-sorted start
-  - name: powerd_enable
-    value: true
-    path: /etc/rc.conf.d/powerd
-  # keep-sorted end
 rc_remove:
   - dumpdev
 rc_update:

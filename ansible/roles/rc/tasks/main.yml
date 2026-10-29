@@ -11,13 +11,6 @@
     name: "{{ item }}"
     state: absent
 
-- name: "Migrate rc-vars"
-  ansible.builtin.include_role:
-    name: sysrc
-  loop: "{{ rc_migrate }}"
-  loop_control:
-    loop_var: sysrc_migrate
-
 - name: "Update rc-vars"
   ansible.builtin.include_tasks: "update.yml"
   loop: "{{ rc_update }}"
