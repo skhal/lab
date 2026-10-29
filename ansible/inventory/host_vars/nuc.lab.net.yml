@@ -30,9 +30,6 @@ rc_remove:
   - dumpdev
 rc_update:
   # keep-sorted start
-  - name: autoboot_delay
-    value: 0
-    path: /boot/loader.conf
   - name: rc_debug
     value: true
   - name: rc_info

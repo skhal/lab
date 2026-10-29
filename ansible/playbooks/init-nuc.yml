@@ -19,6 +19,12 @@
   roles:
     - role: sysctl
 
+- name: Configure loader
+  hosts: nuc.lab.net
+  tags: init-nuc-loader
+  roles:
+    - role: autoboot
+
 - name: Configure services
   hosts: nuc.lab.net
   tags: init-nuc-rc
