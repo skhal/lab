@@ -20,8 +20,10 @@
         name: zfs_enable
         value: true
         path: "{{ _rc_file }}"
+      register: zfs_enable_service_task
 
 - name: Start ZFS service
+  when: zfs_enable_service_task is changed # noqa no-handler
   become: true
   ansible.builtin.service:
     name: zfs
