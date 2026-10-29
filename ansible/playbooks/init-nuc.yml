@@ -50,7 +50,7 @@
 
 - name: Bootstrap users
   hosts: nuc.lab.net
-  tags: init-nuc-users
+  tags: init-nuc-user
   roles:
     # keep-sorted start
     - role: doas
