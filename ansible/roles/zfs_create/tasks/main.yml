@@ -4,9 +4,10 @@
 # license that can be found in the LICENSE file.
 
 ---
-- name: Create dataset {{ _dset.name }}
+- name: Create datasets
+  loop: "{{ zfs_create_dsets | dict2items }}"
   become: true
   community.general.zfs:
-    name: "{{ _dset.name }}"
+    name: "{{ item.key }}"
     state: present
-    extra_zfs_properties: "{{ _dset.props | default(omit) }}"
+    extra_zfs_properties: "{{ item.value | default(omit) }}"

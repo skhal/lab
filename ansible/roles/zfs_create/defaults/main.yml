@@ -1,0 +1,13 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+# zfs_create_dsets maps datasets to a map of optional properties, e.g.
+#   zfs_create_dsets:
+#     zroot/example/one:
+#     zroot/example/two:
+#       jailed: 'on'
+#       canmount: 'off'
+zfs_create_dsets: "{{ undef(hint='ZFS datasets to create and properties') }}"

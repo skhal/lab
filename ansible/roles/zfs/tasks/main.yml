@@ -4,30 +4,25 @@
 # license that can be found in the LICENSE file.
 
 ---
-- name: "Migrate zfs_enable"
-  ansible.builtin.include_role:
-    name: sysrc
+- name: Configure ZFS service
   vars:
-    sysrc_migrate:
-      name: zfs_enable
-      value: true
-      path: /etc/rc.conf.d/zfs
-
-- name: "Update periodic"
-  vars:
-    _rc_file: /etc/periodic.conf
+    _rc_file: /etc/rc.conf.d/zfs
   block:
-    - name: "Update {{ _rc_file }} - enable zfs scrubs"
+    - name: Clean /etc/rc.conf
       become: true
       community.general.sysrc:
-        path: "{{ _rc_file }}"
-        name: daily_scrub_zfs_enable
-        value: true
+        name: zfs_enable
+        state: absent
 
-    # noqa name[template]
-    - name: "Update {{ _rc_file }} - set zfs scrub threshold to {{ zfs_scrub_days }} days"
+    - name: Enable ZFS service in {{ _rc_file }}
       become: true
       community.general.sysrc:
+        name: zfs_enable
+        value: true
         path: "{{ _rc_file }}"
-        name: daily_scrub_zfs_default_threshold
-        value: "{{ zfs_scrub_days }}"
+
+- name: Start ZFS service
+  become: true
+  ansible.builtin.service:
+    name: zfs
+    state: started

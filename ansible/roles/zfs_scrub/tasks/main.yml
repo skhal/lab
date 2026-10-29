@@ -1,0 +1,23 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+- name: Configure periodic
+  vars:
+    _rc_file: /etc/periodic.conf
+  block:
+    - name: Enable ZFS scrub
+      become: true
+      community.general.sysrc:
+        path: "{{ _rc_file }}"
+        name: daily_scrub_zfs_enable
+        value: true
+
+    - name: Set ZFS scrub days threshold to {{ zfs_scrub_days }}
+      become: true
+      community.general.sysrc:
+        path: "{{ _rc_file }}"
+        name: daily_scrub_zfs_default_threshold
+        value: "{{ zfs_scrub_days }}"

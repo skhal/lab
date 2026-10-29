@@ -61,16 +61,16 @@ sysctl_state:
   security.bsd.unprivileged_read_msgbuf: 0
   vfs.zfs.vdev.min_auto_ashift: 12
   # keep-sorted end
-zfs_datasets:
+zfs_create_dsets:
   # keep-sorted start
-  - name: zroot/usr/jail/bsd/poudriere
+  zroot/usr/jail/bsd/poudriere:
     jailed: "on"
-  - name: zroot/usr/jail/pkgbuild/poudriere
+  zroot/usr/jail/pkgbuild/poudriere:
     jailed: "on"
-  - name: zroot/usr/packages
-  - name: zroot/var/cache/pkg.freebsd-base
-  - name: zroot/var/cache/pkg.freebsd-kmods
-  - name: zroot/var/cache/pkg.freebsd-ports
+  zroot/usr/packages:
+  zroot/var/cache/pkg.freebsd-base:
+  zroot/var/cache/pkg.freebsd-kmods:
+  zroot/var/cache/pkg.freebsd-ports:
   # keep-sorted end
 # sync with users in ldap
 zfs_mkhomedir_users:
