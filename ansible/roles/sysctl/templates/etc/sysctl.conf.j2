@@ -7,8 +7,8 @@
 #
 # date:   {{ template_run_date }}
 # source:
-#   host  {{ template_host }}
-#   path  {{ template_fullpath | regex_replace('^.*ansible/roles', 'roles') }}
+#   role  {{ role_name }}@{{ template_host }}
+#   path  {{ template_fullpath | regex_replace('^.*ansible/', '') }}
 
 {% for name, value in sysctl_state | dictsort %}
 {{ name }}={{ value }}
