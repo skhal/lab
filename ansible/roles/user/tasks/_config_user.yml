@@ -39,13 +39,11 @@
     _user_skel_pattern: >-
       {{
         [
-          role_path,
-          "files",
           _user.home,
           "dot.*"
         ] | path_join
       }}
-  loop: "{{ query('fileglob', _user_skel_pattern) | sort }}"
+  loop: "{{ query('fileglob', _user_skel_pattern, wantlist=True) | sort }}"
   loop_control:
     loop_var: _file
   become: true
