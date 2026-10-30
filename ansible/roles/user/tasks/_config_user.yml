@@ -14,7 +14,7 @@
 - name: Copy skeleton
   block:
     - name: Check skeleton files
-      ansible.builtin.command:
+      ansible.builtin.shell:
         cmd: >
           for f in /usr/share/skel/dot.*; do
             target="{{ _user.home }}/${f##*/}"
