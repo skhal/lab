@@ -26,6 +26,7 @@ netif_bridges:
 netif_ifaces:
   igc0:
     cidr: 192.168.10.101/24
+    desc: egress
 pflog_enable: true
 rc_debug: true
 rc_info: true
