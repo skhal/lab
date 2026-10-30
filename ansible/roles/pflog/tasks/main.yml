@@ -4,11 +4,26 @@
 # license that can be found in the LICENSE file.
 
 ---
-- name: "Enable pflog"
+- name: Enable pflog
+  vars:
+    _rc_file: /etc/rc.conf.d/hostname
+    _rc_var: pflog_enable
+  block:
+    - name: Clean /etc/rc.conf
+      become: true
+      community.general.sysrc:
+        name: "{{ _rc_var }}"
+        state: absent
+
+    - name: Enable pflog in {{ _rc_file }}
+      become: true
+      community.general.sysrc:
+        name: "{{ _rc_var }}"
+        value: true
+        path: "{{ _rc_file }}"
+
+- name: Start pflog service
   become: true
-  community.general.sysrc:
-    path: /etc/rc.conf.d/pflog
-    name: pflog_enable
-    value: true
-  when: pflog_enable
-  notify: "start_pflog"
+  ansible.builtin.service:
+    name: pflog
+    state: started
