@@ -16,7 +16,7 @@
         name: cloned_interfaces
         state: value_present
         value: "{{ _bridge.name }}"
-      notify: "restart_network"
+      notify: "netif_restart_service"
 
     - name: "Update {{ _rc_file }} - configure {{ _bridge.name }}" # noqa name[template]
       become: true
@@ -29,4 +29,4 @@
           {% for m in _bridge.get('addm', []) %}addm {{ m }}{% endfor %}
           up
           {% if 'desc' in _bridge %}descr {{ _bridge.desc }}{% endif %}
-      notify: "restart_network"
+      notify: "netif_restart_service"
