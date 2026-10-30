@@ -67,7 +67,6 @@
   hosts: nuc.lab.net
   tags: init-nuc-firewall
   roles:
-    - role: pflog
     - role: pf
 
 - name: Configure remote access

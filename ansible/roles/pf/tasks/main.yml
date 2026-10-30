@@ -4,18 +4,6 @@
 # license that can be found in the LICENSE file.
 
 ---
-- name: "Enable routing gateway"
-  ansible.builtin.include_role:
-    name: routing
-  vars:
-    routing_gateway_enable: true
-
-- name: "Enable pflog"
-  ansible.builtin.include_role:
-    name: pflog
-  vars:
-    pflog_enable: true
-
 - name: "Create configuration"
   vars:
     _conf_file: "/etc/pf.conf"
