@@ -19,11 +19,16 @@
       become: true
       community.general.sysrc:
         name: "{{ _rc_var }}"
-        value: true
+        value: "{{ pflog_enable }}"
         path: "{{ _rc_file }}"
 
 - name: Start pflog service
   become: true
   ansible.builtin.service:
     name: pflog
-    state: started
+    state: >-
+      {% if pflog_enable %}
+        started
+      {% else %}
+        stopped
+      {% endif %}
