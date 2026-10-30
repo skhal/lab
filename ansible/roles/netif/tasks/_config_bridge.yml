@@ -13,8 +13,8 @@
       community.general.sysrc:
         path: "{{ _rc_file }}"
         name: cloned_interfaces
-        state: value_present
         value: "{{ _bridge.name }}"
+        state: value_present
       notify: "netif_restart_service"
 
     - name: Configure {{ _bridge.name }}
@@ -22,9 +22,10 @@
       community.general.sysrc:
         path: "{{ _rc_file }}"
         name: ifconfig_{{ _bridge.name }}
+        # noqa jinja[spacing]
         value: >-
           inet {{ _bridge.cidr }}
-          {% for m in _bridge.get('addm', []) %}addm {{ m }}{% endfor %}
+          {%- for m in _bridge.get('addm', []) %} addm {{ m }}{% endfor %}
           up
-          {% if 'desc' in _bridge %}descr {{ _bridge.desc }}{% endif %}
+          {%- if 'desc' in _bridge %} descr {{ _bridge.desc }}{% endif %}
       notify: "netif_restart_service"
