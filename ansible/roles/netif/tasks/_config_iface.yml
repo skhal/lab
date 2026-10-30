@@ -9,7 +9,8 @@
   community.general.sysrc:
     path: /etc/rc.conf.d/network
     name: "ifconfig_{{ _iface.name }}"
+    # noqa jinja[spacing]
     value: >-
       inet {{ _iface.cidr }} up
-      {% if 'desc' in _iface %}descr {{ _iface.desc }}{% endif %}
+      {%- if 'desc' in _iface %} descr {{ _iface.desc }}{% endif %}
   notify: "netif_restart_service"
