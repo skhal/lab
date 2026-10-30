@@ -49,13 +49,11 @@ pkg_install:
 ssh_allow_users:
   - op
 timezone_name: America/Chicago
-user_list:
+user_config:
   # keep-sorted start
-  - name: op
+  op:
     shell: /bin/tcsh
-  - name: root
-    group: wheel
-    home: /root
+  root:
     shell: /bin/tcsh
   # keep-sorted end
 # keep-sorted end

@@ -4,14 +4,7 @@
 # license that can be found in the LICENSE file.
 
 ---
-# user_list holds users to configure. Each user has the foolowing structure:
-#
-#   name  string  user name
-#   group string  (optional) user group (default: <name>)
-#   home  string  (optional) user home folder (default /home/<name>)
-#   shell string  (optional) user shell (default: <user_default_shell>)
-user_list:
-  -
-
-# user_default_shell is the default shell to set for users.
-user_default_shell: /bin/sh
+# user_config maps user logins to configuration settings. The settings are
+# optional and may include either of the following properties:
+#   shell     string  user shell (default: /bin/sh)
+user_config: "{{ undef(hint='users to configure') }}"

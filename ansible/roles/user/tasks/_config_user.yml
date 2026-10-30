@@ -1,0 +1,62 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+- name: Update shell
+  become: true
+  ansible.builtin.user:
+    name: "{{ _user.name }}"
+    shell: "{{ _user.shell }}"
+    state: present
+
+- name: Copy skeleton
+  block:
+    - name: Check skeleton files
+      ansible.builtin.command:
+        cmd: >
+          for f in /usr/share/skel/dot.*; do
+            target="{{ _user.home }}/${f##*/}"
+            [ -e "${target}" ] || exit 1
+          done
+      register: user_check_skel_task
+      changed_when: false
+
+    - name: Copy skeleton
+      when: user_check_skel_task.rc == 1
+      become: true
+      ansible.builtin.command:
+        cmd: /usr/sbin/pw usermod -m -n {{ _user.name }}
+      register: user_copy_skel_task
+      changed_when: user_copy_skel_task.rc == 0
+
+- name: Copy Lab skeleton
+  vars:
+    _user_skel_pattern: >-
+      {{
+        [
+          role_path,
+          "files",
+          _user.home,
+          "dot.*"
+        ] | path_join
+      }}
+  loop: "{{ query('fileglob', _user_skel_pattern) | sort }}"
+  loop_control:
+    loop_var: _file
+  become: true
+  ansible.builtin.copy:
+    src: "{{ _file }}"
+    dest: >-
+      {{
+        [
+          _user.home,
+          _file
+            | basename
+            | regex_replace('^dot', '', count=1)
+        ] | path_join
+      }}
+    owner: "{{ _user.name }}"
+    group: "{{ _user.group }}"
+    mode: u=rw,g=r,o=r

@@ -4,14 +4,24 @@
 # license that can be found in the LICENSE file.
 
 ---
-- name: "Configure users"
-  ansible.builtin.include_tasks: "configure.yml"
-  vars:
-    _user_default:
-      group: "{{ item_user.name }}"
-      home: "/home/{{ item_user.name }}"
-      shell: "{{ user_default_shell }}"
-    _user: "{{ _user_default | combine(item_user) }}"
-  loop: "{{ user_list }}"
+- name: Configure users
+  loop: "{{ user_config | dict2items }}"
   loop_control:
-    loop_var: item_user
+    loop_var: _item_user
+  vars:
+    _user:
+      name: "{{ _item_user.key }}"
+      group: >-
+        {% if _item_user.key == "root" %}
+          wheel
+        {% else %}
+          {{ _item_user.key }}
+        {% endif %}
+      shell: "{{ _item_user.value.shell | default('/bin/sh') }}"
+      home: >-
+        {% if _item_user.key == "root" %}
+          /root
+        {% else %}
+          /home/{{ _item_user.key }}
+        {% endif %}
+  ansible.builtin.include_tasks: "_config_user.yml"
