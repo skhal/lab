@@ -18,16 +18,13 @@
         cmd: >
           for f in /usr/share/skel/dot.*; do
             target="{{ _user.home }}/${f##*/dot}"
-            [ -e "${target}" ] || {
-              echo >&2 "missing ${target}"
-              exit 1
-            }
+            [ -e "${target}" ] || echo ${target}: no such file
           done
       register: user_check_skel_task
       changed_when: false
 
     - name: Copy skeleton
-      when: user_check_skel_task.rc == 1
+      when: '"no such file" in user_check_skel_task.stdout'
       become: true
       ansible.builtin.command:
         cmd: /usr/sbin/pw usermod -m -n {{ _user.name }}
