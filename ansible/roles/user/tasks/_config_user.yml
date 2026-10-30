@@ -17,8 +17,11 @@
       ansible.builtin.shell:
         cmd: >
           for f in /usr/share/skel/dot.*; do
-            target="{{ _user.home }}/${f##*/}"
-            [ -e "${target}" ] || exit 1
+            target="{{ _user.home }}/${f##*/dot}"
+            [ -e "${target}" ] || {
+              echo >&2 "missing ${target}"
+              exit 1
+            }
           done
       register: user_check_skel_task
       changed_when: false
