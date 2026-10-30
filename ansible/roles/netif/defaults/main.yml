@@ -4,7 +4,7 @@
 # license that can be found in the LICENSE file.
 
 ---
-# keep-sorted start
+# keep-sorted start newline_separated=yes
 # netif_bridges is the list of bridge interfaces to configure. Each iface has
 # the following structure:
 #   name  string  iface name
@@ -12,10 +12,10 @@
 #   addm  string? members interfaces to add (e.g. bridge)
 #   desc  string? iface description
 netif_bridges: []
-# netif_ifaces lists insterfaces to configure. Each iface has the following
-# structure:
-#   name  string  iface name
+
+# netif_ifaces maps network interface to configuration settings. Accepted
+# settings are:
 #   cidr  string  iface IP address with sub-net mask in CIDR format
 #   desc  string? iface description
-netif_ifaces: []
+netif_ifaces: "{{ undef(hint='network interface settings') }}"
 # keep-sorted end

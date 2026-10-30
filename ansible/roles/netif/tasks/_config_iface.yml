@@ -1,0 +1,15 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+- name: Configure {{ _iface.name }}
+  become: true
+  community.general.sysrc:
+    path: /etc/rc.conf.d/network
+    name: "ifconfig_{{ _iface.name }}"
+    value: >-
+      inet {{ _iface.cidr }} up
+      {% if 'desc' in _iface %}descr {{ _iface.desc }}{% endif %}
+  notify: "netif_restart_service"

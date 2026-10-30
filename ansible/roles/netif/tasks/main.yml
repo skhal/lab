@@ -5,20 +5,17 @@
 
 ---
 - name: Configure interfaces
-  loop: "{{ netif_ifaces }}"
+  loop: "{{ netif_ifaces | dict2items }}"
   loop_control:
-    label: "{{ _iface.name }}"
-    loop_var: _iface
+    loop_var: _iter_iface
+    label: "{{ _iter_iface.key }}"
   vars:
-    _rc_file: /etc/rc.conf.d/network
-  become: true
-  community.general.sysrc:
-    path: "{{ _rc_file }}"
-    name: "ifconfig_{{ _iface.name }}"
-    value: >-
-      inet {{ _iface.cidr }} up
-      {% if 'desc' in _iface %}descr {{ _iface.desc }}{% endif %}
-  notify: "netif_restart_service"
+    _iface: >
+      {{
+        _iter_iface.value
+          | combine({'name': _iter_iface.key})
+      }}
+  ansible.builtin.include_tasks: "_config_iface.yml"
 
 - name: Configure bridges
   ansible.builtin.include_tasks: "_ifconfig_bridge.yml"
