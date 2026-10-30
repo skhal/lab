@@ -20,7 +20,7 @@ jail_skel_packages:
   # keep-sorted end
 jail_skel_zfs_dataset: zroot/usr/jail/15.1
 netif_bridges:
-  - name: bridge0
+  bridge0:
     cidr: 10.0.0.1/24
     desc: jail:int
 netif_ifaces:

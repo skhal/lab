@@ -8,8 +8,7 @@
   vars:
     _rc_file: /etc/rc.conf.d/network
   block:
-    # noqa name[template]
-    - name: "Update {{ _rc_file }} - clone {{ _bridge.name }}"
+    - name: Clone {{ _bridge.name }}
       become: true
       community.general.sysrc:
         path: "{{ _rc_file }}"
@@ -18,12 +17,11 @@
         value: "{{ _bridge.name }}"
       notify: "netif_restart_service"
 
-    - name: "Update {{ _rc_file }} - configure {{ _bridge.name }}" # noqa name[template]
+    - name: Configure {{ _bridge.name }}
       become: true
       community.general.sysrc:
         path: "{{ _rc_file }}"
-        name: "ifconfig_{{ _bridge.name }}"
-        # noqa jinja[spacing]
+        name: ifconfig_{{ _bridge.name }}
         value: >-
           inet {{ _bridge.cidr }}
           {% for m in _bridge.get('addm', []) %}addm {{ m }}{% endfor %}

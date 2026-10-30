@@ -5,13 +5,12 @@
 
 ---
 # keep-sorted start newline_separated=yes
-# netif_bridges is the list of bridge interfaces to configure. Each iface has
-# the following structure:
-#   name  string  iface name
+# netif_bridges maps bridge interfaces to configuration settings. Accepted
+# settings are:
 #   cidr  string  iface IP address with sub-net mask in CIDR format
 #   addm  string? members interfaces to add (e.g. bridge)
 #   desc  string? iface description
-netif_bridges: []
+netif_bridges: "{{ undef(hint='network bridge settings') }}"
 
 # netif_ifaces maps network interface to configuration settings. Accepted
 # settings are:

@@ -18,8 +18,14 @@
   ansible.builtin.include_tasks: "_config_iface.yml"
 
 - name: Configure bridges
-  ansible.builtin.include_tasks: "_ifconfig_bridge.yml"
-  loop: "{{ netif_bridges }}"
+  loop: "{{ netif_bridges | dict2items }}"
   loop_control:
     label: "{{ _bridge.name }}"
-    loop_var: _bridge
+    loop_var: _iter_bridge
+  vars:
+    _bridge: >
+      {{
+        _iter_bridge.value
+          | combine({'name': _iter_bridge.key})
+      }}
+  ansible.builtin.include_tasks: "_config_bridge.yml"
