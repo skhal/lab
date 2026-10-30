@@ -4,8 +4,15 @@
 # license that can be found in the LICENSE file.
 
 ---
-- name: Make homedir for users
-  ansible.builtin.include_tasks: "_mkhomedir.yml"
-  loop: "{{ zfs_mkhomedir_users }}"
+- name: Make user homedirs
+  loop: "{{ zfs_mkhomedir_users | dict2items }}"
   loop_control:
-    loop_var: _user
+    loop_var: _item_user
+  vars:
+    _user: >-
+      {{
+        _item_user.value
+          | default({})
+          | combine({'name': _item_user.key })
+      }}
+  ansible.builtin.include_tasks: "_mkhomedir.yml"

@@ -52,11 +52,9 @@
   hosts: nuc.lab.net
   tags: init-nuc-user
   roles:
-    # keep-sorted start
-    - role: doas
+    - role: zfs_mkhomedir # run before roles/user populates dataset
     - role: user
-    - role: zfs_mkhomedir
-    # keep-sorted end
+    - role: doas
 
 - name: Configure network
   hosts: nuc.lab.net
