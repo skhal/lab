@@ -12,16 +12,16 @@
     _user:
       name: "{{ _item_user.key }}"
       group: >-
-        {% if _item_user.key == "root" %}
+        {%- if _item_user.key == "root" -%}
           wheel
-        {% else %}
+        {%- else -%}
           {{ _item_user.key }}
-        {% endif %}
+        {%- endif -%}
       shell: "{{ _item_user.value.shell | default('/bin/sh') }}"
       home: >-
-        {% if _item_user.key == "root" %}
+        {%- if _item_user.key == "root" -%}
           /root
-        {% else %}
+        {%- else -%}
           /home/{{ _item_user.key }}
-        {% endif %}
+        {%- endif %}
   ansible.builtin.include_tasks: "_config_user.yml"
