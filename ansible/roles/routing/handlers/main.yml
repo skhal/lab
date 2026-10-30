@@ -5,7 +5,7 @@
 
 ---
 - name: "Restart routing"
-  listen: "restart_routing"
+  listen: "routing_restart_service"
   become: true
   ansible.builtin.service:
     name: routing

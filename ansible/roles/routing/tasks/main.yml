@@ -4,21 +4,29 @@
 # license that can be found in the LICENSE file.
 
 ---
-- name: "Migrate defaultrouter"
-  ansible.builtin.include_role:
-    name: sysrc
+- name: Configure default route
   vars:
-    sysrc_migrate:
-      name: defaultrouter
-      value: "{{ routing_defaultrouter }}"
-      path: /etc/rc.conf.d/routing
-      notify: "restart_routing"
+    _rc_file: /etc/rc.conf.d/routing
+    _rc_var: defaultrouter
+  block:
+    - name: Remove from /etc/rc.conf
+      become: true
+      community.general.sysrc:
+        name: "{{ _rc_var }}"
+        state: absent
 
-- name: "Enable gateway in /etc/rc.conf.d/routing"
+    - name: Set hostname in {{ _rc_file }}
+      become: true
+      community.general.sysrc:
+        name: "{{ _rc_var }}"
+        value: "{{ routing_defaultrouter }}"
+        path: "{{ _rc_file }}"
+      notify: "routing_restart_service"
+
+- name: "Enable gateway"
   become: true
   community.general.sysrc:
     name: gateway_enable
-    value: true
+    value: "{{ routing_gateway_enable }}"
     path: /etc/rc.conf.d/routing
-  when: routing_enable_gateway
-  notify: "restart_routing"
+  notify: "routing_restart_service"
