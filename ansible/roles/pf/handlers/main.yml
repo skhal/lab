@@ -11,19 +11,20 @@
 # Ref: https://superuser.com/a/1777486
 ---
 # reload_pf_conf reloads non-empty /etc/pf.conf and must be done asynchronously.
-- name: "Reload pf"
-  listen: "reload_pf_conf"
+- name: Reload PF config
+  listen: pf_reload_conf
   become: true
   ansible.builtin.shell:
     cmd: "((sleep 1; nohup pfctl -f /etc/pf.conf) & )"
-  async: 10
+  async: 5
   poll: 0
   register: pf_reload_conf_task
 
-- name: "Wait for pf to reload"
-  listen: "reload_pf_conf"
+- name: Wait for PF to reload config
+  listen: pf_reload_conf
   ansible.builtin.async_status:
     jid: "{{ pf_reload_conf_task.ansible_job_id }}"
   retries: 10
-  register: pf_wait_reload_conf_task
-  until: pf_wait_reload_conf_task is finished
+  delay: 1 # pf.conf load id O(sec); wait for 1s b/w retries
+  register: pf_reload_conf_wait_task
+  until: pf_reload_conf_wait_task is finished

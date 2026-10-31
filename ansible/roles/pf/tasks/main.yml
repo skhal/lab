@@ -42,4 +42,4 @@
     group: wheel
     mode: u=rw,g=r,o=r
     validate: /sbin/pfctl -nf %s
-  notify: "reload_pf_conf"
+  notify: pf_reload_conf
