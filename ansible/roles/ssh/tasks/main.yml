@@ -4,14 +4,23 @@
 # license that can be found in the LICENSE file.
 
 ---
-- name: "Migrate sshd_enable"
-  ansible.builtin.include_role:
-    name: sysrc
+- name: Enable SSH server
   vars:
-    sysrc_migrate:
-      name: sshd_enable
-      value: true
-      path: /etc/rc.conf.d/sshd
+    _rc_file: /etc/rc.conf.d/sshd
+    _rc_var: sshd_enable
+  block:
+    - name: Clean /etc/rc.conf
+      become: true
+      community.general.sysrc:
+        name: "{{ _rc_var }}"
+        state: absent
+
+    - name: Enable SSH server in {{ _rc_file }}
+      become: true
+      community.general.sysrc:
+        name: "{{ _rc_var }}"
+        value: true
+        path: "{{ _rc_file }}"
 
 - name: "Update configuration"
   vars:
