@@ -24,34 +24,31 @@
 
 - name: "Update configuration"
   vars:
-    _conf_file: /etc/ssh/sshd_config/
+    _conf_file: /etc/ssh/sshd_config
   block:
-    # noqa name[template]
-    - name: "Update {{ _conf_file }} - listen on cloned interfaces"
+    - name: Allow groups {{ ssh_allow_groups | join(', ') }}
+      when: ssh_allow_groups | length > 0
+      loop: "{{ ssh_allow_groups }}"
       become: true
       ansible.builtin.lineinfile:
         path: "{{ _conf_file }}"
-        line: "ListenAddress={{ item }}"
-      loop: "{{ ssh_listen_addresses }}"
+        line: |-
+          Match Group {{ item }}
+            AllowUsers *
       notify: "restart_sshd"
 
-    - name: "Update {{ _conf_file }} - allow op user" # noqa name[template]
+    - name: Allow users {{ ssh_allow_users | join(', ') }}
+      when: ssh_allow_users | length > 0
       become: true
       ansible.builtin.lineinfile:
         path: "{{ _conf_file }}"
         line: "AllowUsers={{ ssh_allow_users | join(' ') }}"
       notify: "restart_sshd"
-      when: ssh_allow_users | length > 0
 
-    - name: "Allow groups {{ ssh_allow_groups | join(',') }}"
+    - name: Listen addresses
+      loop: "{{ ssh_listen_addresses }}"
       become: true
       ansible.builtin.lineinfile:
         path: "{{ _conf_file }}"
-        line: |-
-          Match Group {{ _group }}
-            AllowUsers *
-      when: ssh_allow_groups | length > 0
-      loop: "{{ ssh_allow_groups }}"
-      loop_control:
-        loop_var: _group
+        line: "ListenAddress={{ item }}"
       notify: "restart_sshd"
