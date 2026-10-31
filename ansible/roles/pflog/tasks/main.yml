@@ -26,9 +26,4 @@
   become: true
   ansible.builtin.service:
     name: pflog
-    state: >-
-      {% if pflog_enable %}
-        started
-      {% else %}
-        stopped
-      {% endif %}
+    state: "{% if pflog_enable %}started{% else %}stopped {% endif %}"
