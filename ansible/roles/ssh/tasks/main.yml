@@ -24,7 +24,7 @@
 
 - name: "Update configuration"
   vars:
-    _conf_file: "{{ ssh_server_config }}"
+    _conf_file: /etc/ssh/sshd_config/
   block:
     # noqa name[template]
     - name: "Update {{ _conf_file }} - listen on cloned interfaces"
