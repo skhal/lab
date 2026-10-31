@@ -32,10 +32,12 @@
     state: started
 
 - name: "Configure pf"
+  vars:
+    _conf_file: /etc/pf.conf
   become: true
-  ansible.builtin.copy:
-    src: etc/pf.conf
-    dest: /etc/pf.conf
+  ansible.builtin.template:
+    src: "{{ _conf_file | trim('/') }}.j2"
+    dest: "{{ _conf_file }}"
     owner: root
     group: wheel
     mode: u=rw,g=r,o=r
