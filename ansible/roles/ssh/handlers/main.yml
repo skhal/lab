@@ -4,9 +4,9 @@
 # license that can be found in the LICENSE file.
 
 ---
-- name: Restart sshd
+- name: Restart SSH server
+  listen: ssh_restart_service
   become: true
   ansible.builtin.service:
     name: sshd
     state: restarted
-  listen: "restart_sshd"

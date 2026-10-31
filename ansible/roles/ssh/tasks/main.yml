@@ -35,7 +35,7 @@
         line: |-
           Match Group {{ item }}
             AllowUsers *
-      notify: "restart_sshd"
+      notify: ssh_restart_service
 
     - name: Allow users {{ ssh_allow_users | join(', ') }}
       when: ssh_allow_users | length > 0
@@ -43,7 +43,7 @@
       ansible.builtin.lineinfile:
         path: "{{ _conf_file }}"
         line: "AllowUsers={{ ssh_allow_users | join(' ') }}"
-      notify: "restart_sshd"
+      notify: ssh_restart_service
 
     - name: Listen addresses
       loop: "{{ ssh_listen_addresses }}"
@@ -51,4 +51,4 @@
       ansible.builtin.lineinfile:
         path: "{{ _conf_file }}"
         line: "ListenAddress={{ item }}"
-      notify: "restart_sshd"
+      notify: ssh_restart_service
