@@ -4,26 +4,17 @@
 # license that can be found in the LICENSE file.
 
 ---
-- name: "Create configuration"
-  vars:
-    _conf_file: "/etc/pf.conf"
-  block:
-    - name: "Stat {{ _conf_file }}"
-      ansible.builtin.stat:
-        path: "{{ _conf_file }}"
-        get_checksum: false
-      register: pf_stat_pf_conf_task
-
-    - name: "Create /etc/pf.conf"
-      become: true
-      ansible.builtin.file:
-        path: "{{ _conf_file }}"
-        state: touch
-        owner: root
-        group: wheel
-        mode: u=rw,g=r,o=r
-      when: not pf_stat_pf_conf_task.stat.exists
-      notify: "start_pf"
+- name: Create config
+  become: true
+  ansible.builtin.file:
+    path: /etc/pf.conf
+    state: touch
+    access_time: preserve # don't change if exists
+    modification_time: preserve # don't change if exists
+    owner: root
+    group: wheel
+    mode: u=rw,g=r,o=r
+  notify: "start_pf"
 
 - name: "Enable pf"
   become: true
