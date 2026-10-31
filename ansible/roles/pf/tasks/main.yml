@@ -14,41 +14,22 @@
     owner: root
     group: wheel
     mode: u=rw,g=r,o=r
-  notify: "start_pf"
 
-- name: "Enable pf"
+- name: Enable pf
   become: true
   community.general.sysrc:
     path: /etc/rc.conf.d/pf
     name: pf_enable
     value: true
-  notify: "start_pf"
 
-# Make sure pf "started" to let /etc/rc.d/pf load pf.ko for pfctl to work in
-# the steps below.
-- name: "Flush pf changes"
-  ansible.builtin.meta: flush_handlers
-
-# reset_connection is broken in handlers:
-# https://github.com/ansible/ansible/issues/50306
-- name: Reset connection
-  ansible.builtin.meta: reset_connection
-
-- name: "Check status"
-  block:
-    - name: "PF status"
-      become: true
-      ansible.builtin.raw: /sbin/pfctl -s Running
-      register: pf_status_task
-      changed_when: false
-
-    - name: "PF must be running"
-      ansible.builtin.assert:
-        that:
-          - "pf_status_task.rc == 0"
-          - "'Enabled' in pf_status_task.stdout"
-        fail_msg: "Firewall is disabled"
-        success_msg: "Firewall is enabled"
+# start_pf enables PF synchronously because it assumes the configuration
+# /etc/pf.conf is empty, effectively no filters applied.
+#
+- name: Start PF service
+  become: true
+  ansible.builtin.service:
+    name: pf
+    state: started
 
 - name: "Configure pf"
   become: true

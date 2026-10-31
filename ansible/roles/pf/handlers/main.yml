@@ -10,18 +10,6 @@
 #
 # Ref: https://superuser.com/a/1777486
 ---
-# start_pf enables PF synchronously because it assumes the configuration
-# /etc/pf.conf is empty, effectively no filters applied.
-#
-# noqa command-instead-of-module command-instead-of-shell
-- name: "Start pf"
-  listen: "start_pf"
-  become: true
-  ansible.builtin.shell:
-    cmd: service pf start
-  async: 10
-  poll: 0
-
 # reload_pf_conf reloads non-empty /etc/pf.conf and must be done asynchronously.
 - name: "Reload pf"
   listen: "reload_pf_conf"
