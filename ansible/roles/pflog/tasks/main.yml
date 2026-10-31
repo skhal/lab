@@ -6,7 +6,7 @@
 ---
 - name: Enable pflog
   vars:
-    _rc_file: /etc/rc.conf.d/hostname
+    _rc_file: /etc/rc.conf.d/pflog
     _rc_var: pflog_enable
   block:
     - name: Clean /etc/rc.conf
