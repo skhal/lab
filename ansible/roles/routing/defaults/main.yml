@@ -10,5 +10,5 @@ routing_defaultrouter: ""
 
 # routing_gateway_enable enables IP forwarding between interfaces (see sysctl
 # net.inet.ip.forwarding).
-routing_gateway_enable: false
+routing_gateway_enable: "{{ undef(hint='enable gateway mode when set to true') }}"
 # keep-sorted end

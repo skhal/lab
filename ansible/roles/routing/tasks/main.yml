@@ -23,7 +23,8 @@
         path: "{{ _rc_file }}"
       notify: "routing_restart_service"
 
-- name: "Enable gateway"
+- name: Control gateway
+  when: routing_gateway_enable is defined
   become: true
   community.general.sysrc:
     name: gateway_enable
