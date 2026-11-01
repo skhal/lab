@@ -44,16 +44,6 @@ sysctl_state:
   security.bsd.unprivileged_read_msgbuf: 0
   vfs.zfs.vdev.min_auto_ashift: 12
   # keep-sorted end
-# sync with user_config in groups; include users from LDAP server
-user_config:
-  # keep-sorted start
-  op:
-    shell: /bin/tcsh
-  root:
-    shell: /bin/tcsh
-  skhalatyan:
-    shell: /bin/tcsh
-  # keep-sorted end
 zfs_create_dsets:
   # keep-sorted start
   zroot/usr/jail/bsd/poudriere:
@@ -65,8 +55,4 @@ zfs_create_dsets:
   zroot/var/cache/pkg.freebsd-kmods:
   zroot/var/cache/pkg.freebsd-ports:
   # keep-sorted end
-zfs_mkhomedir_users:
-  skhalatyan:
-    uid: 10001
-    gid: 10001
 # keep-sorted end

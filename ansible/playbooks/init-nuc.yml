@@ -52,7 +52,6 @@
   hosts: nuc.lab.net
   tags: init-nuc-user
   roles:
-    - role: zfs_mkhomedir # run before roles/user populates dataset
     - role: user
     - role: doas
 
