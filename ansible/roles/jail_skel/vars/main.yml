@@ -11,10 +11,10 @@
 # Plays and inventory should override jail_skel_packages.
 jail_skel_default_packages:
   # keep-sorted start
-  - FreeBSD-bsdconfig
-  - FreeBSD-set-minimal-jail
+  - FreeBSD-bsdconfig # /usr/sbin/sysrc
+  - FreeBSD-set-minimal-jail # pkgbase system
   - FreeBSD-ssh
-  - doas
+  - doas # for Ansible to manage the jail
   - pkg
-  - python3
+  - python3 # for Ansible to manage the jail
   # keep-sorted end
