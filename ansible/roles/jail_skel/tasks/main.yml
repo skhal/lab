@@ -15,16 +15,14 @@
       canmount: "off"
       readonly: "on"
   register: jail_skel_zfs_dset_task
-  notify: jail_skel_snapshot
 
-- name: "Bootstrap jail service"
-  notify: jail_skel_snapshot
+- name: Bootstrap jail service
   vars:
     _conf_file: /etc/jail.conf
     _rc_file: /etc/rc.conf.d/jail
     _jail_skel_path: "{{ jail_skel_zfs_dset_task.mountpoint }}"
   block:
-    - name: "Create {{ _conf_file }}"
+    - name: Create {{ _conf_file }}
       become: true
       vars:
         prefix: "{{ _jail_skel_path }}"
@@ -42,7 +40,6 @@
         name: jail_enable
         value: true
         path: "{{ _rc_file }}"
-      notify: "start_jail"
 
     - name: Stop jails in reverse order
       become: true
