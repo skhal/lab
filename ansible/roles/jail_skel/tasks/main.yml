@@ -20,12 +20,11 @@
   vars:
     _conf_file: /etc/jail.conf
     _rc_file: /etc/rc.conf.d/jail
-    _jail_skel_path: "{{ jail_skel_zfs_dset_task.mountpoint }}"
   block:
     - name: Create {{ _conf_file }}
       become: true
       vars:
-        prefix: "{{ _jail_skel_path }}"
+        _jailbase: "{{ jail_skel_zfs_dset_task.mountpoint | dirname }}"
       ansible.builtin.template:
         src: "{{ _conf_file | trim('/') }}.j2"
         dest: "{{ _conf_file }}"
