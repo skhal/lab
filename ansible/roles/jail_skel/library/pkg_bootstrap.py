@@ -6,11 +6,10 @@
 from __future__ import annotations
 
 DOCUMENTATION = r"""
-module: jail_bootstrap
+module: pkg_bootstrap
 short_description: Install packages into empty, non-running jail
 description:
     - Copy canonical pkg-repo(8) keys from the server into the jail.
-    - Mount /var/db/pkg/repos as tmpfs in the jail.
     - Install packages from the server using `pkg --rootfs`
 attributes:
     platform:
@@ -44,7 +43,7 @@ EXAMPLES = r"""
 
 # Install minimal jail set
 - name: Install packages
-  jail_bootstrap:
+  pkg_bootstrap:
     path: /usr/jail/example
     packages:
         - FreeBSD-set-minimal-jail
@@ -67,7 +66,6 @@ packages:
 import os
 import shutil
 import traceback
-from contextlib import contextmanager
 
 from ansible.module_utils.basic import AnsibleModule
 
@@ -80,73 +78,7 @@ class Error:
         return self._msg
 
 
-class TMPFSContext:
-    _MOUNT_CMD = "/sbin/mount"
-    _UMOUNT_CMD = "/sbin/umount"
-
-    def __init__(self, module: AnsibleModule, path: str):
-        self._module = module
-        self._path = path
-        self._err = None
-
-    @property
-    def err(self) -> Error | None:
-        return self._err
-
-    def __enter__(self) -> TMPFSContext:
-        self._err = self._mount()
-        return self
-
-    def _mount(self) -> Error | None:
-        if self._module.check_mode:
-            return
-
-        cmd = [TMPFSContext._MOUNT_CMD, "-t", "tmpfs", "tmpfs", self._path]
-
-        rc, _, stderr = self._module.run_command(cmd)
-        if rc != os.EX_OK:
-            return Error(stderr.strip())
-
-    def __exit__(self, *_) -> bool:
-        # Ansible modules are restricted to use of ansible.module_utils and
-        # can't access ansible.errors.AnsibleError on the remote host unless
-        # it is installed as external dependency and this way violate hermetic
-        # setup of the module.
-        #
-        # In order to alleviate the above restriction, the module is written
-        # exceptions free with explicit error propagation, e.g. Google C++ Style
-        # Guide, Go, etc.
-        #
-        # Python libraries do use exceptions. The code should aggressively catch
-        # these to convert exceptions into errors.
-        #
-        # Nevertheless some parts of the code may still miss exception handling.
-        # Let it yell loud and clear with violent crash for easy detection.
-        #
-        # Propagate exception from the context block, catch it at the very high
-        # level of module use, and include full traceback in the modules's error
-        # message.
-
-        if self._err != None:
-            return False
-
-        self._err = self._umount()
-
-        return False
-
-    def _umount(self) -> Error | None:
-        if self._module.check_mode:
-            return
-
-        cmd = [TMPFSContext._UMOUNT_CMD, self._path]
-
-        rc, _, stderr = self._module.run_command(cmd)
-        if rc != os.EX_OK:
-            return Error(stderr.strip())
-
-
 class PKG:
-    _DB_REPOS_PATH = "/var/db/pkg/repos"
     _KEYS_PATH = "/usr/share/keys"
 
     _PKG_CMD = "/usr/sbin/pkg"
@@ -235,38 +167,7 @@ class PKG:
         if not packages:
             return
 
-        _, _, tail = os.path.splitroot(PKG._DB_REPOS_PATH)
-        dest = os.path.join(rootdir, tail)
-
-        if not os.path.exists(dest):
-            self._makedirs(dest)
-
-        ctx = TMPFSContext(self._module, dest)
-        with ctx:
-            if ctx.err:
-                return ctx.err
-
-            if (err := self._install(packages, rootdir)) is not None:
-                return err
-
-        return ctx.err
-
-    def _makedirs(self, path: str) -> Error | None:
-        if not self._module.check_mode:
-            try:
-                os.makedirs(name=path, mode=0o755, exist_ok=True)
-            except OSError as err:
-                return Error(str(err))
-
-        self._changed = True
-        self._diff.append(
-            {
-                "before_header": path,
-                "before": dict(state="absent"),
-                "after_header": path,
-                "after": dict(state="present"),
-            }
-        )
+        return self._install(packages, rootdir)
 
     def _install(self, packages: list[str], rootdir: str) -> Error | None:
         missing_packages, err = self._filter_missing_packages(rootdir, packages)
