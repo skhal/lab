@@ -4,19 +4,42 @@
 # license that can be found in the LICENSE file.
 
 ---
-- name: Bootstrap ZFS
-  become: true
-  zfs_create:
-    name: "{{ jail_skel_zfs_dataset }}"
-    props:
-      canmount: "on"
-      readonly: "off"
-    parent_props:
-      canmount: "off"
-      readonly: "on"
-  register: jail_skel_zfs_dset_task
+- name: Create skeleton
+  notify: "jail_skel_snapshot"
+  block:
+    - name: Create ZFS dataset
+      become: true
+      zfs_create:
+        name: "{{ jail_skel_zfs_dataset }}"
+        props:
+          canmount: "on"
+          readonly: "off"
+        parent_props:
+          canmount: "off"
+          readonly: "on"
+      register: jail_skel_zfs_dset_task
 
-- name: Bootstrap jail service
+    - name: Bootstrap jail
+      become: true
+      pkg_bootstrap:
+        path: "{{ jail_skel_zfs_dset_task.mountpoint }}"
+        packages: "{{ jail_skel_default_packages | union(jail_skel_packages) }}"
+
+    - name: Migrate users
+      ansible.builtin.include_role:
+        name: user_migrate
+      vars:
+        user_migrate_users: "{{ jail_skel_migrate_users }}"
+        user_migrate_rootdir: "{{ jail_skel_zfs_dset_task.mountpoint }}"
+
+    - name: Configure remote access
+      become: true
+      community.general.sysrc:
+        name: sshd_enable
+        value: true
+        path: "{{ jail_skel_zfs_dset_task.mountpoint }}/etc/rc.conf"
+
+- name: Configure jail service
   vars:
     _conf_file: /etc/jail.conf
     _rc_file: /etc/rc.conf.d/jail
@@ -46,87 +69,3 @@
         name: jail_reverse_stop
         value: true
         path: "{{ _rc_file }}"
-
-- name: "Install packages"
-  notify: "jail_skel_snapshot"
-  vars:
-    _jail_skel_path: "{{ jail_skel_zfs_dset_task.mountpoint }}"
-  block:
-    - name: "Install pkg keys"
-      vars:
-        _keys_path: "{{ _jail_skel_path }}/usr/share"
-      block:
-        - name: "Create keys folder {{ _keys_path }}"
-          become: true
-          ansible.builtin.file:
-            path: "{{ _keys_path }}"
-            state: directory
-            owner: root
-            group: wheel
-            mode: u=rwx,g=rx,o=rx
-
-        - name: "Copy keys from /usr/share/keys"
-          become: true
-          ansible.builtin.copy:
-            src: /usr/share/keys
-            dest: "{{ _keys_path }}/"
-            owner: root
-            group: wheel
-            mode: u=rwx,g=rx,o=rx
-            remote_src: true
-
-    - name: "Install with pkg database"
-      vars:
-        _db_path: "{{ _jail_skel_path }}/var/db/pkg/repos"
-      block:
-        - name: "Create pkg db at {{ _db_path }}"
-          become: true
-          ansible.builtin.file:
-            path: "{{ _db_path }}"
-            state: directory
-            owner: root
-            group: wheel
-            mode: u=rwx,g=rx,o=rx
-
-        - name: "Mount metadata cache at {{ _db_path }}"
-          become: true
-          ansible.posix.mount:
-            path: "{{ _db_path }}"
-            src: tmpfs
-            fstype: tmpfs
-            state: ephemeral
-
-        - name: "Install packages to {{ _jail_skel_path }}"
-          become: true
-          community.general.pkgng:
-            rootdir: "{{ _jail_skel_path }}"
-            name: "{{ jail_skel_default_packages | union(jail_skel_packages) }}"
-            state: present
-      always:
-        - name: "Unmount metadata cache at {{ _db_path }}"
-          become: true
-          ansible.posix.mount:
-            path: "{{ _db_path }}"
-            state: unmounted
-
-- name: Bootstrap users
-  vars:
-    _jail_skel_path: "{{ jail_skel_zfs_dset_task.mountpoint }}"
-  notify: "jail_skel_snapshot"
-  block:
-    - name: "Migrate users"
-      ansible.builtin.include_role:
-        name: user_migrate
-      vars:
-        user_migrate_users: "{{ jail_skel_migrate_users }}"
-        user_migrate_rootdir: "{{ _jail_skel_path }}"
-
-- name: Configure remote access
-  vars:
-    _jail_skel_path: "{{ jail_skel_zfs_dset_task.mountpoint }}"
-  notify: "jail_skel_snapshot"
-  become: true
-  community.general.sysrc:
-    name: sshd_enable
-    value: true
-    path: "{{ _jail_skel_path }}/etc/rc.conf"
