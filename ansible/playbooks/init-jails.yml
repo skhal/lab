@@ -4,13 +4,13 @@
 # license that can be found in the LICENSE file.
 
 # NAME
-#   bootstrap-jails • minimal configuration of bare jails.
+#   init-jails • minimal configuration of bare jails.
 #
 # SYNOPSIS
-#   ansible-playbook ./playbooks/bootstrap-jails.yml
+#   ansible-playbook ./playbooks/init-jails.yml
 #
 # DESCRIPTION
-#   bootstrap-jails runs minimal configuration of fresh FreeBSD jails.
+#   init-jails runs minimal configuration of fresh FreeBSD jails.
 #
 #   It runs the following steps:
 #
@@ -20,13 +20,13 @@
 ---
 - name: Configure sysctl
   hosts: dev
-  tags: bootstrap-sysctl
+  tags: init-jail-sysctl
   roles:
     - role: sysctl
 
 - name: Configure services
   hosts: jails
-  tags: bootstrap-services
+  tags: init-jail-rc
   roles:
     # keep-sorted start
     - role: pkg
@@ -36,7 +36,7 @@
 
 - name: Bootstrap users
   hosts: jails
-  tags: bootstrap-users
+  tags: init-jail-user
   roles:
     # keep-sorted start
     - role: doas
@@ -45,6 +45,6 @@
 
 - name: Configure remote access
   hosts: jails
-  tags: bootstrap-remote-access
+  tags: init-jail-access
   roles:
     - role: ssh
