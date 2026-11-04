@@ -6,72 +6,42 @@
 from __future__ import annotations
 
 import os
+from enum import StrEnum, auto
 
 from ansible.module_utils.basic import AnsibleModule
 
 
 class Error:
-    def __init__(self, msg: str):
+    def __init__(self, msg: str) -> None:
         self._msg = msg
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self._msg
 
 
 class DatasetNotExistError(Error):
     """DatasetNotExistError means specified dataset does not exit."""
 
-    def __init__(self, name: str):
+    def __init__(self, name: str) -> None:
         super().__init__(f"can't open '{name}': dataset does not exist")
 
 
 class InvalidPropertyError(Error):
     """InvalidPropertyError means used property is invalid or unsupported."""
 
-    def __init__(self, name: str):
+    def __init__(self, name: str) -> None:
         super().__init__(f"invalid property '{name}'")
 
 
-class Property:
-    """Property describes a ZFS dataset property.
-
-    Derived classes are supported properties. Use these instead of strings to
-    validate supported properties and use it in annotations.
-
-    This implementation only supports a handful of zfsprops(7) that are used
-    in current module.
-    """
-
-    def __init__(self, name: str):
-        self._name = name
-
-    def __str__(self):
-        return self._name
-
-
-class CanMountProperty(Property):
-    def __init__(self):
-        super().__init__("canmount")
-
-
-class MountpointProperty(Property):
-    def __init__(self):
-        super().__init__("mountpoint")
-
-
-class NameProperty(Property):
-    def __init__(self):
-        super().__init__("name")
-
-
-class ReadOnlyProperty(Property):
-    def __init__(self):
-        super().__init__("readonly")
-
-
 class ZFS:
+    class Property(StrEnum):
+        CAN_MOUNT = "canmount"
+        MOUNTPOINT = auto()
+        NAME = auto()
+        READ_ONLY = "readonly"
+
     _ZFS_CMD = "/sbin/zfs"
-    _ALLOWED_CREATE_PROPS = [CanMountProperty(), ReadOnlyProperty()]
+    _ALLOWED_CREATE_PROPS = [Property.CAN_MOUNT, Property.READ_ONLY]
 
     def __init__(self, module: AnsibleModule):
         self._module = module
@@ -122,7 +92,7 @@ class ZFS:
     ) -> Error | None:
         head, _ = os.path.split(dset)
 
-        _, err = self.get(NameProperty(), head)
+        _, err = self.get(ZFS.Property.NAME, head)
         if err != None:
             return self.create(head, props, props)
 
@@ -194,7 +164,7 @@ def get_mountpoint_in_check_mode(
 
     paths = []
     while True:
-        mountpoint, err = zfs.get(MountpointProperty(), dset)
+        mountpoint, err = zfs.get(ZFS.Property.MOUNTPOINT, dset)
         if err != None:
             parent, base = os.path.split(dset)
             if parent == "":
@@ -224,7 +194,7 @@ def run(module: AnsibleModule) -> tuple[dict, Error | None]:
 
     zfs = ZFS(module)
 
-    mountpoint, err = zfs.get(MountpointProperty(), name)
+    mountpoint, err = zfs.get(ZFS.Property.MOUNTPOINT, name)
     if err != None:
         err = zfs.create(name, props, parent_props)
         if err != None:
@@ -233,7 +203,7 @@ def run(module: AnsibleModule) -> tuple[dict, Error | None]:
         mountpoint, err = (
             get_mountpoint_in_check_mode(zfs, name)
             if module.check_mode
-            else zfs.get(MountpointProperty(), name)
+            else zfs.get(ZFS.Property.MOUNTPOINT, name)
         )
         if err != None:
             return {}, err
