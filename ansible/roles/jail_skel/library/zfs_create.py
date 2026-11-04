@@ -35,12 +35,30 @@ class InvalidPropertyError(Error):
 
 class ZFS:
     class Property(StrEnum):
+        # keep-sorted start
         CAN_MOUNT = "canmount"
         MOUNTPOINT = auto()
         NAME = auto()
         READ_ONLY = "readonly"
+        # keep-sorted end
 
-    _ZFS_CMD = "/sbin/zfs"
+    class Command(StrEnum):
+        # keep-sorted start
+        CREATE = auto()
+        GET = auto()
+        # keep-sorted end
+
+    class GetFlag(StrEnum):
+        # keep-sorted start
+        COLUMN = "-o"
+        NO_HEADER = "-H"
+        PARSABLE_VALUE = "-p"
+        # keep-sorted end
+
+    class CreateFlag(StrEnum):
+        OPTION = "-o"
+
+    _CMD = "/sbin/zfs"
     _ALLOWED_CREATE_PROPS = [Property.CAN_MOUNT, Property.READ_ONLY]
 
     def __init__(self, module: AnsibleModule):
@@ -57,7 +75,16 @@ class ZFS:
         return self._diff
 
     def get(self, prop: Property, dset: str) -> tuple[str, Error | None]:
-        cmd = [ZFS._ZFS_CMD, "get", "-H", "-p", "-o", "value", str(prop), dset]
+        cmd = [
+            ZFS._CMD,
+            ZFS.Command.GET,
+            ZFS.GetFlag.NO_HEADER,
+            ZFS.GetFlag.PARSABLE_VALUE,
+            ZFS.GetFlag.COLUMN,
+            "value",
+            prop,
+            dset,
+        ]
 
         rc, stdout, _ = self._module.run_command(cmd)
         if rc != os.EX_OK:
@@ -99,11 +126,10 @@ class ZFS:
         return None
 
     def _create(self, dset: str, props: dict[Property, str]) -> Error | None:
-
         if not self._module.check_mode:
-            cmd = [ZFS._ZFS_CMD, "create"]
+            cmd = [ZFS._CMD, ZFS.Command.CREATE]
             for prop, val in props.items():
-                cmd.extend(("-o", f"{prop}={val}"))
+                cmd.extend((ZFS.CreateFlag.OPTION, f"{prop}={val}"))
             cmd.append(dset)
 
             rc, _, stderr = self._module.run_command(cmd)
