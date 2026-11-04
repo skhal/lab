@@ -113,29 +113,9 @@ class ZFS:
         if err != None:
             return err
 
-        return self._create(dset, props)
-
-    def _maybe_create_parent(
-        self, dset: str, props: dict[Property, str]
-    ) -> Error | None:
-        head, _ = os.path.split(dset)
-
-        _, err = self.get(ZFS.Property.NAME, head)
-        if err != None:
-            return self.create(head, props, props)
-
-        return None
-
-    def _create(self, dset: str, props: dict[Property, str]) -> Error | None:
         if not self._module.check_mode:
-            cmd = [ZFS._CMD, ZFS.Command.CREATE]
-            for prop, val in props.items():
-                cmd.extend((ZFS.CreateFlag.OPTION, f"{prop}={val}"))
-            cmd.append(dset)
-
-            rc, _, stderr = self._module.run_command(cmd)
-            if rc != os.EX_OK:
-                return Error(stderr)
+            if (err := self._create(dset, props)) is not None:
+                return err
 
         self._changed = True
         self._diff.append(
@@ -150,7 +130,26 @@ class ZFS:
             }
         )
 
+    def _maybe_create_parent(
+        self, dset: str, props: dict[Property, str]
+    ) -> Error | None:
+        head, _ = os.path.split(dset)
+
+        _, err = self.get(ZFS.Property.NAME, head)
+        if err != None:
+            return self.create(head, props, props)
+
         return None
+
+    def _create(self, dset: str, props: dict[Property, str]) -> Error | None:
+        cmd = [ZFS._CMD, ZFS.Command.CREATE]
+        for prop, val in props.items():
+            cmd.extend((ZFS.CreateFlag.OPTION, f"{prop}={val}"))
+        cmd.append(dset)
+
+        rc, _, stderr = self._module.run_command(cmd)
+        if rc != os.EX_OK:
+            return Error(stderr)
 
     @staticmethod
     def parse_create_properties(
