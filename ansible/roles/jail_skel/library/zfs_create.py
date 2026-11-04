@@ -6,6 +6,7 @@
 from __future__ import annotations
 
 import os
+import traceback
 from enum import StrEnum, auto
 
 from ansible.module_utils.basic import AnsibleModule
@@ -269,13 +270,16 @@ def main() -> None:
         supports_check_mode=True,
     )
 
-    res, err = run(module)
-    if err != None:
-        module.fail_json(
-            msg=str(err),
-        )
-    else:
+    try:
+        res, err = run(module)
+        if err != None:
+            module.fail_json(
+                msg=str(err),
+            )
+
         module.exit_json(**res)
+    except Exception:
+        module.fail_json(msg=traceback.format_exc())
 
 
 if "__main__" == __name__:
