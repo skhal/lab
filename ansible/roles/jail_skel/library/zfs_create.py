@@ -5,73 +5,6 @@
 
 from __future__ import annotations
 
-DOCUMENTATION = r"""
-module: zfs_create
-short_description: Create a ZFS dataset and its parents
-description:
-    - Create a ZFS dataset along with parents with different properties.
-attributes:
-    check_mode:
-        support: full
-    diff_mode:
-        support: full
-options:
-    name:
-        description:
-            - ZFS dataset to create
-        type: str
-        required: true
-    props:
-        description:
-            - ZFS dataset properties
-        type: dict
-        default: {}
-    parent_props:
-        description:
-            - parent dataset properties
-        type: dict
-        default: {}
-author: Samvel Khalatyan (@skhal)
-"""
-
-EXAMPLES = r"""
-# Setup: zpool/example dataset exists
-
-# Create a dataset and parents with default properties
-- name: Create a dataset and parents
-  zfs_create:
-    name: zpool/example/dot/com
-
-# Create a leaf dataset with custom properties:
-- name: Create a dataset and parents
-  zfs_create:
-    name: zpool/example/dot/com
-    props:
-        readonly: "no"
-
-# Create a leaf dataset and parent datasets with different properties
-- name: Create a dataset and parents
-  zfs_create:
-    name: zpool/example/dot/com
-    props:
-        readonly: "no"
-    parent_props:
-        readonly: "yes"
-"""
-
-RETURN = r"""
-name:
-    description: Dataset name
-    returned: always
-    type: str
-    sample: zroot/usr/example
-mountpoint:
-    description: Dataset mountpoint
-    returned: always
-    type: str
-    sample: /usr/example
-"""
-
 import os
 
 from ansible.module_utils.basic import AnsibleModule
@@ -238,7 +171,9 @@ class ZFS:
         return parsed_props, None
 
 
-def get_mountpoint_in_check_mode(zfs: ZFS, dset: str) -> tuple[str, Error | None]:
+def get_mountpoint_in_check_mode(
+    zfs: ZFS, dset: str
+) -> tuple[str, Error | None]:
     """builds a mountpoint based on the first available parent dataset.
 
     It does not fail if the dataset does not exist. Instead, it find the
@@ -279,7 +214,9 @@ def run(module: AnsibleModule) -> tuple[dict, Error | None]:
     if err != None:
         return {}, err
 
-    parent_props, err = ZFS.parse_create_properties(module.params["parent_props"])
+    parent_props, err = ZFS.parse_create_properties(
+        module.params["parent_props"]
+    )
     if err != None:
         return {}, err
 
@@ -302,7 +239,9 @@ def run(module: AnsibleModule) -> tuple[dict, Error | None]:
             return {}, err
 
     return (
-        dict(name=name, mountpoint=mountpoint, changed=zfs.changed, diff=zfs.diff),
+        dict(
+            name=name, mountpoint=mountpoint, changed=zfs.changed, diff=zfs.diff
+        ),
         None,
     )
 
