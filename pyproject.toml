@@ -19,9 +19,12 @@ repository = "https://github.com/skhal/lab"
 requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
 
-[tool.poetry.dependencies]
-ansible = "^14.1.0"
+[tool.black]
+line-length = 80
 
 [tool.isort]
 profile = "black"
 multi_line_output = 3
+
+[tool.poetry.dependencies]
+ansible = "^14.1.0"

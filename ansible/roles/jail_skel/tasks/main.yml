@@ -26,11 +26,10 @@
         packages: "{{ jail_skel_default_packages | union(jail_skel_packages) }}"
 
     - name: Migrate users
-      ansible.builtin.include_role:
-        name: user_migrate
-      vars:
-        user_migrate_users: "{{ jail_skel_migrate_users }}"
-        user_migrate_rootdir: "{{ jail_skel_zfs_dset_task.mountpoint }}"
+      become: true
+      user_migrate:
+        name: "{{ jail_skel_migrate_users }}"
+        dest: "{{ jail_skel_zfs_dset_task.mountpoint }}"
 
     - name: Configure remote access
       become: true

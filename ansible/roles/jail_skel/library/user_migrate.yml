@@ -1,0 +1,59 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+DOCUMENTATION:
+  module: user_migrate
+  short_description: Migrate users into a jail
+  description:
+    - Copy user configuration from the remote host into a non-running jail.
+    - The module uses pw(8) to add groups and users.
+    - It updates users and groups as needed including user supplemental groups.
+  attributes:
+    platform:
+      platforms: FreeBSD
+    check_mode:
+      support: full
+    diff_mode:
+      support: full
+  options:
+    name:
+      description:
+        - List of user names to migrate.
+        - The users must exist on the remote host.
+      type: list
+      elements: str
+      required: true
+    dest:
+      description:
+        - Jail location on the remote host.
+      type: str
+      required: true
+  requirements:
+    - jail path must exist
+    - /usr/sbin/pw (pkg: FreeBSD-runtime)
+  author: Samvel Khalatyan (@skhal)
+
+EXAMPLES: |
+  - name: Migrate user op
+    user_migrate:
+      name: op
+      dest: /usr/jail/example
+
+  # user root uses non-default shell, e.g. /bin/tcsh
+  - name: Migrate users root and op
+    user_migrate:
+      name: [root, op]
+      dest: /usr/jail/example
+
+RETURN:
+  users:
+    description: A list of migrated users
+    returned: always
+    type: list
+  groups:
+    description: A list of migrated groups
+    returned: always
+    type: list
