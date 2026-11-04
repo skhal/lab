@@ -37,7 +37,7 @@ openssl_gen_rsa_fetch:
   target: /usr/local/etc/pkg/ssl/lab-ports.pub
 pkg_aliases:
   # keep-sorted start
-  outdated: "version -vL="
+  outdated: "version -vRL="
   vital: 'query -e \"%V=1\" %n'
   # keep-sorted end
 pkg_install:
