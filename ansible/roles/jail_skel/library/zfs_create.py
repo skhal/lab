@@ -38,7 +38,7 @@ def get_mountpoint_in_check_mode(
 
     paths = []
     while True:
-        mountpoint, err = zfs.get(ZFS.Property.MOUNTPOINT, dset)
+        (mountpoint,), err = zfs.get(dset, ZFS.Property.MOUNTPOINT)
         if err != None:
             parent, base = os.path.split(dset)
             if parent == "":
@@ -68,16 +68,16 @@ def run(module: AnsibleModule) -> tuple[dict, Error | None]:
 
     zfs = ZFS(module)
 
-    mountpoint, err = zfs.get(ZFS.Property.MOUNTPOINT, name)
+    (mountpoint,), err = zfs.get(name, ZFS.Property.MOUNTPOINT)
     if err != None:
         err = zfs.create(name, props, parent_props)
         if err != None:
             return {}, err
 
-        mountpoint, err = (
+        (mountpoint,), err = (
             get_mountpoint_in_check_mode(zfs, name)
             if module.check_mode
-            else zfs.get(ZFS.Property.MOUNTPOINT, name)
+            else zfs.get(name, ZFS.Property.MOUNTPOINT)
         )
         if err != None:
             return {}, err

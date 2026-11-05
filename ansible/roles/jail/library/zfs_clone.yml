@@ -1,0 +1,58 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+DOCUMENTATION:
+  module: zfs_clone
+  short_description: Clone a ZFS daatset
+  description:
+    - Clone a ZFS snapshot
+    - Pick up the latest snapshot if the origin is a dataset
+    - Verify the origin of the destination dataset if the origin is a snapshot
+  attributes:
+    check_mode:
+      support: full
+    diff_mode:
+      support: full
+  options:
+    name:
+      description: ZFS destination dataset
+      type: str
+      required: true
+    origin:
+      decryption:
+        - ZFS snapshot to clone
+        - Pick up the latest snapshot if it is a dataset
+      type: str
+      required: true
+  author: Samvel Khalatyan (@skhal)
+
+EXAMPLES:
+  - name: Clone a snapshot
+    zfs_clone:
+      name: zpool/example/target
+      origin: zpool/example/source@snapshot
+
+  - name: Clone the latest snapshot
+    zfs_clone:
+      name: zpool/example/target
+      origin: zpool/example/source
+
+RETURN:
+  name:
+    description: Target dataset name
+    returned: always
+    type: str
+    sample: zpool/example/target
+  mountpoint:
+    description: Target dataset mountpoint
+    returned: always
+    type: str
+    sample: /example/target
+  origin:
+    description: Cloned snapshot
+    returned: always
+    type: str
+    sample: zpool/example/source@snapshot

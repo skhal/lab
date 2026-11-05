@@ -5,6 +5,7 @@
 
 import os
 from enum import StrEnum, auto
+from typing import List
 
 from ansible.module_utils.basic import AnsibleModule
 
@@ -31,13 +32,16 @@ class ZFS:
         CAN_MOUNT = "canmount"
         MOUNTPOINT = auto()
         NAME = auto()
+        ORIGIN = auto()
         READ_ONLY = "readonly"
         # keep-sorted end
 
     class Command(StrEnum):
         # keep-sorted start
+        CLONE = auto()
         CREATE = auto()
         GET = auto()
+        LIST = auto()
         # keep-sorted end
 
     class GetFlag(StrEnum):
@@ -49,6 +53,22 @@ class ZFS:
 
     class CreateFlag(StrEnum):
         OPTION = "-o"
+
+    class CloneFlag(StrEnum):
+        OPTION = "-o"
+
+    class ListFlag(StrEnum):
+        # keep-sorted start
+        NO_HEADER = "-H"
+        PROPERTY = "-o"
+        TYPE = "-t"
+        # keep-sorted end
+
+    class ListProperty(StrEnum):
+        NAME = auto()
+
+    class FSType(StrEnum):
+        SNAPSHOT = auto()
 
     _CMD = "/sbin/zfs"
     _ALLOWED_CREATE_PROPS = [Property.CAN_MOUNT, Property.READ_ONLY]
@@ -66,7 +86,9 @@ class ZFS:
     def diff(self):
         return self._diff
 
-    def get(self, prop: Property, dset: str) -> tuple[str, Error | None]:
+    def get(
+        self, dset: str, *props: Property
+    ) -> tuple[List[str], Error | None]:
         cmd = [
             ZFS._CMD,
             ZFS.Command.GET,
@@ -74,15 +96,48 @@ class ZFS:
             ZFS.GetFlag.PARSABLE_VALUE,
             ZFS.GetFlag.COLUMN,
             "value",
-            prop,
+            ",".join(props),
             dset,
         ]
 
         rc, stdout, _ = self._module.run_command(cmd)
         if rc != os.EX_OK:
-            return "", DatasetNotExistError(dset)
+            return [], DatasetNotExistError(dset)
 
-        return stdout.strip(), None
+        return stdout.splitlines(), None
+
+    def clone(
+        self, snapshot: str, dset: str, props: dict[Property, str]
+    ) -> Error | None:
+        if not self._module.check_mode:
+            if (err := self._clone(snapshot, dset, props)) is not None:
+                return err
+
+        self._changed = True
+        self._diff.append(
+            {
+                "before_header": dset,
+                "before": dict(state="absent"),
+                "after_header": dset,
+                "after": dict(state="present", origin=snapshot),
+            }
+        )
+
+    def _clone(
+        self, snapshot: str, dset: str, props: dict[Property, str]
+    ) -> Error | None:
+        cmd = [ZFS._CMD, ZFS.Command.CLONE]
+        for prop, val in props.items():
+            cmd.extend((ZFS.CloneFlag.OPTION, f"{prop}={val}"))
+        cmd.extend((snapshot, dset))
+
+        rc, _, stderr = self._module.run_command(cmd)
+        if rc != os.EX_OK:
+            if "dataset does not exist" in stderr:
+                return DatasetNotExistError(snapshot)
+            return Error(stderr.strip())
+
+        return None
 
     def create(
         self,
@@ -126,7 +181,7 @@ class ZFS:
     ) -> Error | None:
         head, _ = os.path.split(dset)
 
-        _, err = self.get(ZFS.Property.NAME, head)
+        _, err = self.get(head, ZFS.Property.NAME)
         if err != None:
             return self.create(head, props, props)
 
@@ -141,6 +196,28 @@ class ZFS:
         rc, _, stderr = self._module.run_command(cmd)
         if rc != os.EX_OK:
             return Error(stderr)
+
+    def list(self, dset: str, type: FSType) -> tuple[List[str], Error | None]:
+        cmd = [
+            ZFS._CMD,
+            ZFS.Command.LIST,
+            # keep-sorted start newline_separated=yes group_start_regex=^\s+ZFS\.ListFlag\.
+            ZFS.ListFlag.NO_HEADER,
+
+            ZFS.ListFlag.PROPERTY,
+            ZFS.ListProperty.NAME,
+
+            ZFS.ListFlag.TYPE,
+            type,
+            # keep-sorted end
+            dset,
+        ]
+
+        rc, stdout, stderr = self._module.run_command(cmd)
+        if rc != os.EX_OK:
+            return [], Error(stderr.strip())
+
+        return stdout.splitlines(), None
 
     @staticmethod
     def parse_create_properties(

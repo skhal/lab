@@ -4,108 +4,28 @@
 # license that can be found in the LICENSE file.
 
 ---
-- name: "Pick skeleton last snapsthot"
-  block:
-    - name: "Get snapshots of {{ jail_skel_zfs_dataset }}"
-      community.general.zfs_facts:
-        name: "{{ jail_skel_zfs_dataset }}"
-        type: snapshot
-        properties: "name"
-      register: jail_zfs_list_snapshots
-      changed_when: false
-
-    - name: "Pick latest snapshot of {{ jail_skel_zfs_dataset }}"
-      ansible.builtin.set_fact:
-        jail_skel_zfs_dataset_snapshot: "{{ item }}"
-      loop: >-
-        {{
-          jail_zfs_list_snapshots.ansible_facts.ansible_zfs_datasets
-              | map(attribute='name')
-        }}
-      loop_control:
-        extended: true
-      when: ansible_loop.last
-
-- name: "Clone skeleton {{ jail_skel_zfs_dataset }}"
-  vars:
-    _dset: "{{ jail_skel_zfs_dataset | dirname | default(omit) }}/{{ jail_name }}"
-  block:
-    - name: "Check if jail exists at {{ _dset }}"
-      community.general.zfs_facts:
-        name: "{{ _dset }}"
-        type: filesystem
-        properties: "name,mounted,mountpoint"
-      register: jail_zfs_facts_task
-      ignore_errors: true # only want to check if the dataset exists
-
-    - name: "Create dataset"
-      when: jail_zfs_facts_task is failed
-      block:
-        # noqa name[template]
-        - name: "Copy skeleton to {{ _dset }}"
-          become: true
-          ansible.builtin.shell:
-            cmd: >-
-              set -o pipefail;
-              zfs send {{ jail_skel_zfs_dataset_snapshot }} |
-                zfs receive {{ _dset }}
-            executable: /bin/sh
-          register: jail_zfs_copy
-          changed_when: jail_zfs_copy is succeeded
-
-        - name: "Set dataset properties for {{ _dset }}"
-          become: true
-          community.general.zfs:
-            name: "{{ _dset }}"
-            state: present
-            extra_zfs_properties:
-              # keep-sorted start
-              canmount: "on"
-              readonly: "off"
-              # keep-sorted end
-
-        - name: "Get info for {{ _dset }}"
-          community.general.zfs_facts:
-            name: "{{ _dset }}"
-            type: filesystem
-            properties: "name,mounted,mountpoint"
-          register: jail_zfs_facts_new
-
-    - name: "Get jail mountpoint"
-      vars:
-        facts: >-
-          {{
-            [jail_zfs_facts_new, jail_zfs_facts_task]
-              | selectattr('ansible_facts', 'defined')
-              | first
-          }}
-      block:
-        - name: "Jail must be mounted"
-          ansible.builtin.assert:
-            that: >-
-              facts.ansible_facts.ansible_zfs_datasets
-                | selectattr("name", "equalto", _dset)
-                | selectattr("mounted", "equalto", "yes")
-                | count == 1
-            fail_msg: "{{ _dset }} is not mounted"
-            quiet: true
-
-        - name: "Get jail mountpoint"
-          ansible.builtin.set_fact:
-            jail_path: >-
-              {{
-                facts.ansible_facts.ansible_zfs_datasets
-                  | selectattr('name', 'equalto', _dset)
-                  | map(attribute='mountpoint')
-                  | first
-                  | default(omit)
-              }}
+- name: Clone skeleton jail
+  become: true
+  zfs_clone:
+    name: >-
+      {{
+        [
+          (jail_skel_zfs_dataset | dirname),
+          jail_name
+        ] | path_join
+      }}
+    origin: "{{ jail_skel_zfs_dataset }}"
+    props:
+      canmount: "on"
+      readonly: "off"
+  register: jail_clone_task
 
 - name: "Configure jail {{ jail_name }}"
   vars:
+    _jail_path: "{{ jail_clone_task.mountpoint }}"
     _conf_path: /etc/jail.conf.d/{{ jail_name }}.conf
-    _routing_conf_path: "{{ jail_path }}/etc/rc.conf.d/routing"
-    _resolv_conf_path: "{{ jail_path }}/etc/resolv.conf"
+    _routing_conf_path: "{{ _jail_path }}/etc/rc.conf.d/routing"
+    _resolv_conf_path: "{{ _jail_path }}/etc/resolv.conf"
   block:
     - name: Create {{ _conf_path | dirname }}
       become: true
@@ -135,7 +55,7 @@
 
     - name: "Configure network"
       vars:
-        _rc_file: "{{ jail_path }}/etc/rc.conf.d/network"
+        _rc_file: "{{ _jail_path }}/etc/rc.conf.d/network"
       block:
         # noqa name[template]
         - name: "Update {{ _rc_file }} - name vnet interface"
@@ -165,7 +85,7 @@
     - name: "Disable DNS lookup of the remote host in SSH"
       become: true
       ansible.builtin.lineinfile:
-        path: "{{ jail_path }}/etc/ssh/sshd_config"
+        path: "{{ _jail_path }}/etc/ssh/sshd_config"
         line: "UseDNS no"
 
 - name: "Enable jail {{ jail_name }}"
