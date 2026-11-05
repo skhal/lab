@@ -12,13 +12,7 @@ from enum import IntEnum, StrEnum
 
 from ansible.module_utils.basic import AnsibleModule
 
-
-class Error:
-    def __init__(self, msg: str) -> None:
-        self._msg = msg
-
-    def __str__(self) -> str:
-        return self._msg
+from ansible.module_utils.lab.errors import Error
 
 
 class UserNotFoundError(Error):

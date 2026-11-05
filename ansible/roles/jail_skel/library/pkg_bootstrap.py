@@ -69,13 +69,7 @@ import traceback
 
 from ansible.module_utils.basic import AnsibleModule
 
-
-class Error:
-    def __init__(self, msg: str):
-        self._msg = msg
-
-    def __str__(self) -> str:
-        return self._msg
+from ansible.module_utils.lab.errors import Error
 
 
 class PKG:
@@ -203,9 +197,17 @@ class PKG:
 
         return missing_packages, None
 
-    def _install_packages(self, packages: list[str], rootdir: str) -> Error | None:
+    def _install_packages(
+        self, packages: list[str], rootdir: str
+    ) -> Error | None:
         if not self._module.check_mode:
-            cmd = [PKG._PKG_CMD, "--rootdir", rootdir, "install", "--yes"] + packages
+            cmd = [
+                PKG._PKG_CMD,
+                "--rootdir",
+                rootdir,
+                "install",
+                "--yes",
+            ] + packages
 
             rc, _, stderr = self._module.run_command(cmd)
             if rc != os.EX_OK:
