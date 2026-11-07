@@ -8,10 +8,11 @@ from __future__ import annotations
 import os
 import traceback
 from enum import StrEnum, auto
+from typing import Any
 
 from ansible.module_utils.basic import AnsibleModule
-
 from ansible.module_utils.lab.errors import Error
+from ansible.module_utils.lab.module import AnsibleModuleProxy
 from ansible.module_utils.lab.zfs import ZFS
 
 
@@ -53,18 +54,19 @@ def get_mountpoint_in_check_mode(
         return os.path.join(mountpoint, *paths), None
 
 
-def run(module: AnsibleModule) -> tuple[dict, Error | None]:
-    props, err = ZFS.parse_create_properties(module.params["props"])
+def run(
+    module: AnsibleModuleProxy,
+    params: frozendict[str, Any],
+) -> tuple[dict, Error | None]:
+    props, err = ZFS.parse_create_properties(params["props"])
     if err != None:
         return {}, err
 
-    parent_props, err = ZFS.parse_create_properties(
-        module.params["parent_props"]
-    )
+    parent_props, err = ZFS.parse_create_properties(params["parent_props"])
     if err != None:
         return {}, err
 
-    name = module.params["name"]
+    name = params["name"]
 
     zfs = ZFS(module)
 
@@ -117,8 +119,13 @@ def main() -> None:
         supports_check_mode=True,
     )
 
+    module_proxy = AnsibleModuleProxy(
+        run_command=lambda cmd: module.run_command(cmd),
+        check_mode=module.check_mode,
+    )
+
     try:
-        res, err = run(module)
+        res, err = run(module_proxy, module.params)
         if err != None:
             module.fail_json(
                 msg=str(err),

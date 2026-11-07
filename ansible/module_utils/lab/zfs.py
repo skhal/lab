@@ -7,9 +7,10 @@ import os
 from enum import StrEnum, auto
 from typing import List
 
-from ansible.module_utils.basic import AnsibleModule
-
 from ansible.module_utils.lab.errors import Error
+from ansible.module_utils.lab.module import AnsibleModuleProxy
+
+# from ansible.module_utils.basic import AnsibleModule
 
 
 class InvalidPropertyError(Error):
@@ -73,7 +74,7 @@ class ZFS:
     _CMD = "/sbin/zfs"
     _ALLOWED_CREATE_PROPS = [Property.CAN_MOUNT, Property.READ_ONLY]
 
-    def __init__(self, module: AnsibleModule) -> None:
+    def __init__(self, module: AnsibleModuleProxy) -> None:
         self._module = module
         self._changed = False
         self._diff = []
@@ -180,6 +181,8 @@ class ZFS:
         self, dset: str, props: dict[Property, str]
     ) -> Error | None:
         head, _ = os.path.split(dset)
+        if "/" not in head:
+            return
 
         _, err = self.get(head, ZFS.Property.NAME)
         if err != None:
@@ -201,12 +204,10 @@ class ZFS:
         cmd = [
             ZFS._CMD,
             ZFS.Command.LIST,
-            # keep-sorted start newline_separated=yes group_start_regex=^\s+ZFS\.ListFlag\.
+            # keep-sorted start group_start_regex=^\s+ZFS\.ListFlag\.
             ZFS.ListFlag.NO_HEADER,
-
             ZFS.ListFlag.PROPERTY,
             ZFS.ListProperty.NAME,
-
             ZFS.ListFlag.TYPE,
             type,
             # keep-sorted end
