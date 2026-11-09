@@ -8,7 +8,7 @@
 # role      {{ role_name }}@{{ template_host }}
 # path      {{ template_fullpath | regex_replace('^.*ansible/', '') }}
 
-# keep-sorted start
+{# keep-sorted start #}
 allow.raw_sockets;
 devfs_ruleset = 4;
 enforce_statfs = 2;
@@ -20,6 +20,6 @@ host.hostname = "${name}.lab.net";
 mount.devfs;
 path = "{{ _jailbase }}/${name}";
 vnet;
-# keep-sorted end
+{# keep-sorted end #}
 
 .include "/etc/jail.conf.d/*.conf";
