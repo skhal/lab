@@ -70,19 +70,21 @@ def run(
 
     zfs = ZFS(module)
 
-    (mountpoint,), err = zfs.get(name, ZFS.Property.MOUNTPOINT)
+    res, err = zfs.get(name, ZFS.Property.MOUNTPOINT)
     if err != None:
         err = zfs.create(name, props, parent_props)
         if err != None:
             return {}, err
 
-        (mountpoint,), err = (
+        res, err = (
             get_mountpoint_in_check_mode(zfs, name)
             if module.check_mode
             else zfs.get(name, ZFS.Property.MOUNTPOINT)
         )
         if err != None:
             return {}, err
+
+    mountpoint, *_ = res
 
     return (
         dict(
