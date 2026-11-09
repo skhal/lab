@@ -44,9 +44,18 @@
     - role: openldap_client
     - role: pam_ldap
   post_tasks:
-    - name: Mount user home folder
+    - name: Update jail configuration
       vars:
         openldap_client_jail_control_host: nuc.lab.net
-      ansible.builtin.include_role:
-        name: openldap_client
-        tasks_from: mount_homedir
+      block:
+        - name: Mount user home folder
+          ansible.builtin.include_role:
+            name: openldap_client
+            tasks_from: mount_homedir
+
+        - name: Set jail dependency
+          vars:
+            openldap_client_ldap_server_jail: ldap
+          ansible.builtin.include_role:
+            name: openldap_client
+            tasks_from: add_jail_dependency.yml

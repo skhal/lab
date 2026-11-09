@@ -1,0 +1,13 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+- name: Add dependency {{ _dep }}
+  become: true
+  ansible.builtin.lineinfile:
+    path: /etc/jail.conf.d/{{ jail_name }}.conf
+    line: |
+      depend += "{{ _dep }}";
+    insertafter: "# dependencies"

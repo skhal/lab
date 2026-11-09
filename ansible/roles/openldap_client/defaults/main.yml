@@ -4,6 +4,12 @@
 # license that can be found in the LICENSE file.
 
 ---
+# keep-sorted start newline_separated=yes
 # openldap_client_jail_control_host is the node name that hosts jails with LDAP
 # integration.
 openldap_client_jail_control_host: "{{ undef(hint='jails control host') }}"
+
+# openldap_client_ldap_server_jail is the name of the jail running OpenLDAP
+# server.
+openldap_client_ldap_server_jail: "{{ undef(hint='the name of the ldap jail') }}"
+# keep-sorted end

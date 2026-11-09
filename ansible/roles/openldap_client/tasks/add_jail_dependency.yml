@@ -1,0 +1,18 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+- name: Add dependencies
+  when: openldap_client_ldap_server_jail is defined
+  vars:
+    jail_name: "{{ inventory_hostname_short }}"
+    jail_depend:
+      - "{{ openldap_client_ldap_server_jail }}"
+  ansible.builtin.include_role:
+    name: jail
+    tasks_from: add_deps.yml
+  args:
+    apply:
+      delegate_to: "{{ openldap_client_jail_control_host }}"
