@@ -31,3 +31,17 @@
   tags: create-dns-cache
   roles:
     - role: local_unbound
+  post_tasks:
+    - name: Add jail dependency
+      when:
+        - inventory_hostname_short not in ['nuc', 'dns']
+      vars:
+        jail_name: "{{ inventory_hostname_short }}"
+        jail_depend:
+          - dns
+      ansible.builtin.include_role:
+        name: jail
+        tasks_from: add_deps.yml
+      args:
+        apply:
+          delegate_to: nuc.lab.net

@@ -8,6 +8,5 @@
   become: true
   ansible.builtin.lineinfile:
     path: /etc/jail.conf.d/{{ jail_name }}.conf
-    line: |
-      depend += "{{ _dep }}";
+    line: depend += "{{ _dep }}";
     insertafter: "# dependencies"
