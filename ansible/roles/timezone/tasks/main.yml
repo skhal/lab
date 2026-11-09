@@ -9,6 +9,10 @@
     path: /var/db/zoneinfo
     line: "{{ timezone_name }}"
     state: present
+    create: true
+    owner: root
+    group: wheel
+    mode: u=rw,g=r,o=r
   check_mode: true
   register: timezone_check_zone_task
 
