@@ -63,12 +63,14 @@
   tags: create-ldap
   ansible.builtin.import_playbook: playbooks/create-ldap.yml
 
+# TODO(https://github.com/skhal/lab/issues/503): re-enable
 # create-pkg-repo creates Lab pkg(8) repository.
-- name: Carete PKG repository.
-  tags: create-pkg-repo
-  ansible.builtin.import_playbook: playbooks/create-pkg-repo.yml
+# - name: Carete PKG repository.
+#   tags: create-pkg-repo
+#   ansible.builtin.import_playbook: playbooks/create-pkg-repo.yml
 
+# TODO(https://github.com/skhal/lab/issues/503): re-enable
 # bootstrap-devent sets up development environment.
-- name: Bootstrap development environment
-  tags: bootstrap-devenv
-  ansible.builtin.import_playbook: playbooks/bootstrap-devenv.yml
+# - name: Bootstrap development environment
+#   tags: bootstrap-devenv
+#   ansible.builtin.import_playbook: playbooks/bootstrap-devenv.yml

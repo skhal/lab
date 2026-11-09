@@ -14,8 +14,9 @@ jails:
     dns.lab.net:
     ldap.lab.net:
     pkg.lab.net:
-    pkgbuild.lab.net:
-    ssl.lab.net:
+    # TODO(https://github.com/skhal/lab/issues/503): re-enable hosts
+    # pkgbuild.lab.net:
+    # ssl.lab.net:
     # keep-sorted end
 infra:
   hosts:
@@ -23,16 +24,21 @@ infra:
     dns.lab.net:
     ldap.lab.net:
     pkg.lab.net:
-    pkgbuild.lab.net:
-    ssl.lab.net:
+    # TODO(https://github.com/skhal/lab/issues/503): re-enable hosts
+    # pkgbuild.lab.net:
+    # ssl.lab.net:
     # keep-sorted end
 dev:
+  # TODO(https://github.com/skhal/lab/issues/503): re-enable hosts
   hosts:
-    bsd.lab.net:
+    # bsd.lab.net:
 ssl:
   hosts:
     ssl.lab.net: # CA cert
     dns.lab.net: # DNS cert
     ldap.lab.net: # OpenLDAP cert
     pkg.lab.net: # PKG server cert
-    pkgbuild.lab.net: # Poudriere web cert
+    # TODO(https://github.com/skhal/lab/issues/503): re-enable hosts
+    # pkgbuild.lab.net: # Poudriere web cert
+# special group to skip plays during development
+skip:

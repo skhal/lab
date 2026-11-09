@@ -62,22 +62,14 @@
     jail_cidr: 10.0.0.5/24
     jail_depend:
       - dns
-    jail_mounts:
-      # keep-sorted start
-      - path: /usr/packages
-        dest: /var/cache/pkg.lab-ports
-        perm: ro
-      - path: /var/cache/pkg.freebsd-base
-      - path: /var/cache/pkg.freebsd-kmods
-      - path: /var/cache/pkg.freebsd-ports
-      # keep-sorted end
     jail_name: pkg
     # keep-sorted end
   roles:
     - role: jail
 
 - name: Create jail PKG builder
-  hosts: nuc.lab.net
+  # TODO(https://github.com/skhal/lab/issues/503): re-enable
+  hosts: skip
   tags: create-jail-pkgbuild
   vars:
     # keep-sorted start
@@ -105,7 +97,8 @@
     - role: jail
 
 - name: Create jail BSD
-  hosts: nuc.lab.net
+  # TODO(https://github.com/skhal/lab/issues/503): re-enable
+  hosts: skip
   tags: create-jail-bsd
   vars:
     # keep-sorted start
