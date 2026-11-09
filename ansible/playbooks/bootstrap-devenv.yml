@@ -20,8 +20,9 @@
   roles:
     - role: pkg
 
-- name: Configure poudriere
-  hosts: dev
-  tags: bootstrap-devenv-pkg-build
-  roles:
-    - role: poudriere
+# TODO(https://github.com/skhal/lab/issues/503): re-enable
+# - name: Configure poudriere
+#   hosts: dev
+#   tags: bootstrap-devenv-pkg-build
+#   roles:
+#     - role: poudriere
