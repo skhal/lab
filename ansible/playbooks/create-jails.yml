@@ -41,19 +41,6 @@
   roles:
     - role: jail
 
-- name: Create jail LDAP
-  hosts: nuc.lab.net
-  tags: create-jail-ldap
-  vars:
-    # keep-sorted start
-    jail_cidr: 10.0.0.3/24
-    jail_depend:
-      - dns
-    jail_name: ldap
-    # keep-sorted end
-  roles:
-    - role: jail
-
 - name: Create jail PKG
   hosts: nuc.lab.net
   tags: create-jail-pkg
@@ -67,9 +54,22 @@
   roles:
     - role: jail
 
+- name: Create jail LDAP
+  hosts: nuc.lab.net
+  tags: create-jail-ldap
+  vars:
+    # keep-sorted start
+    jail_cidr: 10.0.0.3/24
+    jail_depend:
+      - dns
+      - pkg
+    jail_name: ldap
+    # keep-sorted end
+  roles:
+    - role: jail
+
 - name: Create jail PKG builder
-  # TODO(https://github.com/skhal/lab/issues/503): re-enable
-  hosts: skip
+  hosts: skip # TODO(https://github.com/skhal/lab/issues/503): re-enable
   tags: create-jail-pkgbuild
   vars:
     # keep-sorted start
@@ -97,31 +97,16 @@
     - role: jail
 
 - name: Create jail BSD
-  # TODO(https://github.com/skhal/lab/issues/503): re-enable
-  hosts: skip
+  hosts: nuc.lab.net
   tags: create-jail-bsd
   vars:
     # keep-sorted start
-    jail_allow_mlock: true
-    jail_allow_mount: true
-    jail_allow_mount_devfs: true
-    jail_allow_mount_linprocfs: true
-    jail_allow_mount_nullfs: true
-    jail_allow_mount_procfs: true
-    jail_allow_mount_tmpfs: true
-    jail_allow_mount_zfs: true
-    jail_children_max: 50
     jail_cidr: 10.0.0.101/24
     jail_depend:
       - dns
-      - ldap
       - pkg
-    jail_enforce_statfs: 1
-    jail_mounts:
-      - path: /home/skhalatyan
+      - ldap
     jail_name: bsd
-    jail_zfs_datasets:
-      - zroot/usr/jail/bsd/poudriere
     # keep-sorted end
   roles:
     - role: jail

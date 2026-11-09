@@ -10,7 +10,7 @@ servers:
 jails:
   hosts:
     # keep-sorted start
-    # bsd.lab.net: TODO(https://github.com/skhal/lab/issues/503): re-enable
+    bsd.lab.net:
     dns.lab.net:
     ldap.lab.net:
     pkg.lab.net:
@@ -27,9 +27,8 @@ infra:
     ssl.lab.net:
     # keep-sorted end
 dev:
-  # TODO(https://github.com/skhal/lab/issues/503): re-enable hosts
   hosts:
-    # bsd.lab.net:
+    bsd.lab.net:
 ssl:
   hosts:
     ssl.lab.net: # CA cert
