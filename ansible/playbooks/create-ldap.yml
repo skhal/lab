@@ -38,7 +38,7 @@
         tasks_from: set_passwords
 
 - name: Configure PAM with LDAP
-  hosts: jails
+  hosts: jails,!infra
   tags: create-ldap-pam
   roles:
     - role: openldap_client
