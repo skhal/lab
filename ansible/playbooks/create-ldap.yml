@@ -43,3 +43,14 @@
   roles:
     - role: openldap_client
     - role: pam_ldap
+
+- name: Mount user homes
+  hosts: jails,!infra
+  tags: create-ldap-mount
+  vars:
+    openldap_client_jail_control_host: nuc.lab.net
+  tasks:
+    - name: Mount user home folder
+      ansible.builtin.include_role:
+        name: openldap_client
+        tasks_from: mount_homedir

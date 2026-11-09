@@ -1,0 +1,44 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+- name: Mount user home folders
+  when: openldap_client_jail_control_host is defined
+  block:
+    - name: Collect users
+      ansible.builtin.shell:
+        cmd: |
+          set -e pipefail
+          ldapsearch \
+              -x \
+              -ZZ \
+              -b 'ou=people,dc=lab,dc=net' \
+              -LLL \
+              '(&(homedirectory=*)(!(uid=op)))' \
+              homedirectory \
+            | grep homeDirectory: \
+            | cut -d ' ' -f 2
+      changed_when: false
+      ignore_errors: true
+      register: openldap_client_list_user_homes_task
+
+    - name: Mount users
+      when:
+        - openldap_client_list_user_homes_task is succeeded
+        - openldap_client_list_user_homes_task.stdout_lines | length > 0
+      loop: "{{ openldap_client_list_user_homes_task.stdout_lines }}"
+      loop_control:
+        loop_var: _item_homedir
+      vars:
+        jail_name: "{{ inventory_hostname_short }}"
+        # mount user homer folders
+        jail_mounts:
+          "{{ _item_homedir }}":
+      ansible.builtin.include_role:
+        name: jail
+        tasks_from: mount.yml
+      args:
+        apply:
+          delegate_to: "{{ openldap_client_jail_control_host }}"

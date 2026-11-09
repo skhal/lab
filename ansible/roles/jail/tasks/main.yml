@@ -99,8 +99,7 @@
 # can't use handlers because Ansible does not support passing parameters to
 # handlers, i.e. can't pass the jail name to start. Don't create "smart" logic
 # that would propagate the list of jails to start because all variables are
-# global and other tasks may change the list before the handler runs breaking
-# encapsulation.
+# global and other tasks may change the list before the handler runs.
 - name: Run jail
   block:
     - name: Check if the jail runs

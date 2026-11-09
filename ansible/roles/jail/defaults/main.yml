@@ -58,12 +58,13 @@ jail_depend: []
 # jail(8)).
 jail_enforce_statfs: ""
 
-# jail_mounts lists mount points to add to the jail (see mount in jail(8)).
-# Each mount has the following structure:
-#   path  string  absolute path to mount, e.g. "/home/op"
-#   dest  string? destination path to mount (default: `path`)
-#   perm  string? mount permissions, e.g. "rw" (default: rw)
-jail_mounts: []
+# jail_mounts maps a folder on the hosting node to the jail (see mount in
+# jail(8)).
+# The keys are source paths. The values are optional with the following
+# structure:
+#   dest  string? target mount path inside the jail (default: `path`)
+#   perm  string? mount permissions (default: rw)
+jail_mounts: "{{ unset(hint='mount points map') }}"
 
 # jail_name is the jail name.
 jail_name: ""

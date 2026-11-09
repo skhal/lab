@@ -86,7 +86,7 @@
       - dns
     jail_enforce_statfs: 1
     jail_mounts:
-      - path: /usr/packages
+      /usr/packages:
         dest: /usr/local/poudriere/data/packages
     jail_name: pkgbuild
     jail_zfs_datasets:
