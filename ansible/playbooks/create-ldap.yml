@@ -47,7 +47,6 @@
     - name: Update jail configuration
       vars:
         openldap_client_jail_control_host: nuc.lab.net
-        _jail_control_host: nuc.lab.net
       block:
         - name: Mount user home folder
           ansible.builtin.include_role:
@@ -64,4 +63,4 @@
             tasks_from: add_deps.yml
           args:
             apply:
-              delegate_to: "{{ _jail_control_host }}"
+              delegate_to: "{{ openldap_client_jail_control_host }}"
