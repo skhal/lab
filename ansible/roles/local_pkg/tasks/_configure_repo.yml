@@ -4,11 +4,31 @@
 # license that can be found in the LICENSE file.
 
 ---
-- name: Write {{ _conf_file }}
+- name: Write {{ _repo.conf }}
   become: true
   ansible.builtin.template:
-    src: "{{ _conf_file | trim('/') }}.j2"
-    dest: "{{ _conf_file }}"
+    src: "{{ _repo.conf | trim('/') }}.j2"
+    dest: "{{ _repo.conf }}"
     owner: root
     group: wheel
     mode: u=rw,g=r,o=r
+
+- name: Disable original
+  when: _repo.orig is defined
+  block:
+    - name: Disable {{ _repo.orig }}
+      become: true
+      ansible.builtin.lineinfile:
+        path: /usr/local/etc/pkg/repos/zzz.conf
+        line: "{{ _repo.orig }}: { enabled: no }"
+        owner: root
+        group: wheel
+        create: true
+        mode: u=rw,g=r,o=r
+
+    - name: Update packages repo to {{ _repo.name }}
+      become: true
+      ansible.builtin.script:
+        cmd: pkg-mv-repo.sh {{ _repo.orig }} {{ _repo.name }}
+      register: local_pkg_update_pkg_repo_task
+      changed_when: local_pkg_update_pkg_repo_task.stdout != ''

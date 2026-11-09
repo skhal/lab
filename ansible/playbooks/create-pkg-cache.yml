@@ -32,14 +32,11 @@
   vars:
     local_pkg_repos:
       # keep-sorted start
-      - name: freebsd-base
-        conf: freebsd-base.conf
+      freebsd-base:
         orig: FreeBSD-base
-      - name: freebsd-kmods
-        conf: freebsd-kmods.conf
+      freebsd-kmods:
         orig: FreeBSD-ports-kmods
-      - name: freebsd-ports
-        conf: freebsd-ports.conf
+      freebsd-ports:
         orig: FreeBSD-ports
       # keep-sorted end
   tasks:
