@@ -64,6 +64,11 @@ func TestChecker(t *testing.T) {
 			s:    "// TODO(github.com/foo/bar/issues/123): test",
 		},
 		{
+			name: "valid url",
+			file: "test",
+			s:    "// TODO(https://github.com/foo/bar/issues/123): test",
+		},
+		{
 			name:    "no issue",
 			file:    "test",
 			s:       "// TODO(): test",

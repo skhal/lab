@@ -16,7 +16,7 @@ import (
 var (
 	reNoLint = regexp.MustCompile(`^(?://|#|") check-todo off(?:: .*)?$`)
 	rePrefix = regexp.MustCompile(`(?i)(?://|#|")\s+\btodo\b.*`)
-	reTodo   = regexp.MustCompile(`TODO\(github.com/\w+/\w+/issues/\d+\):\s.+$`)
+	reTodo   = regexp.MustCompile(`TODO\((?:https://)?github.com/\w+/\w+/issues/\d+\):\s.+$`)
 )
 
 // Run checks todo-comments in files. It collects found errors from files and
