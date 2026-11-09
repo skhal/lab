@@ -30,3 +30,21 @@
       uid: "{{ _entry.uid | default(omit) }}"
       uidNumber: "{{ _entry.uidNumber | default(omit) }}"
       # keep-sorted end
+
+- name: Create homefolder
+  when:
+    - _entry.uid is defined
+    - _entry.uid != ansible_user
+    - _entry.homeDirectory is defined
+  block:
+    - name: Create homefolder {{ _entry.homeDirectory }}
+      vars:
+        zfs_mkhomedir_users:
+          "{{ _entry.uid }}":
+            uid: "{{ _entry.uidNumber }}"
+            gid: "{{ _entry.gidNumber }}"
+      ansible.builtin.include_role:
+        name: zfs_mkhomedir
+      args:
+        apply:
+          delegate_to: "{{ zfs_mkhomedir_host }}"

@@ -19,4 +19,5 @@ openssl_gen_certs:
     group: ldap
 ssh_listen_addresses:
   - 10.0.0.3
+zfs_mkhomedir_host: nuc.lab.net
 # keep-sorted end
