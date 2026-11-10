@@ -9,3 +9,23 @@
   tags: claude-linux
   roles:
     - linux
+
+- name: Tune jail params
+  hosts: nuc.lab.net
+  tags: claude-linux-jail
+  tasks:
+    - name: Set jail parameters
+      vars:
+        jail_name: bsd
+        jail_conf:
+          allow_mlock: true
+          allow_mount: true
+          allow_mount_devfs: true
+          allow_mount_linprocfs: true
+          allow_mount_nullfs: true
+          allow_mount_procfs: true
+          allow_mount_tmpfs: true
+          enforce_statfs: 1
+      ansible.builtin.include_role:
+        name: jail
+        tasks_from: set_params.yml
