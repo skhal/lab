@@ -211,6 +211,10 @@ repos:
     entry: markdownfmt
     language: system
     types_or: [markdown]
+    exclude: |
+      (?x)^(
+        \.claude/skills/.*/SKILL\.md
+      )$
     args:
     - "-soft-wraps"
     - "-w"
@@ -340,6 +344,7 @@ repos:
         |.*\.diff\.j2
         |.*\.patch
         |.*\.pb\.go
+        |\.claude/skills/.*/SKILL\.md
         |go\.(mod|sum)
         |home/vim/templates/skel.*
         |infra/net\.lab.*
