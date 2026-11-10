@@ -69,7 +69,12 @@
 #   tags: create-pkg-repo
 #   ansible.builtin.import_playbook: playbooks/create-pkg-repo.yml
 
-# bootstrap-devent sets up development environment.
-- name: Bootstrap development environment
-  tags: bootstrap-devenv
-  ansible.builtin.import_playbook: playbooks/bootstrap-devenv.yml
+# init-dev sets up development environment.
+- name: Configure development environment
+  tags: init-dev
+  ansible.builtin.import_playbook: playbooks/init-dev.yml
+
+# init-claude sets up Claude agent
+- name: Configure Claude agent
+  tags: init-claude
+  ansible.builtin.import_playbook: playbooks/init-claude.yml

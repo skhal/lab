@@ -1,0 +1,44 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+# NAME
+#   init-devenv • setup development environment
+#
+# SYNOPSIS
+#   ansible-playbook ./playbooks/init-devenv.yml
+#
+# DESCRIPTION
+#   init-devenv configures userland for development.
+---
+- name: Tune jail params
+  hosts: nuc.lab.net
+  tags: init-dev-jail
+  tasks:
+    - name: Set jail parameters
+      loop: "{{ query('inventory_hostnames', 'dev') }}"
+      loop_control:
+        loop_var: _item_hostname
+      vars:
+        jail_name: "{{ _item_hostname | split('.') | first }}"
+        jail_conf:
+          allow_chflags: true
+      ansible.builtin.include_role:
+        name: jail
+        tasks_from: set_params.yml
+
+- name: Install packages
+  hosts: dev
+  tags: init-dev-pkg
+  vars_files:
+    - vars/dev.yml
+  roles:
+    - role: pkg
+
+# TODO(https://github.com/skhal/lab/issues/503): re-enable
+# - name: Configure poudriere
+#   hosts: dev
+#   tags: init-dev-poudriere
+#   roles:
+#     - role: poudriere
