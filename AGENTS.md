@@ -151,3 +151,6 @@ reports instead of bypassing hooks.
 
 Short, imperative, prefixed by the area changed, for example
 `ansible: create pkgbuild jail` or `roles/jail: update jail config params`.
+
+Always show the draft commit message to the user for review before
+committing. Commit only after they approve it.
