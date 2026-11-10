@@ -17,9 +17,10 @@ tooling runs inside jails.
 
 ## Boundaries
 
-Stay inside the project. Do not read, create, modify, or delete files outside
-the repository root, including user dotfiles, system configuration, and other
-repositories. If a task seems to require it, stop and ask first.
+- Stay inside the project.
+- Do not read, create, modify, or delete files outside the repository root.
+- This includes user dotfiles, system configuration, and other repositories.
+- If a task seems to require it, stop and ask first.
 
 ## Architecture
 
