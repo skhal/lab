@@ -129,8 +129,9 @@ Or without activating the environment: `poetry run pytest`.
   Comment fields to explain their purpose. Format with `txtpbfmt`.
 - **Bazel**: format and lint with `buildifier`.
 - **Shell**: write scripts in POSIX `sh(1)`, not `bash(1)`. Use
-  `#!/bin/sh`, avoid bashisms (arrays, `[[ ]]`, process substitution), and format with `shfmt`. Shell executables have no
-  file extension.
+  `#!/bin/sh`, avoid bashisms (arrays, `[[ ]]`, process substitution), and
+  format with `shfmt`. Shell executables have no file extension. Run project
+  scripts with `sh`, not `bash`.
 - **Markdown, YAML, JSON, TOML, Lua, Python**: use the repo formatters
   (`markdownfmt`, `yamlfmt`, `prettier`, `tombi`, `stylua`, `black` +
   `isort`).
