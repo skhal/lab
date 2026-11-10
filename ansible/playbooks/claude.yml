@@ -12,7 +12,7 @@
 
 - name: Tune jail params
   hosts: nuc.lab.net
-  tags: claude-linux-jail
+  tags: claude-jail
   tasks:
     - name: Set jail parameters
       vars:
@@ -29,3 +29,11 @@
       ansible.builtin.include_role:
         name: jail
         tasks_from: set_params.yml
+
+- name: Install Claude Code
+  hosts: bsd.lab.net
+  tags: claude-pkg
+  vars:
+    pkg_install: claude-code
+  roles:
+    - pkg
