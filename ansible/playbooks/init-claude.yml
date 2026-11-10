@@ -34,6 +34,10 @@
   hosts: bsd.lab.net
   tags: claude-pkg
   vars:
-    pkg_install: claude-code
+    pkg_install:
+      # keep-sorted start
+      - claude-code
+      - gh
+      # keep-sorted end
   roles:
     - pkg
