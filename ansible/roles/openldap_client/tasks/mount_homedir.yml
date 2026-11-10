@@ -4,8 +4,9 @@
 # license that can be found in the LICENSE file.
 
 ---
+# Run the task on the server that manages jails.
 - name: Mount user home folders
-  when: openldap_client_jail_control_host is defined
+  when: openldap_client_hostnames is defined
   block:
     - name: Collect users
       ansible.builtin.shell:
@@ -28,17 +29,22 @@
       when:
         - openldap_client_list_user_homes_task is succeeded
         - openldap_client_list_user_homes_task.stdout_lines | length > 0
-      loop: "{{ openldap_client_list_user_homes_task.stdout_lines }}"
+      loop: "{{ openldap_client_hostnames }}"
       loop_control:
-        loop_var: _item_homedir
+        loop_var: _item_hostname
       vars:
-        jail_name: "{{ inventory_hostname_short }}"
-        # mount user homer folders
-        jail_mounts:
-          "{{ _item_homedir }}":
+        jail_name: "{{ _item_hostname | split('.') | first }}"
+        jail_mounts: >
+          {{
+            dict(
+              openldap_client_list_user_homes_task.stdout_lines
+                | zip(
+                    [{}] * (
+                      openldap_client_list_user_homes_task.stdout_lines | length
+                    )
+                  )
+            )
+          }}
       ansible.builtin.include_role:
         name: jail
-        tasks_from: mount.yml
-      args:
-        apply:
-          delegate_to: "{{ openldap_client_jail_control_host }}"
+        tasks_from: add_mounts.yml

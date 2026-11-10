@@ -48,11 +48,6 @@
       vars:
         openldap_client_jail_control_host: nuc.lab.net
       block:
-        - name: Mount user home folder
-          ansible.builtin.include_role:
-            name: openldap_client
-            tasks_from: mount_homedir
-
         - name: Add jail dependency
           vars:
             jail_name: "{{ inventory_hostname_short }}"
@@ -64,3 +59,16 @@
           args:
             apply:
               delegate_to: "{{ openldap_client_jail_control_host }}"
+
+- name: Configure client
+  hosts: nuc.lab.net
+  roles:
+    - role: openldap_client
+  post_tasks:
+    - name: Mount user home in clients
+      vars:
+        openldap_client_hostnames: >
+          {{ query('inventory_hostnames', 'jails,!infra') }}
+      ansible.builtin.include_role:
+        name: openldap_client
+        tasks_from: mount_homedir

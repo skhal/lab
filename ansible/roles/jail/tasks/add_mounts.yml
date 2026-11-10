@@ -1,0 +1,53 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+- name: Add mount points
+  when: jail_mounts is defined
+  loop: "{{ jail_mounts | dict2items }}"
+  loop_control:
+    loop_var: _item_mount
+  vars:
+    # defaults: mount at the same path with read-write permissions
+    _mount: >-
+      {{
+        {
+          'dest': _item_mount.key,
+          'perm': 'rw'
+        } | combine(_item_mount.value | default({}))
+          | combine({'path': _item_mount.key })
+      }}
+  become: true
+  ansible.builtin.blockinfile:
+    path: /etc/jail.conf.d/{{ jail_name }}.conf
+    block: |
+      mount += "{{ _mount.path }} $path{{ _mount.dest }} nullfs {{ _mount.perm }} 0 0";
+      exec.prepare += "[ -d $path{{ _mount.dest }} ] || mkdir -p -m 0755 $path{{ _mount.dest }}";
+    insertafter: "# mounts"
+  register: jail_add_mounts_task
+
+# -- no-handler
+# we need to pass jail name to the service restart command and
+# handlers do not support arguments.
+#
+# -- command-instead-of-module
+# ansible.builtin.service treats arguments as the arguments to `service` itself
+# rather than arguments for the service, i.e.:
+#
+#   https://github.com/ansible/ansible/blob/fd540eda9f96783955b227e84e229ca51f041cae/lib/ansible/modules/service.py#L1104
+#   https://github.com/ansible/ansible/pull/81377
+#
+# Instead of:
+#   service <args> <name> <command>
+# we want to run:
+#   service <name> <command> <args>
+# where <args> is the jail name to restart.
+- name: Restart {{ jail_name }}
+  when: jail_add_mounts_task is changed # noqa: no-handler
+  become: true
+  ansible.builtin.command: # noqa: command-instead-of-module
+    cmd: service jail restart {{ jail_name }}
+  register: jail_add_mounts_restart_jail_task
+  changed_when: jail_add_mounts_restart_jail_task is succeeded
