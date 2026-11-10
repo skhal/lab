@@ -1,0 +1,53 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+- name: Set jail parameters
+  become: true
+  loop: "{{ jail_conf | dict2items }}"
+  loop_control:
+    loop_var: _item_param
+  vars:
+    _conf_path: /etc/jail.conf.d/{{ jail_name }}.conf
+  ansible.builtin.lineinfile:
+    path: "{{ _conf_path }}"
+    line: >-
+      {% if _item_param.key.startswith('allow') -%}
+        {{ 'no' if not _item_param.value -}}
+        {{ _item_param.key | split('_') | join('.') }};
+      {%- else -%}
+        {% if _item_param.key.startswith('children') -%}
+        {% set param = _item_param.key | split('_') | join('.') -%}
+        {% else -%}
+        {% set param = _item_param.key -%}
+        {% endif -%}
+        {{ param }} = {{ _item_param.value }};
+      {%- endif %}
+    insertafter: "# params"
+  register: jail_set_params_task
+
+# -- no-handler
+# we need to pass jail name to the service restart command and
+# handlers do not support arguments.
+#
+# -- command-instead-of-module
+# ansible.builtin.service treats arguments as the arguments to `service` itself
+# rather than arguments for the service, i.e.:
+#
+#   https://github.com/ansible/ansible/blob/fd540eda9f96783955b227e84e229ca51f041cae/lib/ansible/modules/service.py#L1104
+#   https://github.com/ansible/ansible/pull/81377
+#
+# Instead of:
+#   service <args> <name> <command>
+# we want to run:
+#   service <name> <command> <args>
+# where <args> is the jail name to restart.
+- name: Restart {{ jail_name }}
+  when: jail_set_params_task is changed # noqa: no-handler
+  become: true
+  ansible.builtin.command: # noqa: command-instead-of-module
+    cmd: service jail restart {{ jail_name }}
+  register: jail_set_params_restart_jail_task
+  changed_when: jail_set_params_restart_jail_task is succeeded
