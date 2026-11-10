@@ -63,34 +63,16 @@
   roles:
     - role: jail
 
-# TODO(https://github.com/skhal/lab/issues/503): re-enable
-# - name: Create jail PKG builder
-#   hosts: nuc.lab.net
-#   tags: create-jail-pkgbuild
-#   vars:
-#     # keep-sorted start
-#     jail_allow_mlock: true
-#     jail_allow_mount: true
-#     jail_allow_mount_devfs: true
-#     jail_allow_mount_linprocfs: true
-#     jail_allow_mount_nullfs: true
-#     jail_allow_mount_procfs: true
-#     jail_allow_mount_tmpfs: true
-#     jail_children_max: 50
-#     jail_cidr: 10.0.0.6/24
-#     jail_depend:
-#       - dns
-#     jail_enforce_statfs: 1
-#     jail_mounts:
-#       /usr/packages:
-#         dest: /usr/local/poudriere/data/packages
-#     jail_name: pkgbuild
-#     jail_zfs_datasets:
-#       - zroot/usr/jail/pkgbuild/poudriere
-#     # keep-sorted end
-#   roles:
-#     - role: linux
-#     - role: jail
+- name: Create jail PKG builder
+  hosts: nuc.lab.net
+  tags: create-jail-pkgbuild
+  vars:
+    # keep-sorted start
+    jail_cidr: 10.0.0.6/24
+    jail_name: pkgbuild
+    # keep-sorted end
+  roles:
+    - role: jail
 
 - name: Create jail BSD
   hosts: nuc.lab.net
