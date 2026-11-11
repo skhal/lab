@@ -15,7 +15,8 @@
   register: routing_restart_task
 
 - name: "Wait for routing to restart"
-  listen: "restart_routing"
+  listen: "routing_restart_service"
+  become: true
   ansible.builtin.async_status:
     jid: "{{ routing_restart_task.ansible_job_id }}"
   retries: 10
