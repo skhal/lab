@@ -398,6 +398,6 @@ zone "1.168.192.in-addr.arpa" {
 	};
 };
 */
-{% for zone in bind_zones %}
+{% for zone in bind_zones | default([]) %}
 include "/usr/local/etc/namedb/zones.conf.d/{{ zone }}.conf";
 {% endfor %}

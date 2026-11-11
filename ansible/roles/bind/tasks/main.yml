@@ -36,6 +36,7 @@
   notify: "bind_restart"
   block:
     - name: "Copy zone files"
+      when: bind_zones is defined
       ansible.builtin.include_tasks: "copy_zone.yml"
       loop: "{{ bind_zones }}"
       loop_control:
