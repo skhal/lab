@@ -1,0 +1,56 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+name: CI Python
+
+on:
+  # Manual trigger from GitHub UI
+  workflow_dispatch:
+    inputs:
+      python-version:
+        required: true
+        type: string
+      package:
+        description: "Folder to run pytest from, relative to the repo root."
+        required: true
+        type: string
+  # Trigger from other workflows
+  workflow_call:
+    inputs:
+      python-version:
+        required: true
+        type: string
+      package:
+        description: "Folder to run pytest from, relative to the repo root."
+        required: true
+        type: string
+
+jobs:
+  test:
+    defaults:
+      run:
+        shell: sh
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v5
+
+    # Poetry must be installed before setup-python to enable dependency cache.
+    - name: Install Poetry
+      run: pipx install poetry
+
+    - name: Setup Python ${{ inputs.python-version }}
+      uses: actions/setup-python@v6
+      with:
+        python-version: ${{ inputs.python-version }}
+        cache: poetry
+
+    - name: Install dependencies
+      run: poetry install --no-root
+
+    - name: Test
+      working-directory: ${{ inputs.package }}
+      run: poetry run pytest -v
