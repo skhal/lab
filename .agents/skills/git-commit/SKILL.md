@@ -10,6 +10,11 @@ area: description
 
 body
 
+[Tested locally:
+
+  % command
+  result]
+
 [Issue #123|Fix #123|NO_ISSUE]
 ```
 
@@ -17,7 +22,8 @@ Rules:
 - lines are up to 80 characters long
 - subject is imperative, lowercase, without trailing period
 - body is concise: why in one or two sentences, then what changed
-- include a proof of the fix if available
+- prove local testing under `Tested locally:`: the actual command, kept
+  simple, and its short result, indented by 2 spaces with a `% ` prompt
 - reference the issue or NO_ISSUE
 
 Process:
