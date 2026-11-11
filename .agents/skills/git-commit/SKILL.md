@@ -15,7 +15,7 @@ body
   % command
   result]
 
-[Issue #123|Fix #123|NO_ISSUE]
+Issue
 ```
 
 Rules:
@@ -24,7 +24,7 @@ Rules:
 - body is concise: why in one or two sentences, then what changed
 - prove local testing under `Tested locally:`: the actual command, kept
   simple, and its short result, indented by 2 spaces with a `% ` prompt
-- reference the issue or NO_ISSUE
+- reference the issue or NO_ISSUE, close issue with Fix
 
 Process:
 
