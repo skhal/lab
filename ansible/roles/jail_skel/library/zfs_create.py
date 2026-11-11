@@ -39,7 +39,7 @@ def get_mountpoint_in_check_mode(
 
     paths = []
     while True:
-        (mountpoint,), err = zfs.get(dset, ZFS.Property.MOUNTPOINT)
+        res, err = zfs.get(dset, ZFS.Property.MOUNTPOINT)
         if err != None:
             parent, base = os.path.split(dset)
             if parent == "":
@@ -50,6 +50,7 @@ def get_mountpoint_in_check_mode(
 
             continue
 
+        (mountpoint,) = res
         paths.reverse()
         return os.path.join(mountpoint, *paths), None
 
@@ -76,11 +77,11 @@ def run(
         if err != None:
             return {}, err
 
-        res, err = (
-            get_mountpoint_in_check_mode(zfs, name)
-            if module.check_mode
-            else zfs.get(name, ZFS.Property.MOUNTPOINT)
-        )
+        if module.check_mode:
+            mountpoint, err = get_mountpoint_in_check_mode(zfs, name)
+            res = [mountpoint]
+        else:
+            res, err = zfs.get(name, ZFS.Property.MOUNTPOINT)
         if err != None:
             return {}, err
 
