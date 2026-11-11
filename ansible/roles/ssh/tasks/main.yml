@@ -51,10 +51,14 @@
       notify: ssh_restart_service
 
     - name: Listen addresses
-      loop: "{{ ssh_listen_addresses }}"
+      when: ssh_listen_addresses | length > 0
       become: true
-      ansible.builtin.lineinfile:
+      ansible.builtin.blockinfile:
         path: "{{ _conf_file }}"
-        line: "ListenAddress={{ item }}"
+        marker: "# {mark} ANSIBLE MANAGED BLOCK listen addresses"
+        block: |
+          {% for addr in ssh_listen_addresses %}
+          ListenAddress={{ addr }}
+          {% endfor %}
         validate: /usr/sbin/sshd -t -f %s
       notify: ssh_restart_service
