@@ -22,5 +22,4 @@
     ownca_not_before: -1d # valid since yesterday
     force: true # re-generate even if exists
   delegate_to: "{{ openssl_ca_host }}"
-  run_once: true
   register: openssl_ca_sign_task
