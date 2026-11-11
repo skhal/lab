@@ -4,13 +4,13 @@
 # license that can be found in the LICENSE file.
 
 # NAME
-#   init-devenv • setup development environment
+#   init-dev • setup development environment
 #
 # SYNOPSIS
-#   ansible-playbook ./playbooks/init-devenv.yml
+#   ansible-playbook ./playbooks/init-dev.yml
 #
 # DESCRIPTION
-#   init-devenv configures userland for development.
+#   init-dev configures userland for development.
 ---
 - name: Tune jail params
   hosts: nuc.lab.net
