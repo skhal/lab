@@ -13,8 +13,8 @@ from typing import Callable, Optional, override
 
 import yaml
 from ansible.errors import AnsibleError
-from ansible.module_utils.common.text.converters import to_text
 
+from ansible.module_utils.common.text.converters import to_text
 from ansible.plugins.connection import ssh
 from ansible.plugins.connection.ssh import Connection as SSHConnection
 
@@ -101,7 +101,9 @@ def _merge_doc_options(src: str, dst: str) -> str:
     return yaml.safe_dump(doc)
 
 
-globals().update(DOCUMENTATION=_merge_doc_options(ssh.DOCUMENTATION, DOCUMENTATION))
+globals().update(
+    DOCUMENTATION=_merge_doc_options(ssh.DOCUMENTATION, DOCUMENTATION)
+)
 
 # keep-sorted start
 _CP_CMD = "cp"
@@ -323,7 +325,9 @@ class Connection(SSHConnection):
         return os.path.join(self.jail.path, path)
 
     @override
-    def fetch_file(self, in_path: str, out_path: str) -> tuple[int, bytes, bytes]:
+    def fetch_file(
+        self, in_path: str, out_path: str
+    ) -> tuple[int, bytes, bytes]:
         """Fetch a remote in_path file to the local out_path file."""
         self._display.vvv(
             f"{self.transport}: fetch {in_path} to {out_path}",
@@ -353,7 +357,9 @@ class Connection(SSHConnection):
         cmd = [_MKTEMP_CMD, "--quiet", "-t", f"ansible.{self.transport}"]
         rc, out, _ = super().exec_command(" ".join(cmd))
         if rc != os.EX_OK:
-            raise AnsibleError(f"failed to create temporary file on {self.remote_host}")
+            raise AnsibleError(
+                f"failed to create temporary file on {self.remote_host}"
+            )
         tmp_file = to_text(out.strip())
         try:
             yield tmp_file
