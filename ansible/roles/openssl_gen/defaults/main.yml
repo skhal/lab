@@ -25,6 +25,10 @@
 #   san   string* an optional list of subject alternative names
 openssl_gen_certs: []
 
+# openssl_gen_renew_before is the time before expiration when to renew
+# certificates, e.g. 15d.
+openssl_gen_renew_before: 15d
+
 # openssl_gen_rsa defines RSA key to generate. It expects the following
 # structure:
 #   - path  string  file name with path to store public key. The private key

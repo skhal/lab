@@ -83,6 +83,14 @@
           when: openssl_gen_crt_stat_task.stat.exists
           register: openssl_gen_crt_task
 
+        - name: Check if certificate is about to expire
+          community.crypto.x509_certificate_info:
+            content: "{{ openssl_gen_crt_task.content | b64decode }}"
+            valid_at:
+              renew: "+{{ openssl_gen_renew_before }}"
+          when: openssl_gen_crt_stat_task.stat.exists
+          register: openssl_gen_crt_info_task
+
     - name: Sign certificate signing request
       ansible.builtin.include_role:
         name: openssl_ca
@@ -95,6 +103,12 @@
               else undef()
           }}
         openssl_ca_sign_csr: "{{ openssl_gen_csr_task.csr }}"
+        # force renewal only when the certificate is within the renewal window
+        openssl_ca_sign_force: >-
+          {{
+            openssl_gen_crt_stat_task.stat.exists
+            and not openssl_gen_crt_info_task.valid_at.renew
+          }}
 
     - name: Write certificate
       become: true
