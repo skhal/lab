@@ -64,7 +64,7 @@ jail_enforce_statfs: ""
 # structure:
 #   dest  string? target mount path inside the jail (default: `path`)
 #   perm  string? mount permissions (default: rw)
-jail_mounts: "{{ unset(hint='mount points map') }}"
+jail_mounts: "{{ undef(hint='mount points map') }}"
 
 # jail_name is the jail name.
 jail_name: ""
