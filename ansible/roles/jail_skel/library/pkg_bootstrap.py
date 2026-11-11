@@ -63,12 +63,12 @@ packages:
     sample: [FreeBSD-set-minimal-jail, doas]
 """
 
+import filecmp
 import os
 import shutil
 import traceback
 
 from ansible.module_utils.basic import AnsibleModule
-
 from ansible.module_utils.lab.errors import Error
 
 
@@ -104,56 +104,63 @@ class PKG:
         _, _, tail = os.path.splitroot(PKG._KEYS_PATH)
         dest = os.path.join(rootdir, tail)
 
-        if not os.path.exists(dest):
-            self._mkdir(dest)
+        # it is expected that the source has keys path. pkg(8) can't bootstrap
+        # without keys. Fail loud if that's the case
+        if not os.path.isdir(PKG._KEYS_PATH):
+            return Error(f"pkg keys directory not found: {PKG._KEYS_PATH}")
 
-        self._copytree(dest)
+        try:
+            files = self._stale_files(PKG._KEYS_PATH, dest)
+        except OSError as err:
+            return Error(str(err))
+        if not files:
+            return
 
-    def _mkdir(self, path: str) -> Error | None:
         if not self._module.check_mode:
             try:
-                os.mkdir(path=path, mode=0o755)
+                for src, dst, _ in files:
+                    os.makedirs(os.path.dirname(dst), mode=0o755, exist_ok=True)
+                    shutil.copy2(src, dst)
             except OSError as err:
                 return Error(str(err))
 
         self._changed = True
-        self._diff.append(
-            {
-                "before_header": path,
-                "before": dict(state="absent"),
-                "after_header": path,
-                "after": dict(state="present"),
-            }
-        )
-
-    def _copytree(self, dest: str) -> Error | None:
-        if self._module.check_mode:
-            return
-
-        copied_files = []
-
-        def copy(src: str, dst: str, *, follow_symlinks=True):
-            shutil.copy2(src, dst, follow_symlinks=follow_symlinks)
-            copied_files.append(dst)
-
-        try:
-            shutil.copytree(PKG._KEYS_PATH, dest, copy_function=copy)
-        except OSError as err:
-            return Error(str(err))
-
-        if not copied_files:
-            return
-
-        self._changed = True
         self._diff.extend(
             {
-                "before_header": f,
-                "before": dict(state="absent"),
-                "after_header": f,
+                "before_header": dst,
+                "before": dict(state=state),
+                "after_header": dst,
                 "after": dict(state="present"),
             }
-            for f in copied_files
+            for _, dst, state in files
         )
+
+    @staticmethod
+    def _stale_files(
+        src_root: str, dest_root: str
+    ) -> list[tuple[str, str, str]]:
+        """Lists files that are missing or differ in dest_root.
+
+        Returns tuples of (source, destination, state), where state is the
+        current state of the destination: absent or outdated.
+        """
+
+        files = []
+
+        def onerror(err: OSError):
+            raise err
+
+        for dirpath, _, filenames in os.walk(src_root, onerror=onerror):
+            relpath = os.path.relpath(dirpath, src_root)
+            for name in sorted(filenames):
+                src = os.path.join(dirpath, name)
+                dst = os.path.normpath(os.path.join(dest_root, relpath, name))
+                if not os.path.exists(dst):
+                    files.append((src, dst, "absent"))
+                elif not filecmp.cmp(src, dst, shallow=False):
+                    files.append((src, dst, "outdated"))
+
+        return files
 
     def install(self, packages: list[str], *, rootdir: str) -> Error | None:
         """install listed packaged"""

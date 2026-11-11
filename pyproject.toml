@@ -32,6 +32,7 @@ package-mode = false  # use poetry only for dependency management
 [tool.poetry.dependencies]
 ansible-core = "^2.21"
 pytest = "^9.2.0"
+pyfakefs = "^6.3.2"
 
 [tool.pytest.ini_options]
 addopts = [
