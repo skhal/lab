@@ -32,6 +32,7 @@
       become: true
       ansible.builtin.blockinfile:
         path: "{{ _conf_file }}"
+        marker: "# {mark} ANSIBLE MANAGED BLOCK {{ item }}"
         block: |
           Match Group {{ item }}
             AllowUsers *

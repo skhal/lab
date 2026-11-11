@@ -25,6 +25,7 @@
     block: |
       mount += "{{ _mount.path }} $path{{ _mount.dest }} nullfs {{ _mount.perm }} 0 0";
       exec.prepare += "[ -d $path{{ _mount.dest }} ] || mkdir -p -m 0755 $path{{ _mount.dest }}";
+    marker: "# {mark} ANSIBLE MANAGED BLOCK {{ _mount.path }}"
     insertafter: "# mounts"
   register: jail_add_mounts_task
 
