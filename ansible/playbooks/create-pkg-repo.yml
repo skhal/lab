@@ -49,8 +49,7 @@
     - name: Install repository
       vars:
         local_pkg_repos:
-          - name: lab-ports
-            conf: lab-ports.conf
+          lab-ports: {}
       ansible.builtin.include_role:
         name: local_pkg
         tasks_from: configure_repos
