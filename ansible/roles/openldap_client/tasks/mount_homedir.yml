@@ -11,7 +11,7 @@
     - name: Collect users
       ansible.builtin.shell:
         cmd: |
-          set -e pipefail
+          set -eo pipefail
           ldapsearch \
               -x \
               -ZZ \
