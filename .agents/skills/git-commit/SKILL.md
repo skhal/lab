@@ -16,7 +16,7 @@ body
 Rules:
 - lines are up to 80 characters long
 - subject is imperative, lowercase, without trailing period
-- body has a short description of why and what the change is
+- body is concise: why in one or two sentences, then what changed
 - include a proof of the fix if available
 - reference the issue or NO_ISSUE
 
