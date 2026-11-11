@@ -34,6 +34,7 @@
       become: true
       ansible.builtin.lineinfile:
         path: /usr/local/etc/pkg.conf
+        regexp: "^\\s+{{ item.key }} = "
         insertafter: "^ALIAS {"
         line: '    {{ item.key }} = "{{ item.value }}";'
 
