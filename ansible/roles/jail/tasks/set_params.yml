@@ -11,8 +11,18 @@
     loop_var: _item_param
   vars:
     _conf_path: /etc/jail.conf.d/{{ jail_name }}.conf
+    _name: >-
+      {{
+        _item_param.key | split('_') | join('.')
+        if _item_param.key.startswith(('allow', 'children'))
+        else _item_param.key
+      }}
   ansible.builtin.lineinfile:
     path: "{{ _conf_path }}"
+    regexp: >-
+      {{ ('^(no)?' ~ (_name | regex_escape) ~ ';')
+         if _item_param.key.startswith('allow')
+         else ('^' ~ (_name | regex_escape) ~ ' = ') }}
     line: >-
       {% if _item_param.key.startswith('allow') -%}
         {{ 'no' if not _item_param.value -}}
