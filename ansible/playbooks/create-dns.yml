@@ -18,6 +18,9 @@
 #   User `bind:bind` owns TLS certificate. The user does not exist until `bind`
 #   role installs package `bind`. Run it before `openssl_gen` to generate a
 #   certificate.
+#
+#   A restart of the authoritative name server flushes the zones from the cache
+#   of every caching name server in the cluster.
 ---
 - name: Create authoritative name server
   hosts: dns.lab.net
@@ -32,6 +35,15 @@
   roles:
     - role: local_unbound
   post_tasks:
+    - name: Flush zones from cache
+      when:
+        - hostvars['dns.lab.net'].bind_restarted | default(false)
+      become: true
+      ansible.builtin.command:
+        cmd: local-unbound-control flush_zone {{ item }}
+      loop: "{{ hostvars['dns.lab.net'].bind_zones }}"
+      changed_when: true
+
     - name: Add jail dependency
       when:
         - inventory_hostname_short not in ['nuc', 'dns']

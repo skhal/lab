@@ -17,3 +17,8 @@
   ansible.builtin.service:
     name: named
     state: restarted
+
+- name: "Record bind restart"
+  listen: "bind_restart"
+  ansible.builtin.set_fact:
+    bind_restarted: true
