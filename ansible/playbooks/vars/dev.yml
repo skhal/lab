@@ -25,6 +25,7 @@ pkg_install:
   - npm
   - protobuf
   - protobuf-go
+  - py312-ansible-lint # pre-commit lint for Ansible files
   - py312-black # Python formatter
   - py312-isort # Python import sorter
   - py312-poetry # Python environment and packaging
