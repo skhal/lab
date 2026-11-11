@@ -34,6 +34,7 @@ pkg_install:
   - rust
   - stylua # Lua formatter
   - superhtml # HTML formatter
+  - tig
   - tmux
   - tree
   - typescript-go
