@@ -4,9 +4,9 @@
 # license that can be found in the LICENSE file.
 #
 # Usage:
-#   ansible-galaxy collection install -r ./requirements.yaml
+#   ansible-galaxy collection install -r ./requirements.yml
 
 ---
 collections:
   - name: community.general
-    version: 13.1.0
+    version: 14.0.1
