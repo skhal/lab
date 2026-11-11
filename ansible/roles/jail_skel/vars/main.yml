@@ -4,6 +4,7 @@
 # license that can be found in the LICENSE file.
 
 ---
+# keep-sorted start newline_separated=yes
 # jail_skel_default_packages lists packages to be installed in the jail
 # skeleton. The actual set of packages installed is a union of:
 #   - jail_skel_default_packages
@@ -18,3 +19,9 @@ jail_skel_default_packages:
   - pkg
   - python3 # for Ansible to manage the jail
   # keep-sorted end
+
+# always migrate ansible_user to the jail skeleton to ensure Ansible can manage
+# future jails.
+jail_skel_migrate_users_default:
+  - "{{ ansible_user }}"
+# keep-sorted end

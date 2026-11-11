@@ -23,12 +23,20 @@
       become: true
       pkg_bootstrap:
         path: "{{ jail_skel_zfs_dset_task.mountpoint }}"
-        packages: "{{ jail_skel_default_packages | union(jail_skel_packages) }}"
+        packages: >
+          {{
+            jail_skel_default_packages
+              | union(jail_skel_packages | default([]))
+          }}
 
     - name: Migrate users
       become: true
       user_migrate:
-        name: "{{ jail_skel_migrate_users }}"
+        name: >
+          {{
+            jail_skel_migrate_users_default
+              | union(jail_skel_migrate_users | default([]))
+          }}
         dest: "{{ jail_skel_zfs_dset_task.mountpoint }}"
 
     - name: Configure remote access
