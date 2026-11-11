@@ -18,7 +18,7 @@ server:
 	prefetch: yes
   tls-system-cert: yes
 	# keep-sorted end
-{% for zone in local_unbound_stub_zones %}
+{% for zone in local_unbound_stub_zones | default([]) %}
 {% if zone.type is defined %}
 	local-zone: "{{ zone.name }}" {{ zone.type }}
 {% endif %}
@@ -30,18 +30,16 @@ remote-control:
 	control-enable: yes
 	control-interface: 127.0.0.1
 	control-use-cert: no
-
-{% for zone in local_unbound_stub_zones %}
+{% for zone in local_unbound_stub_zones | default([]) %}
 
 stub-zone:
 	name: "{{ zone.name }}"
 	stub-addr: "{{ zone.addr }}"
-  {% if zone.tls_upstream | bool %}
+{% if zone.tls_upstream | bool %}
 	stub-tls-upstream: yes
-  {% endif %}
+{% endif %}
 {% endfor %}
-
-{%- for zone in local_unbound_forward_zones %}
+{%- for zone in local_unbound_forward_zones | default([]) %}
 
 forward-zone:
 	name: "{{ zone.name }}"

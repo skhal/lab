@@ -4,7 +4,7 @@
 # license that can be found in the LICENSE file.
 
 ---
-# keep-sorted start
+# keep-sorted start newline_separated=yes
 # local_unbound_forward_zones configures zones to forward queries to DNS
 # resolvers (see unbound.conf(5)). Each zone has the following structure:
 #
@@ -12,8 +12,8 @@
 #   addr  string  IP address of the server to forward to.
 #
 # ref list: https://github.com/trinib/AdGuard-WireGuard-Unbound-DNScrypt/blob/00139af587bf2ff35b9614768b4f5967cd7c5401/unbound.conf#L163-L209
-local_unbound_forward_zones:
-  -
+local_unbound_forward_zones: "{{ undef(hint='a list of forward zones') }}"
+
 # local_unbound_stub_zones create stub zones (see local-unbound.conf(5)). Each zone
 # has the following structure:
 #
@@ -21,6 +21,5 @@ local_unbound_forward_zones:
 #   addr  string  zone address with optional port, e.g. 1.2.3.4@53
 #   type  string? set type of the local zone (see local-zone in
 #                 local-unbound.conf(5))
-local_unbound_stub_zones:
-  -
+local_unbound_stub_zones: "{{ undef(hint='a list of stub zones') }}"
 # keep-sorted end
