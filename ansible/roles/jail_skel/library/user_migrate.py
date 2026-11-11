@@ -11,13 +11,12 @@ from dataclasses import dataclass
 from enum import IntEnum, StrEnum
 
 from ansible.module_utils.basic import AnsibleModule
-
 from ansible.module_utils.lab.errors import Error
 
 
 class UserNotFoundError(Error):
     def __init__(self, *users: str) -> None:
-        super().__init__(f"users '{','.join(*users)}' not found")
+        super().__init__(f"users '{','.join(users)}' not found")
 
 
 @dataclass(eq=True, frozen=True)
@@ -120,7 +119,9 @@ class PW:
         Name = "-n"
         # keep-sorted end
 
-    def __init__(self, module: AnsibleModule, *, rootdir=str | None) -> None:
+    def __init__(
+        self, module: AnsibleModule, *, rootdir: str | None = None
+    ) -> None:
         self._module = module
         self._rootdir = rootdir
         self._changed = False
@@ -185,7 +186,7 @@ class PW:
         if rc != os.EX_OK:
             return Error(
                 f"{PW.Command.UserAdd}: {stderr.strip()}\n{u}"
-                " groups:{supplemental_groups}"
+                f" groups:{supplemental_groups}"
             )
 
     def usermod(self, u: User) -> Error | None:
