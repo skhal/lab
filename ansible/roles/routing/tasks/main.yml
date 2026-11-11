@@ -15,7 +15,7 @@
         name: "{{ _rc_var }}"
         state: absent
 
-    - name: Set hostname in {{ _rc_file }}
+    - name: Set {{ _rc_var }} in {{ _rc_file }}
       become: true
       community.general.sysrc:
         name: "{{ _rc_var }}"
