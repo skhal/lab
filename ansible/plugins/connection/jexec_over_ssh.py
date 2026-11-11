@@ -198,7 +198,7 @@ class Connection(SSHConnection):
     # keep-sorted end
 
     transport = "jexec_over_ssh"  # plugin identifier
-    has_pipelining = True  # use persistent connection
+    has_pipelining = True  # send module code over stdin, no temp files
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
