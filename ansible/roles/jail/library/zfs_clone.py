@@ -65,11 +65,13 @@ class Cloner:
 
             origin = snapshot
 
-        if dset and dset.origin != origin:
-            return None, Error(
-                f"dataset '{name}' origin '{dset.origin}' does not match "
-                "requested origin '{origin}'"
-            )
+        if dset:
+            if dset.origin != origin:
+                return None, Error(
+                    f"dataset '{name}' origin '{dset.origin}' does not match "
+                    f"requested origin '{origin}'"
+                )
+            return dset, None
 
         if (err := self._clone(origin, name, props)) is not None:
             return Dataset.nil(), err
