@@ -15,7 +15,7 @@ on:
 
 jobs:
   bootstrap:
-    uses: ./.github/workflows/ci_analyze.yml
+    uses: ./.github/workflows/_ci_analyze.yml
 
   ci:
     needs: bootstrap

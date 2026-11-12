@@ -15,7 +15,7 @@ on:
 
 jobs:
   bootstrap:
-    uses: ./.github/workflows/ci_analyze.yml
+    uses: ./.github/workflows/_ci_analyze.yml
 
   ci:
     needs: bootstrap
@@ -25,7 +25,7 @@ jobs:
     strategy:
       matrix:
         go-version: ['1.25.x']
-    uses: ./.github/workflows/ci_go.yml
+    uses: ./.github/workflows/_ci_go.yml
     with:
       package: ./check
       go-version: ${{ matrix.go-version }}
