@@ -39,7 +39,7 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v5
+      uses: actions/checkout@v7
 
     # Poetry must be installed before setup-python to enable dependency cache.
     - name: Install Poetry

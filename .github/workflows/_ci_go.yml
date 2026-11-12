@@ -37,7 +37,7 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v5
+      uses: actions/checkout@v7
 
     - name: Setup Go ${{ inputs.go-version }}
       uses: actions/setup-go@v7
