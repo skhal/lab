@@ -11,7 +11,7 @@
     state: present
 
 # The package installs files with the lab- prefix, including the configuration
-# file <prefix>/etc/lab-certval.txtpb. See sysutils/certval in Lab ports.
+# file <prefix>/etc/lab-certval.txtpb. See sysutils/lab-certval in Lab ports.
 - name: Configure certval
   vars:
     _conf_file: /usr/local/etc/lab-certval.txtpb

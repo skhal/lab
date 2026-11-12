@@ -13,7 +13,7 @@
 #   validate-cert configures certificate validation such as certificate
 #   expiration date check, etc.
 #
-#   It installs sysutils/certval from Lab ports. Built it manually before
+#   It installs sysutils/lab-certval from Lab ports. Built it manually before
 #   running this playbook.
 #
 # CAVEATS
@@ -25,7 +25,7 @@
   tags: validate-cert-build
   vars:
     pkgbuild_ports:
-      - sysutils/certval
+      - sysutils/lab-certval
   roles:
     - role: pkgbuild
 

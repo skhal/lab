@@ -51,7 +51,7 @@ lab       null      2026-09-25 14:51:01 /usr/local/poudriere/ports/lab/ports
 Build one of the Lab ports using ports overlay:
 
 ```
-# poudriere bulk -j 15amd64 -O lab -C sysutils/certval
+# poudriere bulk -j 15amd64 -O lab -C sysutils/lab-certval
 ```
 
 ## Develop a port with poudriere(8)
