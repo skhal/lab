@@ -10,7 +10,7 @@
 
 # Source: /etc/pkg/FreeBSD.conf
 freebsd-kmods: {
-  url: "pkg+https://freebsd-kmods.{{ local_pkg_hostname }}/${ABI}/kmods_quarterly_1",
+  url: "pkg+https://freebsd-kmods.{{ local_pkg_hostname }}/${ABI}/kmods_quarterly_${VERSION_MINOR}",
   mirror_type: "srv",
   signature_type: "fingerprints",
   fingerprints: "/usr/share/keys/pkg",
