@@ -17,7 +17,7 @@ exec.consolelog = "/var/log/jail_${name}.log";
 exec.start = "/bin/sh /etc/rc";
 exec.stop = "/bin/sh /etc/rc.shutdown";
 host.hostname = "${name}.lab.net";
-mount = "/home/op $path/home/op nullfs rw 0 0";
+mount = "/home/{{ ansible_user }} $path/home/{{ ansible_user }} nullfs rw 0 0";
 mount.devfs;
 path = "{{ _jailbase }}/${name}";
 vnet;

@@ -17,7 +17,7 @@
               -ZZ \
               -b 'ou=people,dc=lab,dc=net' \
               -LLL \
-              '(&(homedirectory=*)(!(uid=op)))' \
+              '(&(homedirectory=*)(!(uid={{ ansible_user }})))' \
               homedirectory \
             | grep homeDirectory: \
             | cut -d ' ' -f 2

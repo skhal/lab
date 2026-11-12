@@ -47,7 +47,7 @@ pkg_install:
   - neovim
   # keep-sorted end
 ssh_allow_users:
-  - op
+  - "{{ ansible_user }}"
 timezone_name: America/Chicago
 user_config:
   # keep-sorted start
