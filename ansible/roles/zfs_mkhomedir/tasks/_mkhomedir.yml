@@ -21,7 +21,7 @@
         properties: "name,mountpoint"
       register: zfs_mkhomedir_dset_info_task
 
-    - name: Fix ownership
+    - name: Fix homedir
       vars:
         _homedir: >-
           {{
@@ -29,11 +29,19 @@
               | selectattr('name', 'equalto', _dset)
               | map(attribute='mountpoint')
               | first
-              | default(omit)
           }}
-      become: true
-      ansible.builtin.file:
-        path: "{{ _homedir }}"
-        owner: "{{ _user.uid }}"
-        group: "{{ _user.gid }}"
-        mode: u=rwx,g=rx,o=rx
+      block:
+        - name: Check mountpoint of {{ _dset }}
+          ansible.builtin.assert:
+            that: _homedir is string and _homedir.startswith('/')
+            fail_msg: >-
+              {{ _dset }} has no usable mountpoint (got '{{ _homedir }}')
+            quiet: true
+
+        - name: Fix ownership
+          become: true
+          ansible.builtin.file:
+            path: "{{ _homedir }}"
+            owner: "{{ _user.uid }}"
+            group: "{{ _user.gid }}"
+            mode: u=rwx,g=rx,o=rx
