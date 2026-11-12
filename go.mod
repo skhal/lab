@@ -4,7 +4,7 @@ go 1.26.0
 
 require (
 	github.com/bufbuild/protocompile v0.14.1
-	github.com/gomarkdown/markdown v0.0.0-20260417124207-7d523f7318df
+	github.com/gomarkdown/markdown v0.0.0-20261109103609-13f93121d67a
 	github.com/google/go-cmp v0.7.0
 	github.com/lpar/gzipped/v2 v2.1.0
 	github.com/mmcdole/gofeed v1.5.0
