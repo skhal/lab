@@ -1,0 +1,52 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+name: Dependabot Issues
+
+# Dependabot alerts do not create issues. This workflow polls open alerts and
+# files an issue for each alert that does not have one yet.
+
+on:
+  schedule:
+  - cron: "17 6 * * *"
+  # Run manually from the Actions tab
+  workflow_dispatch:
+
+# The job authenticates with a personal token (see ALERTS_TOKEN below), not
+# with GITHUB_TOKEN, because GITHUB_TOKEN cannot read Dependabot alerts.
+permissions: {}
+
+jobs:
+  issues:
+    defaults:
+      run:
+        shell: sh
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Create Issues for Open Alerts
+      env:
+        # Fine-grained token for this repository with "Dependabot alerts: read"
+        # and "Issues: read and write" permissions.
+        GH_TOKEN: ${{ secrets.ALERTS_TOKEN }}
+        GH_REPO: ${{ github.repository }}
+      run: |
+        gh api --paginate "repos/${GH_REPO}/dependabot/alerts?state=open" \
+          --jq '.[] | [.number, .html_url, .security_advisory.ghsa_id, .security_advisory.severity, .dependency.package.name, .security_advisory.summary] | @tsv' |
+        while IFS="$(printf '\t')" read -r number url ghsa severity package summary; do
+          # Look at closed issues too, so a closed one is not filed again.
+          existing="$(gh issue list --state all --search "\"${url}\" in:body" --json number --jq 'length')"
+          if [ "${existing}" != "0" ]; then
+            echo "alert ${number}: issue exists"
+            continue
+          fi
+          gh issue create \
+            --title "github: address dependabot alert ${number} in ${package}" \
+            --body "Dependabot found a ${severity} vulnerability in ${package} (${ghsa}):
+        ${url}
+
+        > ${summary}"
+          echo "alert ${number}: issue created"
+        done
