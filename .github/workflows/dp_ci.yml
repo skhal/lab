@@ -19,6 +19,8 @@ permissions:
 jobs:
   bootstrap:
     uses: ./.github/workflows/_ci_analyze.yml
+    with:
+      base: ${{ github.event.before }}
 
   ci:
     needs: bootstrap
