@@ -351,6 +351,7 @@ repos:
         |home/vim/templates/skel.*
         |infra/net\.lab.*
         |nvim/plugin/lab-skeleton/share/new.*
+        |ports/.*/(distinfo|pkg-descr|files/.*)
       )$
   - id: nosubmit
     name: "No-submit"
