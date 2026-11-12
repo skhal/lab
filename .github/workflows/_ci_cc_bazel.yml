@@ -45,10 +45,30 @@ jobs:
         persist-credentials: false
 
     - name: Setup LLVM ${{ inputs.llvm-version }}
+      env:
+        LLVM_VERSION: ${{ inputs.llvm-version }}
+        # Ref: https://apt.llvm.org
+        LLVM_KEY_FINGERPRINT: 6084F3CF814B57C1CF12EFD515CF4D18AF4F7421
       run: |
-        wget https://apt.llvm.org/llvm.sh
-        chmod +x ./llvm.sh
-        sudo ./llvm.sh ${{ inputs.llvm-version }}
+        set -eu
+        codename="$(lsb_release -cs)"
+        keyring=/etc/apt/keyrings/apt.llvm.org.gpg
+
+        wget -qO llvm-snapshot.gpg.key https://apt.llvm.org/llvm-snapshot.gpg.key
+        gpg --show-keys --fingerprint llvm-snapshot.gpg.key | tr -d ' ' | grep -qx "${LLVM_KEY_FINGERPRINT}" || {
+          echo "LLVM signing key ${LLVM_KEY_FINGERPRINT} not found" >&2
+          exit 1
+        }
+
+        sudo install -d -m 0755 /etc/apt/keyrings
+        gpg --dearmor <llvm-snapshot.gpg.key | sudo tee "${keyring}" >/dev/null
+        rm llvm-snapshot.gpg.key
+
+        repo="https://apt.llvm.org/${codename}/ llvm-toolchain-${codename}-${LLVM_VERSION} main"
+        echo "deb [signed-by=${keyring}] ${repo}" | sudo tee /etc/apt/sources.list.d/llvm.list >/dev/null
+
+        sudo apt-get update
+        sudo apt-get install -y "clang-${LLVM_VERSION}"
 
     - name: Setup Bazel
       uses: bazel-contrib/setup-bazel@f34d6a05eae3c24acab7fa54587492daeaeffdab # 0.19.2
