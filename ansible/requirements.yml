@@ -4,7 +4,7 @@
 # license that can be found in the LICENSE file.
 #
 # Usage:
-#   ansible-galaxy collection install -r ./requirements.yml
+#   poetry run ansible-galaxy collection install -r ./requirements.yml
 
 ---
 collections:

@@ -12,7 +12,7 @@ PACKAGES = brew
 go npm rust: ${PACKAGES} .NOTMAIN
 .endif
 
-INSTALL_PATHS = tcshrc.d nvim ${PACKAGES} ctags.d go npm rust
+INSTALL_PATHS = tcshrc.d nvim ${PACKAGES} ansible ctags.d go npm rust
 SOURCES = tcshrc tmux.conf gitconfig
 INSTALL_TARGETS = ${SOURCES:S,^,${HOME}/.,}
 

@@ -25,6 +25,16 @@ groups: op,wheel
 Run an SSH server and install `op` user SSH keys for password-less remote
 access.
 
+Install `ansible-core` with Poetry and Ansible collections with
+`ansible-galaxy` (collections go to `~/.ansible/collections`). `make -C home`
+does both, or by hand from the repository root:
+
+```
+$ poetry install --no-root
+
+$ poetry run ansible-galaxy collection install -r ansible/requirements.yml
+```
+
 Setup cluster with Ansible (`-K` option is to prompt for the `root` password on
 the server, needed at the very first step to install doas(1) for further remote
 management):
@@ -32,5 +42,5 @@ management):
 ```
 $ cd ansible/
 
-$ ansible-playbook -K ./setup-lab.yml
+$ poetry run ansible-playbook -K ./setup-lab.yml
 ```

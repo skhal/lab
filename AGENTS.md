@@ -79,6 +79,16 @@ root `pyproject.toml`. Activate the environment and run the tests from the
 
 Or without activating the environment: `poetry run pytest`.
 
+Ansible collections (`ansible/requirements.yml`) are not on PyPI. Poetry
+installs `ansible-core`; `ansible-galaxy` from that environment installs the
+collections into `~/.ansible/collections`. `make -C home` does both, or by hand
+from the repository root:
+
+```console
+% poetry install --no-root
+% poetry run ansible-galaxy collection install -r ansible/requirements.yml
+```
+
 ### pre-commit
 
 ```console
