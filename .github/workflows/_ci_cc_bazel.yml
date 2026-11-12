@@ -49,7 +49,7 @@ jobs:
         sudo ./llvm.sh ${{ inputs.llvm-version }}
 
     - name: Setup Bazel
-      uses: bazel-contrib/setup-bazel@0.15.0
+      uses: bazel-contrib/setup-bazel@0.19.2
       with:
         # Avoid downloading Bazel every time.
         bazelisk-cache: true
