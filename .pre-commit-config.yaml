@@ -213,7 +213,8 @@ repos:
     types_or: [markdown]
     exclude: |
       (?x)^(
-        \.agents/skills/.*/SKILL\.md
+         \.agents/skills/.*/SKILL\.md
+        |\.claude/skills/.*/SKILL\.md
       )$
     args:
     - "-soft-wraps"
@@ -345,6 +346,7 @@ repos:
         |.*\.patch
         |.*\.pb\.go
         |\.agents/skills/.*/SKILL\.md
+        |\.claude/skills/.*/SKILL\.md
         |go\.(mod|sum)
         |home/vim/templates/skel.*
         |infra/net\.lab.*
