@@ -24,7 +24,7 @@
           poudriere jail \
             -c \
             -j {{ poudriere_jail.name }} \
-            -m pkgbase={{ poudriere_jail.pkgbase_repodir }} \
+            -m 'pkgbase=base_release_${VERSION_MINOR}' \
             -U {{ poudriere_jail.pkgbase_uri }} \
             -v {{ poudriere_jail.version }}
       register: poudriere_create_jail_task
