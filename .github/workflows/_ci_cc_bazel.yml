@@ -40,7 +40,7 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v7
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
     - name: Setup LLVM ${{ inputs.llvm-version }}
       run: |
@@ -49,7 +49,7 @@ jobs:
         sudo ./llvm.sh ${{ inputs.llvm-version }}
 
     - name: Setup Bazel
-      uses: bazel-contrib/setup-bazel@0.19.2
+      uses: bazel-contrib/setup-bazel@f34d6a05eae3c24acab7fa54587492daeaeffdab # 0.19.2
       with:
         # Avoid downloading Bazel every time.
         bazelisk-cache: true
