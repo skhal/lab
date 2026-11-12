@@ -36,7 +36,7 @@
     _user_skel_pattern: >-
       {{
         [
-          _user.home,
+          _user.home | regex_replace('^/+', ''),
           "dot.*"
         ] | path_join
       }}
