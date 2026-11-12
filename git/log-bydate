@@ -6,7 +6,7 @@
 # license that can be found in the LICENSE file.
 
 # log-bydate groups log messages by date. It skips grouping if the output is
-# the output is piped. Use GITGROUP environment variable to override grouping
+# piped. Use GITGROUP environment variable to override grouping
 # decision.
 #
 # ENVIRONMENT
@@ -23,6 +23,8 @@ nogroup() {
 last_date=
 last_date_count=
 buf=
+nl='
+'
 
 flush() {
   if [ -z "${last_date}" ]; then
@@ -30,7 +32,7 @@ flush() {
   fi
   day_of_week="$(date -j -f%Y-%m-%d "${last_date}" +%a)"
   echo "${day_of_week} ${last_date} (${last_date_count})"
-  echo -e "${buf}"
+  printf '%s\n' "${buf}"
 }
 
 # group groups lines in the standard input by date.
@@ -43,7 +45,7 @@ flush() {
 #
 #   * 2026-01-01 abc123 commit message
 group() {
-  while read prefix date suffix; do
+  while read -r prefix date suffix; do
     if [ "${last_date}" != "${date}" ]; then
       flush
       last_date="${date}"
@@ -51,7 +53,7 @@ group() {
       buf=
     fi
     last_date_count=$((last_date_count + 1))
-    buf="${buf}${buf:+\n}${prefix} ${suffix}"
+    buf="${buf}${buf:+${nl}}${prefix} ${suffix}"
   done
   flush
 }
