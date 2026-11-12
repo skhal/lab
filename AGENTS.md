@@ -152,6 +152,18 @@ from the repository root:
 - **Spelling.** `typos` runs on all files; see `_typos.toml`.
 - Prefer small, focused changes and add tests with new behavior.
 
+## Shell commands
+
+The agent's Bash tool can only run `bash` or `zsh`, so it cannot be switched to
+`sh(1)`. Stay portable anyway:
+
+- Write every command in POSIX `sh(1)` syntax: no arrays, `[[ ]]`, `{a,b}`
+  brace expansion, process substitution, or `$'...'` quoting.
+- Run scripts explicitly with `sh script`, never `bash script`.
+- Use `sh -c '...'` only when a snippet needs `sh` semantics; do not wrap
+  ordinary commands in it, because that bypasses the permission rules in
+  `.claude/settings.json`.
+
 ## Checks
 
 Formatting and linting run through pre-commit (`.pre-commit-config.yaml`).
