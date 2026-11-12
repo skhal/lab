@@ -107,6 +107,50 @@ def test_run_clone_latest_snapshot(zfs_clone):
     assert got["changed"]
 
 
+@pytest.mark.parametrize(
+    "origin, want_origin",
+    [("zroot/src@a", "zroot/src@a"), ("zroot/src", "zroot/src@b")],
+)
+def test_run_check_mode_new_dataset(zfs_clone, origin, want_origin):
+    fake = FakeZFS(
+        datasets={"zroot/jail": ("-", "/jail")},
+        snapshots={"zroot/src": ["zroot/src@a", "zroot/src@b"]},
+    )
+    params = dict(name="zroot/jail/dst", origin=origin, props={})
+
+    got, err = zfs_clone.run(fake.module(check_mode=True), params)
+
+    assert err is None
+    assert fake.cloned == []
+    assert "zroot/jail/dst" not in fake.datasets
+    assert got["name"] == "zroot/jail/dst"
+    assert got["origin"] == want_origin
+    assert got["mountpoint"] == "/jail/dst"
+    assert got["changed"]
+
+
+def test_run_check_mode_missing_parent(zfs_clone):
+    fake = FakeZFS(snapshots={"zroot/src": ["zroot/src@a"]})
+    params = dict(name="zroot/dst", origin="zroot/src@a", props={})
+
+    got, err = zfs_clone.run(fake.module(check_mode=True), params)
+
+    assert err is None
+    assert got["mountpoint"] == "/zroot/dst"
+    assert got["changed"]
+
+
+def test_run_check_mode_existing_dataset(zfs_clone):
+    fake = FakeZFS(datasets={"zroot/dst": ("zroot/src@a", "/dst")})
+    params = dict(name="zroot/dst", origin="zroot/src@a", props={})
+
+    got, err = zfs_clone.run(fake.module(check_mode=True), params)
+
+    assert err is None
+    assert got["mountpoint"] == "/dst"
+    assert not got["changed"]
+
+
 @pytest.mark.parametrize("origin", ["zroot/src@a", "zroot/src"])
 def test_run_existing_dataset_is_idempotent(zfs_clone, origin):
     fake = FakeZFS(

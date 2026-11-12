@@ -76,7 +76,22 @@ class Cloner:
         if (err := self._clone(origin, name, props)) is not None:
             return Dataset.nil(), err
 
+        if self._module.check_mode:
+            # the clone is skipped in check mode: predict the dataset instead
+            # of querying a dataset that does not exist.
+            return self._predict_dset(name, origin), None
+
         return self._get_dset_origin(name)
+
+    def _predict_dset(self, name: str, origin: str) -> Dataset:
+        """Predicts a clone: it inherits the mountpoint from its parent."""
+        parent, _, base = name.rpartition("/")
+        mountpoint = f"/{name}"
+        if parent:
+            parent_dset = self._maybe_get_dset_origin(parent)
+            if parent_dset is not None:
+                mountpoint = f"{parent_dset.mountpoint.rstrip('/')}/{base}"
+        return Dataset(name=name, origin=origin, mountpoint=mountpoint)
 
     def _maybe_get_dset_origin(self, name: str) -> Dataset | None:
         dset, err = self._get_dset_origin(name)
