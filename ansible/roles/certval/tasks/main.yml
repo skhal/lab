@@ -10,22 +10,23 @@
     name: lab-certval
     state: present
 
+# The package installs files with the lab- prefix, including the configuration
+# file <prefix>/etc/lab-certval.txtpb. See sysutils/certval in Lab ports.
 - name: Configure certval
   vars:
-    _conf_file: /usr/local/etc/certval.txtpb
+    _conf_file: /usr/local/etc/lab-certval.txtpb
   become: true
-  ansible.builtin.template:
-    src: "{{ _conf_file | trim('/') }}.j2"
-    dest: "{{ _conf_file }}"
-    owner: root
-    group: wheel
-    mode: u=rw,g=,o=
+  block:
+    - name: Install configuration file
+      ansible.builtin.template:
+        src: "{{ _conf_file | trim('/') }}.j2"
+        dest: "{{ _conf_file }}"
+        owner: root
+        group: wheel
+        mode: u=rw,g=,o=
 
-- name: Run daily
-  vars:
-    _conf_file: /usr/local/etc/certval.txtpb
-  become: true
-  ansible.builtin.cron:
-    name: "validate certificates"
-    special_time: daily
-    job: "/usr/local/bin/lab-certval -c {{ _conf_file }}"
+    - name: Run daily
+      ansible.builtin.cron:
+        name: "validate certificates"
+        special_time: daily
+        job: "/usr/local/bin/lab-certval -c {{ _conf_file }}"
