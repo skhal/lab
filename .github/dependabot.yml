@@ -1,0 +1,48 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+version: 2
+updates:
+# Keeps action versions, and commit SHA pins, current.
+- package-ecosystem: github-actions
+  directory: /
+  schedule:
+    interval: weekly
+  groups:
+    github-actions:
+      patterns: ["*"]
+  commit-message:
+    prefix: "workflows:"
+
+- package-ecosystem: gomod
+  directory: /
+  schedule:
+    interval: weekly
+  groups:
+    go:
+      patterns: ["*"]
+  commit-message:
+    prefix: "go:"
+
+# Covers Poetry: pyproject.toml and poetry.lock.
+- package-ecosystem: pip
+  directory: /
+  schedule:
+    interval: weekly
+  groups:
+    python:
+      patterns: ["*"]
+  commit-message:
+    prefix: "python:"
+
+- package-ecosystem: bazel
+  directory: /
+  schedule:
+    interval: weekly
+  groups:
+    bazel:
+      patterns: ["*"]
+  commit-message:
+    prefix: "bazel:"
