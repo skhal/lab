@@ -21,5 +21,5 @@ unset user_base_path_
 
 # Pipe `go doc` and `go help` through $PAGER
 if ( -x "$HOME"/go/bin/go ) then
-  alias go '"$HOME"/go/bin/go \!*:q'
+  alias go '"$HOME"/go/bin/go'
 endif
