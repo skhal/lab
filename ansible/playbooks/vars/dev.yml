@@ -32,6 +32,7 @@ pkg_install:
   - py312-pre-commit
   - py312-ty # Python LSP
   - rust
+  - sccache # cache Rust builds
   - stylua # Lua formatter
   - superhtml # HTML formatter
   - tig

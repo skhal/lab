@@ -7,6 +7,10 @@
 # Flavor: FreeBSD
 
 CARGO_BIN_PATH = ${HOME}/.cargo/bin
+# Cache compiled crates with sccache(1) if it is installed. Cargo ignores an
+# empty RUSTC_WRAPPER.
+RUSTC_WRAPPER != command -v sccache || true
+
 PACKAGE_LIST = packages.txt
 PACKAGES = ${grep -v '^\#' ${PACKAGE_LIST} | tr ' ' ',':L:sh:M*}
 
@@ -28,6 +32,6 @@ target=${package:${M_target}}
 ${target}: ${CARGO_BIN_PATH} ${PACKAGE_LIST}
 	@if ! test -e ${.TARGET}; then \
 		echo ".. install ${.TARGET:T} to ${.TARGET}"; \
-		cargo install --locked ${package:${M_unpack}}; \
+		RUSTC_WRAPPER=${RUSTC_WRAPPER} cargo install --locked ${package:${M_unpack}}; \
 	 fi
 .endfor
