@@ -20,10 +20,13 @@ eof
   exit 1
 fi
 
-# page passes the output of go-command through PAGER.
+# page passes the output of go-command through PAGER. It returns the exit code
+# of the go-command, not the pager.
 page() {
-  set -o pipefail
-  eval 2>&1 "$@" | $PAGER
+  page_rc_=0
+  page_out_=$(eval 2>&1 "$@") || page_rc_=$?
+  printf '%s\n' "${page_out_}" | $PAGER
+  return ${page_rc_}
 }
 
 if [ -t 1 ]; then
