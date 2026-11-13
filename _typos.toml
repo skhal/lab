@@ -8,3 +8,7 @@ extend-ignore-re = [
   "(?Rm)^.*(--|#|//)\\sNOLINT$",
   "(#|//)\\sNOLINTNEXTLINE\\n.*"
 ]
+
+[default.extend-words]
+# protols is a Protobuf language server.
+protols = "protols"
