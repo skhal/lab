@@ -8,7 +8,7 @@ name = "lab"
 version = "0.0.0"
 description = "R&D Lab"
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = ">=3.13"
 license = "BSD-3-Clause"
 authors = [{ name = "Samvel Khalatyan", email = "sn.khalatyan@gmail.com" }]
 
@@ -30,9 +30,9 @@ multi_line_output = 3
 package-mode = false  # use poetry only for dependency management
 
 [tool.poetry.dependencies]
-ansible-core = "^2.21"
-pytest = "^9.2.0"
-pyfakefs = "^6.3.2"
+ansible-core = ">=2.20"
+pyfakefs = ">=6.3.2"
+pytest = ">=9.2.0"
 
 [tool.pytest.ini_options]
 addopts = [
