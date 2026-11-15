@@ -81,3 +81,6 @@ ports/**/work/
 # LLVM
 .cache
 compile_commands.json
+
+# Ansible
+.collections

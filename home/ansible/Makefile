@@ -2,18 +2,27 @@
 #
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
-
 #
 # Flavor: FreeBSD
 
-# Poetry installs ansible-core in a virtual environment. Collections are not on
-# PyPI, so use ansible-galaxy from the environment to install them into the
-# default location, ~/.ansible/collections.
-ROOT = ${git rev-parse --show-toplevel:L:sh:M*}
-REQUIREMENTS = ${ROOT}/ansible/requirements.yml
+GIT_WORKTREE = ${git rev-parse --show-toplevel:L:sh:M*}
 
-install: .PHONY
-	@echo ".. install ansible-core with poetry"
-	@poetry -C ${ROOT} install --no-root
-	@echo ".. install ansible collections from ${REQUIREMENTS:S,^${ROOT}/,,}"
-	@poetry -C ${ROOT} run ansible-galaxy collection install -r ${REQUIREMENTS}
+PROJECTS = ansible
+INSTALL_PROJECTS = ${PROJECTS:S,^,${GIT_WORKTREE}/,:S,$,/.collections,}
+
+install:  ansible-core ${INSTALL_PROJECTS} .PHONY
+
+ansible-core: .PHONY
+	@echo ".. install ${.TARGET}"
+	@poetry -C ${GIT_WORKTREE} install --no-root
+
+REQUIREMENTS = ${.TARGET:H:S,$,/requirements.yml,}
+
+INSTALL_PROJECT: .NOTMAIN .USE
+	@echo ".. install ${REQUIREMENTS} to ${.TARGET}"
+	@poetry -C ${.TARGET:H} run \
+		ansible-galaxy collection install -r ${REQUIREMENTS} -p ${.TARGET}
+
+.for project in ${INSTALL_PROJECTS}
+${project}: ${REQUIREMENTS} INSTALL_PROJECT
+.endfor
