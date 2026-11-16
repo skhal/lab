@@ -19,8 +19,8 @@
 
     - name: Use latest branch
       become: true
-      ansible.builtin.copy:
-        src: "{{ _conf_file | trim('/') }}"
+      ansible.builtin.template:
+        src: "{{ _conf_file | trim('/') }}.j2"
         dest: "{{ _conf_file }}"
         owner: root
         group: wheel
