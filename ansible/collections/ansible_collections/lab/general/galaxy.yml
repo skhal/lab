@@ -1,0 +1,38 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+#SPDX-License-Identifier: BSD-3-Clause
+
+### REQUIRED
+# The namespace of the collection.
+namespace: lab
+
+# The name of the collection.
+name: general
+
+# The version of the collection. Must be compatible with semantic versioning.
+version: 0.0.0
+
+# The path to the Markdown (.md) readme file, relative to the root of the
+# collection.
+readme: README.md
+
+authors:
+- Samvel Khalatyan (https://github.com/skhal)
+
+description: general purpose roles and plugins.
+
+license:
+- BSD-3-Clause
+
+# The path to the license file for the collection, relative to the root of the
+# collection.
+license_file: 'LICENSE'
+
+# The URL of the originating SCM repository.
+repository: https://github.com/skhal/lab
+
+# The URL to the collection issue tracker.
+issues: https://github.com/skhal/lab/issues

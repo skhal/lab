@@ -338,6 +338,7 @@ repos:
     exclude: |
       (?x)^(
          MODULE\.bazel\.lock
+        | ansible/collections/ansible_collections/.*/LICENSE
         | poetry\.lock
         |.*_string\.go
         |.*/(test)?data/.*
