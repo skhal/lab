@@ -32,5 +32,5 @@ jobs:
         python-version: ['3.12', '3.15']
     uses: ./.github/workflows/_ci_python.yml
     with:
-      package: ./ansible
+      package: ./ansible/lab
       python-version: ${{ matrix.python-version }}

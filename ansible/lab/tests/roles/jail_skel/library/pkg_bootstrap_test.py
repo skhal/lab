@@ -13,7 +13,6 @@ from pathlib import Path
 from unittest import mock
 
 import pytest
-
 from ansible.module_utils.lab.module import AnsibleModuleProxy
 
 _MODULE_PATH = (

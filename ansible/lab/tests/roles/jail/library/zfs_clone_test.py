@@ -14,7 +14,6 @@ from typing import Sequence
 from unittest import mock
 
 import pytest
-
 from ansible.module_utils.lab.module import AnsibleModuleProxy
 
 _MODULE_PATH = Path(__file__).parents[4] / "roles/jail/library/zfs_clone.py"

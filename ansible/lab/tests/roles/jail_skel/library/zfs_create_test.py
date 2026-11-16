@@ -14,7 +14,6 @@ from typing import Sequence
 from unittest import mock
 
 import pytest
-
 from ansible.module_utils.lab.module import AnsibleModuleProxy
 
 _MODULE_PATH = (

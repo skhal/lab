@@ -9,7 +9,6 @@ from dataclasses import KW_ONLY, dataclass, field
 from typing import Callable, Optional, Sequence, override
 
 import pytest
-
 from ansible.module_utils.lab.errors import Error
 from ansible.module_utils.lab.module import AnsibleModuleProxy
 from ansible.module_utils.lab.zfs import ZFS

@@ -7,7 +7,7 @@
 
 GIT_WORKTREE = ${git rev-parse --show-toplevel:L:sh:M*}
 
-PROJECTS = ansible
+PROJECTS = ansible/lab
 INSTALL_PROJECTS = ${PROJECTS:S,^,${GIT_WORKTREE}/,:S,$,/.collections,}
 
 install:  ansible-core ${INSTALL_PROJECTS} .PHONY
