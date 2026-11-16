@@ -30,9 +30,12 @@ multi_line_output = 3
 package-mode = false  # use poetry only for dependency management
 
 [tool.poetry.dependencies]
+# keep-sorted start
 ansible-core = ">=2.20"
+ansible-lint = "^26.11.0"
 pyfakefs = ">=6.3.2"
 pytest = ">=9.2.0"
+# keep-sorted end
 
 [tool.pytest.ini_options]
 addopts = [
