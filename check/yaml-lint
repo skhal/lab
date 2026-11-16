@@ -41,7 +41,10 @@ done
 
 rc=0
 if [ -n "${yaml_ansible_files}" ]; then
-  if ! ansible-lint --project-dir "${ansible_project_dir}" -f brief -qq --fix=all ${yaml_ansible_files}; then
+  # Git runs yaml-lint took from the repository root, where Ansible does not
+  # find the project config (collections_path, roles_path, ...).
+  if ! env ANSIBLE_CONFIG="${ansible_project_dir}/ansible.cfg" \
+    ansible-lint --project-dir "${ansible_project_dir}" -f brief -qq --fix=all ${yaml_ansible_files}; then
     rc=1
   fi
 fi
