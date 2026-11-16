@@ -25,6 +25,8 @@ CREATE_PATH: .NOTMAIN .USE
 ${ANSIBLE_LOG_PATH}: CREATE_PATH
 
 ${ANSIBLE_VAULT_PATH}:: CREATE_PATH
+
+${ANSIBLE_VAULT_PATH}::
 	@if test $$(stat -f '%Sp' ${.TARGET}) != "drwx------"; then \
 		echo ".. fix permissions for ${.TARGET}"; \
 		chmod 0700 ${.TARGET}; \
