@@ -83,4 +83,5 @@ ports/**/work/
 compile_commands.json
 
 # Ansible
+.ansible
 .collections
