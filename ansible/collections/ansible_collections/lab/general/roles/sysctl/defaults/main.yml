@@ -3,7 +3,6 @@
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 
----
 # sysctl_state is a list of sysctl management information bases (MIBs) and
 # their values to add to /etc/sysctl.conf. Each item has the following
 # structure:

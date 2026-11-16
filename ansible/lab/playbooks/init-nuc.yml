@@ -17,7 +17,7 @@
   hosts: nuc.lab.net
   tags: init-nuc-sysctl
   roles:
-    - role: sysctl
+    - role: lab.general.sysctl
 
 - name: Configure loader
   hosts: nuc.lab.net

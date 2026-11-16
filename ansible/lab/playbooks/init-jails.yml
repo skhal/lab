@@ -22,7 +22,7 @@
   hosts: dev
   tags: init-jail-sysctl
   roles:
-    - role: sysctl
+    - role: lab.general.sysctl
 
 - name: Configure services
   hosts: jails
