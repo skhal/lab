@@ -5,9 +5,10 @@
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 
-# Yaml-lint runs different linters and formatter for ordinary ans Ansible YAML
-# files. A YAML file is Ansible YAML if it resides in an Ansible project, i.e.
-# a folder with ansible.cfg file.
+# Yaml-lint runs different linters and formatter for YAML files. It uses
+# ansible-lint for Ansible projects and collections, and yamlfmt for other
+# files.
+
 set -e
 
 # ansible_project returns longest prefix of the path that points at the Ansible
@@ -29,6 +30,21 @@ ansible_project() {
     _path=$(dirname "${_path}")
     if [ -e "${_path}/ansible.cfg" ]; then
       echo "${_path}"
+      return
+    fi
+  done
+}
+
+ansible_collection() {
+  local _path=${1:?'ansible_collection: missing path'}
+  for _ in $(seq 1 5); do
+    if [ "${_path}" = "." ]; then
+      break
+    fi
+    _path=$(dirname "${_path}")
+    if [ -e "${_path}/galaxy.yml" ]; then
+      echo "${_path}"
+      return
     fi
   done
 }
@@ -43,6 +59,9 @@ ansible_project() {
 # It eagerly runs all checks and reports an error if any of the checks failed.
 check_ansible_projects() (
   # run in a sub-shell to limit IFS exposure.
+  local _check=${1:?'check_ansible_projects: missing check'}
+  shift
+
   local _rc=0
 
   local _p _proj _files
@@ -50,7 +69,7 @@ check_ansible_projects() (
   for _p in $@; do
     _proj="${_p%%=*}"
     _files="${_p#*=}"
-    if ! _check_ansible_project "$_proj" $_files; then
+    if ! ${_check} "$_proj" $_files; then
       _rc=1
     fi
   done
@@ -73,6 +92,22 @@ _check_ansible_project() (
   # it is safe to exec because the function runs a sub-shell
   exec env ANSIBLE_CONFIG="${_proj}/ansible.cfg" \
     ansible-lint --project-dir "${_proj}" -f brief -qq --fix=all ${_files}
+)
+
+_check_ansible_collection() (
+  # run in a sub-shell to reset IFS
+  unset IFS
+
+  local _collection=${1:?'_check_ansible_collection: missing collection'}
+  local _files=${2:?'_check_ansible_collection: missing files'}
+  _files=$(echo $_files | sed -e 's/,/ /g')
+
+  if $VERBOSE; then
+    echo >&2 ansible-lint: $_collection $_files
+  fi
+
+  # it is safe to exec because the function runs a sub-shell
+  exec ansible-lint --project-dir "${_collection}" -f brief -qq --fix=all ${_files}
 )
 
 # check_yaml_files runs YAML lint/format for non-Ansible files.
@@ -154,15 +189,23 @@ shift $((OPTIND - 1))
 
 yaml_files=
 ansible_projects=
+ansible_collections=
 for f; do
   if filter_with ansible_project ansible_projects "$f"; then
+    continue
+  fi
+  if filter_with ansible_collection ansible_collections "$f"; then
     continue
   fi
   yaml_files="${yaml_files:+${yaml_files} }${f}"
 done
 
 rc=0
-if ! check_ansible_projects ${ansible_projects}; then
+if ! check_ansible_projects _check_ansible_project ${ansible_projects}; then
+  rc=1
+fi
+
+if ! check_ansible_projects _check_ansible_collection ${ansible_collections}; then
   rc=1
 fi
 
