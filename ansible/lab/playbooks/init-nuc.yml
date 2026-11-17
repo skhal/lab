@@ -31,10 +31,10 @@
   roles:
     # keep-sorted start
     - role: hostname
+    - role: lab.general.pkg
     - role: moused
     - role: ntp
     - role: periodic
-    - role: pkg
     - role: powerd
     - role: rc
     - role: syslog

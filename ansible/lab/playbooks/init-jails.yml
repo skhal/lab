@@ -29,7 +29,7 @@
   tags: init-jail-rc
   roles:
     # keep-sorted start
-    - role: pkg
+    - role: lab.general.pkg
     - role: syslog
     - role: timezone
     # keep-sorted end
