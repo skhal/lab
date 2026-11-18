@@ -4,5 +4,8 @@
 # license that can be found in the LICENSE file.
 
 ---
+# keep-sorted start
+ansible_become_method: ansible.builtin.sudo
 ansible_connection: local
 ansible_python_interpreter: auto_silent
+# keep-sorted end
