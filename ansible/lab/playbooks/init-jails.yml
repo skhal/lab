@@ -38,7 +38,7 @@
   hosts: jails
   tags: init-jail-user
   roles:
-    - role: user
+    - role: lab.general.user
     - role: lab.general.doas
 
 - name: Configure remote access
