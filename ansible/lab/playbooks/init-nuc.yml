@@ -72,7 +72,7 @@
   hosts: nuc.lab.net
   tags: init-nuc-access
   roles:
-    - role: ssh
+    - role: lab.general.ssh
 
 - name: Reboot
   hosts: nuc.lab.net

@@ -45,4 +45,4 @@
   hosts: jails
   tags: init-jail-access
   roles:
-    - role: ssh
+    - role: lab.general.ssh
