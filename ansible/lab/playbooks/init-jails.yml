@@ -31,7 +31,7 @@
     # keep-sorted start
     - role: lab.general.pkg
     - role: lab.general.syslog
-    - role: timezone
+    - role: lab.general.timezone
     # keep-sorted end
 
 - name: Bootstrap users

@@ -33,12 +33,12 @@
     - role: hostname
     - role: lab.general.pkg
     - role: lab.general.syslog
+    - role: lab.general.timezone
     - role: moused
     - role: ntp
     - role: periodic
     - role: powerd
     - role: rc
-    - role: timezone
     # keep-sorted end
 
 - name: Configure ZFS
