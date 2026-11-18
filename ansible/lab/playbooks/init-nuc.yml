@@ -53,7 +53,7 @@
   tags: init-nuc-user
   roles:
     - role: user
-    - role: doas
+    - role: lab.general.doas
 
 - name: Configure network
   hosts: nuc.lab.net

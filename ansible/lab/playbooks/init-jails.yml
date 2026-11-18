@@ -38,10 +38,8 @@
   hosts: jails
   tags: init-jail-user
   roles:
-    # keep-sorted start
-    - role: doas
     - role: user
-    # keep-sorted end
+    - role: lab.general.doas
 
 - name: Configure remote access
   hosts: jails
