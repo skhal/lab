@@ -7,7 +7,7 @@
 
 GIT_WORKTREE = ${git rev-parse --show-toplevel:L:sh:M*}
 
-PROJECTS = ansible/lab
+PROJECTS = ansible/lab ansible/mac
 INSTALL_PROJECTS = ${PROJECTS:S,^,${GIT_WORKTREE}/,:S,$,/.collections,}
 
 ANSIBLE_LOG_PATH = ${HOME}/.ansible/log

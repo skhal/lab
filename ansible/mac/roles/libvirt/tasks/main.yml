@@ -18,3 +18,8 @@
         that: libvirt_check_hvf_task.stdout | trim == '1'
         fail_msg: HVF is unavailable; kern.hv_support is {{ libvirt_check_hvf_task.stdout | trim }}
         quiet: true
+
+- name: Install libvirt
+  community.general.homebrew:
+    name: libvirt
+    state: present
