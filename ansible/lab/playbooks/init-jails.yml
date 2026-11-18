@@ -30,7 +30,7 @@
   roles:
     # keep-sorted start
     - role: lab.general.pkg
-    - role: syslog
+    - role: lab.general.syslog
     - role: timezone
     # keep-sorted end
 

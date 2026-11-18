@@ -32,12 +32,12 @@
     # keep-sorted start
     - role: hostname
     - role: lab.general.pkg
+    - role: lab.general.syslog
     - role: moused
     - role: ntp
     - role: periodic
     - role: powerd
     - role: rc
-    - role: syslog
     - role: timezone
     # keep-sorted end
 
