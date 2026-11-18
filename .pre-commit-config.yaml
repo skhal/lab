@@ -317,9 +317,10 @@ repos:
   - id: yaml-fmt
     name: "YAML format"
     description: "format YAML files"
-    entry: ./check/yaml-lint
+    entry: check-yaml-lint
     language: system
     types_or: [yaml]
+    pass_filenames: true
 
   # ... everything else
   - id: issue
