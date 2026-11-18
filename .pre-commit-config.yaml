@@ -148,7 +148,7 @@ repos:
       )$
   - id: go-test
     name: "Go test"
-    description: "run Go tests for changes packages"
+    description: "run Go tests for changed packages"
     entry: check-go-test
     args: ["-cover", "80"]
     language: system
@@ -260,6 +260,13 @@ repos:
     entry: isort
     language: system
     types_or: [python]
+  - id: py-test
+    name: "Python test"
+    description: "run Python tests for changed packages"
+    entry: ./check/py-test
+    language: system
+    types_or: [python]
+    require_serial: true
 
   # Shell
   - id: sh-fmt

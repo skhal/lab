@@ -1,0 +1,34 @@
+#!/bin/sh
+#
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+set -e
+
+for file_; do
+  path_=$(dirname "$file_")
+  while true; do
+    case "$path_" in
+      "." | "/")
+        break
+        ;;
+    esac
+
+    if [ -f "$path_"/pytest.ini ]; then
+      echo "$path_"
+      break
+    fi
+
+    path_=$(dirname "$path_")
+  done
+done \
+  | sort -u \
+  | while read -r path_; do
+    (
+      # pytest uses the exit code 5 to indicate missing tests in the project.
+      # Treat it as a success instead of a failure.
+      cd "$path_" && poetry run pytest || [ $? -eq 5 ]
+    ) || exit 1
+  done
