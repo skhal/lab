@@ -11,7 +11,7 @@
 #   sha256  string  SHA 256 sum of the image
 vm_base: "{{ undef(hint='base image') }}"
 
-vm_cloud_init: "{{ undef(hint='cloud init for the VM') }}"
+vm_cloud_init: {}
 
 # vm_disk_path is the location of VM disks.
 vm_disk_path: "{{ undef(hint='vm image store') }}"

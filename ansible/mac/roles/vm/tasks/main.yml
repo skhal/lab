@@ -43,7 +43,7 @@
     # source: https://download.freebsd.org/releases/VM-IMAGES/15.1-RELEASE/aarch64/Latest/CHECKSUM.SHA256
     image_checksum: "sha256:{{ vm_base.sha256 }}"
     image_compression: auto
-    cloud_init: "{{ vm_cloud_init | default(omit) }}"
+    cloud_init: "{{ vm_cloud_init | default(omit, true) }}"
     serial:
       type: pty
       log.file: "{{ vm_log_path }}/{{ vm_hostname }}-console.log"
