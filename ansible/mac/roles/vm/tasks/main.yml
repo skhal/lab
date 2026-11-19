@@ -4,22 +4,54 @@
 # license that can be found in the LICENSE file.
 
 ---
-- name: Hypervisor Framework must be enabled
-  block:
-    - name: Read HVF from Kernel
-      ansible.builtin.command:
-        cmd: sysctl -n kern.hv_support
-      register: vm_check_hvf_task
-      changed_when: false
-      check_mode: false
+- name: Create folders
+  loop:
+    # keep-sorted start
+    - "{{ vm_disk_path }}"
+    - "{{ vm_image_cache_path }}"
+    - "{{ vm_log_path }}"
+    # keep-sorted end
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: u=rwx,g=,o=
 
-    - name: HVF must be enabled
-      ansible.builtin.assert:
-        that: vm_check_hvf_task.stdout | trim == '1'
-        fail_msg: HVF is unavailable; kern.hv_support is {{ vm_check_hvf_task.stdout | trim }}
-        quiet: true
+- name: Create a VM
+  community.libvirt.virt_cloud_instance:
+    name: "{{ vm_hostname }}"
+    uri: qemu:///session # local VM
+    virt_type: hvf # use Hypervisor Framework
+    # HVF can only work with interrupt controller GICv3 but QEMU virt defaults
+    # to GICv2.
+    features:
+      gic.version: 3
+    # virt-install needs to know the guest OS
+    osinfo:
+      name: freebsd15.1
+    vcpus: 2
+    memory: 2048
+    force_disk: "{{ vm_force_disk | default(omit) }}" # recreate the disk if enabled
+    disks:
+      - path: "{{ vm_disk_path }}/{{ vm_hostname }}.raw"
+        size: "{{ vm_disk_size_gib }}"
+        # use raw format because the VM uses ZFS with compression and other
+        # features. It'd be much faster if we rely on a single layer of disk
+        # optimizations.
+        format: raw
+    base_image: "{{ vm_base.url }}"
+    image_cache_dir: "{{ vm_image_cache_path }}"
+    # source: https://download.freebsd.org/releases/VM-IMAGES/15.1-RELEASE/aarch64/Latest/CHECKSUM.SHA256
+    image_checksum: "sha256:{{ vm_base.sha256 }}"
+    image_compression: auto
+    wait_for_cloud_init_reboot: false
+    cloud_init_auto_reboot: false
+    cloud_init: "{{ vm_cloud_init | default(omit) }}"
+    serial:
+      type: pty
+      log.file: "{{ vm_log_path }}/{{ vm_hostname }}-console.log"
 
-- name: Install packages
-  community.general.homebrew:
-    name: libvirt
-    state: present
+- name: Wait for VM access
+  ansible.builtin.wait_for:
+    path: "{{ vm_log_path }}/{{ vm_hostname }}-console.log"
+    search_regex: "login:"
+    timeout: 300

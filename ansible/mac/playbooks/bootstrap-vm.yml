@@ -8,4 +8,5 @@
   hosts: localhost
   tags: bootstrap-vm
   roles:
+    - role: libvirt
     - role: vm

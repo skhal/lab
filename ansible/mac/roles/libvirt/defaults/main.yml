@@ -1,0 +1,16 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+# keep-sorted start newline_separated=yes
+# libvirt_cache_path is for libvirt to cache archifacts, e.g. downloaded images.
+libvirt_cache_path: "{{ lookup('ansible.builtin.env', 'HOME') }}/.cache/libvirt"
+
+# libvirt_share_path is the location for libvirt's share/.
+libvirt_share_path: "{{ lookup('ansible.builtin.env', 'HOME') }}/.local/share/libvirt"
+
+# libvirt_state_path is the path of libvirt's var-like storage for logs.
+libvirt_state_path: "{{ lookup('ansible.builtin.env', 'HOME') }}/.local/state/libvirt"
+# keep-sorted end

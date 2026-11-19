@@ -8,4 +8,21 @@
 ansible_become_method: ansible.builtin.sudo
 ansible_connection: local
 ansible_python_interpreter: auto_silent
+vm_base:
+  url: https://download.freebsd.org/releases/VM-IMAGES/15.1-RELEASE/aarch64/Latest/FreeBSD-15.1-RELEASE-arm64-aarch64-BASIC-CLOUDINIT-zfs.raw.xz
+  sha256: 907ca57e12503124cc48da5d698da139459c60afa023aa12e82729d655e8e15b
+vm_cloud_init:
+  user_data: |
+    #cloud-config
+    users:
+      - name: op
+        groups: wheel
+        shell: /bin/tcsh
+  meta_data: |
+    instance-id: "{{ vm_hostname }}"
+    local-hostname: "{{ vm_hostname }}"
+vm_disk_path: "{{ libvirt_share_path }}"
+vm_hostname: vm.lab.net
+vm_image_cache_path: "{{ libvirt_cache_path }}/image"
+vm_log_path: "{{ libvirt_state_path }}/log"
 # keep-sorted end

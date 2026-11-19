@@ -1,0 +1,49 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+- name: Hypervisor Framework must be enabled
+  block:
+    - name: Read HVF from Kernel
+      ansible.builtin.command:
+        cmd: sysctl -n kern.hv_support
+      register: libvirt_check_hvf_task
+      changed_when: false
+      check_mode: false
+
+    - name: HVF must be enabled
+      ansible.builtin.assert:
+        that: libvirt_check_hvf_task.stdout | trim == '1'
+        fail_msg: >-
+          HVF is unavailable;
+          kern.hv_support is {{ libvirt_check_hvf_task.stdout | trim }}
+        quiet: true
+
+- name: Bootstrap libvirt
+  vars:
+    _packages:
+      # keep-sorted start
+      - libvirt
+      - qemu
+      - virt-manager
+      - xorriso
+      # keep-sorted end
+  block:
+    - name: "Install packages"
+      community.general.homebrew:
+        name: "{{ _packages }}"
+        state: present
+
+    - name: Create folders
+      loop:
+        # keep-sorted start
+        - "{{ libvirt_cache_path }}"
+        - "{{ libvirt_share_path }}"
+        - "{{ libvirt_state_path }}"
+        # keep-sorted end
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        mode: u=rwx,g=,o=

@@ -8,8 +8,11 @@
 
 ---
 collections:
-  - name: community.general
-    version: 14.0.1
-
+  # keep-sorted start
   - name: ansible.posix
     version: 2.2.2
+  - name: community.general
+    version: 14.0.1
+  - name: community.libvirt
+    version: 2.4.0
+  # keep-sorted end
