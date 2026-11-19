@@ -12,17 +12,25 @@ vm_base:
   url: https://download.freebsd.org/releases/VM-IMAGES/15.1-RELEASE/aarch64/Latest/FreeBSD-15.1-RELEASE-arm64-aarch64-BASIC-CLOUDINIT-zfs.raw.xz
   sha256: 907ca57e12503124cc48da5d698da139459c60afa023aa12e82729d655e8e15b
 vm_cloud_init:
-  user_data: |
-    #cloud-config
-    users:
-      - name: op
-        groups: wheel
-        shell: /bin/tcsh
   meta_data: |
     instance-id: "{{ vm_hostname }}"
     local-hostname: "{{ vm_hostname }}"
+  user_data: |
+    #cloud-config
+    fqdn: {{ vm_hostname }}
+    users:
+      - name: op
+        gecos: Operator
+        groups: wheel
+        shell: /bin/tcsh
+        passwd: "{{ vm_op_password }}"
+    chpasswd:
+      expire: false
+      users:
+        - name: root
+          password: "{{ vm_root_password }}"
 vm_disk_path: "{{ libvirt_share_path }}"
-vm_hostname: vm.lab.net
+vm_hostname: base.lab.net
 vm_image_cache_path: "{{ libvirt_cache_path }}/image"
 vm_log_path: "{{ libvirt_state_path }}/log"
 # keep-sorted end

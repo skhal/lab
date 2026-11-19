@@ -11,11 +11,14 @@
 #   sha256  string  SHA 256 sum of the image
 vm_base: "{{ undef(hint='base image') }}"
 
+# vm_cloud_init triggers image configuration such as add users, set hostname,
+# etc. when set. FreeBSD uses nuageinit(7).
 vm_cloud_init: {}
 
 # vm_disk_path is the location of VM disks.
 vm_disk_path: "{{ undef(hint='vm image store') }}"
 
+# vm_disk_size_gib sets the disk size in GiB.
 vm_disk_size_gib: 10
 
 # vm_force_disk re-creates the VM disk when set to true.
