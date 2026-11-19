@@ -9,5 +9,5 @@
 # SYNOPSIS
 #   ansible-playbook ./setup-cluster.yml
 ---
-- name: Bootstrap qemu
-  ansible.builtin.import_playbook: playbooks/bootstrap-qemu.yml
+- name: Bootstrap vm
+  ansible.builtin.import_playbook: playbooks/bootstrap-vm.yml

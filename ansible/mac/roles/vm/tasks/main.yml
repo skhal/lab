@@ -9,17 +9,17 @@
     - name: Read HVF from Kernel
       ansible.builtin.command:
         cmd: sysctl -n kern.hv_support
-      register: libvirt_check_hvf_task
+      register: vm_check_hvf_task
       changed_when: false
       check_mode: false
 
     - name: HVF must be enabled
       ansible.builtin.assert:
-        that: libvirt_check_hvf_task.stdout | trim == '1'
-        fail_msg: HVF is unavailable; kern.hv_support is {{ libvirt_check_hvf_task.stdout | trim }}
+        that: vm_check_hvf_task.stdout | trim == '1'
+        fail_msg: HVF is unavailable; kern.hv_support is {{ vm_check_hvf_task.stdout | trim }}
         quiet: true
 
-- name: Install libvirt
+- name: Install packages
   community.general.homebrew:
     name: libvirt
     state: present

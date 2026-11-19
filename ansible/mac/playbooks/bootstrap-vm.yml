@@ -4,7 +4,8 @@
 # license that can be found in the LICENSE file.
 
 ---
-- name: Bootstrap libvirt
+- name: Bootstrap VM
   hosts: localhost
+  tags: bootstrap-vm
   roles:
-    - role: libvirt
+    - role: vm
