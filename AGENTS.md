@@ -177,3 +177,8 @@ Short, imperative, prefixed by the area changed, for example
 
 Always show the draft commit message to the user for review before
 committing. Commit only after they approve it.
+
+## Style
+
+- Directory naming: follow [style/hier.md](style/hier.md) when creating,
+  renaming or moving directories.
