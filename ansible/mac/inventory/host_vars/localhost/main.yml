@@ -36,4 +36,5 @@ vm_hostname: base.lab.net
 vm_image_cache_path: "{{ libvirt_cache_path }}/image"
 vm_log_path: "{{ libvirt_state_path }}/log"
 vm_op_ssh_pubkey: "{{ lookup('ansible.builtin.env', 'HOME') }}/.ssh/id_op.pub"
+vm_ssh_port: 2222
 # keep-sorted end

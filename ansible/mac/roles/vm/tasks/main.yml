@@ -38,6 +38,11 @@
         # features. It'd be much faster if we rely on a single layer of disk
         # optimizations.
         format: raw
+    networks:
+      - value: none
+    qemu_commandline: >-
+      args=-netdev user,id=net0,hostfwd=tcp:127.0.0.1:{{ vm_ssh_port }}-:22
+      -device virtio-net-pci,netdev=net0,bus=pcie.0,addr=0x1f
     base_image: "{{ vm_base.url }}"
     image_cache_dir: "{{ vm_image_cache_path }}"
     # source: https://download.freebsd.org/releases/VM-IMAGES/15.1-RELEASE/aarch64/Latest/CHECKSUM.SHA256

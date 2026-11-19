@@ -33,4 +33,8 @@ vm_image_cache_path: "{{ undef(hint='path to cache dir') }}"
 
 # vm_log_path is the location of VM logs.
 vm_log_path: "{{ undef(hint='path to console logs') }}"
+
+# vm_ssh_port is the loopback port that will be forwarded to guest's sshd
+# running on standard port.
+vm_ssh_port: "{{ undef(hint='loopback port to forward to ssh server in guest') }}"
 # keep-sorted end
