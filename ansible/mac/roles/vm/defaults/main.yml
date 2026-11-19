@@ -20,7 +20,7 @@ vm_disk_size_gib: 10
 
 # vm_force_disk re-creates the VM disk when set to true.
 #   ansible-playbook -e vm_force_disk=true
-vm_force_disk: "{{ undef(hint='recreate VM disk when enabled') }}"
+vm_force_disk: false
 
 # vm_hostname is the virtual machine's hostname.
 vm_hostname: "{{ undef(hint='virtual machine name') }}"

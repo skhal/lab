@@ -30,7 +30,7 @@
       name: freebsd15.1
     vcpus: 2
     memory: 2048
-    force_disk: "{{ vm_force_disk | default(omit) }}" # recreate the disk if enabled
+    force_disk: "{{ vm_force_disk }}"
     disks:
       - path: "{{ vm_disk_path }}/{{ vm_hostname }}.raw"
         size: "{{ vm_disk_size_gib }}"
