@@ -22,6 +22,13 @@ pkg_install:
   # keep-sorted end
 rc_debug: true
 rc_info: false
+# QEMU uses libslipr to emulate network in user space. It has the following
+# default settings:
+#   10.0.2.0/24   vnet
+#   10.0.2.2      gateway
+#   10.0.2.3      DNS resolver (forwarder)
+#   10.0.2.15-    DHCP address space
+routing_defaultrouter: 10.0.2.2
 sysctl_state:
   # keep-sorted start
   kern.randompid: 1

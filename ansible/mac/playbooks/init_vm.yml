@@ -44,3 +44,9 @@
   roles:
     - role: lab.general.user
     - role: lab.general.doas
+
+- name: Configure network
+  hosts: base.lab.net
+  tags: init-vm-network
+  roles:
+    - role: lab.general.routing
