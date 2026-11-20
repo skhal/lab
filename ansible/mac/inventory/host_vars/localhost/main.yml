@@ -18,6 +18,16 @@ vm_cloud_init:
   user_data: |
     #cloud-config
     fqdn: {{ vm_hostname }}
+    chpasswd:
+      expire: false
+      users:
+        - name: root
+          password: "{{ vm_root_password }}"
+    packages:
+      # keep-sorted start
+      - doas # for Ansible privilege escalation
+      - python315 # for Ansible
+      # keep-sorted end
     users:
       - name: op
         gecos: Operator
@@ -26,11 +36,13 @@ vm_cloud_init:
         passwd: "{{ vm_op_password }}"
         ssh_authorized_keys:
           - "{{ lookup('ansible.builtin.file', vm_op_ssh_pubkey) }}"
-    chpasswd:
-      expire: false
-      users:
-        - name: root
-          password: "{{ vm_root_password }}"
+    write_files:
+      - path: /usr/local/etc/doas.conf
+        content: >
+          permit nopass :wheel
+        permissions: 0640
+        owner: root:wheel
+        defer: true # create after the users are created and packages are installed
 vm_disk_path: "{{ libvirt_share_path }}"
 vm_hostname: base.lab.net
 vm_image_cache_path: "{{ libvirt_cache_path }}/image"
