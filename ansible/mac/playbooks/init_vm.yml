@@ -24,3 +24,4 @@
     - role: lab.general.syslog
     - role: lab.general.timezone
     - role: lab.general.moused
+    - role: lab.general.ntp
