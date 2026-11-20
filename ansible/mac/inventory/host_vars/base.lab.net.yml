@@ -6,6 +6,17 @@
 ---
 # keep-sorted start
 autoboot_delay_sec: 0
+pkg_aliases:
+  # keep-sorted start
+  outdated: "version -vRL="
+  vital: 'query -e \"%V=1\" %n'
+  # keep-sorted end
+pkg_install:
+  # keep-sorted start
+  - bind-tools
+  - doas
+  - neovim
+  # keep-sorted end
 rc_debug: true
 rc_info: false
 sysctl_state:
