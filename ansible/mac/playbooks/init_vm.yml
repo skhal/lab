@@ -15,3 +15,9 @@
   tags: init-vm-loader
   roles:
     - role: lab.general.autoboot
+
+- name: Configure services
+  hosts: base.lab.net
+  tags: init-vm-rc
+  roles:
+    - role: lab.general.hostname
