@@ -9,13 +9,13 @@
     _rc_file: /etc/rc.conf.d/routing
     _rc_var: defaultrouter
   block:
-    - name: Remove from /etc/rc.conf
+    - name: Clean /etc/rc.conf
       become: true
       community.general.sysrc:
         name: "{{ _rc_var }}"
         state: absent
 
-    - name: Set {{ _rc_var }} in {{ _rc_file }}
+    - name: Update {{ _rc_file }}
       become: true
       community.general.sysrc:
         name: "{{ _rc_var }}"

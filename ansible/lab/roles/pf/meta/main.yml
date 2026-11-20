@@ -5,7 +5,7 @@
 
 ---
 dependencies:
-  - role: routing
+  - role: lab.general.routing
     vars:
       routing_gateway_enable: true
   - role: pflog
