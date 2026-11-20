@@ -50,3 +50,4 @@
   tags: init-vm-network
   roles:
     - role: lab.general.routing
+    - role: lab.general.netif

@@ -10,7 +10,7 @@
 #   cidr  string  iface IP address with sub-net mask in CIDR format
 #   addm  string? members interfaces to add (e.g. bridge)
 #   desc  string? iface description
-netif_bridges: "{{ undef(hint='network bridge settings') }}"
+netif_bridges: {}
 
 # netif_ifaces maps network interface to configuration settings. Accepted
 # settings are:

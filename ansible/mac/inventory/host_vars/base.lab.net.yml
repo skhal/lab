@@ -9,6 +9,10 @@ autoboot_delay_sec: 0
 doas_conf:
   - rule: permit nopass :wheel
     description: Permit members of the wheel group to perform actions as root without password.
+netif_ifaces:
+  vtnet0:
+    cidr: 10.0.2.15/24
+    desc: egress
 pkg_aliases:
   # keep-sorted start
   outdated: "version -vRL="
