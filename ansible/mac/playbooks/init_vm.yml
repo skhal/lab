@@ -30,3 +30,10 @@
     - role: lab.general.syslog
     - role: lab.general.timezone
     # keep-sorted end
+
+- name: Configure ZFS
+  hosts: base.lab.net
+  tags: init-vm-zfs
+  roles:
+    - role: lab.general.zfs
+    - role: lab.general.zfs_scrub
