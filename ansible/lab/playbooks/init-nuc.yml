@@ -60,7 +60,7 @@
   tags: init-nuc-network
   roles:
     - role: lab.general.routing
-    - role: netif
+    - role: lab.general.netif
 
 - name: Configure firewall
   hosts: nuc.lab.net
