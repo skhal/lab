@@ -25,6 +25,7 @@
     - role: lab.general.moused
     - role: lab.general.ntp
     - role: lab.general.periodic
+    - role: lab.general.rc
     - role: lab.general.syslog
     - role: lab.general.timezone
     # keep-sorted end
