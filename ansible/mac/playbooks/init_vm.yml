@@ -22,3 +22,4 @@
   roles:
     - role: lab.general.hostname
     - role: lab.general.syslog
+    - role: lab.general.timezone
