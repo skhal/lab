@@ -21,3 +21,4 @@
   tags: init-vm-rc
   roles:
     - role: lab.general.hostname
+    - role: lab.general.syslog
