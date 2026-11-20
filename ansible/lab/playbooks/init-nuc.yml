@@ -23,7 +23,7 @@
   hosts: nuc.lab.net
   tags: init-nuc-loader
   roles:
-    - role: autoboot
+    - role: lab.general.autoboot
 
 - name: Configure services
   hosts: nuc.lab.net
