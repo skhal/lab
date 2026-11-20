@@ -9,3 +9,9 @@
   tags: init-vm-sysctl
   roles:
     - role: lab.general.sysctl
+
+- name: Configure Loader
+  hosts: base.lab.net
+  tags: init-vm-loader
+  roles:
+    - role: lab.general.autoboot
