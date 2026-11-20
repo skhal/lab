@@ -20,8 +20,11 @@
   hosts: base.lab.net
   tags: init-vm-rc
   roles:
+    # keep-sorted start
     - role: lab.general.hostname
-    - role: lab.general.syslog
-    - role: lab.general.timezone
     - role: lab.general.moused
     - role: lab.general.ntp
+    - role: lab.general.periodic
+    - role: lab.general.syslog
+    - role: lab.general.timezone
+    # keep-sorted end
