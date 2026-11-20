@@ -6,6 +6,9 @@
 ---
 # keep-sorted start
 autoboot_delay_sec: 0
+doas_conf:
+  - rule: permit nopass :wheel
+    description: Permit members of the wheel group to perform actions as root without password.
 pkg_aliases:
   # keep-sorted start
   outdated: "version -vRL="
@@ -30,4 +33,9 @@ sysctl_state:
   vfs.zfs.vdev.min_auto_ashift: 12
   # keep-sorted end
 timezone_name: America/Chicago
+user_config:
+  op:
+    shell: /bin/tcsh
+  root:
+    shell: /bin/tcsh
 # keep-sorted end

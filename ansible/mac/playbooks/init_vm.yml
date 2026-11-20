@@ -37,3 +37,10 @@
   roles:
     - role: lab.general.zfs
     - role: lab.general.zfs_scrub
+
+- name: Bootstrap users
+  hosts: base.lab.net
+  tags: init-vm-user
+  roles:
+    - role: lab.general.user
+    - role: lab.general.doas
