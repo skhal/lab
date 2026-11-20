@@ -1,0 +1,11 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+# keep-sorted start
+ansible_async_dir: /var/tmp/.ansible_async
+ansible_python_interpreter: /usr/local/bin/python3.15
+ansible_user: op
+# keep-sorted end

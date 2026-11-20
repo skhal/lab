@@ -9,5 +9,8 @@
 # SYNOPSIS
 #   ansible-playbook ./setup-cluster.yml
 ---
-- name: Bootstrap vm
+- name: Bootstrap VM
   ansible.builtin.import_playbook: playbooks/bootstrap-vm.yml
+
+- name: Init VM
+  ansible.builtin.import_playbook: playbooks/init_vm.yml
