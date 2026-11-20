@@ -8,13 +8,13 @@
   vars:
     _rc_file: /etc/rc.conf.d/ntpd
   block:
-    - name: Remove {{ _rc_var.key }} from /etc/rc.conf
+    - name: Clean /etc/rc.conf
       become: true
       community.general.sysrc:
         name: "{{ _rc_var.key }}"
         state: absent
 
-    - name: Set {{ _rc_var.key }} in {{ _rc_file }}
+    - name: Configure {{ _rc_file }}
       become: true
       community.general.sysrc:
         name: "{{ _rc_var.key }}"
