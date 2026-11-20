@@ -30,7 +30,7 @@
   tags: init-nuc-rc
   roles:
     # keep-sorted start
-    - role: hostname
+    - role: lab.general.hostname
     - role: lab.general.pkg
     - role: lab.general.syslog
     - role: lab.general.timezone
