@@ -5,6 +5,7 @@
 
 ---
 # keep-sorted start
+autoboot_delay_sec: 0
 sysctl_state:
   # keep-sorted start
   kern.randompid: 1

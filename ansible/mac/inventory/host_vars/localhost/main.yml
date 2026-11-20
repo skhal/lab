@@ -8,5 +8,4 @@
 ansible_become_method: ansible.builtin.sudo
 ansible_connection: local
 ansible_python_interpreter: auto_silent
-autoboot_delay_sec: 0
 # keep-sorted end
