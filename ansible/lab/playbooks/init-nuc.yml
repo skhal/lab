@@ -46,7 +46,7 @@
   tags: init-nuc-zfs
   roles:
     - role: lab.general.zfs
-    - role: zfs_scrub
+    - role: lab.general.zfs_scrub
 
 - name: Bootstrap users
   hosts: nuc.lab.net
