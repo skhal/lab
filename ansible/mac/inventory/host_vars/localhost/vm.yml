@@ -1,0 +1,49 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+# keep-sorted start
+vm_base:
+  url: https://download.freebsd.org/releases/VM-IMAGES/15.1-RELEASE/aarch64/Latest/FreeBSD-15.1-RELEASE-arm64-aarch64-BASIC-CLOUDINIT-zfs.raw.xz
+  sha256: 907ca57e12503124cc48da5d698da139459c60afa023aa12e82729d655e8e15b
+vm_cloud_init:
+  meta_data: |
+    instance-id: "{{ vm_hostname }}"
+    local-hostname: "{{ vm_hostname }}"
+  user_data: |
+    #cloud-config
+    fqdn: {{ vm_hostname }}
+    chpasswd:
+      expire: false
+      users:
+        - name: root
+          password: "{{ vm_root_password }}"
+    packages:
+      # keep-sorted start
+      - doas # for Ansible privilege escalation
+      - python315 # for Ansible
+      # keep-sorted end
+    users:
+      - name: op
+        gecos: Operator
+        groups: wheel
+        shell: /bin/tcsh
+        passwd: "{{ vm_op_password }}"
+        ssh_authorized_keys:
+          - "{{ lookup('ansible.builtin.file', vm_op_ssh_pubkey) }}"
+    write_files:
+      - path: /usr/local/etc/doas.conf
+        content: >
+          permit nopass :wheel
+        permissions: 0640
+        owner: root:wheel
+        defer: true # create after the users are created and packages are installed
+vm_disk_path: "{{ libvirt_share_path }}"
+vm_hostname: base.lab.net
+vm_image_cache_path: "{{ libvirt_cache_path }}/image"
+vm_log_path: "{{ libvirt_state_path }}/log"
+vm_op_ssh_pubkey: "{{ lookup('ansible.builtin.env', 'HOME') }}/.ssh/id_op.pub"
+vm_ssh_port: 2222
+# keep-sorted end
