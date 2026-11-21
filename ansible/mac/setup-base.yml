@@ -14,3 +14,6 @@
 
 - name: Init Base
   ansible.builtin.import_playbook: playbooks/init-base.yml
+
+- name: Setup Development Environment
+  ansible.builtin.import_playbook: playbooks/init-dev.yml

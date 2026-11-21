@@ -1,0 +1,24 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+- name: Install packages
+  hosts: base.lab.net
+  tags: init-dev-pkg
+  vars:
+    pkg_install:
+      # keep-sorted start
+      - bash # pre-commit uses it
+      - git
+      - go126
+      - py312-poetry
+      - python315
+      - tig
+      - tmux
+      - tree
+      - typos
+      # keep-sorted end
+  roles:
+    - role: lab.general.pkg
