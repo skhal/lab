@@ -1,0 +1,16 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+# NAME
+#   setup-base • master playbook to setup a local cluster on Mac using HVF
+#
+# SYNOPSIS
+#   ansible-playbook ./setup-base.yml
+---
+- name: Bootstrap Base
+  ansible.builtin.import_playbook: playbooks/bootstrap-base.yml
+
+- name: Init Base
+  ansible.builtin.import_playbook: playbooks/init-base.yml

@@ -6,19 +6,19 @@
 ---
 - name: Configure sysctl
   hosts: base.lab.net
-  tags: init-vm-sysctl
+  tags: init-base-sysctl
   roles:
     - role: lab.general.sysctl
 
 - name: Configure Loader
   hosts: base.lab.net
-  tags: init-vm-loader
+  tags: init-base-loader
   roles:
     - role: lab.general.autoboot
 
 - name: Configure services
   hosts: base.lab.net
-  tags: init-vm-rc
+  tags: init-base-rc
   roles:
     # keep-sorted start
     - role: lab.general.hostname
@@ -33,21 +33,21 @@
 
 - name: Configure ZFS
   hosts: base.lab.net
-  tags: init-vm-zfs
+  tags: init-base-zfs
   roles:
     - role: lab.general.zfs
     - role: lab.general.zfs_scrub
 
 - name: Bootstrap users
   hosts: base.lab.net
-  tags: init-vm-user
+  tags: init-base-user
   roles:
     - role: lab.general.user
     - role: lab.general.doas
 
 - name: Configure network
   hosts: base.lab.net
-  tags: init-vm-network
+  tags: init-base-network
   roles:
     - role: resolver
     - role: lab.general.routing
@@ -55,6 +55,6 @@
 
 - name: Configure remote access
   hosts: base.lab.net
-  tags: init-vm-access
+  tags: init-base-access
   roles:
     - role: lab.general.ssh
