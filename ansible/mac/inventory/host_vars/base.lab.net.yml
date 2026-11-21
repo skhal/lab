@@ -26,6 +26,8 @@ pkg_install:
   # keep-sorted end
 rc_debug: true
 rc_info: false
+resolver_desc: QEMU SLIRP resolver
+resolver_ip: 10.0.2.3
 # QEMU uses libslipr to emulate network in user space. It has the following
 # default settings:
 #   10.0.2.0/24   vnet

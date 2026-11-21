@@ -49,5 +49,6 @@
   hosts: base.lab.net
   tags: init-vm-network
   roles:
+    - role: resolver
     - role: lab.general.routing
     - role: lab.general.netif
