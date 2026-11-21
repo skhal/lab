@@ -35,6 +35,10 @@ resolver_ip: 10.0.2.3
 #   10.0.2.3      DNS resolver (forwarder)
 #   10.0.2.15-    DHCP address space
 routing_defaultrouter: 10.0.2.2
+ssh_allow_users:
+  - "{{ ansible_user }}"
+ssh_listen_addresses:
+  - 10.0.2.15
 sysctl_state:
   # keep-sorted start
   kern.randompid: 1

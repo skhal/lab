@@ -52,3 +52,9 @@
     - role: resolver
     - role: lab.general.routing
     - role: lab.general.netif
+
+- name: Configure remote access
+  hosts: base.lab.net
+  tags: init-vm-access
+  roles:
+    - role: lab.general.ssh
