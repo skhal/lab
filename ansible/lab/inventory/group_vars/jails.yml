@@ -5,7 +5,7 @@
 
 ---
 # keep-sorted start
-ansible_connection: jexec_over_ssh
+ansible_connection: lab.jail.jexec_over_ssh
 ansible_jexec_over_ssh_escalator: doas
 ansible_ssh_host: nuc.lab.net
 # keep-sorted end

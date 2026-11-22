@@ -54,7 +54,7 @@ EXAMPLES = r"""
 # Run ping module inside the jail using `doas jexec -U {{ ansible_user }}`
 - name: Example
   hosts: bar.example.com
-  connection: jexec_over_ssh
+  connection: lab.jail.jexec_over_ssh
   vars:
     ansible_ssh_host: foo.example.com
     ansible_jexec_over_ssh_jail_name: bar
@@ -67,7 +67,7 @@ EXAMPLES = r"""
 # `doas jexec -U operator`
 - name: Example
   hosts: bar.example.com
-  connection: jexec_over_ssh
+  connection: lab.jail.jexec_over_ssh
   vars:
     ansible_ssh_host: foo.example.com
     ansible_jexec_over_ssh_jail_name: bar
@@ -79,7 +79,7 @@ EXAMPLES = r"""
 
 # Same but using Ansible CLI:
 #   ansible foo.example.com \
-#       -c jexec_over_ssh \
+#       -c lab.jail.jexec_over_ssh \
 #       -e ansible_ssh_host=foo.example.com \
 #       -e ansible_jexec_over_ssh_jail_name=bar \
 #       -e ansible_jexec_over_ssh_escalator=doas \
