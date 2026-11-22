@@ -31,7 +31,7 @@
         name: nginx_enable
         value: true
 
-- name: Configure nginx
+- name: Configure nginx configs
   vars:
     _conf_files:
       # keep-sorted start
@@ -41,12 +41,10 @@
       - /usr/local/etc/nginx/conf.d/lab-ports.conf
       - /usr/local/etc/nginx/nginx.conf
       # keep-sorted end
-  block:
-    - name: Create configs
-      loop: "{{ _conf_files }}"
-      loop_control:
-        loop_var: _conf_file
-      ansible.builtin.include_tasks: "_create_conf.yml"
+  loop: "{{ _conf_files }}"
+  loop_control:
+    loop_var: _conf_file
+  ansible.builtin.include_tasks: "_create_conf.yml"
 
 - name: Configure newsyslog
   vars:
