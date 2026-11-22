@@ -4,7 +4,8 @@
 -- license that can be found in the LICENSE file.
 
 local function detect_filetype(file)
-	if not vim.fs.root(vim.fs.normalize(file), { "ansible.cfg" }) then
+	local ansible_root_files = { "ansible.cfg", "galaxy.yml" }
+	if not vim.fs.root(vim.fs.normalize(file), ansible_root_files) then
 		return "yaml"
 	end
 	return "yaml.ansible"
