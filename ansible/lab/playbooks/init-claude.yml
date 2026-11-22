@@ -40,4 +40,4 @@
       - gh
       # keep-sorted end
   roles:
-    - pkg
+    - lab.general.pkg
