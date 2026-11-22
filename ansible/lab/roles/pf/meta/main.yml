@@ -5,9 +5,12 @@
 
 ---
 dependencies:
+  # keep-sorted start newline_separated=yes
+  - role: lab.general.pflog
+    vars:
+      pflog_enable: true
+
   - role: lab.general.routing
     vars:
       routing_gateway_enable: true
-  - role: pflog
-    vars:
-      pflog_enable: true
+  # keep-sorted end
