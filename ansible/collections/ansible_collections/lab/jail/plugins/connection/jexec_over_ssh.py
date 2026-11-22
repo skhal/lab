@@ -11,98 +11,10 @@ from dataclasses import dataclass
 from functools import wraps
 from typing import Callable, Optional, override
 
-import yaml
 from ansible.errors import AnsibleError
 from ansible.module_utils.common.text.converters import to_text
 from ansible.plugins.connection import ssh
 from ansible.plugins.connection.ssh import Connection as SSHConnection
-
-DOCUMENTATION = r"""
-name: jexec_over_ssh
-short_description: Run tasks using jexec on the remote host.
-description:
-    - Run commands or put/fetch files to a jail on the remote host using jexec.
-options:
-    jail_name:
-        description:
-            - Jail name to connect to.
-        type: str
-        required: true
-        vars:
-            - name: ansible_jexec_over_ssh_jail_name
-    jail_user:
-        description:
-            - Jail user to run commands as using jexec(8) -U flag.
-        type: str
-        vars:
-            - name: ansible_user
-            - name: ansible_jexec_over_ssh_jail_user
-    escalator:
-        description:
-            - Method used to escalate jexec(8) privileges.
-        type: str
-        choices: [doas, sudo]
-        vars:
-            - name: ansible_jexec_over_ssh_escalator
-author: Samvel Khalatyan
-"""
-
-EXAMPLES = r"""
-# Setup: a hostname foo.example.com runs a jail bar with hostname
-# bar.example.com.
-
-# Run ping module inside the jail using `doas jexec -U {{ ansible_user }}`
-- name: Example
-  hosts: bar.example.com
-  connection: lab.jail.jexec_over_ssh
-  vars:
-    ansible_ssh_host: foo.example.com
-    ansible_jexec_over_ssh_jail_name: bar
-    ansible_jexec_over_ssh_escalator: doas
-  tasks:
-    - name: Ping the jail
-      ansible.builtin.ping:
-
-# Run ping module inside the jail with operator-user using
-# `doas jexec -U operator`
-- name: Example
-  hosts: bar.example.com
-  connection: lab.jail.jexec_over_ssh
-  vars:
-    ansible_ssh_host: foo.example.com
-    ansible_jexec_over_ssh_jail_name: bar
-    ansible_jexec_over_ssh_jail_user: operator
-    ansible_jexec_over_ssh_escalator: doas
-  tasks:
-    - name: Ping the jail
-      ansible.builtin.ping:
-
-# Same but using Ansible CLI:
-#   ansible foo.example.com \
-#       -c lab.jail.jexec_over_ssh \
-#       -e ansible_ssh_host=foo.example.com \
-#       -e ansible_jexec_over_ssh_jail_name=bar \
-#       -e ansible_jexec_over_ssh_escalator=doas \
-#       -m ping
-"""
-
-_DOC_OPTIONS_KEY = "options"
-
-
-def _merge_doc_options(src: str, dst: str) -> str:
-    """Merge documentation options from src to dst where src options have
-    overwrite priority.
-    """
-    doc = yaml.safe_load(dst) or {}
-    opts = doc.get(_DOC_OPTIONS_KEY, {})
-    opts.update((yaml.safe_load(src) or {}).get(_DOC_OPTIONS_KEY, {}))
-    doc[_DOC_OPTIONS_KEY] = opts
-    return yaml.safe_dump(doc)
-
-
-globals().update(
-    DOCUMENTATION=_merge_doc_options(ssh.DOCUMENTATION, DOCUMENTATION)
-)
 
 # keep-sorted start
 _CP_CMD = "cp"
