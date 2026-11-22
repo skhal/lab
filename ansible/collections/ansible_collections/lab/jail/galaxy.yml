@@ -1,0 +1,29 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+# SPDX-License-Identifier: BSD-3-Clause
+---
+namespace: lab
+name: jail
+version: 0.0.0
+
+description: roles and plugins to manage jails.
+readme: README.md
+
+authors:
+  - Samvel Khalatyan (https://github.com/skhal)
+
+license:
+  - BSD-3-Clause
+license_file: "LICENSE"
+
+repository: https://github.com/skhal/lab
+issues: https://github.com/skhal/lab/issues
+
+tags:
+  # keep-sorted start
+  - freebsd
+  - infrastructure
+  # keep-sorted end
