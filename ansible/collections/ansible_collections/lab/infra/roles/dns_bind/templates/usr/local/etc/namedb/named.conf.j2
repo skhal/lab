@@ -16,11 +16,11 @@
 // simple mistakes, you can break connectivity for affected parties,
 // or cause huge amounts of useless Internet traffic.
 
-{% if bind_tls is defined %}
-tls {{ bind_tls.name }} {
-	cert-file "{{ bind_tls.cert }}";
-	key-file "{{ bind_tls.key }}";
-	protocols { {{ (bind_tls.protocols | join(';')) if bind_tls.protocols is defined else 'TLSv1.3' }}; };
+{% if dns_bind_tls is defined %}
+tls {{ dns_bind_tls.name }} {
+	cert-file "{{ dns_bind_tls.cert }}";
+	key-file "{{ dns_bind_tls.key }}";
+	protocols { {{ (dns_bind_tls.protocols | join(';')) if dns_bind_tls.protocols is defined else 'TLSv1.3' }}; };
 };
 {% endif %}
 
@@ -36,8 +36,8 @@ options {
 // For named to be accessible to the network, comment this option, specify
 // the proper IP address, or delete this option.
 	listen-on
-  {%- if bind_listen_on.port is defined %} port {{ bind_listen_on.port }}{% endif %}
-  {%- if bind_listen_on.tls is defined %} tls {{ bind_listen_on.tls }}{% endif %} { {{ bind_listen_on.addr }}; };
+  {%- if dns_bind_listen_on.port is defined %} port {{ dns_bind_listen_on.port }}{% endif %}
+  {%- if dns_bind_listen_on.tls is defined %} tls {{ dns_bind_listen_on.tls }}{% endif %} { {{ dns_bind_listen_on.addr }}; };
 	allow-query	{ localnets; };
 	allow-transfer	{ "none"; };
 
@@ -398,6 +398,6 @@ zone "1.168.192.in-addr.arpa" {
 	};
 };
 */
-{% for zone in bind_zones | default([]) %}
+{% for zone in dns_bind_zones | default([]) %}
 include "/usr/local/etc/namedb/zones.conf.d/{{ zone }}.conf";
 {% endfor %}

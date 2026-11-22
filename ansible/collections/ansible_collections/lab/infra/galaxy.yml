@@ -22,6 +22,12 @@ license_file: "LICENSE"
 repository: https://github.com/skhal/lab
 issues: https://github.com/skhal/lab/issues
 
+dependencies:
+  community.general: ">=14.0.1"
+
 tags:
+  # keep-sorted start
   - freebsd
   - infrastructure
+  - networking
+  # keep-sorted end

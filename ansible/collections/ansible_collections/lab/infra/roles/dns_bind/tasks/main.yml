@@ -6,13 +6,13 @@
 ---
 - name: "Install DNS server"
   block:
-    - name: "Install DNS server {{ bind_package }}"
+    - name: "Install DNS server {{ dns_bind_package }}"
       become: true
       community.general.pkgng:
-        name: "{{ bind_package }}"
+        name: "{{ dns_bind_package }}"
 
 - name: "Enable service"
-  notify: "bind_start"
+  notify: "dns_bind_start"
   vars:
     _rc_file: /usr/local/etc/rc.conf.d/named
   block:
@@ -33,12 +33,12 @@
         value: true
 
 - name: "Update configuration"
-  notify: "bind_restart"
+  notify: "dns_bind_restart"
   block:
     - name: "Copy zone files"
-      when: bind_zones is defined
+      when: dns_bind_zones is defined
       ansible.builtin.include_tasks: "copy_zone.yml"
-      loop: "{{ bind_zones }}"
+      loop: "{{ dns_bind_zones }}"
       loop_control:
         loop_var: _zone
 

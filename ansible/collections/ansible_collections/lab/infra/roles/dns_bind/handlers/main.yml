@@ -5,20 +5,20 @@
 
 ---
 - name: "Start bind"
-  listen: "bind_start"
+  listen: "dns_bind_start"
   become: true
   ansible.builtin.service:
     name: named
     state: started
 
 - name: "Restart bind"
-  listen: "bind_restart"
+  listen: "dns_bind_restart"
   become: true
   ansible.builtin.service:
     name: named
     state: restarted
 
 - name: "Record bind restart"
-  listen: "bind_restart"
+  listen: "dns_bind_restart"
   ansible.builtin.set_fact:
-    bind_restarted: true
+    dns_bind_restarted: true
