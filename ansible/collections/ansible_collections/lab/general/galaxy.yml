@@ -1,11 +1,11 @@
+---
 # Copyright 2026 Samvel Khalatyan. All rights reserved.
 #
 # Use of this source code is governed by a BSD-style
 # license that can be found in the LICENSE file.
 
-#SPDX-License-Identifier: BSD-3-Clause
+# SPDX-License-Identifier: BSD-3-Clause
 
-### REQUIRED
 # The namespace of the collection.
 namespace: lab
 
@@ -20,19 +20,30 @@ version: 0.0.0
 readme: README.md
 
 authors:
-- Samvel Khalatyan (https://github.com/skhal)
+  - Samvel Khalatyan (https://github.com/skhal)
 
 description: general purpose roles and plugins.
 
 license:
-- BSD-3-Clause
+  - BSD-3-Clause
 
 # The path to the license file for the collection, relative to the root of the
 # collection.
-license_file: 'LICENSE'
+license_file: "LICENSE"
 
 # The URL of the originating SCM repository.
 repository: https://github.com/skhal/lab
 
 # The URL to the collection issue tracker.
 issues: https://github.com/skhal/lab/issues
+
+dependencies:
+  community.general: ">=14.0.1"
+
+# A list of tags to include for searching on Galaxy.
+tags:
+  - freebsd
+  - infrastructure
+  - networking
+  - system
+  - zfs
