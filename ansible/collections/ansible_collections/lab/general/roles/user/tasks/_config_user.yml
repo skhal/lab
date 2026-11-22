@@ -36,7 +36,7 @@
     _user_skel_pattern: >-
       {{
         [
-          _user.home | regex_replace('^/+', ''),
+          _user.home | relpath('/'),
           "dot.*.js"
         ] | path_join
       }}

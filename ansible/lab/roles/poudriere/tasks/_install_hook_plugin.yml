@@ -12,7 +12,7 @@
     src: >-
       {{
         [
-          _plugins_path | trim('/'),
+          _plugins_path | relpath('/'),
           _plugin.name
         ] | path_join
       }}

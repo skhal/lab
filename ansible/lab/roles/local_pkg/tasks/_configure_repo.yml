@@ -7,7 +7,7 @@
 - name: Write {{ _repo.conf }}
   become: true
   ansible.builtin.template:
-    src: "{{ _repo.conf | trim('/') }}.j2"
+    src: "{{ _repo.conf | relpath('/') }}.j2"
     dest: "{{ _repo.conf }}"
     owner: root
     group: wheel

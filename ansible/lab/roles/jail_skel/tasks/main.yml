@@ -56,7 +56,7 @@
       vars:
         _jailbase: "{{ jail_skel_zfs_dset_task.mountpoint | dirname }}"
       ansible.builtin.template:
-        src: "{{ _conf_file | trim('/') }}.j2"
+        src: "{{ _conf_file | relpath('/') }}.j2"
         dest: "{{ _conf_file }}"
         owner: root
         group: wheel
