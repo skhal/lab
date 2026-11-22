@@ -33,7 +33,7 @@
   hosts: all
   tags: create-dns-cache
   roles:
-    - role: local_unbound
+    - role: lab.infra.dns_unbound
   post_tasks:
     - name: Flush zones from cache
       when:

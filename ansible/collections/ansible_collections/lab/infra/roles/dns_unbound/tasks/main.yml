@@ -19,7 +19,7 @@
     group: unbound
     mode: u=rw,g=r,o=r
     validate: local-unbound-checkconf -f %s
-  notify: local_unbound_restart
+  notify: dns_unbound_restart
 
 - name: "Enable service"
   become: true
@@ -27,7 +27,7 @@
     path: /etc/rc.conf.d/local_unbound
     name: local_unbound_enable
     value: true
-  notify: local_unbound_start
+  notify: dns_unbound_start
 
 - name: "Configure resolver"
   become: true
