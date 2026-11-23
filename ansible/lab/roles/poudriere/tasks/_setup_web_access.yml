@@ -44,7 +44,7 @@
       vars:
         _conf_file: /usr/local/etc/nginx/nginx.conf
       ansible.builtin.template:
-        src: "{{ _conf_file | trim('/') }}.j2"
+        src: "{{ _conf_file | relpath('/') }}.j2"
         dest: "{{ _conf_file }}"
         owner: root
         group: wheel

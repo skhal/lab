@@ -26,6 +26,8 @@ pkg_install:
   # keep-sorted end
 rc_debug: true
 rc_info: false
+resolver_desc: QEMU SLIRP resolver
+resolver_ip: 10.0.2.3
 # QEMU uses libslipr to emulate network in user space. It has the following
 # default settings:
 #   10.0.2.0/24   vnet
@@ -33,6 +35,10 @@ rc_info: false
 #   10.0.2.3      DNS resolver (forwarder)
 #   10.0.2.15-    DHCP address space
 routing_defaultrouter: 10.0.2.2
+ssh_allow_users:
+  - "{{ ansible_user }}"
+ssh_listen_addresses:
+  - 10.0.2.15
 sysctl_state:
   # keep-sorted start
   kern.randompid: 1

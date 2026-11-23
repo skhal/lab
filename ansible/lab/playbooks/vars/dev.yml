@@ -29,7 +29,6 @@ pkg_install:
   - protobuf-go
   - py312-black # Python formatter
   - py312-isort # Python import sorter
-  - py312-poetry # Python environment and packaging
   - py312-pre-commit
   - py312-ty # Python LSP
   - python315

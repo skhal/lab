@@ -15,7 +15,7 @@
     _conf_file: /usr/local/etc/doas.conf
   become: true
   ansible.builtin.template:
-    src: "{{ _conf_file | trim('/') }}.j2"
+    src: "{{ _conf_file | relpath('/') }}.j2"
     dest: "{{ _conf_file }}"
     owner: root
     group: wheel
@@ -38,7 +38,7 @@
     - name: Configure PAM with doas
       become: true
       ansible.builtin.template:
-        src: "{{ _pam_file | trim('/') }}.j2"
+        src: "{{ _pam_file | relpath('/') }}.j2"
         dest: "{{ _pam_file }}"
         owner: root
         group: wheel

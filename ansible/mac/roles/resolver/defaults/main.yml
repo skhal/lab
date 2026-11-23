@@ -1,0 +1,14 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+# keep-sorted start newline_separated=yes
+# resolver_desc is optional comment for the resolver. It goes right before the
+# `nameserver ...` line in /etc/resolv.conf.
+resolver_desc: ""
+
+# resolver_ip is the nameserver IPv4 address.
+resolver_ip: "{{ undef(hint='DNS resolver') }}"
+# keep-sorted end

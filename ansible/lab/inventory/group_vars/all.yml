@@ -16,14 +16,10 @@
 ansible_async_dir: /var/tmp/.ansible_async
 ansible_python_interpreter: /usr/local/bin/python3
 ansible_user: op
-doas_conf:
-  - rule: permit nopass :wheel
-    description: Permit members of the wheel group to perform actions as root without password.
-local_pkg_hostname: pkg.lab.net
-local_unbound_forward_zones:
+dns_unbound_forward_zones:
   - name: "."
     addr: 192.168.10.1
-local_unbound_stub_zones:
+dns_unbound_stub_zones:
   - name: "lab.net"
     addr: 10.0.0.2@853
     tls_upstream: true
@@ -31,6 +27,10 @@ local_unbound_stub_zones:
     addr: 10.0.0.2@853
     tls_upstream: true
     type: always_transparent
+doas_conf:
+  - rule: permit nopass :wheel
+    description: Permit members of the wheel group to perform actions as root without password.
+local_pkg_hostname: pkg.lab.net
 openssl_ca_host: ssl.lab.net
 openssl_gen_rsa_fetch:
   source: pkgbuild.lab.net:/usr/local/etc/poudriere/ssl/pkg.pub

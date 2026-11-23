@@ -15,5 +15,6 @@
 #
 # keep-sorted start
 protols
+tombi-cli --git https://github.com/tombi-toml/tombi --tag v1.11.3
 typos-lsp --git https://github.com/tekumara/typos-lsp
 # keep-sorted end

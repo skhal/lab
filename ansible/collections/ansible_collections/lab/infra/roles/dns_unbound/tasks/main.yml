@@ -1,0 +1,40 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+- name: "Install package"
+  become: true
+  community.general.pkgng:
+    name: FreeBSD-local-unbound
+    state: present
+
+- name: "Configure service"
+  become: true
+  ansible.builtin.template:
+    src: var/unbound/unbound.conf.j2
+    dest: /var/unbound/unbound.conf
+    owner: unbound
+    group: unbound
+    mode: u=rw,g=r,o=r
+    validate: local-unbound-checkconf -f %s
+  notify: dns_unbound_restart
+
+- name: "Enable service"
+  become: true
+  community.general.sysrc:
+    path: /etc/rc.conf.d/local_unbound
+    name: local_unbound_enable
+    value: true
+  notify: dns_unbound_start
+
+- name: "Configure resolver"
+  become: true
+  ansible.builtin.copy:
+    dest: /etc/resolv.conf
+    content: |
+      nameserver 127.0.0.1
+    owner: root
+    group: wheel
+    mode: u=rw,g=r,o=r

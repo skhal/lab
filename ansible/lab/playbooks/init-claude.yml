@@ -8,7 +8,7 @@
   hosts: nuc.lab.net
   tags: claude-linux
   roles:
-    - linux
+    - lab.general.linux
 
 - name: Tune jail params
   hosts: nuc.lab.net
@@ -40,4 +40,4 @@
       - gh
       # keep-sorted end
   roles:
-    - pkg
+    - lab.general.pkg

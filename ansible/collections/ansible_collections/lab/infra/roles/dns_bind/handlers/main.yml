@@ -1,0 +1,24 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+- name: "Start bind"
+  listen: "dns_bind_start"
+  become: true
+  ansible.builtin.service:
+    name: named
+    state: started
+
+- name: "Restart bind"
+  listen: "dns_bind_restart"
+  become: true
+  ansible.builtin.service:
+    name: named
+    state: restarted
+
+- name: "Record bind restart"
+  listen: "dns_bind_restart"
+  ansible.builtin.set_fact:
+    dns_bind_restarted: true

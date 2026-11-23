@@ -6,21 +6,21 @@
 ---
 # keep-sorted start
 ansible_jexec_over_ssh_jail_name: dns
-bind_listen_on:
+certval_certificates:
+  - name: "DNS Certificate"
+    path: /usr/local/etc/namedb/ssl/bind.crt
+dns_bind_listen_on:
   port: 853
   addr: 10.0.0.2
   tls: local-tls
-bind_tls:
+dns_bind_tls:
   name: local-tls
   cert: /usr/local/etc/namedb/ssl/bind.crt
   key: /usr/local/etc/namedb/ssl/private/bind.key
   protocols:
     - TLSv1.3
-bind_zones:
+dns_bind_zones:
   - lab.net
-certval_certificates:
-  - name: "DNS Certificate"
-    path: /usr/local/etc/namedb/ssl/bind.crt
 openssl_gen_certs:
   - name: Bind Cert
     path: "/usr/local/etc/namedb/ssl/bind.crt"

@@ -1,0 +1,73 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+---
+- name: Save space
+  hosts: base.lab.net
+  tags: init-base-clean
+  vars:
+    _debug_path: /usr/lib/debug
+  tasks:
+    # ref: https://github.com/FreeBSDFoundation/blog/blob/93200ac1fc55def67092277aa8d7e7a953b2f6a1/three-ways-to-try-freebsd-in-under-five-minutes/configure.yml
+    - name: Remove {{ _debug_path }}
+      become: true
+      ansible.builtin.file:
+        path: "{{ _debug_path }}"
+        state: absent
+
+- name: Configure sysctl
+  hosts: base.lab.net
+  tags: init-base-sysctl
+  roles:
+    - role: lab.general.sysctl
+
+- name: Configure Loader
+  hosts: base.lab.net
+  tags: init-base-loader
+  roles:
+    - role: lab.general.autoboot
+
+- name: Configure services
+  hosts: base.lab.net
+  tags: init-base-rc
+  roles:
+    # keep-sorted start
+    - role: lab.general.hostname
+    - role: lab.general.moused
+    - role: lab.general.ntp
+    - role: lab.general.periodic
+    - role: lab.general.pkg
+    - role: lab.general.rc
+    - role: lab.general.syslog
+    - role: lab.general.timezone
+    # keep-sorted end
+
+- name: Configure ZFS
+  hosts: base.lab.net
+  tags: init-base-zfs
+  roles:
+    - role: lab.general.zfs
+    - role: lab.general.zfs_scrub
+
+- name: Bootstrap users
+  hosts: base.lab.net
+  tags: init-base-user
+  roles:
+    - role: lab.general.user
+    - role: lab.general.doas
+
+- name: Configure network
+  hosts: base.lab.net
+  tags: init-base-network
+  roles:
+    - role: resolver
+    - role: lab.general.routing
+    - role: lab.general.netif
+
+- name: Configure remote access
+  hosts: base.lab.net
+  tags: init-base-access
+  roles:
+    - role: lab.general.ssh
