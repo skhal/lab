@@ -34,8 +34,8 @@ package-mode = false  # use poetry only for dependency management
 ansible-core = ">=2.20"
 ansible-lint = "^26.11.0"
 # keep-sorted end
-libvirt-python = "^12.9.0"
-lxml = "^6.1.3"
+libvirt-python = { version = "^12.9.0", markers = "sys_platform == 'darwin'" }
+lxml = { version = "^6.1.3", markers = "sys_platform == 'darwin'" }
 pyfakefs = ">=6.3.2"
 pytest = ">=9.2.0"
 
