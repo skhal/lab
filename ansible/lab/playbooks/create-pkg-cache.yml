@@ -24,7 +24,7 @@
   hosts: pkg.lab.net
   tags: create-pkg-cache-server
   roles:
-    - role: local_pkg
+    - role: lab.infra.pkg_cache
 
 - name: Configure PKG repos
   hosts: all

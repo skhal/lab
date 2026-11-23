@@ -9,7 +9,6 @@ ansible_jexec_over_ssh_jail_name: pkg
 certval_certificates:
   - name: "PKG Certificate"
     path: /usr/local/etc/nginx/ssl/pkg.crt
-local_pkg_listen_on: 10.0.0.5
 openssl_gen_certs:
   # keep-sorted start
   - name: PKG freebsd-base Cert
@@ -33,6 +32,7 @@ openssl_gen_certs:
     group: www
     owner: www
   # keep-sorted end
+pkg_cache_listen_on: 10.0.0.5
 ssh_listen_addresses:
   - 10.0.0.5
 # keep-sorted end

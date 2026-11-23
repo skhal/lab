@@ -8,28 +8,28 @@
 # role      {{ role_name }}@{{ template_host }}
 # path      {{ template_fullpath | regex_replace('^.*ansible/', '') }}
 
-  proxy_cache_path /var/cache/pkg.freebsd-base levels=1:2 use_temp_path=off
-                   keys_zone=freebsd-base:10m inactive=30d;
+  proxy_cache_path /var/cache/pkg.freebsd-ports levels=1:2 use_temp_path=off
+                   keys_zone=freebsd-ports:10m inactive=14d;
 
   server {
-    listen        {{ local_pkg_listen_on }}:443 ssl;
-    server_name   freebsd-base.{{ inventory_hostname }};
+    listen        {{ pkg_cache_listen_on }}:443 ssl;
+    server_name   freebsd-ports.{{ inventory_hostname }};
 
     allow 10.0.0.0/24;  # local network
     deny  all;
 
-    ssl_certificate     /usr/local/etc/nginx/ssl/pkg.freebsd-base.crt;
-    ssl_certificate_key /usr/local/etc/nginx/ssl/private/pkg.freebsd-base.key;
+    ssl_certificate     /usr/local/etc/nginx/ssl/pkg.freebsd-ports.crt;
+    ssl_certificate_key /usr/local/etc/nginx/ssl/private/pkg.freebsd-ports.key;
 
-    access_log /var/log/nginx/freebsd-base.access.log proxy-pass;
+    access_log /var/log/nginx/freebsd-ports.access.log proxy-pass;
 
     # keep-sorted start
-    proxy_cache               freebsd-base;
+    proxy_cache               freebsd-ports;
     proxy_cache_bypass        $http_x_cache_bypass;
     proxy_cache_lock          on;  # concurrent MISS'es lock, first fetches.
     proxy_cache_lock_timeout  30s; # first fetch must complete in 30 seconds.
     proxy_cache_revalidate    on;  # conditional GET for outdated content.
-    proxy_cache_valid         200 206 14d; # cache validity
+    proxy_cache_valid         200 206 7d; # cache validity
     proxy_ssl_server_name     on;
     # keep-sorted end
 
@@ -43,7 +43,7 @@
       proxy_intercept_errors on;
       error_page 301 302 307 = @redirect;
 
-      add_header X-Cache "$upstream_cache_status freebsd-base";
+      add_header X-Cache "$upstream_cache_status freebsd-ports";
     }
 
     location @redirect {
@@ -61,7 +61,7 @@
       proxy_set_header  If-Modified-Since $http_if_modified_since;
       # keep-sorted end
 
-      add_header X-Cache "$orig_cache_status freebsd-base (before redirect)";
-      add_header X-Cache "$upstream_cache_status freebsd-base (redirect)";
+      add_header X-Cache "$orig_cache_status freebsd-ports (before redirect)";
+      add_header X-Cache "$upstream_cache_status freebsd-ports (redirect)";
     }
   }

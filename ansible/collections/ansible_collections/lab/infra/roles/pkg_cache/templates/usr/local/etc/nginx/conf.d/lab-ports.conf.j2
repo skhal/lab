@@ -9,7 +9,7 @@
 # path      {{ template_fullpath | regex_replace('^.*ansible/', '') }}
 
   server {
-    listen        {{ local_pkg_listen_on }}:443 ssl;
+    listen        {{ pkg_cache_listen_on }}:443 ssl;
     server_name   lab-ports.{{ inventory_hostname }};
 
     allow 10.0.0.0/24;  # local network

@@ -25,7 +25,7 @@
 
     - name: Enable nginx
       become: true
-      notify: local_pkg_start_nginx
+      notify: pkg_cache_start_nginx
       community.general.sysrc:
         path: "{{ _rc_file }}"
         name: nginx_enable

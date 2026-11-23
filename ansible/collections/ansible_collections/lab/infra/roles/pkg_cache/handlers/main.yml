@@ -6,14 +6,14 @@
 ---
 - name: Start nginx
   become: true
-  listen: local_pkg_start_nginx
+  listen: pkg_cache_start_nginx
   ansible.builtin.service:
     name: nginx
     state: started
 
 - name: Restart nginx
   become: true
-  listen: local_pkg_restart_nginx
+  listen: pkg_cache_restart_nginx
   ansible.builtin.service:
     name: nginx
     state: restarted
