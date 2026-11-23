@@ -39,6 +39,9 @@ lxml = "^6.1.3"
 pyfakefs = ">=6.3.2"
 pytest = ">=9.2.0"
 
+[tool.poetry.requires-plugins]
+poetry-plugin-patch = { path = "poetry/plugin/patch", develop = true }
+
 [tool.pytest.ini_options]
 addopts = [
   "--import-mode=importlib",

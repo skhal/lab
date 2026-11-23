@@ -12,6 +12,7 @@ repos:
   - id: check-executables-have-shebangs
   - id: check-shebang-scripts-are-executable
   - id: end-of-file-fixer
+    # keep-sorted start skip_lines=3,-1
     exclude: |
       (?x)^(
          .*/testdata/.*
@@ -19,7 +20,9 @@ repos:
         |.*\.diff\.j2
         |.*\.patch
       )$
+    # keep-sorted end
   - id: trailing-whitespace
+    # keep-sorted start skip_lines=3,-1
     exclude: |
       (?x)^(
          .*/testdata/.*
@@ -28,6 +31,7 @@ repos:
         |.*\.patch
         |infra/net\.lab.*
       )$
+    # keep-sorted end
 
 - repo: local
   hooks:
@@ -343,17 +347,19 @@ repos:
     language: system
     stages: [pre-commit]
     exclude_types: [json]
+    # keep-sorted start skip_lines=3,-1
     exclude: |
       (?x)^(
          MODULE\.bazel\.lock
         | ansible/collections/ansible_collections/.*/LICENSE
         | poetry\.lock
-        |.*_string\.go
         |.*/(test)?data/.*
         |.*\.diff
         |.*\.diff\.j2
+        |.*\.lock
         |.*\.patch
         |.*\.pb\.go
+        |.*_string\.go
         |\.agents/skills/.*/SKILL\.md
         |\.claude/skills/.*/SKILL\.md
         |go\.(mod|sum)
@@ -362,6 +368,7 @@ repos:
         |nvim/plugin/lab-skeleton/share/new.*
         |ports/.*/(distinfo|pkg-descr|files/.*)
       )$
+    # keep-sorted end
   - id: nosubmit
     name: "No-submit"
     description: "NOSUMIT should not be set"
@@ -372,12 +379,14 @@ repos:
     description: "a TODO comment must include an issue"
     entry: check-todo
     language: system
+    # keep-sorted start skip_lines=3,-1
     exclude: |
       (?x)^(
          .*\.diff
         |.*\.diff\.j2
         |.*\.patch
       )$
+    # keep-sorted end
   - id: keep-sorted
     name: "Keep sorted"
     description: "keep lines sorted"
@@ -395,10 +404,12 @@ repos:
     entry: typos
     language: system
     types: [text]
+    # keep-sorted start skip_lines=3,-1
     exclude: |
       (?x)^(
          .*\.diff
         |.*\.diff\.j2
-        |infra/net\.lab.*\.conf
         |.*\.patch
+        |infra/net\.lab.*\.conf
       )$
+    # keep-sorted end

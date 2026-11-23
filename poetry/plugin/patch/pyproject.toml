@@ -4,17 +4,20 @@
 # license that can be found in the LICENSE file.
 
 [project]
-name = "poetry-patch"
+name = "poetry-plugin-patch"
 version = "0.0.0"
 description = "Poetry patch command to patch packages."
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = ">=3.12,<4.0"
 authors = [{ name = "Samvel Khalatyan", email = "sn.khalatyan@gmail.com" }]
-dependencies = []
+dependencies = ["poetry (>=2.5.1,<3.0.0)"]
+
+[project.entry-points."poetry.application.plugin"]
+patch = "poetry_plugin_patch.plugin:PatchApplicationPlugin"
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
-packages = [{ include = "poetry_patch", from = "src" }]
+packages = [{ include = "poetry_plugin_patch", from = "src" }]
