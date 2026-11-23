@@ -7,6 +7,5 @@
 
 # keep-sorted start
 prettier
-tombi
 vtsls@vtsls/language-server
 # keep-sorted end
