@@ -1,0 +1,20 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+[project]
+name = "poetry-patch"
+version = "0.0.0"
+description = "Poetry patch command to patch packages."
+readme = "README.md"
+requires-python = ">=3.12"
+authors = [{ name = "Samvel Khalatyan", email = "sn.khalatyan@gmail.com" }]
+dependencies = []
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+packages = [{ include = "poetry_patch", from = "src" }]
