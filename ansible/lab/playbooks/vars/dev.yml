@@ -27,11 +27,10 @@ pkg_install:
   - npm
   - protobuf
   - protobuf-go
-  - py312-black # Python formatter
-  - py312-isort # Python import sorter
   - py312-pre-commit
   - py312-ty # Python LSP
   - python315
+  - ruff # Python linter in Rust
   - rust
   - sccache # cache Rust builds
   - stylua # Lua formatter

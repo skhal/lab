@@ -19,13 +19,6 @@ repository = "https://github.com/skhal/lab"
 requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
 
-[tool.black]
-line-length = 80
-
-[tool.isort]
-profile = "black"
-multi_line_output = 3
-
 [tool.poetry]
 package-mode = false  # use poetry only for dependency management
 
@@ -46,3 +39,30 @@ poetry-plugin-patch = { path = "poetry/plugin/patch", develop = true }
 addopts = [
   "--import-mode=importlib",
 ]
+
+[tool.ruff]
+indent-width = 4
+line-length = 80
+
+[tool.ruff.format]
+indent-style = "space"
+
+[tool.ruff.lint]
+ignore = [
+  "UP035",  # import from collections.abc: noisy in existing code
+]
+select = [
+  "B",  # flake8-bugbear
+  "E",  # pycodestyle errors
+  "F",  # pyflakes
+  "I",  # isort
+  "UP",  # pyupgrade
+  "W",  # pycodestyle warnings
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["poetry_plugin_patch"]
+
+[tool.ruff.lint.per-file-ignores]
+# __init__.py files re-export names.
+"**/__init__.py" = ["F401"]

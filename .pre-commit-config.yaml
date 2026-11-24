@@ -254,14 +254,20 @@ repos:
     args: ["-skip_all_colons"]
 
   # Python
-  - id: py-fmt
-    name: "Python format"
-    entry: black
+  - id: py-lint
+    name: "Python lint"
+    description: "lint Python files and sort includes"
+    entry: ruff
+    args:
+    - check
+    - --fix
     language: system
     types_or: [python]
-  - id: py-isort
-    name: "Python sort includes"
-    entry: isort
+  - id: py-fmt
+    name: "Python format"
+    entry: ruff
+    args:
+    - format
     language: system
     types_or: [python]
   - id: py-test

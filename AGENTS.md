@@ -144,8 +144,8 @@ from the repository root:
   format with `shfmt`. Shell executables have no file extension. Run project
   scripts with `sh`, not `bash`.
 - **Markdown, YAML, JSON, TOML, Lua, Python**: use the repo formatters
-  (`markdownfmt`, `yamlfmt`, `prettier`, `tombi`, `stylua`, `black` +
-  `isort`).
+  (`markdownfmt`, `yamlfmt`, `prettier`, `tombi`, `stylua`,
+  `ruff`).
 - **Sorted lists.** Respect `keep-sorted` blocks.
 - **No** `NOSUBMIT` markers, binary files, or untracked-issue `TODO`s (checked
   by `check-nosubmit`, `check-todo`, `check-issue`).
