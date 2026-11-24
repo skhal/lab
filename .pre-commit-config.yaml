@@ -261,6 +261,7 @@ repos:
     args:
     - check
     - --fix
+    - --force-exclude
     language: system
     types_or: [python]
   - id: py-fmt
@@ -268,6 +269,7 @@ repos:
     entry: ruff
     args:
     - format
+    - --force-exclude
     language: system
     types_or: [python]
   - id: py-test
