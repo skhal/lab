@@ -8,7 +8,7 @@
 XDG_CONFIG_HOME ?= ${HOME}/.config
 NVIM_CONFIG_PATH = ${XDG_CONFIG_HOME}/nvim
 
-INSTALL_PATHS = after ftdetect lua pack
+INSTALL_PATHS = after colors ftdetect lua pack
 
 SOURCES = init.lua
 INSTALL_TARGETS = ${SOURCES:S,^,${NVIM_CONFIG_PATH}/,}

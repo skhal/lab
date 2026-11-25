@@ -8,3 +8,5 @@ vim.o.colorcolumn = "80"
 for _, group in pairs({ "Normal", "NormalFloat" }) do
 	vim.api.nvim_set_hl(0, group, { bg = "none" })
 end
+
+vim.cmd.colorscheme("claude")
