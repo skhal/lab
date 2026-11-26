@@ -1,0 +1,95 @@
+From b6e603a813e413bbbc0e4892afaaa55667e374bc Mon Sep 17 00:00:00 2001
+From: Samvel Khalatyan <sn.khalatyan@gmail.com>
+Date: Sun, 28 Jun 2026 14:01:59 -0500
+Subject: [PATCH] Apply directives to comment lines.
+
+Google keep-sorted (https://github.com/google/keep-sorted) helps to keep YAML
+lines sorted between two marker comments, which is helpful in Ansible
+playbooks, pre-commit configs, etc.:
+
+    $ cat -n /tmp/example.yml
+    1  ---
+    2  example:
+    3    # keep-sorted start
+    4    - name: a
+    5    - name: c
+    6      b: bar
+    7    # keep-sorted end
+
+Yamllint reports "rule:comments-indentation" violation on line 7:
+
+    $ yamllint -v
+    yamllint 1.38.0
+
+    $ yamllint /tmp/example.yml
+    /tmp/example.yml
+      7:3       warning  comment not indented like content  (comments-indentation)
+
+A directive to skip the next line does not work either:
+
+    $ cat -n /tmp/example_nolint.yml
+    1  ---
+    2  example:
+    3    # keep-sorted start
+    4    - name: one
+    5    - name: two
+    6      b: bar
+    7    # yamllint disable-line rule:comments-indentation
+    8    # keep-sorted end
+
+    $ yamllint /tmp/example_nolint.yml
+    /tmp/example_nolint.yml
+      7:3       warning  comment not indented like content  (comments-indentation)
+
+Note that the violation is for the directive itself because Yamllint
+does not apply directives to comments.
+
+This change makes Yamllint apply the "next line directive" to comments.
+---
+ yamllint/linter.py | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/yamllint/linter.py b/yamllint/linter.py
+index 74bfeae..0f57807 100644
+--- a/yamllint/linter.py
++++ b/yamllint/linter.py
+@@ -44,6 +44,7 @@ class LintProblem:
+         self.desc = desc
+         #: Identifier of the rule that detected the problem
+         self.rule = rule
++        self.iscommentline = False
+         self.level = None
+ 
+     @property
+@@ -129,6 +130,10 @@ def get_cosmetic_problems(buffer, conf, filepath):
+     disabled_for_line = DisableLineDirective()
+     disabled_for_next_line = DisableLineDirective()
+ 
++    def disabled_for_next_comment(problem):
++        return (problem.iscommentline and
++                disabled_for_next_line.is_disabled_by_directive(problem))
++
+     for elem in parser.token_or_comment_or_line_generator(buffer):
+         if isinstance(elem, parser.Token):
+             for rule in token_rules:
+@@ -145,6 +150,7 @@ def get_cosmetic_problems(buffer, conf, filepath):
+                 rule_conf = conf.rules[rule.ID]
+                 for problem in rule.check(rule_conf, elem):
+                     problem.rule = rule.ID
++                    problem.iscommentline = True
+                     problem.level = rule_conf['level']
+                     cache.append(problem)
+ 
+@@ -165,7 +171,8 @@ def get_cosmetic_problems(buffer, conf, filepath):
+             # problems found (but filter them according to the directives)
+             for problem in cache:
+                 if not (disabled_for_line.is_disabled_by_directive(problem) or
+-                        disabled.is_disabled_by_directive(problem)):
++                        disabled.is_disabled_by_directive(problem) or
++                        disabled_for_next_comment(problem)):
+                     yield problem
+ 
+             disabled_for_line = disabled_for_next_line
+-- 
+2.56.1
+

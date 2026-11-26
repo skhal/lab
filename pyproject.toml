@@ -35,6 +35,10 @@ pytest = ">=9.2.0"
 [tool.poetry.requires-plugins]
 poetry-plugin-patch = { path = "poetry/plugin/patch", develop = true }
 
+[[tool.poetry-plugin-patch.spec]]
+package = "yamllint"
+patches = ["third_party/patch/yamllint/1.38.0/0001-Apply-directives-to-comment-lines.patch"]
+
 [tool.pytest.ini_options]
 addopts = [
   "--import-mode=importlib",
