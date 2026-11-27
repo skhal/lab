@@ -16,6 +16,16 @@ on:
         description: "Folder to run pytest from, relative to the repo root."
         required: true
         type: string
+      project:
+        description: >-
+          Folder with pyproject.toml and poetry.lock to install dependencies from, relative to the repo root.
+        type: string
+        default: "."
+      install-args:
+        description: >-
+          Extra arguments to poetry install. Use an empty value to install the project itself along with its dependencies.
+        type: string
+        default: "--no-root"
   # Trigger from other workflows
   workflow_call:
     inputs:
@@ -26,6 +36,16 @@ on:
         description: "Folder to run pytest from, relative to the repo root."
         required: true
         type: string
+      project:
+        description: >-
+          Folder with pyproject.toml and poetry.lock to install dependencies from, relative to the repo root.
+        type: string
+        default: "."
+      install-args:
+        description: >-
+          Extra arguments to poetry install. Use an empty value to install the project itself along with its dependencies.
+        type: string
+        default: "--no-root"
 
 permissions:
   contents: read
@@ -52,9 +72,13 @@ jobs:
       with:
         python-version: ${{ inputs.python-version }}
         cache: poetry
+        cache-dependency-path: ${{ inputs.project }}/poetry.lock
 
     - name: Install dependencies
-      run: poetry install --no-root
+      working-directory: ${{ inputs.project }}
+      env:
+        INSTALL_ARGS: ${{ inputs.install-args }}
+      run: poetry install ${INSTALL_ARGS}
 
     - name: Test
       working-directory: ${{ inputs.package }}

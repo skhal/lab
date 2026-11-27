@@ -1,0 +1,40 @@
+# Copyright 2026 Samvel Khalatyan. All rights reserved.
+#
+# Use of this source code is governed by a BSD-style
+# license that can be found in the LICENSE file.
+
+name: Poetry CI
+
+on:
+  push:
+    branches: ["main"]
+    paths: ['poetry/**']
+  schedule:
+  # Everyday Monday at 6:00 UTC
+  - cron: '0 6 * * MON'
+
+permissions:
+  contents: read
+
+jobs:
+  bootstrap:
+    uses: ./.github/workflows/_ci_analyze.yml
+    with:
+      base: ${{ github.event.before }}
+      py-root: poetry
+      py-all: ${{ github.event_name == 'schedule' }}
+
+  ci:
+    needs: bootstrap
+    if: needs.bootstrap.outputs.py_packages != '[]'
+    strategy:
+      fail-fast: false
+      matrix:
+        package: ${{ fromJSON(needs.bootstrap.outputs.py_packages) }}
+        python-version: ['3.13', '3.14', '3.15']
+    uses: ./.github/workflows/_ci_python.yml
+    with:
+      package: ./${{ matrix.package }}
+      project: ./${{ matrix.package }}
+      install-args: ""
+      python-version: ${{ matrix.python-version }}

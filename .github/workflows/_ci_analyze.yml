@@ -14,6 +14,16 @@ on:
           Commit to diff against, e.g. github.event.before of a push. Falls back to the parent of HEAD when empty, all zeros (new branch), or not fetchable (force push).
         type: string
         default: ""
+      py-root:
+        description: >-
+          Folder to search for Python packages, e.g. poetry. A package is a folder with pyproject.toml. Leave empty to skip the package lookup.
+        type: string
+        default: ""
+      py-all:
+        description: >-
+          List all packages under py-root, not only the ones with changes.
+        type: boolean
+        default: false
     outputs:
       bzl_changes:
         description: "Bazel changes detected when set to true."
@@ -27,6 +37,10 @@ on:
       py_changes:
         description: "Python changes detected when set to true."
         value: ${{ jobs.analyze.outputs.py_changes }}
+      py_packages:
+        description: >-
+          JSON array of Python package folders (relative to the repo root) under py-root that have changes, or all of them when py-all is set.
+        value: ${{ jobs.analyze.outputs.py_packages }}
 
 permissions:
   contents: read
@@ -42,6 +56,7 @@ jobs:
       cc_changes: ${{ steps.cc_changes.outputs.detected }}
       go_changes: ${{ steps.go_changes.outputs.detected }}
       py_changes: ${{ steps.py_changes.outputs.detected }}
+      py_packages: ${{ steps.py_packages.outputs.packages }}
 
     steps:
     - name: Checkout
@@ -101,3 +116,34 @@ jobs:
           detected=true
         fi
         echo "detected=${detected}" | tee $GITHUB_OUTPUT
+
+    # A package is the nearest folder with pyproject.toml above a changed file.
+    # Any change under the package counts, e.g. pyproject.toml, poetry.lock.
+    - name: Find Python Packages
+      id: py_packages
+      env:
+        ALL: ${{ inputs.py-all }}
+        ROOT: ${{ inputs.py-root }}
+      run: |
+        : > "${RUNNER_TEMP}/py_packages"
+        if [ -n "${ROOT}" ]; then
+          if [ "${ALL}" = true ]; then
+            git ls-files -- "${ROOT}" |
+              grep '/pyproject\.toml$' |
+              while IFS= read -r f; do dirname "${f}"; done >> "${RUNNER_TEMP}/py_packages"
+          else
+            grep "^${ROOT}/" "${RUNNER_TEMP}/changed_files" |
+              while IFS= read -r f; do
+                d=$(dirname "${f}")
+                while [ "${d}" != "${ROOT}" ] && [ "${d}" != "." ]; do
+                  if [ -f "${d}/pyproject.toml" ]; then
+                    echo "${d}" >> "${RUNNER_TEMP}/py_packages"
+                    break
+                  fi
+                  d=$(dirname "${d}")
+                done
+              done
+          fi
+        fi
+        packages=$(sort -u "${RUNNER_TEMP}/py_packages" | jq -R . | jq -sc .)
+        echo "packages=${packages}" | tee $GITHUB_OUTPUT
