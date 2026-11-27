@@ -77,4 +77,9 @@ known-first-party = ["poetry_plugin_patch"]
 
 [tool.ruff.lint.per-file-ignores]
 # __init__.py files re-export names.
-"**/__init__.py" = ["F401"]
+"**/__init__.py" = ["D", "F401"]
+# Tests do not need docstrings.
+"**/tests/**" = ["D"]
+"**/*_test.py" = ["D"]
+"**/test_*.py" = ["D"]
+"**/conftest.py" = ["D"]
