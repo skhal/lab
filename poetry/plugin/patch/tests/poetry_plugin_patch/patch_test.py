@@ -5,6 +5,7 @@
 
 
 import difflib
+import subprocess
 from contextlib import AbstractContextManager, nullcontext
 from dataclasses import dataclass, field
 from importlib.metadata import Distribution, PathDistribution
@@ -159,6 +160,15 @@ def snapshot(dist: Distribution) -> dict[str, str]:
         else:
             tree[str(rel)] = p.read_text()
     return tree
+
+
+def _is_gnu_patch() -> bool:
+    """Detect the patch(1) flavor: GNU on Linux, BSD on FreeBSD."""
+
+    proc = subprocess.run(
+        ("patch", "--version"), capture_output=True, text=True, check=False
+    )
+    return "GNU patch" in proc.stdout
 
 
 @dataclass(frozen=True)
@@ -326,8 +336,9 @@ _TESTS = (
             expect=pytest.raises(PackagePatchError),
         ),
         marks=pytest.mark.xfail(
+            condition=not _is_gnu_patch(),
             strict=True,
-            reason="_is_patched() treats a mismatched reverse del as patched",
+            reason="BSD patch applies a reversed delete to an existing file",
         ),
         id="invalid delete patch",
     ),
