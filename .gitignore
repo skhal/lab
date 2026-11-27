@@ -85,3 +85,6 @@ compile_commands.json
 # Ansible
 .ansible
 .collections
+
+# ty LSP sometimes crashes
+*.core

@@ -20,7 +20,12 @@ from typing import override
 from poetry.console.commands.env_command import EnvCommand
 
 from poetry_plugin_patch._error import format_exc
-from poetry_plugin_patch.error import PatchError
+from poetry_plugin_patch.error import (
+    AlreadyPatchedError,
+    PackageNotFoundError,
+    PatchError,
+)
+from poetry_plugin_patch.patch import patch
 from poetry_plugin_patch.spec import PatchSpec
 
 
@@ -75,6 +80,18 @@ patches = ["path/to/file.patch"]
         return 0
 
     def _handle(self) -> None:
-        _ = tuple(PatchSpec.parse(s, self.pyproject_base) for s in self.specs)
+        specs = tuple(
+            PatchSpec.parse(s, self.pyproject_base) for s in self.specs
+        )
 
-        # TODO(https://github.com/skhal/lab/issues/693): apply patches
+        for spec in specs:
+            dist = self.env.site_packages.find_distribution(spec.package)
+            if dist is None:
+                raise PackageNotFoundError(spec.package)
+
+            try:
+                patch(dist, spec)
+            except AlreadyPatchedError as err:
+                self.line(str(err))
+            else:
+                self.line(f"patched {spec.package}")
