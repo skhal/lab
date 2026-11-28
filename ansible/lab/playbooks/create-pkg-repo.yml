@@ -44,7 +44,10 @@
     - name: Install repository
       vars:
         local_pkg_repos:
-          lab-ports: {}
+          lab-ports:
+            rsa_fetch:
+              source: pkgbuild.lab.net:/usr/local/etc/poudriere/ssl/pkg.pub
+              target: /usr/local/etc/pkg/ssl/lab-ports.pub
       ansible.builtin.include_role:
         name: local_pkg
         tasks_from: configure_repos

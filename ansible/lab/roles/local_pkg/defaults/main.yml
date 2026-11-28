@@ -14,15 +14,15 @@ local_pkg_hostname: ""
 # The key is one of the supported repository names from the role's templates.
 #
 # The values is optional and has the following structure when present:
-#   orig  string? the old repository name this one replaces. This field
-#                 triggers an update of `repository` annotation in installed
-#                 packages from <orig> value to <name> to prefer newly
-#                 installed repository in pkg-upgrade(8).
+#   orig      string? the old repository name this one replaces. This field
+#                     triggers an update of `repository` annotation in installed
+#                     packages from <orig> value to <name> to prefer newly
+#                     installed repository in pkg-upgrade(8).
+#   rsa_fetch dict?   fetch RSA key from the remote host.
+#
+# The rsa_fetch is an optional field and has the following structure when set:
+#   source  string  remote public key location in the form of `host:path` where
+#                   the path is absolute.
+#   target  string  destination path to store the fetched RSA key.
 local_pkg_repos: "{{ undef(hint='a map of repository configurations to install') }}"
-
-# local_pkg_rsa_fetch defines RSA public key to fetch. It expects the
-# following structure:
-#   - source  string  path to the remote public key in the form host:/path
-#   - target  string  path to the public key to save
-local_pkg_rsa_fetch: "{{ undef(hint='RSA public key source and targets') }}"
 # keep-sorted end

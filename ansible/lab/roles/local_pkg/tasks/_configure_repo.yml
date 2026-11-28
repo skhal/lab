@@ -32,3 +32,34 @@
         cmd: pkg-mv-repo.sh {{ _repo.orig }} {{ _repo.name }}
       register: local_pkg_update_pkg_repo_task
       changed_when: local_pkg_update_pkg_repo_task.stdout != ''
+
+- name: Fetch public key
+  when: _repo.rsa_fetch is defined
+  vars:
+    _src_host: "{{ _repo.rsa_fetch.source | split(':', 1) | first }}"
+    _src_path: "{{ _repo.rsa_fetch.source | split(':', 1) | last }}"
+    _dst_path: "{{ _repo.rsa_fetch.target }}"
+  block:
+    - name: Create path for public key
+      become: true
+      ansible.builtin.file:
+        path: "{{ _dst_path | dirname }}"
+        state: directory
+        owner: root
+        group: wheel
+        mode: u=rwx,g=rx,o=rx
+
+    - name: Load public key
+      ansible.builtin.slurp:
+        src: "{{ _src_path }}"
+      register: local_pkg_public_key_task
+      delegate_to: "{{ _src_host }}"
+
+    - name: Write public key
+      become: true
+      ansible.builtin.copy:
+        dest: "{{ _dst_path }}"
+        content: "{{ local_pkg_public_key_task.content | b64decode }}"
+        owner: root
+        group: wheel
+        mode: u=rw,g=r,o=r
