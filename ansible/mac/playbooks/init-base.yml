@@ -62,7 +62,7 @@
   hosts: base.lab.net
   tags: init-base-network
   roles:
-    - role: resolver
+    - role: lab.general.resolver
     - role: lab.general.routing
     - role: lab.general.netif
 
