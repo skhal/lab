@@ -6,6 +6,7 @@
 # List of Node.js packages to install. Keep one package per line.
 
 # keep-sorted start
+ansible-language-server@ansible/ansible-language-server
 prettier
 vtsls@vtsls/language-server
 # keep-sorted end
