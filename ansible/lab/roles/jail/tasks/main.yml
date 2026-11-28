@@ -109,10 +109,9 @@
       failed_when: false
       changed_when: false
 
-    # noqa command-instead-of-module
     - name: "Run jail {{ jail_name }}"
       become: true
-      ansible.builtin.command:
+      ansible.builtin.command: # noqa: command-instead-of-module
         cmd: service jail start {{ jail_name }}
       when: jail_jls_task.rc != 0
       register: jail_service_restart_result

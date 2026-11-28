@@ -31,10 +31,10 @@ doas_conf:
   - rule: permit nopass :wheel
     description: Permit members of the wheel group to perform actions as root without password.
 local_pkg_hostname: pkg.lab.net
-openssl_ca_host: ssl.lab.net
-openssl_gen_rsa_fetch:
+local_pkg_rsa_fetch:
   source: pkgbuild.lab.net:/usr/local/etc/poudriere/ssl/pkg.pub
   target: /usr/local/etc/pkg/ssl/lab-ports.pub
+openssl_ca_host: ssl.lab.net
 pkg_aliases:
   # keep-sorted start
   outdated: "version -vRL="

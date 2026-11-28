@@ -41,11 +41,6 @@
   hosts: all
   tags: create-pkg-repo-install
   tasks:
-    - name: Fetch public key
-      ansible.builtin.include_role:
-        name: openssl_gen
-        tasks_from: rsa_fetch
-
     - name: Install repository
       vars:
         local_pkg_repos:

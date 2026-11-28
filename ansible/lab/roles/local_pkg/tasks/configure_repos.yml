@@ -32,3 +32,34 @@
               })
           }}
       ansible.builtin.include_tasks: _configure_repo.yml
+
+- name: Fetch public key
+  when: local_pkg_rsa_fetch is defined
+  vars:
+    _src_host: "{{ local_pkg_rsa_fetch.source | split(':', 1) | first }}"
+    _src_path: "{{ local_pkg_rsa_fetch.source | split(':', 1) | last }}"
+    _dst_path: "{{ local_pkg_rsa_fetch.target }}"
+  block:
+    - name: Create path for public key
+      become: true
+      ansible.builtin.file:
+        path: "{{ _dst_path | dirname }}"
+        state: directory
+        owner: root
+        group: wheel
+        mode: u=rwx,g=rx,o=rx
+
+    - name: Load public key
+      ansible.builtin.slurp:
+        src: "{{ _src_path }}"
+      register: local_pkg_public_key_task
+      delegate_to: "{{ _src_host }}"
+
+    - name: Write public key
+      become: true
+      ansible.builtin.copy:
+        dest: "{{ _dst_path }}"
+        content: "{{ local_pkg_public_key_task.content | b64decode }}"
+        owner: root
+        group: wheel
+        mode: u=rw,g=r,o=r

@@ -19,4 +19,10 @@ local_pkg_hostname: ""
 #                 packages from <orig> value to <name> to prefer newly
 #                 installed repository in pkg-upgrade(8).
 local_pkg_repos: "{{ undef(hint='a map of repository configurations to install') }}"
+
+# local_pkg_rsa_fetch defines RSA public key to fetch. It expects the
+# following structure:
+#   - source  string  path to the remote public key in the form host:/path
+#   - target  string  path to the public key to save
+local_pkg_rsa_fetch: "{{ undef(hint='RSA public key source and targets') }}"
 # keep-sorted end
